@@ -3,760 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GeoArmy — Comunidad de Geovannyrk</title>
-  <meta name="description" content="Cuartel general de la comunidad GeoArmy. Streams de Fortnite y Overwatch con Geovannyrk en Twitch."/>
+  <meta name="robots" content="noindex"/>
+  <title>Conectando… — GeoArmy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css"/>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-VT78CC8X2V');
-  </script>
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="../../css/v3-theme.css"/>
+  <style>
+    /* Pequeño spinner propio, no depende de nada más del sitio */
+    .cb-spin {
+      display: inline-block; width: 34px; height: 34px; border-radius: 50%;
+      border: 3px solid rgba(169,112,255,.25); border-top-color: #a970ff;
+      animation: cbSpin 0.8s linear infinite; margin-bottom: .9rem;
+    }
+    @keyframes cbSpin { to { transform: rotate(360deg); } }
+  </style>
   <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <!-- Tema V3 (espacial/holográfico) — antes vivía inline aquí, ahora es un archivo
-       compartido para poder reusarlo en mi-geoarmy.html y páginas nuevas -->
-  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <script src="../../js/geoarmy-config.js"></script>
 </head>
 <body>
-
-  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
-
-  <!-- Tema V3: ver css/v3-theme.css (antes este bloque estaba embebido aquí) -->
-
-  <div class="v3-page">
+  <div class="v3-page" style="min-height:100vh;">
     <div class="v3-stars"></div>
-
-    <!-- NAV -->
-    <nav class="v3-nav">
-      <div class="v3-nav-inner">
-        <a href="#inicio" class="v3-logo nav-logo">
-          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
-          <span class="v3-wordmark">GEO ARMY</span>
-        </a>
-        <div class="v3-auth">
-          <div id="geoAccountWidget"></div>
-          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Nav real oculto: mantiene vivo el sistema de paneles / tabs de móvil, no se ve en pantalla -->
-    <div class="nav-links" aria-hidden="true">
-      <a href="#inicio">Geo Army</a>
-      <a href="tienda.html">Tienda</a>
-      <a href="fortnite.html">Fortnite</a>
-      <a href="#ganadores">Ganadores</a>
-      <a href="puntos.html">Puntos</a>
-      <a href="alcancia.html">Alcancía</a>
-      <a href="#solicitudes">Solicitudes</a>
-    </div>
-
-    <!-- Tabs de navegación para móvil -->
-    <div class="panel-tabs" id="panelTabs" aria-label="Secciones"></div>
-
-    <!-- HERO / GEO ARMY (inicio) -->
-    <section class="hero v3-hero-stage panel" id="inicio" style="border-bottom:none;padding:26px 1.5rem 10px;">
-      <h1 class="v3-h1-sr">Geo Army</h1>
-
-      <div class="v3-orbit-wrap">
-        <div class="v3-globe-wrap" data-reveal>
-        <picture>
-          <source srcset="geo-army-globe.webp" type="image/webp">
-          <img src="geo-army-globe.jpg" alt="Geo Army" width="900" height="1200" loading="eager"/>
-        </picture>
-
-        <!-- Nav en forma de marcadores sobre el planeta -->
-        <div class="v3-planet-nav" id="v3PlanetNav">
-          <a href="tienda.html" style="--mx:26%; --my:33%;">
-            <span class="v3-marker-label">Tienda</span>
-            <span class="v3-marker-icon">🛒</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
-          <a href="fortnite.html" style="--mx:67%; --my:29%;">
-            <span class="v3-marker-label">Fortnite</span>
-            <span class="v3-marker-icon v3-marker-fn">F</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
-          <a href="#ganadores" style="--mx:50%; --my:20%;">
-            <span class="v3-marker-label">Ganadores</span>
-            <span class="v3-marker-icon">🏆</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
-          <a href="puntos.html" style="--mx:80%; --my:63%;">
-            <span class="v3-marker-label">Puntos</span>
-            <span class="v3-marker-icon">⭐</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
-          <a href="alcancia.html" style="--mx:38%; --my:65%;">
-            <span class="v3-marker-label">Alcancía</span>
-            <span class="v3-marker-icon">🐷</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
-          <a href="#solicitudes" style="--mx:69%; --my:69%;">
-            <span class="v3-marker-label">Solicitudes</span>
-            <span class="v3-marker-icon">📋</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
-        </div>
-        </div>
-
-        <div class="v3-orbit-side">
-          <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
-          <div class="v3-orbit-card v3-oc-purple" data-reveal>
-            <div class="v3-oc-num">01 · ÚNETE</div>
-            <div class="v3-oc-body"><b>Comunidad</b><span>Entra a la comunidad</span></div>
-          </div>
-          <div class="v3-orbit-card v3-oc-blue" data-reveal>
-            <div class="v3-oc-num">02 · PARTICIPA</div>
-            <div class="v3-oc-body"><b>En el stream</b><span>Sorteos · Ruletas</span></div>
-          </div>
-          <div class="v3-orbit-card v3-oc-green" data-reveal>
-            <div class="v3-oc-num">03 · GANA</div>
-            <div class="v3-oc-body"><b>Recompensas</b><span>Puntos · Premios</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="v3-tagline">EL CUARTEL GENERAL DE LA COMUNIDAD</div>
-      <p class="v3-sub">Un punto de encuentro para gamers. Compite, gana premios y forma parte de la comunidad.</p>
-
-      <div class="v3-live-pill" id="live-badge">
-        <span class="live-dot"></span>
-        <span id="live-label" class="v3-sr-only">Cargando...</span>
-        <span id="v3LiveText">Cargando…</span>
-      </div>
-
-      <div class="v3-cta-row" data-reveal>
-        <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-btn-primary">▶ Ver stream</a>
-        <button class="v3-btn-secondary" onclick="copyCode()">Explorar código: SORTEOSRK</button>
-      </div>
-
-      <div class="v3-now-section" data-reveal>
-        <div class="v3-now-header"><span class="v3-now-line"></span>Ahora en Geo Army<span class="v3-now-line"></span></div>
-
-        <div class="v3-now-grid">
-          <div class="v3-now-card v3-c-purple">
-            <div class="v3-now-head"><span class="v3-now-ic">📡</span>Stream</div>
-            <div class="v3-now-status"><span class="v3-now-dot" id="status-dot"></span><span id="status-text">Cargando...</span></div>
-            <div class="v3-now-sub"><span id="stream-game"></span> <span id="stream-viewers"></span></div>
-            <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-now-btn">Ver stream ›</a>
-          </div>
-
-          <div class="v3-now-card v3-c-discord">
-            <div class="v3-now-head"><span class="v3-now-ic"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.106c.36.698.772 1.362 1.225 1.994a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg></span>Discord</div>
-            <div class="v3-now-big v3-now-big-sm">Únete a nuestra comunidad</div>
-            <div class="v3-now-sub">Chatea, participa y entérate de todo</div>
-            <a href="#" class="v3-now-btn">Entrar al Discord ›</a>
-          </div>
-
-          <div class="v3-now-card v3-c-whatsapp">
-            <div class="v3-now-head"><span class="v3-now-ic"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.484 1.34 5.003L2 22l5.117-1.334a9.96 9.96 0 0 0 4.887 1.28h.004c5.514 0 9.997-4.483 9.997-9.997s-4.483-9.946-9.997-9.946zm0 18.176a8.156 8.156 0 0 1-4.152-1.135l-.298-.176-3.036.792.812-2.958-.194-.304a8.163 8.163 0 0 1-1.253-4.398c0-4.51 3.67-8.18 8.18-8.18 4.508 0 8.18 3.67 8.18 8.18 0 4.51-3.672 8.18-8.18 8.18h-.06z"/></svg></span>WhatsApp</div>
-            <div class="v3-now-big v3-now-big-sm">Únete por WhatsApp</div>
-            <div class="v3-now-sub">Entérate de sorteos y avisos al instante</div>
-            <a href="#" class="v3-now-btn">Entrar al grupo ›</a>
-          </div>
-
-          <div class="v3-now-card v3-c-gold">
-            <div class="v3-now-head"><span class="v3-now-ic">🎮</span>Pavos Fortnite</div>
-            <div class="v3-now-big v3-now-big-sm">¿Necesitas pavos?</div>
-            <div class="v3-now-sub">Entra acá y consigue V-Bucks para Fortnite</div>
-            <a href="fortnite.html" class="v3-now-btn">Entra acá ›</a>
-          </div>
-
-          <div class="v3-now-card v3-c-pink">
-            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Último ganador</div>
-            <div class="v3-now-winner" id="v3LastWinner">Cargando…</div>
-            <a href="#ganadores" class="v3-now-btn">Ver todos ›</a>
-          </div>
-        </div>
-
-        <div class="v3-recent">
-          <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Últimos ganadores</div>
-          <div class="v3-recent-row" id="v3RecentRow">Cargando…</div>
-          <a href="#ganadores" class="v3-recent-more">Ver Salón de la Fama ›</a>
-        </div>
-
-        <div class="v3-missions">
-          <h3>Misiones Geo Army</h3>
-          <div class="v3-missions-grid">
-            <div class="v3-mission"><span class="v3-mission-ic">💬</span><div class="v3-mission-body"><b>Sigue el stream</b><div class="v3-mission-bar"><span style="width:100%"></span></div></div></div>
-            <div class="v3-mission"><span class="v3-mission-ic">📅</span><div class="v3-mission-body"><b>Participa en un evento</b><div class="v3-mission-bar"><span style="width:0%"></span></div></div></div>
-            <div class="v3-mission"><span class="v3-mission-ic">💜</span><div class="v3-mission-body"><b>Entra al Discord</b><div class="v3-mission-bar"><span style="width:100%"></span></div></div></div>
-            <div class="v3-mission"><span class="v3-mission-ic">⭐</span><div class="v3-mission-body"><b>Consigue tus primeros puntos</b><div class="v3-mission-bar"><span style="width:60%"></span></div></div></div>
-          </div>
-          <p class="v3-missions-note">*Ejemplo ilustrativo — todavía no hay sistema de cuentas para seguir el progreso real de cada usuario.</p>
-        </div>
+    <section class="v3-page-hero">
+      <div class="v3-tagline" style="letter-spacing:.28em;">MI GEO ARMY</div>
+      <h1 class="v3-page-title" style="font-size:1.7rem;">Conectando con Twitch…</h1>
+      <div class="v3-simple-card" id="cbCard">
+        <div class="cb-spin" id="cbSpin"></div>
+        <p id="cbMsg">Un momento, estamos confirmando tu sesión.</p>
       </div>
     </section>
   </div>
 
-  <!-- GANADORES -->
-  <section class="section alt panel" id="ganadores">
-    <style>
-      #ganadores .gn-wrap{max-width:940px;margin:0 auto;}
-      #ganadores .gn-stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 22px;}
-      #ganadores .gn-chip{flex:1;min-width:120px;background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);transition:transform .35s var(--ease),border-color .35s var(--ease);}
-      #ganadores .gn-chip:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.18);}
-      #ganadores .gn-chip b{font-family:'Space Grotesk',sans-serif;font-size:2rem;line-height:1;display:block;}
-      #ganadores .gn-chip span{font-size:.7rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.5);}
-      #ganadores .gn-chip.gold b{color:#ffd23f;}
-      #ganadores .gn-chip.pend b{color:#ffb13f;}
-      #ganadores .gn-chip.done b{color:#46e0a8;}
-      #ganadores .gn-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
-      #ganadores .gn-search{flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:12px;font-size:.95rem;font-family:inherit;}
-      #ganadores .gn-search::placeholder{color:rgba(255,255,255,.4);}
-      #ganadores .gn-search:focus{outline:2px solid var(--accent-light);outline-offset:1px;}
-      #ganadores .gn-filters{display:flex;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:5px;border-radius:100px;}
-      #ganadores .gn-filters button{font-family:'Space Grotesk',sans-serif;font-size:.78rem;background:transparent;border:0;color:rgba(255,255,255,.55);padding:8px 14px;border-radius:100px;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease);}
-      #ganadores .gn-filters button[aria-pressed="true"]{background:linear-gradient(135deg,var(--accent-light),var(--accent));color:#0a0814;}
-      #ganadores .gn-card{background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow);}
-      #ganadores table{width:100%;border-collapse:collapse;}
-      #ganadores thead th{font-family:'Space Grotesk',sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;text-align:left;color:rgba(255,255,255,.45);padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
-      #ganadores tbody td{padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.05);font-size:.93rem;vertical-align:middle;color:#fff;}
-      #ganadores tbody tr:last-child td{border-bottom:0;}
-      #ganadores tbody tr:hover{background:rgba(169,112,255,.07);}
-      #ganadores .gn-id{font-family:'Space Grotesk',sans-serif;color:#a970ff;font-size:.82rem;}
-      #ganadores .gn-user{font-weight:600;}
-      #ganadores .gn-prize{color:#ffd23f;}
-      #ganadores .gn-ev{color:rgba(255,255,255,.55);font-size:.85rem;}
-      #ganadores .gn-badge{display:inline-flex;align-items:center;gap:6px;font-size:.73rem;font-weight:600;padding:5px 11px;border-radius:99px;white-space:nowrap;}
-      #ganadores .gn-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;}
-      #ganadores .gn-badge.pend{color:#ffb13f;background:rgba(255,177,63,.13);}
-      #ganadores .gn-badge.done{color:#46e0a8;background:rgba(70,224,168,.12);}
-      #ganadores .gn-badge.exp{color:#9aa0aa;background:rgba(154,160,170,.13);}
-      #ganadores .gn-chip.exp b{color:#9aa0aa;}
-      #ganadores .gn-badge.alc{color:#a970ff;background:rgba(169,112,255,.13);}
-      #ganadores .gn-chip.alc b{color:#a970ff;}
-      #ganadores .gn-cd{display:inline-block;margin-left:8px;font-size:.72rem;font-weight:600;color:#ffb13f;font-family:'Space Grotesk',sans-serif;vertical-align:middle;white-space:nowrap;}
-      #ganadores .gn-cd.urge{color:#ef4444;}
-      #ganadores .gn-empty{padding:44px 20px;text-align:center;color:rgba(255,255,255,.5);}
-      #ganadores .gn-empty b{display:block;color:#fff;font-family:'Space Grotesk',sans-serif;margin-bottom:6px;font-size:1.05rem;}
-      #ganadores .gn-foot{margin-top:16px;color:rgba(255,255,255,.4);font-size:.78rem;text-align:right;}
-      #ganadores .gn-rank-card{background:linear-gradient(180deg, rgba(255,210,63,.09), rgba(255,210,63,.03)), var(--bg2);border:1px solid rgba(255,210,63,.25);border-radius:20px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--card-shadow);}
-      #ganadores .gn-rank-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
-      #ganadores .gn-rank-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;color:#ffd23f;}
-      #ganadores .gn-rank-sub{font-size:.78rem;color:rgba(255,255,255,.5);text-transform:capitalize;}
-      #ganadores .gn-rank-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-      #ganadores .gn-rank-row:last-child{border-bottom:0;}
-      #ganadores .gn-rank-pos{width:28px;flex-shrink:0;font-size:1.1rem;text-align:center;}
-      #ganadores .gn-rank-name{flex:1;font-weight:600;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-      #ganadores .gn-rank-total{color:#ffd23f;font-family:'Space Grotesk',sans-serif;font-size:.88rem;white-space:nowrap;}
-      #ganadores .gn-rank-count{color:rgba(255,255,255,.45);font-size:.76rem;min-width:74px;text-align:right;white-space:nowrap;}
-      #ganadores .gn-rank-empty{padding:14px 4px;color:rgba(255,255,255,.5);font-size:.9rem;text-align:center;}
-      @media(max-width:560px){
-        #ganadores .gn-rank-count{min-width:0;}
+  <script>
+  (function () {
+    'use strict';
+    var RETURN_TO_KEY = 'geoarmy_return_to_v1';
+
+    // Esta página siempre vive en "<base-del-sitio>/auth/callback/" (o
+    // ".../auth/callback/index.html"). Calculamos <base-del-sitio> a partir
+    // de la propia URL en vez de asumir que el sitio está en la raíz — así
+    // funciona igual en producción ("/") y en esta beta ("/geoarmy-v2/"),
+    // o en cualquier otra subcarpeta futura, sin tocar este archivo.
+    var SITE_BASE = (function () {
+      var m = window.location.pathname.match(/^(.*\/)auth\/callback\/(?:index\.html)?$/);
+      return m ? m[1] : '/';
+    })();
+    var DEFAULT_DEST = SITE_BASE + 'mi-geoarmy.html';
+
+    function showError(text) {
+      var spin = document.getElementById('cbSpin');
+      var msg = document.getElementById('cbMsg');
+      if (spin) spin.outerHTML = '<div style="font-size:32px;margin-bottom:.75rem;">⚠️</div>';
+      if (msg) {
+        msg.innerHTML = text + '<br><br><a href="' + SITE_BASE + 'index.html" style="color:#a970ff;">Volver al inicio</a>';
       }
-      @media(max-width:620px){
-        #ganadores thead{display:none;}
-        #ganadores tbody tr{display:block;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);}
-        #ganadores tbody td{display:flex;justify-content:space-between;gap:12px;border:0;padding:8px 16px;}
-        #ganadores tbody td::before{content:attr(data-label);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);}
-        #ganadores tbody td.gn-user-cell::before{content:"";}
-        #ganadores tbody td[data-label="Estado"]{flex-wrap:wrap;justify-content:flex-end;gap:6px;}
+    }
+
+    function goToDest() {
+      var dest = DEFAULT_DEST;
+      try {
+        var saved = sessionStorage.getItem(RETURN_TO_KEY);
+        if (saved) {
+          dest = saved;
+          sessionStorage.removeItem(RETURN_TO_KEY);
+        }
+      } catch (e) {}
+      // dest siempre es una ruta absoluta del sitio (empieza en "/"), guardada
+      // por signInWithTwitch() en js/geoarmy-account.js antes de salir a Twitch
+      // — ya incluye la subcarpeta de la beta si aplica (ej. /geoarmy-v2/...).
+      window.location.replace(window.location.origin + dest);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!window.supabase || !window.supabase.createClient) {
+        showError('No se pudo cargar el sistema de cuentas (supabase-js).');
+        return;
       }
-    </style>
-    <div class="section-inner">
-      <div class="section-header" data-decor="GANADORES">
-        <div class="section-tag">Salón de la Fama</div>
-        <h2>Ganadores de la Geo Army</h2>
-        <p>Cada victoria en la ruleta, el boss y los sorteos queda registrada aquí. Transparencia total para la comunidad.</p>
-      </div>
-      <div class="gn-wrap" data-reveal>
-        <div class="gn-stats">
-          <div class="gn-chip gold"><b id="gnTotal">0</b><span>Ganadores</span></div>
-          <div class="gn-chip pend"><b id="gnPend">0</b><span>Por entregar</span></div>
-          <div class="gn-chip alc"><b id="gnAlc">0</b><span>En alcancía</span></div>
-          <div class="gn-chip done"><b id="gnDone">0</b><span>Entregados</span></div>
-          <div class="gn-chip exp"><b id="gnExp">0</b><span>Caducados</span></div>
-        </div>
-        <div class="gn-rank-card">
-          <div class="gn-rank-head">
-            <span class="gn-rank-title">🏆 Ranking de Pavos</span>
-            <span class="gn-rank-sub" id="gnRankMes">—</span>
-          </div>
-          <div id="gnRankBody"></div>
-        </div>
-        <div class="gn-controls">
-          <input id="gnSearch" class="gn-search" type="search" placeholder="Buscar por usuario o premio…" aria-label="Buscar ganadores">
-          <div class="gn-filters" role="group" aria-label="Filtrar por estado">
-            <button data-f="todos" aria-pressed="true">Todos</button>
-            <button data-f="pendientes" aria-pressed="false">Pendientes</button>
-            <button data-f="alcancia" aria-pressed="false">En alcancía</button>
-            <button data-f="entregados" aria-pressed="false">Entregados</button>
-            <button data-f="caducados" aria-pressed="false">Caducados</button>
-          </div>
-        </div>
-        <div class="gn-card">
-          <table>
-            <thead>
-              <tr><th>#</th><th>Usuario</th><th>Premio</th><th>Evento</th><th>Fecha</th><th>Estado</th></tr>
-            </thead>
-            <tbody id="gnBody"></tbody>
-          </table>
-        </div>
-        <div class="gn-foot" id="gnUpdated">Cargando…</div>
-      </div>
-    </div>
-    <script>
-    (function(){
-      var SAMPLE = { ganadores: [
-        {id:3, usuario:"Andrea_GG", premio:"800 V-Bucks", evento:"Ruleta Fortnite", fecha:"17/06/2026", entregado:false},
-        {id:2, usuario:"Kratos_OW", premio:"10.000 OW Coins", evento:"Boss Nemesis", fecha:"15/06/2026", entregado:true},
-        {id:1, usuario:"LunaStream", premio:"500 V-Bucks", evento:"Ruleta Fortnite", fecha:"12/06/2026", entregado:true}
-      ]};
-      var DATA = [], filtro = 'todos', RANKING_DESDE_ID = 0;
-      var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-      // ===== Timer de reclamo (2 semanas) =====
-      var DIAS_LIMITE = 14;                             // días para reclamar antes de caducar
-      var TIMER_DESDE = new Date(2026, 7, 15).getTime();// piso: la regla arrancó el sábado 15/08/2026
-      function inicioMs(g){
-        var propio = null;
-        if(g.creado){ var t = new Date(g.creado).getTime(); if(!isNaN(t)) propio = t; } // marca exacta (premios nuevos)
-        if(propio === null){ var f = parseFechaGn(g.fecha); if(f) propio = f.getTime(); } // si no, su fecha de registro
-        if(propio === null) return TIMER_DESDE;
-        return Math.max(propio, TIMER_DESDE);           // nunca antes del sábado que arrancó la regla
+      if (!window.GEOARMY_SUPABASE_URL || window.GEOARMY_SUPABASE_URL.indexOf('TU-PROYECTO') !== -1) {
+        showError('Falta configurar Supabase en js/geoarmy-config.js.');
+        return;
       }
-      function expiraMs(g){ return inicioMs(g) + DIAS_LIMITE*86400000; }
-      function estadoGn(g){
-        if(g.alcancia) return 'alcancia';
-        if(g.entregado) return 'entregado';
-        if(Date.now() >= expiraMs(g)) return 'caducado';
-        return 'pendiente';
-      }
-      function cuentaRegresiva(ms){
-        if(ms<=0) return 'Caducado';
-        var d=Math.floor(ms/86400000); ms%=86400000;
-        var h=Math.floor(ms/3600000);  ms%=3600000;
-        var m=Math.floor(ms/60000);    ms%=60000;
-        var s=Math.floor(ms/1000);
-        if(d>0) return d+'d '+h+'h';
-        if(h>0) return h+'h '+m+'m';
-        if(m>0) return m+'m '+s+'s';
-        return s+'s';
-      }
-      function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-      var NOMBRES_MONEDA_GN = { pavos: 'Pavos', owcoins: 'OW Coins', usd: 'USD', gcoins: 'G coins' };
-      function fmtMonedaGn(cant, moneda){
-        var n = NOMBRES_MONEDA_GN[moneda] || moneda || '';
-        return cant.toLocaleString() + ' ' + n;
-      }
-      // Junta en una sola fila por usuario todos los registros marcados "En alcancía"
-      // (en vez de mostrar un renglón nuevo cada vez que se le mete algo a su alcancía).
-      // Los demás estados (pendiente/entregado/caducado) se muestran igual que siempre.
-      function agruparAlcancia(rows){
-        var resultado = [], porUsuario = {};
-        rows.forEach(function(g){
-          if(estadoGn(g) !== 'alcancia'){ resultado.push(g); return; }
-          // Se agrupa por usuario + moneda, para que pavos, OW Coins y G coins
-          // siempre queden en renglones separados y nunca se mezclen entre sí.
-          var key = (g.usuario||'').toLowerCase().trim() + '|' + (g.moneda||'');
-          if(!porUsuario[key]){
-            var nuevo = {
-              id: g.id, usuario: g.usuario, evento: 'Recompensa de Cofre',
-              fecha: g.fecha, alcancia: true, entregado: false,
-              _moneda: g.moneda, _monto: 0, _count: 0,
-            };
-            porUsuario[key] = nuevo;
-            resultado.push(nuevo); // entra en el orden de su aparición más reciente (rows ya viene ordenado por id desc)
-          }
-          var p = porUsuario[key];
-          p._monto += (g.cantidad || 0);
-          p._count++;
-        });
-        resultado.forEach(function(r){
-          if(r._moneda === undefined) return;
-          r.premio = fmtMonedaGn(r._monto, r._moneda);
-          r.evento = r._count > 1 ? ('Varios (' + r._count + ' aportes)') : r.evento;
-        });
-        return resultado;
-      }
-      function parseFechaGn(f){
-        if(!f) return null;
-        var partes = String(f).split('/');
-        if(partes.length!==3) return null;
-        var d=parseInt(partes[0],10), m=parseInt(partes[1],10), y=parseInt(partes[2],10);
-        if(!d||!m||!y) return null;
-        return new Date(y, m-1, d);
-      }
-      function renderRanking(){
-        var ahora = new Date();
-        var anoM = ahora.getFullYear(), mesM = ahora.getMonth();
-        var mapa = {};
-        DATA.forEach(function(g){
-          if(g.rankeable===false) return;
-          if(g.moneda!=='pavos') return;
-          if(!(g.id > RANKING_DESDE_ID)) return;
-          var f = parseFechaGn(g.fecha);
-          if(!f || f.getFullYear()!==anoM || f.getMonth()!==mesM) return;
-          var key = (g.usuario||'').toLowerCase().trim();
-          if(!mapa[key]) mapa[key] = {nombre:g.usuario, total:0, premios:0};
-          mapa[key].total += (g.cantidad||0);
-          mapa[key].premios += 1;
-          mapa[key].nombre = g.usuario;
-        });
-        var lista = Object.keys(mapa).map(function(k){return mapa[k];}).sort(function(a,b){return b.total-a.total;});
-        var box = document.getElementById('gnRankBody');
-        var sub = document.getElementById('gnRankMes');
-        sub.textContent = MESES[mesM] + ' ' + anoM;
-        if(!lista.length){
-          box.innerHTML = '<div class="gn-rank-empty">Todavía nadie ha ganado pavos este mes. ¡Sé el primero! 🟣</div>';
+
+      var sb = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+
+      // supabase-js detecta y procesa el code/token de la URL automáticamente
+      // al crear el cliente (detectSessionInUrl, activo por defecto). Solo
+      // necesitamos esperar a que getSession() confirme que ya quedó guardada.
+      sb.auth.getSession().then(function (r) {
+        var session = r.data && r.data.session;
+        if (r.error || !session) {
+          console.warn('[auth/callback] no se encontró sesión tras volver de Twitch', r.error);
+          showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
           return;
         }
-        var medallas = ['🥇','🥈','🥉'];
-        box.innerHTML = lista.slice(0,10).map(function(r,i){
-          var medalla = medallas[i] || ((i+1)+'.');
-          return '<div class="gn-rank-row">'+
-            '<span class="gn-rank-pos">'+medalla+'</span>'+
-            '<span class="gn-rank-name">'+esc(r.nombre)+'</span>'+
-            '<span class="gn-rank-total">'+r.total.toLocaleString()+' 🟣</span>'+
-            '<span class="gn-rank-count">'+r.premios+' premio'+(r.premios===1?'':'s')+'</span>'+
-          '</div>';
-        }).join('');
-      }
-      function render(){
-        var q = document.getElementById('gnSearch').value.trim().toLowerCase();
-        var rows = DATA.slice().sort(function(a,b){return b.id-a.id;});
-        if(filtro==='pendientes') rows = rows.filter(function(g){return estadoGn(g)==='pendiente';});
-        if(filtro==='alcancia')   rows = rows.filter(function(g){return estadoGn(g)==='alcancia';});
-        if(filtro==='entregados') rows = rows.filter(function(g){return estadoGn(g)==='entregado';});
-        if(filtro==='caducados')  rows = rows.filter(function(g){return estadoGn(g)==='caducado';});
-        if(q) rows = rows.filter(function(g){return (g.usuario+' '+g.premio+' '+(g.evento||'')).toLowerCase().indexOf(q)>-1;});
-        rows = agruparAlcancia(rows);
-        var tb = document.getElementById('gnBody');
-        if(!rows.length){
-          tb.innerHTML = '<tr><td colspan="6" class="gn-empty"><b>Sin resultados</b>Aún no hay ganadores que coincidan.</td></tr>';
-        } else {
-          tb.innerHTML = rows.map(function(g){
-            var est = estadoGn(g), estadoHtml;
-            if(est==='entregado'){
-              estadoHtml = '<span class="gn-badge done">Entregado</span>';
-            } else if(est==='caducado'){
-              estadoHtml = '<span class="gn-badge exp">Caducado</span>';
-            } else if(est==='alcancia'){
-              estadoHtml = '<span class="gn-badge alc">🐷 En alcancía</span>';
-            } else {
-              var restante = expiraMs(g) - Date.now();
-              var urge = restante < 86400000 ? ' urge' : '';   // menos de 1 día = rojo
-              estadoHtml = '<span class="gn-badge pend">Pendiente</span>'+
-                '<span class="gn-cd'+urge+'" data-exp="'+expiraMs(g)+'">⏳ '+cuentaRegresiva(restante)+'</span>';
-            }
-            return '<tr>'+
-              '<td data-label="#" class="gn-id">#'+g.id+'</td>'+
-              '<td data-label="Usuario" class="gn-user-cell"><span class="gn-user">'+esc(g.usuario)+'</span></td>'+
-              '<td data-label="Premio" class="gn-prize">'+esc(g.premio)+'</td>'+
-              '<td data-label="Evento" class="gn-ev">'+esc(g.evento||'General')+'</td>'+
-              '<td data-label="Fecha" class="gn-ev">'+esc(g.fecha||'')+'</td>'+
-              '<td data-label="Estado">'+estadoHtml+'</td>'+
-            '</tr>';
-          }).join('');
-        }
-        document.getElementById('gnTotal').textContent = DATA.length;
-        document.getElementById('gnPend').textContent  = DATA.filter(function(g){return estadoGn(g)==='pendiente';}).length;
-        document.getElementById('gnAlc').textContent   = DATA.filter(function(g){return estadoGn(g)==='alcancia';}).length;
-        document.getElementById('gnDone').textContent  = DATA.filter(function(g){return estadoGn(g)==='entregado';}).length;
-        var expEl = document.getElementById('gnExp');
-        if(expEl) expEl.textContent = DATA.filter(function(g){return estadoGn(g)==='caducado';}).length;
-      }
-      // Actualiza los contadores en vivo cada segundo; re-renderiza si alguno acaba de caducar
-      function tick(){
-        var cds = document.querySelectorAll('#ganadores .gn-cd');
-        var recargar = false;
-        cds.forEach(function(el){
-          var restante = parseInt(el.getAttribute('data-exp'),10) - Date.now();
-          if(restante <= 0){ recargar = true; return; }
-          el.textContent = '⏳ ' + cuentaRegresiva(restante);
-          if(restante < 86400000) el.classList.add('urge');
-        });
-        if(recargar) render();
-      }
-      function load(){
-        fetch('ganadores.json?t='+Date.now(),{cache:'no-store'})
-          .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-          .then(function(j){
-            DATA = j.ganadores || [];
-            RANKING_DESDE_ID = typeof j.rankingDesdeId === 'number' ? j.rankingDesdeId : 0;
-            document.getElementById('gnUpdated').textContent =
-              'Actualizado ' + new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-            render();
-            renderRanking();
-          })
-          .catch(function(){
-            DATA = SAMPLE.ganadores;
-            RANKING_DESDE_ID = 0;
-            document.getElementById('gnUpdated').textContent = 'Vista previa (sin ganadores.json todavía)';
-            render();
-            renderRanking();
-          });
-      }
-      document.getElementById('gnSearch').addEventListener('input', render);
-      var btns = document.querySelectorAll('#ganadores .gn-filters button');
-      btns.forEach(function(b){
-        b.addEventListener('click', function(){
-          btns.forEach(function(x){x.setAttribute('aria-pressed','false');});
-          b.setAttribute('aria-pressed','true');
-          filtro = b.getAttribute('data-f'); render();
-        });
+        goToDest();
+      }).catch(function (e) {
+        console.warn('[auth/callback] error confirmando la sesión', e);
+        showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
       });
-      load();
-      setInterval(load, 30000);
-      setInterval(tick, 1000);
-    })();
-    </script>
-  </section>
-
-  <!-- SOLICITUDES -->
-  <section class="section panel" id="solicitudes">
-    <style>
-      #solicitudes .sc-wrap{max-width:960px;margin:0 auto;}
-      #solicitudes .sc-stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 22px;}
-      #solicitudes .sc-chip{flex:1;min-width:120px;background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);transition:transform .35s var(--ease),border-color .35s var(--ease);}
-      #solicitudes .sc-chip:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.18);}
-      #solicitudes .sc-chip b{font-family:'Space Grotesk',sans-serif;font-size:2rem;line-height:1;display:block;}
-      #solicitudes .sc-chip span{font-size:.7rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.5);}
-      #solicitudes .sc-chip.gold b{color:#ec4899;}
-      #solicitudes .sc-chip.pend b{color:#ffb13f;}
-      #solicitudes .sc-chip.done b{color:#46e0a8;}
-      #solicitudes .sc-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
-      #solicitudes .sc-search{flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:12px;font-size:.95rem;font-family:inherit;}
-      #solicitudes .sc-search::placeholder{color:rgba(255,255,255,.4);}
-      #solicitudes .sc-search:focus{outline:2px solid var(--pink);outline-offset:1px;}
-      #solicitudes .sc-filters{display:flex;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:5px;border-radius:100px;}
-      #solicitudes .sc-filters button{font-family:'Space Grotesk',sans-serif;font-size:.78rem;background:transparent;border:0;color:rgba(255,255,255,.55);padding:8px 14px;border-radius:100px;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease);}
-      #solicitudes .sc-filters button[aria-pressed="true"]{background:linear-gradient(135deg,#f472b6,var(--pink));color:#fff;}
-      #solicitudes .sc-card{background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow);}
-      #solicitudes .sc-row{display:flex;gap:14px;align-items:center;padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.06);transition:background .25s var(--ease);}
-      #solicitudes .sc-row:hover{background:rgba(236,72,153,.05);}
-      #solicitudes .sc-row:last-child{border-bottom:0;}
-      #solicitudes .sc-thumb{width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0;background:rgba(0,0,0,.3);}
-      #solicitudes .sc-info{flex:1;min-width:0;}
-      #solicitudes .sc-item{color:#fff;font-weight:600;font-size:.95rem;}
-      #solicitudes .sc-meta{color:rgba(255,255,255,.55);font-size:.82rem;margin-top:2px;}
-      #solicitudes .sc-badge{display:inline-flex;align-items:center;gap:6px;font-size:.73rem;font-weight:600;padding:5px 11px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
-      #solicitudes .sc-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;}
-      #solicitudes .sc-badge.pend{color:#ffb13f;background:rgba(255,177,63,.13);}
-      #solicitudes .sc-badge.done{color:#46e0a8;background:rgba(70,224,168,.12);}
-      #solicitudes .sc-badge.rej{color:#ef4444;background:rgba(239,68,68,.13);}
-      #solicitudes .sc-empty{padding:44px 20px;text-align:center;color:rgba(255,255,255,.5);}
-      #solicitudes .sc-empty b{display:block;color:#fff;font-family:'Space Grotesk',sans-serif;margin-bottom:6px;font-size:1.05rem;}
-      #solicitudes .sc-foot{margin-top:16px;color:rgba(255,255,255,.4);font-size:.78rem;text-align:right;}
-      @media(max-width:560px){
-        #solicitudes .sc-row{flex-wrap:wrap;}
-        #solicitudes .sc-badge{margin-left:70px;}
-      }
-    </style>
-    <div class="section-inner">
-      <div class="section-header" data-decor="CANJES">
-        <div class="section-tag">Canjes de la Geo Army</div>
-        <h2>Solicitudes de canje</h2>
-        <p>Lo que cada ganador pidió a cambio de su premio de la ruleta, con imagen del item. Se piden con <strong>/reclamar</strong> en Discord.</p>
-      </div>
-      <div class="sc-wrap" data-reveal>
-        <div class="sc-stats">
-          <div class="sc-chip gold"><b id="scTotal">0</b><span>Solicitudes</span></div>
-          <div class="sc-chip pend"><b id="scPend">0</b><span>Por entregar</span></div>
-          <div class="sc-chip done"><b id="scDone">0</b><span>Entregadas</span></div>
-        </div>
-        <div class="sc-controls">
-          <input id="scSearch" class="sc-search" type="search" placeholder="Buscar por usuario o item…" aria-label="Buscar solicitudes">
-          <div class="sc-filters" role="group" aria-label="Filtrar por estado">
-            <button data-f="todos" aria-pressed="true">Todos</button>
-            <button data-f="pendientes" aria-pressed="false">Pendientes</button>
-            <button data-f="entregados" aria-pressed="false">Entregadas</button>
-            <button data-f="rechazados" aria-pressed="false">Rechazadas</button>
-          </div>
-        </div>
-        <div class="sc-card" id="scCard"></div>
-        <div class="sc-foot" id="scUpdated">Cargando…</div>
-      </div>
-    </div>
-    <script>
-    (function(){
-      var DATA = [], filtro = 'todos';
-      function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-      function render(){
-        var q = document.getElementById('scSearch').value.trim().toLowerCase();
-        var rows = DATA.slice().sort(function(a,b){return b.id-a.id;});
-        if(filtro==='pendientes') rows = rows.filter(function(s){return !s.entregado && !s.rechazado;});
-        if(filtro==='entregados') rows = rows.filter(function(s){return s.entregado;});
-        if(filtro==='rechazados') rows = rows.filter(function(s){return s.rechazado;});
-        if(q) rows = rows.filter(function(s){return (s.nombreFortnite+' '+s.item+' '+(s.ganadorPremio||'')).toLowerCase().indexOf(q)>-1;});
-        var card = document.getElementById('scCard');
-        if(!rows.length){
-          card.innerHTML = '<div class="sc-empty"><b>Sin resultados</b>Aún no hay solicitudes que coincidan.</div>';
-        } else {
-          card.innerHTML = rows.map(function(s){
-            var badge = s.entregado
-              ? '<span class="sc-badge done">Entregado</span>'
-              : (s.rechazado ? '<span class="sc-badge rej">Rechazado</span>' : '<span class="sc-badge pend">Pendiente</span>');
-            return '<div class="sc-row">'+
-              '<img class="sc-thumb" src="'+esc(s.imagenUrl||'')+'" alt="" onerror="this.style.visibility=\'hidden\'"/>'+
-              '<div class="sc-info">'+
-                '<div class="sc-item">'+esc(s.item)+'</div>'+
-                '<div class="sc-meta">'+esc(s.nombreFortnite)+' · ganó '+esc(s.ganadorPremio||'')+'</div>'+
-              '</div>'+
-              badge+
-            '</div>';
-          }).join('');
-        }
-        document.getElementById('scTotal').textContent = DATA.length;
-        document.getElementById('scPend').textContent  = DATA.filter(function(s){return !s.entregado && !s.rechazado;}).length;
-        document.getElementById('scDone').textContent  = DATA.filter(function(s){return s.entregado;}).length;
-      }
-      function load(){
-        fetch('solicitudes.json?t='+Date.now(),{cache:'no-store'})
-          .then(function(r){ if(!r.ok) throw 0; return r.json(); })
-          .then(function(j){
-            DATA = j.solicitudes || [];
-            document.getElementById('scUpdated').textContent =
-              'Actualizado ' + new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-            render();
-          })
-          .catch(function(){
-            DATA = [];
-            document.getElementById('scUpdated').textContent = 'Aún no hay solicitudes.json (todavía no se ha usado /reclamar).';
-            render();
-          });
-      }
-      document.getElementById('scSearch').addEventListener('input', render);
-      var btns = document.querySelectorAll('#solicitudes .sc-filters button');
-      btns.forEach(function(b){
-        b.addEventListener('click', function(){
-          btns.forEach(function(x){x.setAttribute('aria-pressed','false');});
-          b.setAttribute('aria-pressed','true');
-          filtro = b.getAttribute('data-f'); render();
-        });
-      });
-      load();
-      setInterval(load, 30000);
-    })();
-    </script>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <div class="footer-logo">
-        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
-        GeoArmy
-      </div>
-      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
-      <div class="footer-code">geovanyrk.github.io</div>
-    </div>
-  </footer>
-
-  <div class="toast" id="toast">¡Código copiado!</div>
-  <script src="js/main.js"></script>
-  <script src="js/premium.js"></script>
-  <script src="js/geoarmy-config.js"></script>
-  <script src="js/geoarmy-account.js"></script>
-  <script>
-  // ===== V3: conecta los marcadores del planeta con el sistema de paneles =====
-  // (el nav real .nav-links está oculto y sigue funcionando para móvil/JS;
-  // este bloque solo replica "activar panel" para los marcadores visibles)
-  (function () {
-    try {
-      var links = document.querySelectorAll('#v3PlanetNav a[href^="#"]');
-      links.forEach(function (a) {
-        a.addEventListener('click', function (e) {
-          var id = a.getAttribute('href').slice(1);
-          var target = document.getElementById(id);
-          if (!target || !target.classList.contains('panel')) return;
-          e.preventDefault();
-          document.querySelectorAll('.panel').forEach(function (p) {
-            p.classList.toggle('is-active', p === target);
-          });
-          history.replaceState(null, '', '#' + id);
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      });
-    } catch (e) { console.warn('[v3-planet-nav]', e); }
-  })();
-  </script>
-  <script>
-  // ===== V3: reescribe el texto de la píldora "en vivo" sin tocar main.js =====
-  // main.js sigue escribiendo en #live-label (ahora oculto visualmente); aquí solo
-  // observamos ese texto y mostramos una versión más útil en #v3LiveText.
-  (function () {
-    try {
-      var label = document.getElementById('live-label');
-      var out = document.getElementById('v3LiveText');
-      if (!label || !out) return;
-      function sync() {
-        var txt = label.textContent || '';
-        if (txt.indexOf('En vivo') !== -1) {
-          out.textContent = 'EN VIVO AHORA';
-        } else if (txt.indexOf('Fuera de línea') !== -1) {
-          out.textContent = 'Próximo stream: 7:00 PM';
-        } else {
-          out.textContent = txt;
-        }
-      }
-      sync();
-      new MutationObserver(sync).observe(label, { childList: true, characterData: true, subtree: true });
-    } catch (e) { console.warn('[v3-live-text]', e); }
-  })();
-  </script>
-  <script>
-  // ===== V3: "Ahora en Geo Army" — Último ganador + Últimos ganadores, con datos reales de ganadores.json =====
-  // Independiente del script del panel #ganadores (no lo toca), envuelto en try/catch, no rompe nada si falla.
-  (function () {
-    try {
-      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-      function diasDesde(f) {
-        var partes = String(f || '').split('/');
-        if (partes.length !== 3) return '';
-        var d = parseInt(partes[0], 10), m = parseInt(partes[1], 10), y = parseInt(partes[2], 10);
-        if (!d || !m || !y) return '';
-        var fecha = new Date(y, m - 1, d);
-        var diff = Math.floor((new Date() - fecha) / 86400000);
-        if (diff <= 0) return 'Hoy';
-        if (diff === 1) return 'Hace 1 día';
-        return 'Hace ' + diff + ' días';
-      }
-      function renderLast(rows) {
-        var el = document.getElementById('v3LastWinner');
-        if (!el) return;
-        if (!rows.length) { el.innerHTML = '<div class="v3-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
-        var g = rows[0];
-        el.innerHTML =
-          '<div class="v3-now-winner-ava">🏆</div>' +
-          '<div><div class="v3-now-winner-name">@' + esc(g.usuario) + '</div>' +
-          '<div class="v3-now-winner-prize">' + esc(g.premio) + '</div></div>';
-      }
-      function renderRecent(rows) {
-        var el = document.getElementById('v3RecentRow');
-        if (!el) return;
-        if (!rows.length) { el.innerHTML = '<div class="v3-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
-        var ranks = ['g1', 'g2', 'g3'];
-        el.innerHTML = rows.slice(0, 3).map(function (g, i) {
-          return '<div class="v3-recent-item">' +
-            '<div class="v3-recent-rank ' + ranks[i] + '">' + (i + 1) + '</div>' +
-            '<div><div class="v3-recent-name">@' + esc(g.usuario) + '</div>' +
-            '<div class="v3-recent-prize">' + esc(g.premio) + '</div>' +
-            '<div class="v3-recent-time">' + diasDesde(g.fecha) + '</div></div>' +
-            '</div>';
-        }).join('');
-      }
-      fetch('ganadores.json?t=' + Date.now(), { cache: 'no-store' })
-        .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-        .then(function (j) {
-          var rows = (j.ganadores || []).slice().sort(function (a, b) { return b.id - a.id; });
-          renderLast(rows);
-          renderRecent(rows);
-        })
-        .catch(function () { renderLast([]); renderRecent([]); });
-    } catch (e) { console.warn('[v3-now]', e); }
+    });
   })();
   </script>
 </body>
