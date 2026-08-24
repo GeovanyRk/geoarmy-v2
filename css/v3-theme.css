@@ -1,0 +1,335 @@
+/* =====================================================================
+   GEO ARMY — TEMA "V3" (espacial/holográfico)
+   Extraído del <style> que vivía inline en index-v3.html para poder
+   reusarlo en páginas nuevas (mi-geoarmy.html y las que sigan) sin
+   duplicar el bloque completo en cada archivo. index-v3.html ahora
+   enlaza este archivo en vez de tener el <style> embebido — mismo CSS,
+   solo cambió dónde vive.
+   ===================================================================== */
+
+.v3-page {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -6%, #12244a 0%, #0a1730 40%, rgba(10,23,48,0) 72%),
+    radial-gradient(50% 55% at -8% 42%, rgba(58,160,255,.16), rgba(58,160,255,0) 70%),
+    radial-gradient(50% 55% at 108% 58%, rgba(145,71,255,.17), rgba(145,71,255,0) 70%),
+    radial-gradient(40% 40% at 50% 102%, rgba(236,72,153,.07), rgba(236,72,153,0) 70%),
+    #04070f;
+  position: relative; overflow: hidden;
+}
+.v3-stars {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .55;
+  background-image:
+    radial-gradient(1.4px 1.4px at 10% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 46% 6%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 23% 38%, #fff, transparent),
+    radial-gradient(1px 1px at 76% 22%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 62% 48%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 14%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 34% 68%, #fff, transparent),
+    radial-gradient(1px 1px at 84% 62%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 6% 82%, #fff, transparent),
+    radial-gradient(1px 1px at 55% 84%, #fff, transparent);
+  background-repeat: repeat; background-size: 340px 340px;
+  animation: v3Twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes v3Twinkle { 0% { opacity: .4; } 100% { opacity: .68; } }
+@media (prefers-reduced-motion: reduce) { .v3-stars { animation: none; } }
+.v3-nav { position: relative; z-index: 3; }
+.v3-nav-inner { max-width: 1320px; margin: 0 auto; padding: 22px 1.5rem 0; display: flex; align-items: center; justify-content: space-between; }
+.v3-logo { display: flex; align-items: center; gap: 12px; }
+.v3-logo-mark {
+  width: 42px; height: 42px; flex-shrink: 0; overflow: hidden;
+  background: #04101f;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 26px rgba(58,160,255,.55);
+}
+.v3-logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+.v3-wordmark { font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: .12em; font-size: 19px; color: #eaf2ff; }
+.v3-auth { display: flex; align-items: center; gap: 20px; }
+.v3-login-link { display: flex; align-items: center; gap: 7px; font-size: 14px; color: #b9cdea; transition: color .25s; }
+.v3-login-link:hover { color: #fff; }
+.v3-join-btn {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px; letter-spacing: .03em;
+  color: #fff; background: linear-gradient(135deg, #2f7ce6, #3aa0ff); border-radius: 8px;
+  padding: 11px 22px; box-shadow: 0 10px 26px -10px rgba(58,160,255,.65); transition: transform .3s var(--ease);
+}
+.v3-join-btn:hover { transform: translateY(-2px); }
+
+/* Nav real (accesible/funcional) oculto — sigue alimentando el sistema de paneles y los tabs de móvil */
+.v3-page .nav-links { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+
+/* ===== Nav como marcadores sobre el planeta (estilo mapa de Fortnite) ===== */
+.v3-planet-nav { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.v3-planet-nav a {
+  position: absolute; left: var(--mx); top: var(--my);
+  display: flex; flex-direction: column; align-items: center;
+  transform: translate(-50%, -100%);
+  pointer-events: auto; text-decoration: none; cursor: pointer;
+}
+.v3-marker-icon {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+  background: rgba(8,16,34,.8); border: 1px solid rgba(150,200,255,.55);
+  box-shadow: 0 0 18px rgba(90,170,255,.55);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.v3-marker-fn {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 19px; font-style: italic;
+  color: #eaf6ff; background: linear-gradient(150deg, rgba(58,160,255,.35), rgba(8,16,34,.85));
+  border-color: rgba(120,190,255,.8); text-shadow: 0 0 10px rgba(150,210,255,.8);
+}
+.v3-marker-stem { width: 2px; height: 26px; background: linear-gradient(to bottom, rgba(150,200,255,.85), rgba(150,200,255,.1)); }
+.v3-marker-ring {
+  width: 20px; height: 8px; border-radius: 50%; margin-top: -2px;
+  background: radial-gradient(circle, rgba(120,190,255,.9), transparent 72%);
+  box-shadow: 0 0 16px 3px rgba(90,170,255,.5);
+  animation: v3RingPulse 2.4s ease-in-out infinite;
+}
+.v3-marker-label {
+  order: -1; margin-bottom: 6px;
+  font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: .05em; white-space: nowrap;
+  color: #eaf2ff; background: rgba(8,16,34,.88); border: 1px solid rgba(150,200,255,.4);
+  padding: 3px 9px; border-radius: 6px;
+  opacity: 0; transform: translateY(4px); transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.v3-planet-nav a:hover .v3-marker-label,
+.v3-planet-nav a:focus-visible .v3-marker-label { opacity: 1; transform: translateY(0); }
+.v3-planet-nav a:hover .v3-marker-icon,
+.v3-planet-nav a:focus-visible .v3-marker-icon { transform: scale(1.18); box-shadow: 0 0 22px rgba(120,200,255,.8); }
+@keyframes v3RingPulse { 0%, 100% { transform: scale(1); opacity: .9; } 50% { transform: scale(1.3); opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .v3-marker-ring { animation: none; } }
+@media (max-width: 560px) {
+  .v3-marker-icon { width: 36px; height: 36px; font-size: 15px; }
+  .v3-marker-fn { font-size: 14px; }
+  .v3-marker-stem { height: 18px; }
+}
+
+/* ===== Hero: globo + wordmark ===== */
+.v3-hero-stage { position: relative; z-index: 2; text-align: center; padding: 4px 1.5rem 6px; }
+.v3-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.v3-h1-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+
+/* ===== Tarjetas orbitales — reemplazan la sección "Cómo funciona" separada,
+   ahora viven pegadas al planeta como lectura de una interfaz espacial ===== */
+.v3-orbit-wrap { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 1320px; margin: 0 auto; }
+.v3-orbit-side { display: flex; flex-direction: column; gap: 12px; }
+.v3-orbit-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .04em;
+  color: #eaf2ff; text-transform: uppercase; margin-bottom: 2px;
+}
+.v3-orbit-card {
+  --ac: #9147ff; width: 168px; flex-shrink: 0; text-align: left;
+  background: rgba(9,18,38,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(150,200,255,.22); border-left: 2px solid var(--ac);
+  border-radius: 10px; padding: 11px 13px;
+  box-shadow: 0 12px 26px -20px var(--ac);
+}
+.v3-oc-purple { --ac: #9147ff; } .v3-oc-blue { --ac: #3aa0ff; } .v3-oc-green { --ac: #00c853; }
+.v3-oc-num { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 12px; color: var(--ac); letter-spacing: .05em; margin-bottom: 4px; }
+.v3-oc-body b { display: block; font-family: 'Orbitron', sans-serif; font-size: 11.5px; color: #eaf2ff; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 3px; }
+.v3-oc-body span { font-size: 10.5px; color: #9fb2d1; line-height: 1.35; display: block; }
+@media (max-width: 980px) {
+  .v3-orbit-wrap { flex-direction: column; gap: 14px; }
+  .v3-orbit-side { width: 100%; max-width: 460px; }
+}
+@media (max-width: 480px) { .v3-orbit-side { flex-direction: column; } }
+
+.v3-globe-wrap { position: relative; width: min(460px, 72vw); margin: -6px 0 -6%; animation: v3Float 6s ease-in-out infinite; flex-shrink: 0; }
+.v3-globe-wrap img {
+  width: 100%; height: auto; display: block;
+  -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 88%);
+  mask-image: radial-gradient(closest-side, #000 62%, transparent 88%);
+}
+@keyframes v3Float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@media (prefers-reduced-motion: reduce) { .v3-globe-wrap { animation: none; } }
+.v3-tagline { font-family: 'Orbitron', sans-serif; letter-spacing: .32em; font-size: 12.5px; color: #7fb0f5; margin: 10px 0 0; position: relative; z-index: 2; }
+.v3-sub { color: #a9bad6; font-size: 16px; max-width: 520px; margin: 12px auto 0; line-height: 1.6; }
+.v3-live-pill {
+  display: inline-flex; align-items: center; gap: 10px; margin: 14px auto 0;
+  font-size: 12.5px; color: #b9cdea; background: rgba(58,160,255,.08); border: 1px solid rgba(120,180,255,.28);
+  padding: 7px 16px; border-radius: 100px;
+}
+.v3-live-pill .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #6b7a95; transition: background .3s; }
+.v3-live-pill .live-dot.live { background: #00c853; box-shadow: 0 0 8px #00c853; animation: v3DotPulse 1.8s ease-in-out infinite; }
+@keyframes v3DotPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+.v3-cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
+.v3-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px;
+  color: #041022; background: linear-gradient(135deg, #eaf4ff, #9fd0ff); padding: 14px 28px; border-radius: 8px;
+  box-shadow: 0 14px 34px -12px rgba(120,190,255,.55); transition: transform .3s var(--ease);
+  animation: v3CtaPulse 2.6s ease-in-out infinite;
+}
+.v3-btn-primary:hover { transform: translateY(-3px); animation-play-state: paused; }
+@keyframes v3CtaPulse {
+  0%, 100% { box-shadow: 0 14px 34px -12px rgba(120,190,255,.55), 0 0 0 0 rgba(150,200,255,.5); }
+  50% { box-shadow: 0 14px 34px -12px rgba(120,190,255,.55), 0 0 0 9px rgba(150,200,255,0); }
+}
+@media (prefers-reduced-motion: reduce) { .v3-btn-primary, .v3-live-pill .live-dot.live { animation: none; } }
+.v3-btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px;
+  color: #eaf2ff; background: rgba(255,255,255,.04); border: 1px solid rgba(150,190,255,.35);
+  padding: 14px 26px; border-radius: 8px; cursor: pointer; transition: transform .3s var(--ease), border-color .3s;
+}
+.v3-btn-secondary:hover { transform: translateY(-3px); border-color: rgba(150,190,255,.7); }
+
+/* ===== Ahora en Geo Army ===== */
+.v3-now-section { position: relative; z-index: 2; max-width: 1380px; margin: 26px auto 0; padding: 0 1.5rem 70px; }
+.v3-now-header {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .14em;
+  color: #eaf2ff; text-transform: uppercase; margin-bottom: 26px;
+}
+.v3-now-line { flex: 1; max-width: 120px; height: 1px; background: linear-gradient(90deg, transparent, rgba(150,200,255,.5)); }
+.v3-now-line:last-child { background: linear-gradient(90deg, rgba(150,200,255,.5), transparent); }
+.v3-now-header-sm { font-size: 13px; justify-content: flex-start; gap: 10px; margin: 34px 0 16px; }
+.v3-now-header-sm .v3-now-line { display: none; }
+
+.v3-now-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.v3-now-card {
+  --ac: #9147ff;
+  position: relative; background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+  border: 1px solid rgba(255,255,255,.1); border-top: 2px solid var(--ac);
+  border-radius: 14px; padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 20px 40px -30px var(--ac), inset 0 1px 0 rgba(255,255,255,.04);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.v3-now-card:hover { transform: translateY(-4px); }
+.v3-c-purple { --ac: #9147ff; }
+.v3-c-gold { --ac: #ffd23f; }
+.v3-c-blue { --ac: #3aa0ff; }
+.v3-c-green { --ac: #00c853; }
+.v3-c-discord { --ac: #5865f2; }
+.v3-c-whatsapp { --ac: #25d366; }
+.v3-c-pink { --ac: #ec4899; }
+
+.v3-now-head {
+  display: flex; align-items: center; gap: 9px; font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: #eaf2ff;
+  padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.v3-now-ic { font-size: 16px; color: var(--ac); display: inline-flex; }
+.v3-now-status { display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 19px; color: var(--ac); text-transform: uppercase; }
+.v3-now-dot { width: 9px; height: 9px; border-radius: 50%; background: #5a6478; flex-shrink: 0; }
+.v3-now-dot.live { background: #00c853; box-shadow: 0 0 10px #00c853; animation: v3DotPulse 1.8s ease-in-out infinite; }
+.v3-now-sub { font-size: 12.5px; color: #9fb2d1; min-height: 14px; }
+.v3-now-big { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 2rem; color: var(--ac); line-height: 1.08; }
+.v3-now-big span { font-size: .85rem; font-weight: 700; color: #c9d6ec; text-transform: uppercase; margin-left: 4px; }
+.v3-now-big-sm { font-size: 1.4rem; }
+.v3-now-winner { display: flex; align-items: center; gap: 12px; }
+.v3-now-winner-ava {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; font-size: 18px;
+  background: radial-gradient(circle at 35% 30%, #1d2b52, #0a1122); border: 1px solid rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center;
+}
+.v3-now-winner-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14.5px; color: var(--ac); }
+.v3-now-winner-prize { font-size: 12.5px; color: #c9d6ec; margin-top: 2px; }
+.v3-now-btn {
+  margin-top: auto; text-align: center; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+  background: var(--ac); padding: 10px 14px; border-radius: 8px; transition: transform .3s var(--ease), filter .3s var(--ease);
+}
+.v3-now-btn:hover { transform: translateY(-2px); filter: brightness(1.12); }
+.v3-c-purple .v3-now-btn, .v3-c-blue .v3-now-btn, .v3-c-discord .v3-now-btn, .v3-c-pink .v3-now-btn { color: #fff; }
+.v3-c-gold .v3-now-btn, .v3-c-green .v3-now-btn, .v3-c-whatsapp .v3-now-btn { color: #04101f; }
+
+.v3-recent { margin-top: 8px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 22px 24px; }
+.v3-recent-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.v3-recent-item { flex: 1; min-width: 210px; display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 12px 14px; }
+.v3-recent-rank {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; background: #1c2740; color: #eaf2ff; border: 1px solid rgba(255,255,255,.15);
+}
+.v3-recent-rank.g1 { background: #7a5a00; color: #ffd23f; border-color: rgba(255,210,63,.5); }
+.v3-recent-rank.g2 { background: #3a3f4a; color: #d7dee8; border-color: rgba(215,222,232,.4); }
+.v3-recent-rank.g3 { background: #5a3517; color: #e0a06a; border-color: rgba(224,160,106,.4); }
+.v3-recent-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: #eaf2ff; }
+.v3-recent-prize { font-size: 12px; color: #8fb0e0; margin-top: 2px; }
+.v3-recent-time { font-size: 10.5px; color: #5f7396; margin-top: 2px; }
+.v3-recent-more { display: inline-block; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; color: #8fc4ff; }
+.v3-recent-more:hover { color: #c3e2ff; }
+.v3-recent-empty { color: #7f92b3; font-size: 13px; padding: 8px 0; }
+
+.v3-missions { margin-top: 16px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 24px; }
+.v3-missions h3 { font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #eaf2ff; margin-bottom: 20px; }
+
+.v3-missions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; }
+.v3-mission { display: flex; align-items: center; gap: 10px; }
+.v3-mission-ic { font-size: 17px; flex-shrink: 0; }
+.v3-mission-body { flex: 1; min-width: 0; }
+.v3-mission-body b { display: block; font-size: 12.5px; color: #eaf2ff; font-weight: 600; margin-bottom: 5px; }
+.v3-mission-bar { height: 5px; border-radius: 100px; background: rgba(255,255,255,.08); overflow: hidden; }
+.v3-mission-bar span { display: block; height: 100%; background: linear-gradient(90deg, #9147ff, #3aa0ff); border-radius: 100px; }
+.v3-missions-note { margin-top: 16px; font-size: 10.5px; color: #5f7396; line-height: 1.5; }
+
+.v3-ridge { position: relative; z-index: 1; width: 100%; height: 90px; display: block; margin-top: -60px; }
+
+@media (max-width: 980px) { .v3-now-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) {
+  .v3-now-grid { grid-template-columns: 1fr; }
+  .v3-missions-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .v3-auth .v3-login-link span { display: none; }
+}
+@media (max-width: 560px) { .v3-cards { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   AÑADIDO PARA SUBPÁGINAS (mi-geoarmy.html y las que sigan este estilo)
+   El home (index-v3.html) navega con marcadores sobre el planeta; una
+   subpágina sin planeta necesita una fila de links normal en el nav.
+   ===================================================================== */
+.v3-page-links { display: flex; align-items: center; gap: 22px; }
+.v3-page-links a { font-family: 'Inter', sans-serif; font-size: 13.5px; color: #b9cdea; transition: color .25s; white-space: nowrap; }
+.v3-page-links a:hover { color: #fff; }
+@media (max-width: 900px) { .v3-page-links { display: none; } }
+
+.v3-page-hero { position: relative; z-index: 2; text-align: center; padding: 64px 1.5rem 8px; max-width: 640px; margin: 0 auto; }
+.v3-page-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; margin-bottom: .6rem; color: #eaf2ff; }
+.v3-page-sub { color: #a9bad6; font-size: 15.5px; line-height: 1.6; }
+
+.v3-simple-card {
+  max-width: 440px; margin: 1.5rem auto; text-align: center;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+  border: 1px solid rgba(255,255,255,.1); border-radius: 20px;
+  padding: 2.4rem 2rem; box-shadow: 0 20px 40px -30px rgba(145,71,255,.4);
+  position: relative; z-index: 2;
+}
+.v3-simple-card .v3-simple-ic { font-size: 32px; margin-bottom: .75rem; }
+.v3-simple-card p { color: #a9bad6; font-size: 13.5px; line-height: 1.6; margin-bottom: 1.6rem; }
+
+.v3-xp-card {
+  position: relative; z-index: 2; max-width: 1320px; margin: 1.2rem auto 0; padding: 0 1.5rem;
+}
+.v3-xp-inner {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+  border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 1.6rem 1.8rem;
+  box-shadow: 0 20px 40px -30px rgba(145,71,255,.35);
+}
+.v3-xp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.v3-xp-level { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1rem; color: #eaf2ff; }
+.v3-xp-text { font-size: 13px; color: #9fb2d1; }
+.v3-xp-bar-bg { height: 8px; border-radius: 100px; background: rgba(255,255,255,.08); overflow: hidden; }
+.v3-xp-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #9147ff, #3aa0ff); border-radius: 100px; transition: width .6s ease; }
+.v3-xp-note { margin-top: 10px; font-size: 11.5px; color: #5f7396; }
+
+.v3-table-wrap { position: relative; z-index: 2; max-width: 1320px; margin: 2.2rem auto 0; padding: 0 1.5rem 70px; }
+.v3-table-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+  border: 1px solid rgba(255,255,255,.1); border-radius: 16px; overflow: hidden;
+  box-shadow: 0 20px 40px -30px rgba(58,160,255,.4);
+}
+.v3-table-card table { width: 100%; border-collapse: collapse; }
+.v3-table-card thead th {
+  font-family: 'Orbitron', sans-serif; font-size: .68rem; text-transform: uppercase; letter-spacing: .1em;
+  text-align: left; color: rgba(234,242,255,.5); padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.v3-table-card tbody td { padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .92rem; color: #eaf2ff; }
+.v3-table-card tbody tr:last-child td { border-bottom: 0; }
+.v3-table-card tbody tr:hover { background: rgba(58,160,255,.06); }
+.v3-table-empty { text-align: center; color: #7f92b3; padding: 30px 18px !important; }
+@media (max-width: 620px) {
+  .v3-table-card thead { display: none; }
+  .v3-table-card tbody tr { display: block; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .v3-table-card tbody td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 8px 16px; }
+  .v3-table-card tbody td::before { content: attr(data-label); font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(234,242,255,.4); }
+}

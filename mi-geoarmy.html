@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi Geo Army — GeoArmy</title>
+  <meta name="description" content="Tu perfil dentro de la comunidad Geo Army: G-Coins, nivel y ranking."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <div class="v3-page" style="min-height:100vh;">
+    <div class="v3-stars"></div>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index-v3.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="index-v3.html#inicio">Inicio</a>
+          <a href="tienda.html">Tienda</a>
+          <a href="fortnite.html">Fortnite</a>
+          <a href="puntos.html">Puntos</a>
+          <a href="alcancia.html">Alcancía</a>
+          <a href="independencia.html">Independencia</a>
+        </div>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="v3-page-hero">
+      <div class="v3-tagline" style="letter-spacing:.28em;">TU CUENTA</div>
+      <h1 class="v3-page-title">Mi Geo Army</h1>
+      <p class="v3-page-sub">Tu perfil dentro del universo Geo Army: G-Coins, nivel y tu lugar en el ranking de la comunidad.</p>
+    </section>
+
+    <!-- Estado: sin sesión -->
+    <div id="mgLoggedOut" class="v3-simple-card" hidden>
+      <div class="v3-simple-ic">👤</div>
+      <p>Inicia sesión con tu cuenta de Twitch para ver tu perfil, tus G-Coins, tu nivel y tu posición en el ranking.</p>
+      <button type="button" class="v3-btn-secondary" id="mgLoginBtn" style="width:100%; justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2 2 6v14h6v2h4l2-2h4l4-4V2H4Zm16 12-3 3h-5l-2 2v-2H6V4h14v10Z"/><rect x="9" y="7" width="2" height="5"/><rect x="14" y="7" width="2" height="5"/></svg>
+        Continuar con Twitch
+      </button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="mgDashboard" hidden>
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-now-grid">
+          <div class="v3-now-card v3-c-purple">
+            <div class="v3-now-head"><span class="v3-now-ic">👤</span>Perfil</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img id="mgAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
+              <div style="min-width:0;">
+                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+                <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
+                <div id="mgCountry" class="v3-now-sub" hidden></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="v3-now-card v3-c-gold" id="gcoins">
+            <div class="v3-now-head"><span class="v3-now-ic">🪙</span>G-Coins</div>
+            <div class="v3-now-big" id="mgGcoins">—<span>G</span></div>
+            <div class="v3-now-sub">G-Coins disponibles</div>
+            <button type="button" class="v3-now-btn" id="mgRefreshSaldo" style="border:none; cursor:pointer; font-family:'Orbitron',sans-serif;">Actualizar saldo</button>
+          </div>
+
+          <div class="v3-now-card v3-c-blue">
+            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Ranking</div>
+            <div class="v3-now-big" id="mgRank">—</div>
+            <div class="v3-now-sub">Ranking Geo Army</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v3-xp-card">
+        <div class="v3-xp-inner">
+          <div class="v3-xp-top">
+            <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
+            <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
+          </div>
+          <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
+          <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
+        </div>
+      </div>
+
+      <div class="v3-table-wrap" id="ranking">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking Geo Army</div>
+        <div class="v3-table-card">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Usuario</th><th>Nivel</th><th>G-Coins</th></tr>
+            </thead>
+            <tbody id="mgRankBody">
+              <tr><td colspan="4" class="v3-table-empty">Cargando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script>
+  (function () {
+    var XP_PER_LEVEL = 1000; // debe coincidir con xp_to_level() en supabase/schema.sql
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+
+    function whenReady(cb) {
+      if (window.GeoArmyAccount && window.GeoArmyAccount.client) { cb(); return; }
+      setTimeout(function () { whenReady(cb); }, 60);
+    }
+
+    async function refreshSaldo(sb, session) {
+      var el = document.getElementById('mgGcoins');
+      el.innerHTML = '…';
+      try {
+        if (session.provider_token) {
+          var res = await fetch('https://geoarmy.duckdns.org/api/saldo', {
+            headers: { Authorization: 'Bearer ' + session.provider_token },
+          });
+          if (res.ok) {
+            var data = await res.json();
+            if (typeof data.oro === 'number') { el.innerHTML = data.oro.toLocaleString() + '<span>G</span>'; return; }
+          }
+        }
+        el.innerHTML = '<span style="font-size:.9rem;">Reconecta para ver tu saldo</span>';
+      } catch (e) {
+        console.warn('[mi-geoarmy] no se pudo leer el saldo', e);
+        el.innerHTML = '<span style="font-size:.9rem;">Sin conexión</span>';
+      }
+    }
+
+    // El ranking real (xp_leaderboard / gcoin_leaderboard del schema nuevo)
+    // todavía no está conectado aquí a propósito — primero se prueba el
+    // login real con Twitch, el ranking se conecta en un paso aparte.
+    function loadRankingTable() {
+      var tbody = document.getElementById('mgRankBody');
+      tbody.innerHTML = '<tr><td colspan="4" class="v3-table-empty">Ranking próximamente.</td></tr>';
+    }
+
+    async function loadDashboard(sb) {
+      var loggedOutEl = document.getElementById('mgLoggedOut');
+      var dashEl = document.getElementById('mgDashboard');
+      try {
+        var sessionRes = await sb.auth.getSession();
+        var session = sessionRes.data && sessionRes.data.session;
+        if (!session) { loggedOutEl.hidden = false; dashEl.hidden = true; return; }
+
+        var profRes = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+        if (profRes.error || !profRes.data) { loggedOutEl.hidden = false; dashEl.hidden = true; return; }
+        var profile = profRes.data;
+
+        loggedOutEl.hidden = true;
+        dashEl.hidden = false;
+
+        var avatarEl = document.getElementById('mgAvatar');
+        avatarEl.src = profile.avatar_url || '';
+        avatarEl.style.display = profile.avatar_url ? '' : 'none';
+        document.getElementById('mgName').textContent = profile.display_name || profile.twitch_login || 'Miembro';
+        document.getElementById('mgLevel').textContent = 'Nivel ' + profile.level;
+        document.getElementById('mgLevelBig').textContent = 'Nivel ' + profile.level;
+
+        var countryEl = document.getElementById('mgCountry');
+        if (profile.country_code) { countryEl.hidden = false; countryEl.textContent = profile.country_code; }
+        else countryEl.hidden = true;
+
+        var dentro = (profile.xp || 0) % XP_PER_LEVEL;
+        document.getElementById('mgXpText').textContent = dentro.toLocaleString() + ' / ' + XP_PER_LEVEL.toLocaleString() + ' XP';
+        document.getElementById('mgXpBarFill').style.width = Math.min(100, (dentro / XP_PER_LEVEL) * 100) + '%';
+
+        await refreshSaldo(sb, session);
+
+        // Ranking real: pendiente, ver nota en loadRankingTable().
+        document.getElementById('mgRank').textContent = 'Próximamente';
+
+        loadRankingTable();
+      } catch (e) {
+        console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
+        loggedOutEl.hidden = false;
+        dashEl.hidden = true;
+      }
+    }
+
+    whenReady(function () {
+      var sb = window.GeoArmyAccount.client;
+      document.getElementById('mgLoginBtn').addEventListener('click', function () {
+        window.GeoArmyAccount.openLogin();
+      });
+      document.getElementById('mgRefreshSaldo').addEventListener('click', async function () {
+        var sessionRes = await sb.auth.getSession();
+        var session = sessionRes.data && sessionRes.data.session;
+        if (!session || !session.provider_token) {
+          await window.GeoArmyAccount.signInWithTwitch(window.location.pathname + '#gcoins');
+          return;
+        }
+        await refreshSaldo(sb, session);
+      });
+      sb.auth.onAuthStateChange(function () { loadDashboard(sb); });
+      loadDashboard(sb);
+    });
+  })();
+  </script>
+</body>
+</html>
