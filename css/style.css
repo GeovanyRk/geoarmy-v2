@@ -619,10 +619,31 @@ html.panels-ready .panel.is-active { display: block; }
 
 .ga-account-wrap { position: relative; }
 .ga-dropdown {
-  position: absolute; top: calc(100% + 10px); right: 0; min-width: 210px;
+  position: absolute; top: calc(100% + 10px); right: 0; min-width: 210px; max-width: 260px;
   background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: var(--card-shadow); padding: 8px; display: flex; flex-direction: column;
   gap: 2px; z-index: 200;
+}
+
+/* Resumen rápido de saldos, arriba del listado de opciones del dropdown. */
+.ga-balances {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding: 4px 4px 10px; margin-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.ga-chip {
+  display: inline-flex; align-items: center; gap: 5px; flex: 1 1 auto;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px;
+  color: var(--text); background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: 100px; padding: 5px 9px; white-space: nowrap;
+}
+.ga-chip-ic { font-size: 12px; line-height: 1; display: inline-flex; flex-shrink: 0; }
+.ga-chip-ic-img { width: 14px; height: 14px; object-fit: contain; flex-shrink: 0; }
+.ga-chip-gcoin { color: var(--gold); }
+.ga-chip-vbucks { color: #3aa0ff; }
+.ga-chip-owcoins { color: #ff8a3d; }
+@media (max-width: 480px) {
+  .ga-balances { gap: 5px; }
+  .ga-chip { flex: 1 1 calc(50% - 5px); justify-content: center; }
 }
 .ga-drop-item {
   display: flex; align-items: center; gap: 8px; padding: 10px 12px;
