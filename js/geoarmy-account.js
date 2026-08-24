@@ -6,17 +6,17 @@
 //   <div id="geoAccountWidget"></div>
 (function () {
   'use strict';
-
+ 
   // ====== Config real de Supabase: ver js/geoarmy-config.js ======
   // (un solo lugar para pegar SUPABASE_URL / SUPABASE_ANON_KEY; este archivo
   // debe cargarse ANTES que este script en cada página)
-  const SUPABASE_URL = window.GEOARMY_SUPABASE_URL || 'https://zhegmjppvpgvrnhlevsc.supabase.co';
-  const SUPABASE_ANON_KEY = window.GEOARMY_SUPABASE_ANON_KEY || 'sb_publishable_NOs6VaVgUOQiib5r0GJQiQ_ZoWt1_qb';
+  const SUPABASE_URL = window.GEOARMY_SUPABASE_URL || 'https://TU-PROYECTO.supabase.co';
+  const SUPABASE_ANON_KEY = window.GEOARMY_SUPABASE_ANON_KEY || 'TU-ANON-KEY-PUBLICA';
   // Mismo backend que ya usa tienda.html para el saldo real de G-Coins.
   const TIENDA_API_BASE = 'https://geoarmy.duckdns.org';
   const RETURN_TO_KEY = 'geoarmy_return_to_v1';
   // =======================================================================
-
+ 
   if (!window.supabase || !window.supabase.createClient) {
     console.warn('[geoarmy-account] Falta cargar supabase-js antes de este script.');
     return;
@@ -24,9 +24,9 @@
   if (SUPABASE_URL.indexOf('TU-PROYECTO') !== -1) {
     console.warn('[geoarmy-account] Falta configurar SUPABASE_URL / SUPABASE_ANON_KEY en js/geoarmy-config.js');
   }
-
+ 
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+ 
   // Carpeta base del sitio/beta (con barra final), ej. "/" en producción o
   // "/geoarmy-v2/" en esta beta.
   //
@@ -44,7 +44,7 @@
     console.warn('[geoarmy-account] Falta GEOARMY_SITE_BASE en js/geoarmy-config.js — usando "/" por defecto.');
     return '/';
   }
-
+ 
   // Guarda a dónde volver después del login (la página actual) y manda al
   // usuario a Twitch. auth/callback/index.html retoma esta ruta guardada
   // una vez Supabase confirma la sesión.
@@ -59,7 +59,7 @@
       options: { redirectTo: window.location.origin + siteBase() + 'auth/callback/' },
     });
   }
-
+ 
   // Otras páginas (ej. mi-geoarmy.html) reusan esta misma instancia/sesión.
   window.GeoArmyAccount = {
     client: sb,
@@ -67,9 +67,9 @@
     refreshWidget: render,
     signInWithTwitch: signInWithTwitch,
   };
-
+ 
   var CACHE_KEY = 'geoarmy_gcoins_cache_v1';
-
+ 
   function cacheSaldo(valor) {
     try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ valor: valor, ts: Date.now() })); } catch (e) {}
   }
@@ -80,7 +80,7 @@
       return JSON.parse(raw);
     } catch (e) { return null; }
   }
-
+ 
   // Lee el saldo REAL de G-Coins desde tienda-server, igual que ya hace
   // tienda.html — usando el access token de Twitch del propio usuario.
   // No inventa un balance nuevo: es el mismo saldo de siempre.
@@ -99,7 +99,7 @@
       return null;
     }
   }
-
+ 
   // El trigger de Supabase (handle_new_user) ya crea el perfil en el primer
   // login — aquí solo lo leemos, nunca lo escribimos desde el cliente.
   async function fetchProfile(userId) {
@@ -107,13 +107,13 @@
     if (r.error) { console.warn('[geoarmy-account] no se pudo leer el perfil', r.error); return null; }
     return r.data;
   }
-
+ 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
   }
-
+ 
   function renderLoggedOut(slot) {
     slot.innerHTML =
       '<button type="button" class="ga-account-btn ga-logged-out" id="gaOpenLogin">' +
@@ -121,14 +121,14 @@
       '</button>';
     document.getElementById('gaOpenLogin').addEventListener('click', openLoginModal);
   }
-
+ 
   function renderLoggedIn(slot, profile, saldo) {
     var nombre = profile.display_name || profile.twitch_login || 'Miembro';
     var avatar = profile.avatar_url
       ? '<img src="' + esc(profile.avatar_url) + '" alt="" class="ga-avatar"/>'
       : '<span class="ga-avatar ga-avatar-fallback">' + esc(nombre[0] || '?') + '</span>';
     var saldoTxt = saldo == null ? '—' : Number(saldo).toLocaleString();
-
+ 
     slot.innerHTML =
       '<div class="ga-account-wrap">' +
         '<button type="button" class="ga-account-btn ga-logged-in" id="gaToggleMenu">' +
@@ -141,10 +141,19 @@
           '<a href="mi-geoarmy.html" class="ga-drop-item">👤 Mi perfil</a>' +
           '<a href="mi-geoarmy.html#gcoins" class="ga-drop-item">🪙 Mis G-Coins</a>' +
           '<a href="mi-geoarmy.html#ranking" class="ga-drop-item">🏆 Ranking</a>' +
+          // "Panel Admin" NUNCA aparece en el navbar público — solo aquí, dentro
+          // del dropdown de la propia cuenta, y solo si profiles.role === 'admin'.
+          // Esto es únicamente ocultar el enlace (UX): la protección real está
+          // del lado del servidor en admin_list_redemption_requests()/
+          // admin_update_redemption_status() (ver migracion-panel-admin-v2.sql),
+          // que rechazan a cualquiera que no sea admin aunque conozca la URL.
+          (profile.role === 'admin'
+            ? '<a href="admin/recompensas/" class="ga-drop-item">🛠️ Panel Admin</a>'
+            : '') +
           '<button type="button" class="ga-drop-item ga-drop-danger" id="gaLogout">🚪 Cerrar sesión</button>' +
         '</div>' +
       '</div>';
-
+ 
     var btn = document.getElementById('gaToggleMenu');
     var dd = document.getElementById('gaDropdown');
     btn.addEventListener('click', function (e) {
@@ -159,7 +168,7 @@
       location.href = 'index.html';
     });
   }
-
+ 
   function openLoginModal() {
     var overlay = document.createElement('div');
     overlay.className = 'ga-modal-overlay';
@@ -181,18 +190,18 @@
       await signInWithTwitch();
     });
   }
-
+ 
   async function render() {
     var slot = document.getElementById('geoAccountWidget');
     if (!slot) return;
-
+ 
     var sessionRes = await sb.auth.getSession();
     var session = sessionRes.data && sessionRes.data.session;
     if (!session) { renderLoggedOut(slot); return; }
-
+ 
     var profile = await fetchProfile(session.user.id);
     if (!profile) { renderLoggedOut(slot); return; }
-
+ 
     var saldo = null;
     if (session.provider_token) {
       saldo = await fetchSaldoReal(session.provider_token);
@@ -203,7 +212,7 @@
     }
     renderLoggedIn(slot, profile, saldo);
   }
-
+ 
   sb.auth.onAuthStateChange(function () { render(); });
   document.addEventListener('DOMContentLoaded', render);
 })();
