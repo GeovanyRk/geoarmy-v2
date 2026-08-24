@@ -68,66 +68,60 @@
 
     <!-- Dashboard -->
     <div id="mgDashboard" hidden>
+
+      <!-- MIS SALDOS: G-Coins (tienda-server, tarjeta fija) + wallet_balances de
+           Supabase (mgWalletGrid, generado por loadWallets()). Visualmente es
+           una sola fila; técnicamente siguen siendo dos fuentes separadas. -->
       <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-now-grid">
-          <div class="v3-now-card v3-c-purple">
-            <div class="v3-now-head"><span class="v3-now-ic">👤</span>Perfil</div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <img id="mgAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
-              <div style="min-width:0;">
-                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
-                <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
-                <div id="mgCountry" class="v3-now-sub" hidden></div>
-              </div>
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">💰</span>Mis saldos</div>
+        <div class="v3-saldos-row">
+          <div class="v3-saldo-card v3-c-gold" id="gcoins">
+            <div class="v3-saldo-head"><span class="v3-saldo-ic">🪙</span>G-Coins</div>
+            <div class="v3-saldo-amt" id="mgGcoins">—<span>G</span></div>
+            <div class="v3-saldo-sub">Disponibles</div>
+            <button type="button" class="v3-saldo-link" id="mgRefreshSaldo">Actualizar saldo</button>
+          </div>
+          <div id="mgWalletGrid">
+            <div class="v3-table-empty">Cargando…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MI PERFIL + PROGRESO -->
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-account-row">
+          <div class="v3-profile-card v3-c-purple">
+            <img id="mgAvatar" src="" alt="" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
+            <div style="min-width:0;">
+              <div class="v3-now-header-sm" style="margin:0 0 8px;"><span class="v3-now-ic">👤</span>Mi perfil</div>
+              <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+              <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
+              <div id="mgCountry" class="v3-now-sub" hidden></div>
             </div>
           </div>
 
-          <div class="v3-now-card v3-c-gold" id="gcoins">
-            <div class="v3-now-head"><span class="v3-now-ic">🪙</span>G-Coins</div>
-            <div class="v3-now-big" id="mgGcoins">—<span>G</span></div>
-            <div class="v3-now-sub">G-Coins disponibles</div>
-            <button type="button" class="v3-now-btn" id="mgRefreshSaldo" style="border:none; cursor:pointer; font-family:'Orbitron',sans-serif;">Actualizar saldo</button>
-          </div>
-
-          <div class="v3-now-card v3-c-blue">
-            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Ranking</div>
-            <div class="v3-now-big" id="mgRank">—</div>
-            <div class="v3-now-sub">Ranking Geo Army</div>
+          <div class="v3-xp-inner" style="margin:0;">
+            <div class="v3-now-header-sm" style="margin:0 0 12px;"><span class="v3-now-ic">📈</span>Progreso</div>
+            <div class="v3-xp-top">
+              <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
+              <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
+            </div>
+            <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
+            <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
           </div>
         </div>
       </div>
 
-      <div class="v3-xp-card">
-        <div class="v3-xp-inner">
-          <div class="v3-xp-top">
-            <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
-            <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
-          </div>
-          <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
-          <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
+      <!-- RANKING: todavía no conectado (ver loadRankingTable()). Se deja como
+           placeholder compacto; mgRankBody sigue en el DOM (oculto) para cuando
+           se conecte el ranking real, sin tener que tocar el JS. -->
+      <div class="v3-table-wrap" id="ranking" style="margin-top:1.6rem;">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking</div>
+        <div class="v3-table-card v3-ranking-placeholder">
+          <div class="v3-now-sub">Tu posición en el ranking Geo Army</div>
+          <div class="v3-now-big v3-now-big-sm v3-c-blue" id="mgRank">—</div>
         </div>
-      </div>
-
-      <!-- Mis recompensas: saldos reales de wallet_balances (Supabase). GCOIN
-           sigue aparte, viene de tienda-server (ver tarjeta G-Coins arriba). -->
-      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🎁</span>Mis recompensas</div>
-        <div class="v3-now-grid" id="mgWalletGrid">
-          <div class="v3-table-empty">Cargando…</div>
-        </div>
-      </div>
-
-      <!-- Mis solicitudes: historial de redemption_requests del propio usuario. -->
-      <div class="v3-table-wrap" id="misSolicitudes">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
-        <div id="mgRequestsList">
-          <div class="v3-table-empty">Cargando…</div>
-        </div>
-      </div>
-
-      <div class="v3-table-wrap" id="ranking">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking Geo Army</div>
-        <div class="v3-table-card">
+        <div hidden>
           <table>
             <thead>
               <tr><th>#</th><th>Usuario</th><th>Nivel</th><th>G-Coins</th></tr>
@@ -136,6 +130,14 @@
               <tr><td colspan="4" class="v3-table-empty">Cargando…</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Mis solicitudes: historial de redemption_requests del propio usuario. -->
+      <div class="v3-table-wrap" id="misSolicitudes">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
+        <div id="mgRequestsList">
+          <div class="v3-table-empty">Cargando…</div>
         </div>
       </div>
     </div>
