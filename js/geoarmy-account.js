@@ -14,9 +14,6 @@
   const SUPABASE_ANON_KEY = window.GEOARMY_SUPABASE_ANON_KEY || 'TU-ANON-KEY-PUBLICA';
   // Mismo backend que ya usa tienda.html para el saldo real de G-Coins.
   const TIENDA_API_BASE = 'https://geoarmy.duckdns.org';
-  // Página que completa el login (debe registrarse en Supabase Auth ->
-  // URL Configuration -> Redirect URLs, EXACTAMENTE con esta barra final).
-  const AUTH_CALLBACK_URL_SUFFIX = '/auth/callback/';
   const RETURN_TO_KEY = 'geoarmy_return_to_v1';
   // =======================================================================
 
@@ -30,6 +27,24 @@
 
   var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Carpeta base del sitio/beta (con barra final), ej. "/" en producción o
+  // "/geoarmy-v2/" en esta beta.
+  //
+  // Se toma de window.GEOARMY_SITE_BASE, declarado explícitamente en
+  // js/geoarmy-config.js — NO se adivina a partir de window.location.pathname.
+  // Motivo: algunos hosts (Cloudflare/GitHub Pages sirviendo un subdirectorio)
+  // normalizan/quitan la barra final de una URL de carpeta (ej.
+  // "/geoarmy-v2/auth/callback/" puede llegar como "/geoarmy-v2/auth/callback"
+  // sin barra), lo que hacía que adivinar la base a partir del pathname fuera
+  // poco confiable y mandara al usuario a la raíz de producción. Con un valor
+  // explícito por despliegue, esto queda resuelto sin depender de cómo cada
+  // host maneje esa barra.
+  function siteBase() {
+    if (window.GEOARMY_SITE_BASE) return window.GEOARMY_SITE_BASE;
+    console.warn('[geoarmy-account] Falta GEOARMY_SITE_BASE en js/geoarmy-config.js — usando "/" por defecto.');
+    return '/';
+  }
+
   // Guarda a dónde volver después del login (la página actual) y manda al
   // usuario a Twitch. auth/callback/index.html retoma esta ruta guardada
   // una vez Supabase confirma la sesión.
@@ -39,7 +54,9 @@
     } catch (e) {}
     await sb.auth.signInWithOAuth({
       provider: 'twitch',
-      options: { redirectTo: window.location.origin + AUTH_CALLBACK_URL_SUFFIX },
+      // Debe registrarse en Supabase Auth -> URL Configuration -> Redirect
+      // URLs EXACTAMENTE con esta barra final (ej. .../geoarmy-v2/auth/callback/).
+      options: { redirectTo: window.location.origin + siteBase() + 'auth/callback/' },
     });
   }
 
@@ -139,7 +156,7 @@
     document.getElementById('gaLogout').addEventListener('click', async function () {
       await sb.auth.signOut();
       try { sessionStorage.removeItem(CACHE_KEY); } catch (e) {}
-      location.href = 'index-v3.html';
+      location.href = 'index.html';
     });
   }
 

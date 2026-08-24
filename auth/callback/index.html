@@ -7,51 +7,97 @@
   <title>Conectando… — GeoArmy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../css/style.css"/>
-  <link rel="stylesheet" href="../../css/v3-theme.css"/>
   <style>
-    /* Pequeño spinner propio, no depende de nada más del sitio */
+    /* Estilos mínimos propios, para que la página se vea bien AUNQUE
+       css/style.css y css/v3-theme.css (cargados dinámicamente más abajo)
+       tarden en llegar o fallen — esta página nunca debe depender de rutas
+       relativas resueltas por el navegador (ver nota de GEOARMY_SITE_BASE). */
+    body { background: #0a0a14; color: #eaf2ff; font-family: 'Inter', sans-serif; }
+    .cb-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+    .cb-card { max-width: 420px; }
+    .cb-tag { letter-spacing: .28em; font-size: 12px; color: #a9bad6; margin-bottom: .6rem; }
+    .cb-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; margin: 0 0 1.2rem; }
     .cb-spin {
       display: inline-block; width: 34px; height: 34px; border-radius: 50%;
       border: 3px solid rgba(169,112,255,.25); border-top-color: #a970ff;
       animation: cbSpin 0.8s linear infinite; margin-bottom: .9rem;
     }
     @keyframes cbSpin { to { transform: rotate(360deg); } }
+    .cb-msg { color: #a9bad6; font-size: 14px; line-height: 1.6; }
+    .cb-msg a { color: #a970ff; }
   </style>
   <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="../../js/geoarmy-config.js"></script>
 </head>
 <body>
-  <div class="v3-page" style="min-height:100vh;">
-    <div class="v3-stars"></div>
-    <section class="v3-page-hero">
-      <div class="v3-tagline" style="letter-spacing:.28em;">MI GEO ARMY</div>
-      <h1 class="v3-page-title" style="font-size:1.7rem;">Conectando con Twitch…</h1>
-      <div class="v3-simple-card" id="cbCard">
-        <div class="cb-spin" id="cbSpin"></div>
-        <p id="cbMsg">Un momento, estamos confirmando tu sesión.</p>
-      </div>
-    </section>
+  <div class="cb-wrap">
+    <div class="cb-card" id="cbCard">
+      <div class="cb-tag">MI GEO ARMY</div>
+      <h1 class="cb-title">Conectando con Twitch…</h1>
+      <div class="cb-spin" id="cbSpin"></div>
+      <p class="cb-msg" id="cbMsg">Un momento, estamos confirmando tu sesión.</p>
+    </div>
   </div>
 
   <script>
   (function () {
     'use strict';
+
+    // ===== Bootstrap de la carpeta base de este despliegue =====
+    // Esta página vive 2 niveles adentro (auth/callback/index.html), así que
+    // NO puede simplemente cargar js/geoarmy-config.js con una ruta relativa
+    // ("../../js/geoarmy-config.js"): eso depende de que el navegador resuelva
+    // esa ruta contra la URL exacta con la que se sirvió la página, y varios
+    // hosts (Cloudflare/GitHub Pages sirviendo un subdirectorio) quitan la
+    // barra final de "/geoarmy-v2/auth/callback/" al servirla, lo que hacía
+    // que "../../" terminara resolviendo a la raíz de producción en vez de
+    // a "/geoarmy-v2/" — la causa exacta de que "Falta configurar Supabase"
+    // apareciera con la config correcta, y de que el link de error mandara a
+    // geoarmy.tv/index.html.
+    //
+    // Por eso este valor se declara aquí LITERAL (no se adivina de la URL) y
+    // se usa para construir, con el origen del sitio, la ruta absoluta real
+    // hacia geoarmy-config.js y hacia los CSS. DEBE ser idéntico al
+    // GEOARMY_SITE_BASE de js/geoarmy-config.js — si cambias uno, cambia el
+    // otro. (Una vez cargado geoarmy-config.js, se compara contra ese valor
+    // real y se avisa en consola si quedaron desincronizados.)
+    var SITE_BASE_BOOTSTRAP = '/geoarmy-v2/';
+
     var RETURN_TO_KEY = 'geoarmy_return_to_v1';
-    var DEFAULT_DEST = '/mi-geoarmy.html';
 
     function showError(text) {
       var spin = document.getElementById('cbSpin');
       var msg = document.getElementById('cbMsg');
       if (spin) spin.outerHTML = '<div style="font-size:32px;margin-bottom:.75rem;">⚠️</div>';
       if (msg) {
-        msg.innerHTML = text + '<br><br><a href="/index-v3.html" style="color:#a970ff;">Volver al inicio</a>';
+        msg.innerHTML = text + '<br><br><a href="' + SITE_BASE_BOOTSTRAP + 'index.html">Volver al inicio</a>';
       }
     }
 
-    function goToDest() {
-      var dest = DEFAULT_DEST;
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function () { resolve(); };
+        s.onerror = function () { reject(new Error('no se pudo cargar ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+
+    function loadCss(href) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = href;
+      document.head.appendChild(l);
+    }
+
+    // CSS del sitio: no bloqueante, cosmético (si tarda o falla, el spinner
+    // y el mensaje de arriba ya se ven bien con los estilos inline).
+    loadCss(window.location.origin + SITE_BASE_BOOTSTRAP + 'css/style.css');
+    loadCss(window.location.origin + SITE_BASE_BOOTSTRAP + 'css/v3-theme.css');
+
+    function goToDest(siteBase) {
+      var dest = siteBase + 'mi-geoarmy.html';
       try {
         var saved = sessionStorage.getItem(RETURN_TO_KEY);
         if (saved) {
@@ -59,8 +105,10 @@
           sessionStorage.removeItem(RETURN_TO_KEY);
         }
       } catch (e) {}
-      // dest siempre es una ruta absoluta del sitio (empieza en "/"), guardada
-      // por signInWithTwitch() en js/geoarmy-account.js antes de salir a Twitch.
+      // dest guardado por signInWithTwitch() en js/geoarmy-account.js ya
+      // incluye la subcarpeta de la beta (viene de window.location.pathname
+      // de la página original) — solo el destino por defecto usa siteBase
+      // explícito aquí.
       window.location.replace(window.location.origin + dest);
     }
 
@@ -69,27 +117,41 @@
         showError('No se pudo cargar el sistema de cuentas (supabase-js).');
         return;
       }
-      if (!window.GEOARMY_SUPABASE_URL || window.GEOARMY_SUPABASE_URL.indexOf('TU-PROYECTO') !== -1) {
-        showError('Falta configurar Supabase en js/geoarmy-config.js.');
-        return;
-      }
 
-      var sb = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+      loadScript(window.location.origin + SITE_BASE_BOOTSTRAP + 'js/geoarmy-config.js').then(function () {
+        if (window.GEOARMY_SITE_BASE && window.GEOARMY_SITE_BASE !== SITE_BASE_BOOTSTRAP) {
+          console.warn(
+            '[auth/callback] GEOARMY_SITE_BASE de geoarmy-config.js (' + window.GEOARMY_SITE_BASE + ') ' +
+            'no coincide con el bootstrap de esta página (' + SITE_BASE_BOOTSTRAP + '). Actualiza ambos.'
+          );
+        }
+        var siteBase = window.GEOARMY_SITE_BASE || SITE_BASE_BOOTSTRAP;
 
-      // supabase-js detecta y procesa el code/token de la URL automáticamente
-      // al crear el cliente (detectSessionInUrl, activo por defecto). Solo
-      // necesitamos esperar a que getSession() confirme que ya quedó guardada.
-      sb.auth.getSession().then(function (r) {
-        var session = r.data && r.data.session;
-        if (r.error || !session) {
-          console.warn('[auth/callback] no se encontró sesión tras volver de Twitch', r.error);
-          showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
+        if (!window.GEOARMY_SUPABASE_URL || window.GEOARMY_SUPABASE_URL.indexOf('TU-PROYECTO') !== -1) {
+          showError('Falta configurar Supabase en js/geoarmy-config.js.');
           return;
         }
-        goToDest();
+
+        var sb = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+
+        // supabase-js detecta y procesa el code/token de la URL automáticamente
+        // al crear el cliente (detectSessionInUrl, activo por defecto). Solo
+        // necesitamos esperar a que getSession() confirme que ya quedó guardada.
+        sb.auth.getSession().then(function (r) {
+          var session = r.data && r.data.session;
+          if (r.error || !session) {
+            console.warn('[auth/callback] no se encontró sesión tras volver de Twitch', r.error);
+            showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
+            return;
+          }
+          goToDest(siteBase);
+        }).catch(function (e) {
+          console.warn('[auth/callback] error confirmando la sesión', e);
+          showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
+        });
       }).catch(function (e) {
-        console.warn('[auth/callback] error confirmando la sesión', e);
-        showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
+        console.warn('[auth/callback] no se pudo cargar geoarmy-config.js', e);
+        showError('No se pudo cargar la configuración de Supabase (js/geoarmy-config.js).');
       });
     });
   })();
