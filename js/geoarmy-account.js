@@ -10,8 +10,8 @@
   // ====== Config real de Supabase: ver js/geoarmy-config.js ======
   // (un solo lugar para pegar SUPABASE_URL / SUPABASE_ANON_KEY; este archivo
   // debe cargarse ANTES que este script en cada página)
-  const SUPABASE_URL = window.GEOARMY_SUPABASE_URL || 'https://TU-PROYECTO.supabase.co';
-  const SUPABASE_ANON_KEY = window.GEOARMY_SUPABASE_ANON_KEY || 'TU-ANON-KEY-PUBLICA';
+  const SUPABASE_URL = window.GEOARMY_SUPABASE_URL || 'https://zhegmjppvpgvrnhlevsc.supabase.co';
+  const SUPABASE_ANON_KEY = window.GEOARMY_SUPABASE_ANON_KEY || 'sb_publishable_NOs6VaVgUOQiib5r0GJQiQ_ZoWt1_qb';
   // Mismo backend que ya usa tienda.html para el saldo real de G-Coins.
   const TIENDA_API_BASE = 'https://geoarmy.duckdns.org';
   const RETURN_TO_KEY = 'geoarmy_return_to_v1';
