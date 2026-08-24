@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>Conectando… — GeoArmy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/style.css"/>
+  <link rel="stylesheet" href="../../css/v3-theme.css"/>
+  <style>
+    /* Pequeño spinner propio, no depende de nada más del sitio */
+    .cb-spin {
+      display: inline-block; width: 34px; height: 34px; border-radius: 50%;
+      border: 3px solid rgba(169,112,255,.25); border-top-color: #a970ff;
+      animation: cbSpin 0.8s linear infinite; margin-bottom: .9rem;
+    }
+    @keyframes cbSpin { to { transform: rotate(360deg); } }
+  </style>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../../js/geoarmy-config.js"></script>
+</head>
+<body>
+  <div class="v3-page" style="min-height:100vh;">
+    <div class="v3-stars"></div>
+    <section class="v3-page-hero">
+      <div class="v3-tagline" style="letter-spacing:.28em;">MI GEO ARMY</div>
+      <h1 class="v3-page-title" style="font-size:1.7rem;">Conectando con Twitch…</h1>
+      <div class="v3-simple-card" id="cbCard">
+        <div class="cb-spin" id="cbSpin"></div>
+        <p id="cbMsg">Un momento, estamos confirmando tu sesión.</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+    var RETURN_TO_KEY = 'geoarmy_return_to_v1';
+
+    // Esta página siempre vive en "<base-del-sitio>/auth/callback/" (o
+    // ".../auth/callback/index.html"). Calculamos <base-del-sitio> a partir
+    // de la propia URL en vez de asumir que el sitio está en la raíz — así
+    // funciona igual en producción ("/") y en esta beta ("/geoarmy-v2/"),
+    // o en cualquier otra subcarpeta futura, sin tocar este archivo.
+    var SITE_BASE = (function () {
+      var m = window.location.pathname.match(/^(.*\/)auth\/callback\/(?:index\.html)?$/);
+      return m ? m[1] : '/';
+    })();
+    var DEFAULT_DEST = SITE_BASE + 'mi-geoarmy.html';
+
+    function showError(text) {
+      var spin = document.getElementById('cbSpin');
+      var msg = document.getElementById('cbMsg');
+      if (spin) spin.outerHTML = '<div style="font-size:32px;margin-bottom:.75rem;">⚠️</div>';
+      if (msg) {
+        msg.innerHTML = text + '<br><br><a href="' + SITE_BASE + 'index.html" style="color:#a970ff;">Volver al inicio</a>';
+      }
+    }
+
+    function goToDest() {
+      var dest = DEFAULT_DEST;
+      try {
+        var saved = sessionStorage.getItem(RETURN_TO_KEY);
+        if (saved) {
+          dest = saved;
+          sessionStorage.removeItem(RETURN_TO_KEY);
+        }
+      } catch (e) {}
+      // dest siempre es una ruta absoluta del sitio (empieza en "/"), guardada
+      // por signInWithTwitch() en js/geoarmy-account.js antes de salir a Twitch
+      // — ya incluye la subcarpeta de la beta si aplica (ej. /geoarmy-v2/...).
+      window.location.replace(window.location.origin + dest);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!window.supabase || !window.supabase.createClient) {
+        showError('No se pudo cargar el sistema de cuentas (supabase-js).');
+        return;
+      }
+      if (!window.GEOARMY_SUPABASE_URL || window.GEOARMY_SUPABASE_URL.indexOf('TU-PROYECTO') !== -1) {
+        showError('Falta configurar Supabase en js/geoarmy-config.js.');
+        return;
+      }
+
+      var sb = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+
+      // supabase-js detecta y procesa el code/token de la URL automáticamente
+      // al crear el cliente (detectSessionInUrl, activo por defecto). Solo
+      // necesitamos esperar a que getSession() confirme que ya quedó guardada.
+      sb.auth.getSession().then(function (r) {
+        var session = r.data && r.data.session;
+        if (r.error || !session) {
+          console.warn('[auth/callback] no se encontró sesión tras volver de Twitch', r.error);
+          showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
+          return;
+        }
+        goToDest();
+      }).catch(function (e) {
+        console.warn('[auth/callback] error confirmando la sesión', e);
+        showError('No se pudo iniciar sesión con Twitch. Intenta de nuevo desde el sitio.');
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
