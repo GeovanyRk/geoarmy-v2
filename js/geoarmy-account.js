@@ -107,6 +107,32 @@
     if (r.error) { console.warn('[geoarmy-account] no se pudo leer el perfil', r.error); return null; }
     return r.data;
   }
+
+  // Lectura mínima y aislada, solo para los chips de resumen del widget global
+  // (visible en todas las páginas). NO reemplaza ni duplica loadWallets() de
+  // mi-geoarmy.html — es la misma tabla, filtrada al propio usuario (RLS
+  // intacta, mismo cliente/sesión de siempre), pidiendo solo VBUCKS/OWCOINS y
+  // los campos mínimos (balance, reserved) para calcular el disponible.
+  async function fetchMiniWallets(userId) {
+    try {
+      var res = await sb.from('wallet_balances')
+        .select('currency_code, balance, reserved')
+        .eq('profile_id', userId)
+        .in('currency_code', ['VBUCKS', 'OWCOINS']);
+      if (res.error) {
+        console.warn('[geoarmy-account] no se pudieron leer los saldos mini (VBUCKS/OWCOINS)', res.error);
+        return {};
+      }
+      var byCode = {};
+      (res.data || []).forEach(function (row) {
+        byCode[row.currency_code] = Number(row.balance || 0) - Number(row.reserved || 0);
+      });
+      return byCode;
+    } catch (e) {
+      console.warn('[geoarmy-account] error leyendo saldos mini', e);
+      return {};
+    }
+  }
  
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
@@ -122,13 +148,34 @@
     document.getElementById('gaOpenLogin').addEventListener('click', openLoginModal);
   }
  
-  function renderLoggedIn(slot, profile, saldo) {
+  function renderLoggedIn(slot, profile, saldo, miniWallets) {
     var nombre = profile.display_name || profile.twitch_login || 'Miembro';
     var avatar = profile.avatar_url
       ? '<img src="' + esc(profile.avatar_url) + '" alt="" class="ga-avatar"/>'
       : '<span class="ga-avatar ga-avatar-fallback">' + esc(nombre[0] || '?') + '</span>';
     var saldoTxt = saldo == null ? '—' : Number(saldo).toLocaleString();
- 
+
+    // Resumen rápido de saldos, arriba del listado de opciones del dropdown.
+    // G-Coins reusa el mismo `saldo` que ya trae tienda-server (sin segunda
+    // consulta); V-Bucks/OW Coins vienen de fetchMiniWallets() (wallet_balances,
+    // solo lectura, ver arriba) — ambas fuentes se muestran juntas pero nunca
+    // se combinan/mezclan.
+    miniWallets = miniWallets || {};
+    var vbucksTxt = miniWallets.VBUCKS == null ? '—' : Number(miniWallets.VBUCKS).toLocaleString();
+    var owcoinsTxt = miniWallets.OWCOINS == null ? '—' : Number(miniWallets.OWCOINS).toLocaleString();
+    var balancesRow =
+      '<div class="ga-balances">' +
+        '<span class="ga-chip ga-chip-gcoin" title="G-Coins disponibles">' +
+          '<img class="ga-chip-ic ga-chip-ic-img" src="gcoin-icon.png" alt=""/>' + saldoTxt +
+        '</span>' +
+        '<span class="ga-chip ga-chip-vbucks" title="V-Bucks disponibles">' +
+          '<span class="ga-chip-ic">🎮</span>' + vbucksTxt +
+        '</span>' +
+        '<span class="ga-chip ga-chip-owcoins" title="OW Coins disponibles">' +
+          '<span class="ga-chip-ic">🕹️</span>' + owcoinsTxt +
+        '</span>' +
+      '</div>';
+
     slot.innerHTML =
       '<div class="ga-account-wrap">' +
         '<button type="button" class="ga-account-btn ga-logged-in" id="gaToggleMenu">' +
@@ -138,6 +185,7 @@
           '<span class="ga-gcoins">' + saldoTxt + ' G</span>' +
         '</button>' +
         '<div class="ga-dropdown" id="gaDropdown" hidden>' +
+          balancesRow +
           '<a href="mi-geoarmy.html" class="ga-drop-item">👤 Mi perfil</a>' +
           '<a href="mi-geoarmy.html#gcoins" class="ga-drop-item">🪙 Mis G-Coins</a>' +
           '<a href="mi-geoarmy.html#ranking" class="ga-drop-item">🏆 Ranking</a>' +
@@ -210,7 +258,8 @@
       var cached = saldoCacheado();
       if (cached) saldo = cached.valor;
     }
-    renderLoggedIn(slot, profile, saldo);
+    var miniWallets = await fetchMiniWallets(session.user.id);
+    renderLoggedIn(slot, profile, saldo, miniWallets);
   }
  
   sb.auth.onAuthStateChange(function () { render(); });
