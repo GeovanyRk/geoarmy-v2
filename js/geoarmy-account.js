@@ -166,7 +166,7 @@
     var balancesRow =
       '<div class="ga-balances">' +
         '<span class="ga-chip ga-chip-gcoin" title="G-Coins disponibles">' +
-          '<img class="ga-chip-ic ga-chip-ic-img" src="gcoin-icon.png" alt=""/>' + saldoTxt +
+          '<img class="ga-chip-ic ga-chip-ic-img" src="' + siteBase() + 'gcoin-icon.png" alt="" onerror="this.remove()"/>' + saldoTxt +
         '</span>' +
         '<span class="ga-chip ga-chip-vbucks" title="V-Bucks disponibles">' +
           '<span class="ga-chip-ic">🎮</span>' + vbucksTxt +
