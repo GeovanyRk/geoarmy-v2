@@ -42,7 +42,6 @@
           <a href="fortnite.html">Fortnite</a>
           <a href="puntos.html">Puntos</a>
           <a href="alcancia.html">Alcancía</a>
-          <a href="independencia.html">Independencia</a>
         </div>
         <div class="v3-auth">
           <div id="geoAccountWidget"></div>
@@ -69,49 +68,60 @@
 
     <!-- Dashboard -->
     <div id="mgDashboard" hidden>
+
+      <!-- MIS SALDOS: G-Coins (tienda-server, tarjeta fija) + wallet_balances de
+           Supabase (mgWalletGrid, generado por loadWallets()). Visualmente es
+           una sola fila; técnicamente siguen siendo dos fuentes separadas. -->
       <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-now-grid">
-          <div class="v3-now-card v3-c-purple">
-            <div class="v3-now-head"><span class="v3-now-ic">👤</span>Perfil</div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <img id="mgAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
-              <div style="min-width:0;">
-                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
-                <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
-                <div id="mgCountry" class="v3-now-sub" hidden></div>
-              </div>
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">💰</span>Mis saldos</div>
+        <div class="v3-saldos-row">
+          <div class="v3-saldo-card v3-c-gold" id="gcoins">
+            <div class="v3-saldo-head"><span class="v3-saldo-ic">🪙</span>G-Coins</div>
+            <div class="v3-saldo-amt" id="mgGcoins">—<span>G</span></div>
+            <div class="v3-saldo-sub">Disponibles</div>
+            <button type="button" class="v3-saldo-link" id="mgRefreshSaldo">Actualizar saldo</button>
+          </div>
+          <div id="mgWalletGrid">
+            <div class="v3-table-empty">Cargando…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MI PERFIL + PROGRESO -->
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-account-row">
+          <div class="v3-profile-card v3-c-purple">
+            <img id="mgAvatar" src="" alt="" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
+            <div style="min-width:0;">
+              <div class="v3-now-header-sm" style="margin:0 0 8px;"><span class="v3-now-ic">👤</span>Mi perfil</div>
+              <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+              <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
+              <div id="mgCountry" class="v3-now-sub" hidden></div>
             </div>
           </div>
 
-          <div class="v3-now-card v3-c-gold" id="gcoins">
-            <div class="v3-now-head"><span class="v3-now-ic">🪙</span>G-Coins</div>
-            <div class="v3-now-big" id="mgGcoins">—<span>G</span></div>
-            <div class="v3-now-sub">G-Coins disponibles</div>
-            <button type="button" class="v3-now-btn" id="mgRefreshSaldo" style="border:none; cursor:pointer; font-family:'Orbitron',sans-serif;">Actualizar saldo</button>
-          </div>
-
-          <div class="v3-now-card v3-c-blue">
-            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Ranking</div>
-            <div class="v3-now-big" id="mgRank">—</div>
-            <div class="v3-now-sub">Ranking Geo Army</div>
+          <div class="v3-xp-inner" style="margin:0;">
+            <div class="v3-now-header-sm" style="margin:0 0 12px;"><span class="v3-now-ic">📈</span>Progreso</div>
+            <div class="v3-xp-top">
+              <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
+              <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
+            </div>
+            <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
+            <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
           </div>
         </div>
       </div>
 
-      <div class="v3-xp-card">
-        <div class="v3-xp-inner">
-          <div class="v3-xp-top">
-            <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
-            <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
-          </div>
-          <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
-          <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
+      <!-- RANKING: todavía no conectado (ver loadRankingTable()). Se deja como
+           placeholder compacto; mgRankBody sigue en el DOM (oculto) para cuando
+           se conecte el ranking real, sin tener que tocar el JS. -->
+      <div class="v3-table-wrap" id="ranking" style="margin-top:1.6rem;">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking</div>
+        <div class="v3-table-card v3-ranking-placeholder">
+          <div class="v3-now-sub">Tu posición en el ranking Geo Army</div>
+          <div class="v3-now-big v3-now-big-sm v3-c-blue" id="mgRank">—</div>
         </div>
-      </div>
-
-      <div class="v3-table-wrap" id="ranking">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking Geo Army</div>
-        <div class="v3-table-card">
+        <div hidden>
           <table>
             <thead>
               <tr><th>#</th><th>Usuario</th><th>Nivel</th><th>G-Coins</th></tr>
@@ -120,6 +130,14 @@
               <tr><td colspan="4" class="v3-table-empty">Cargando…</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Mis solicitudes: historial de redemption_requests del propio usuario. -->
+      <div class="v3-table-wrap" id="misSolicitudes">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
+        <div id="mgRequestsList">
+          <div class="v3-table-empty">Cargando…</div>
         </div>
       </div>
     </div>
@@ -147,6 +165,190 @@
       return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
       });
+    }
+
+    // ===== Mis recompensas / Mis solicitudes (wallet_balances, redemption_requests) =====
+    // GCOIN queda fuera a propósito: sigue siendo externally_managed (tienda-server),
+    // no tiene fila en wallet_balances y no se toca aquí (ver tarjeta G-Coins arriba,
+    // que sigue leyendo el saldo real de tienda-server como siempre).
+    var WALLET_CURRENCIES = [
+      { code: 'VBUCKS',     label: 'Fortnite',  unit: 'V-Bucks',  icon: '🎮', accent: 'v3-c-purple', decimals: 0 },
+      { code: 'OWCOINS',    label: 'Overwatch', unit: 'OW Coins', icon: '🕹️', accent: 'v3-c-blue',   decimals: 0 },
+      { code: 'PAYPAL_USD', label: 'PayPal',    unit: 'USD',      icon: '💵', accent: 'v3-c-gold',   decimals: 2 },
+      { code: 'TWITCH_SUB', label: 'Twitch',    unit: 'Subs',     icon: '🟣', accent: 'v3-c-purple', decimals: 0 }
+    ];
+
+    var STATUS_LABELS = {
+      pending: 'Pendiente', approved: 'Aprobado', delivered: 'Entregado',
+      rejected: 'Rechazado', cancelled: 'Cancelada'
+    };
+
+    function findCurrency(code) {
+      for (var i = 0; i < WALLET_CURRENCIES.length; i++) {
+        if (WALLET_CURRENCIES[i].code === code) return WALLET_CURRENCIES[i];
+      }
+      return { code: code, label: code, unit: code, icon: '🎁', accent: 'v3-c-purple', decimals: 0 };
+    }
+
+    function formatWalletAmount(cur, valor) {
+      var n = Number(valor || 0);
+      if (cur.decimals === 2) return '$' + n.toFixed(2);
+      return n.toLocaleString() + ' ' + cur.unit;
+    }
+
+    function formatFechaCorta(iso) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' });
+      } catch (e) { return iso; }
+    }
+
+    async function loadWallets(sb, userId) {
+      var grid = document.getElementById('mgWalletGrid');
+      if (!grid) return;
+      var res = await sb.from('wallet_balances').select('currency_code, balance, reserved').eq('profile_id', userId);
+      if (res.error) {
+        console.warn('[mi-geoarmy] no se pudieron leer los saldos de wallet', res.error);
+        grid.innerHTML = '<div class="v3-table-empty">No se pudieron cargar tus recompensas.</div>';
+        return;
+      }
+      var byCurrency = {};
+      (res.data || []).forEach(function (row) { byCurrency[row.currency_code] = row; });
+
+      grid.innerHTML = WALLET_CURRENCIES.map(function (cur) {
+        var row = byCurrency[cur.code];
+        var balance = row ? Number(row.balance) : 0;
+        var reserved = row ? Number(row.reserved) : 0;
+        var disponible = balance - reserved;
+        var puedeSolicitar = disponible > 0;
+        return (
+          '<div class="v3-now-card ' + cur.accent + '">' +
+            '<div class="v3-now-head"><span class="v3-now-ic">' + cur.icon + '</span>' + esc(cur.label) + '</div>' +
+            '<div class="v3-now-big">' + formatWalletAmount(cur, disponible) + '</div>' +
+            '<div class="v3-now-sub">Disponible' +
+              (reserved > 0 ? ' · ' + formatWalletAmount(cur, reserved) + ' reservado' : '') +
+            '</div>' +
+            (puedeSolicitar
+              ? '<button type="button" class="v3-now-btn mg-redeem-btn" data-currency="' + cur.code + '" data-disponible="' + disponible + '" style="border:none; cursor:pointer; font-family:\'Orbitron\',sans-serif;">Solicitar recompensa</button>'
+              : '')
+          + '</div>'
+        );
+      }).join('');
+
+      Array.prototype.forEach.call(grid.querySelectorAll('.mg-redeem-btn'), function (btn) {
+        btn.addEventListener('click', function () {
+          var code = btn.getAttribute('data-currency');
+          var disponible = Number(btn.getAttribute('data-disponible'));
+          openRedeemModal(sb, findCurrency(code), disponible, userId);
+        });
+      });
+    }
+
+    // El amount NO es libre: se fija al momento de abrir el modal (el
+    // disponible actual de esa moneda) y no se vuelve a leer un input libre,
+    // tal como se pidió para esta primera prueba end-to-end.
+    function openRedeemModal(sb, cur, disponible, userId) {
+      var requestKey = (window.crypto && window.crypto.randomUUID)
+        ? window.crypto.randomUUID()
+        : ('rk-' + Date.now() + '-' + Math.random().toString(16).slice(2));
+      var sending = false;
+
+      var overlay = document.createElement('div');
+      overlay.className = 'ga-modal-overlay';
+      overlay.innerHTML =
+        '<div class="ga-modal">' +
+          '<button type="button" class="ga-modal-close" aria-label="Cerrar">✕</button>' +
+          '<div class="ga-modal-logo">' + cur.icon + '</div>' +
+          '<h3>Solicitar recompensa — ' + esc(cur.label) + '</h3>' +
+          '<p>Vas a solicitar <strong>' + formatWalletAmount(cur, disponible) + '</strong>. Ese monto quedará reservado mientras se procesa tu solicitud.</p>' +
+          '<form id="mgRedeemForm" style="text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:10px;">' +
+            '<label style="font-size:13px; color:#a9bad6;">¿Qué estás solicitando?' +
+              '<input type="text" id="mgReqItem" required maxlength="200" placeholder="Ej: Skin Fortnite de prueba" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
+            '</label>' +
+            '<label style="font-size:13px; color:#a9bad6;">Tu usuario/cuenta para recibirlo' +
+              '<input type="text" id="mgReqAccount" required maxlength="200" placeholder="Ej: tu Epic username" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
+            '</label>' +
+            '<label style="font-size:13px; color:#a9bad6;">Notas (opcional)' +
+              '<textarea id="mgReqNotes" maxlength="1000" rows="2" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;"></textarea>' +
+            '</label>' +
+            '<div id="mgReqError" style="color:#ff8080; font-size:13px;"></div>' +
+            '<button type="submit" class="ga-twitch-btn" id="mgReqSubmit">Confirmar solicitud (' + formatWalletAmount(cur, disponible) + ')</button>' +
+          '</form>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+      overlay.querySelector('.ga-modal-close').addEventListener('click', function () { overlay.remove(); });
+
+      overlay.querySelector('#mgRedeemForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        // Mismo request_key en cada intento de ESTE modal (doble clic o
+        // retry tras un error) — nunca se genera uno nuevo aquí dentro.
+        if (sending) return;
+        sending = true;
+        var submitBtn = document.getElementById('mgReqSubmit');
+        var errEl = document.getElementById('mgReqError');
+        errEl.textContent = '';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Enviando…';
+
+        var item = document.getElementById('mgReqItem').value.trim();
+        var account = document.getElementById('mgReqAccount').value.trim();
+        var notes = document.getElementById('mgReqNotes').value.trim();
+
+        try {
+          var res = await sb.rpc('request_redemption', {
+            p_currency_code: cur.code,
+            p_amount: disponible,
+            p_request_key: requestKey,
+            p_requested_item: item || null,
+            p_account_identifier: account || null,
+            p_user_notes: notes || null
+          });
+          if (res.error) throw res.error;
+          overlay.remove();
+          await loadWallets(sb, userId);
+          await loadMyRequests(sb, userId);
+        } catch (err) {
+          console.warn('[mi-geoarmy] error solicitando recompensa', err);
+          errEl.textContent = (err && err.message) ? err.message : 'No se pudo enviar la solicitud. Intenta de nuevo.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirmar solicitud (' + formatWalletAmount(cur, disponible) + ')';
+          sending = false;
+        }
+      });
+    }
+
+    async function loadMyRequests(sb, userId) {
+      var wrap = document.getElementById('mgRequestsList');
+      if (!wrap) return;
+      var res = await sb.from('redemption_requests')
+        .select('id, currency_code, amount, status, requested_item, requested_at')
+        .eq('user_id', userId)
+        .order('requested_at', { ascending: false });
+      if (res.error) {
+        console.warn('[mi-geoarmy] no se pudieron leer tus solicitudes', res.error);
+        wrap.innerHTML = '<div class="v3-table-empty">No se pudieron cargar tus solicitudes.</div>';
+        return;
+      }
+      var rows = res.data || [];
+      if (!rows.length) {
+        wrap.innerHTML = '<div class="v3-table-empty">Todavía no tienes solicitudes.</div>';
+        return;
+      }
+      wrap.innerHTML = rows.map(function (r) {
+        var cur = findCurrency(r.currency_code);
+        return (
+          '<div class="v3-table-card" style="margin-bottom:10px; padding:14px;">' +
+            '<div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">' +
+              '<div>' +
+                '<div style="font-weight:600;">' + esc(r.requested_item || cur.label) + '</div>' +
+                '<div class="v3-now-sub">' + formatWalletAmount(cur, r.amount) + ' · ' + formatFechaCorta(r.requested_at) + '</div>' +
+              '</div>' +
+              '<div class="v3-now-sub" style="align-self:center; white-space:nowrap;">' + esc(STATUS_LABELS[r.status] || r.status) + '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
     }
 
     function whenReady(cb) {
@@ -213,6 +415,8 @@
         document.getElementById('mgXpBarFill').style.width = Math.min(100, (dentro / XP_PER_LEVEL) * 100) + '%';
 
         await refreshSaldo(sb, session);
+        await loadWallets(sb, session.user.id);
+        await loadMyRequests(sb, session.user.id);
 
         // Ranking real: pendiente, ver nota en loadRankingTable().
         document.getElementById('mgRank').textContent = 'Próximamente';
