@@ -187,7 +187,13 @@
         '<div class="ga-dropdown" id="gaDropdown" hidden>' +
           balancesRow +
           '<a href="mi-geoarmy.html" class="ga-drop-item">👤 Mi perfil</a>' +
-          '<a href="mi-geoarmy.html#gcoins" class="ga-drop-item">🪙 Mis G-Coins</a>' +
+          // Antes usaba el emoji 🪙, que no lo soportan todas las fuentes del
+          // sistema (se veía como un cuadro vacío) — se reemplaza por el mismo
+          // ícono de imagen que ya usa el chip de G-Coins arriba, sin depender
+          // de la fuente de emojis.
+          '<a href="mi-geoarmy.html#gcoins" class="ga-drop-item">' +
+            '<img class="ga-drop-ic-img" src="' + siteBase() + 'gcoin-icon.png" alt="" onerror="this.remove()"/> Mis G-Coins' +
+          '</a>' +
           '<a href="mi-geoarmy.html#ranking" class="ga-drop-item">🏆 Ranking</a>' +
           // "Panel Admin" NUNCA aparece en el navbar público — solo aquí, dentro
           // del dropdown de la propia cuenta, y solo si profiles.role === 'admin'.

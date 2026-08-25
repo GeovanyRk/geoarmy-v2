@@ -652,6 +652,7 @@ html.panels-ready .panel.is-active { display: block; }
   font-family: 'Inter', sans-serif; transition: background .2s, color .2s;
 }
 .ga-drop-item:hover { background: rgba(255,255,255,.05); color: var(--text); }
+.ga-drop-ic-img { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; }
 .ga-drop-danger:hover { background: rgba(255,68,68,.1); color: var(--red); }
 
 .ga-modal-overlay {
