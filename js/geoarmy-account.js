@@ -1,4 +1,4 @@
-// ===== MI GEO ARMY — cuentas con Supabase Auth + Twitch (Fase 1) =====
+ // ===== MI GEO ARMY — cuentas con Supabase Auth + Twitch (Fase 1) =====
 // Este archivo es independiente de main.js/premium.js — no los toca.
 // Requiere, en el <head> o antes de este script:
 //   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -107,7 +107,7 @@
     if (r.error) { console.warn('[geoarmy-account] no se pudo leer el perfil', r.error); return null; }
     return r.data;
   }
-
+ 
   // Lectura mínima y aislada, solo para los chips de resumen del widget global
   // (visible en todas las páginas). NO reemplaza ni duplica loadWallets() de
   // mi-geoarmy.html — es la misma tabla, filtrada al propio usuario (RLS
@@ -154,7 +154,7 @@
       ? '<img src="' + esc(profile.avatar_url) + '" alt="" class="ga-avatar"/>'
       : '<span class="ga-avatar ga-avatar-fallback">' + esc(nombre[0] || '?') + '</span>';
     var saldoTxt = saldo == null ? '—' : Number(saldo).toLocaleString();
-
+ 
     // Resumen rápido de saldos, arriba del listado de opciones del dropdown.
     // G-Coins reusa el mismo `saldo` que ya trae tienda-server (sin segunda
     // consulta); V-Bucks/OW Coins vienen de fetchMiniWallets() (wallet_balances,
@@ -166,7 +166,7 @@
     var balancesRow =
       '<div class="ga-balances">' +
         '<span class="ga-chip ga-chip-gcoin" title="G-Coins disponibles">' +
-          '<img class="ga-chip-ic ga-chip-ic-img" src="' + siteBase() + 'gcoin-icon.png" alt=""/>' + saldoTxt +
+          '<img class="ga-chip-ic ga-chip-ic-img" src="gcoin-icon.png" alt=""/>' + saldoTxt +
         '</span>' +
         '<span class="ga-chip ga-chip-vbucks" title="V-Bucks disponibles">' +
           '<span class="ga-chip-ic">🎮</span>' + vbucksTxt +
@@ -175,7 +175,7 @@
           '<span class="ga-chip-ic">🕹️</span>' + owcoinsTxt +
         '</span>' +
       '</div>';
-
+ 
     slot.innerHTML =
       '<div class="ga-account-wrap">' +
         '<button type="button" class="ga-account-btn ga-logged-in" id="gaToggleMenu">' +
