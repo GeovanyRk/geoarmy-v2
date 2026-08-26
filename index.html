@@ -30,6 +30,10 @@
 
   <div class="v3-page">
     <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
 
     <!-- NAV -->
     <nav class="v3-nav">
@@ -63,7 +67,20 @@
     <section class="hero v3-hero-stage panel" id="inicio" style="border-bottom:none;padding:26px 1.5rem 10px;">
       <h1 class="v3-h1-sr">Geo Army</h1>
 
-      <div class="v3-orbit-wrap">
+      <div class="v3-world-header">
+        <span class="v3-now-line"></span>
+        <span class="v3-world-star">✦</span> Elige tu mundo <span class="v3-world-star">✦</span>
+        <span class="v3-now-line"></span>
+      </div>
+
+      <!-- En desktop ancho (>1300px) los 3 mundos van fijos, lado a lado (ver
+           CSS: "order" los reordena 02/activo/03 aunque el DOM empiece en el
+           activo). Por debajo de 1300px esto mismo se vuelve una tira
+           deslizable (scroll-snap) que arranca en el mundo activo porque es
+           el primero en el DOM — sin JS de por medio, para que no se rompa. -->
+      <div class="v3-orbit-wrap" id="v3WorldRow">
+        <div class="v3-world-slide v3-world-slide-main">
+        <div class="v3-globe-col">
         <div class="v3-globe-wrap" data-reveal>
         <picture>
           <source srcset="geo-army-globe.webp" type="image/webp">
@@ -111,8 +128,34 @@
         </div>
         </div>
 
-        <div class="v3-orbit-side">
-          <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
+        <div class="v3-world-active">
+          <div class="v3-world-active-eyebrow">Mundo 01</div>
+          <div class="v3-world-active-name">GEO ARMY</div>
+          <div class="v3-world-active-pill"><span class="dot"></span>Mundo activo</div>
+        </div>
+        </div>
+        </div>
+
+        <!-- Mundo 02: bloqueado, próximo evento (decorativo por ahora) -->
+        <div class="v3-world-slide v3-world-slide-02">
+        <div class="v3-world-locked" data-reveal>
+          <img src="world-02.jpg" alt="Mundo 02 — Próximamente" class="v3-world-planet-img" loading="lazy"/>
+        </div>
+        </div>
+
+        <!-- Mundo 03: bloqueado, próximo evento (decorativo por ahora) -->
+        <div class="v3-world-slide v3-world-slide-03">
+        <div class="v3-world-locked" data-reveal>
+          <img src="world-03.jpg" alt="Mundo 03 — Próximamente" class="v3-world-planet-img" loading="lazy"/>
+        </div>
+        </div>
+      </div>
+
+      <div class="v3-world-hint">‹ Desliza para explorar ›</div>
+
+      <div class="v3-howworks">
+        <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
+        <div class="v3-orbit-row">
           <div class="v3-orbit-card v3-oc-purple" data-reveal>
             <div class="v3-oc-num">01 · ÚNETE</div>
             <div class="v3-oc-body"><b>Comunidad</b><span>Entra a la comunidad</span></div>

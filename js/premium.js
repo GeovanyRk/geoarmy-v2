@@ -141,25 +141,8 @@
     }
   }, 'panelNav');
 
-  // Punto de luz que sigue al cursor — solo desktop, puramente cosmético.
-  // Crea su propio elemento (no depende de nada del HTML existente).
-  safe(function initCursorGlow() {
-    if (!window.matchMedia('(pointer: fine)').matches) return;
-    var glow = document.createElement('div');
-    glow.className = 'cursor-glow';
-    document.body.appendChild(glow);
-    var raf = null, mx = 0, my = 0;
-    function update() {
-      glow.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0) translate3d(-50%,-50%,0)';
-      raf = null;
-    }
-    window.addEventListener('mousemove', function (e) {
-      mx = e.clientX; my = e.clientY;
-      glow.classList.add('is-active');
-      if (!raf) raf = requestAnimationFrame(update);
-    }, { passive: true });
-    document.addEventListener('mouseleave', function () { glow.classList.remove('is-active'); });
-  }, 'cursorGlow');
+  // (Quitado a pedido: el punto de luz morado que seguía al cursor por toda
+  // la página. Era puramente decorativo/additive — sin efecto en nada más.)
 
   // Tilt 3D sutil en tarjetas al pasar el mouse — solo desktop, puramente cosmético.
   // Si no corre, las tarjetas quedan exactamente como antes (sin este JS no tienen transform inline).

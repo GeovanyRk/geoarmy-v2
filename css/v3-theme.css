@@ -34,6 +34,16 @@
 }
 @keyframes v3Twinkle { 0% { opacity: .4; } 100% { opacity: .68; } }
 @media (prefers-reduced-motion: reduce) { .v3-stars { animation: none; } }
+
+/* ===== Nebulosas de las esquinas — recortadas de la imagen de referencia
+   ("Elige tu mundo"), para que el fondo de la página se vea igual que ahí.
+   Puramente decorativo, detrás de todo el contenido. ===== */
+.v3-nebula { position: absolute; z-index: 0; pointer-events: none; width: 560px; height: auto; max-width: 42vw; opacity: .85; }
+.v3-nebula-tl { top: 0; left: 0; }
+.v3-nebula-tr { top: 0; right: 0; }
+.v3-nebula-bl { bottom: 0; left: 0; }
+.v3-nebula-br { bottom: 0; right: 0; }
+@media (max-width: 900px) { .v3-nebula { opacity: .55; width: 380px; } }
 .v3-nav { position: relative; z-index: 3; }
 .v3-nav-inner { max-width: 1320px; margin: 0 auto; padding: 22px 1.5rem 0; display: flex; align-items: center; justify-content: space-between; }
 .v3-logo { display: flex; align-items: center; gap: 12px; }
@@ -110,14 +120,103 @@
 .v3-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
 .v3-h1-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
 
-/* ===== Tarjetas orbitales — reemplazan la sección "Cómo funciona" separada,
-   ahora viven pegadas al planeta como lectura de una interfaz espacial ===== */
-.v3-orbit-wrap { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 1320px; margin: 0 auto; }
-.v3-orbit-side { display: flex; flex-direction: column; gap: 12px; }
+/* ===== "Elige tu mundo" — header ornamental arriba del planeta principal ===== */
+.v3-world-header {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .32em;
+  color: #eaf2ff; text-transform: uppercase; margin: 0 0 6px;
+}
+.v3-world-header .v3-now-line { max-width: 90px; }
+.v3-world-star { color: #7fb0f5; font-size: 11px; }
+
+/* ===== "Elige tu mundo" — 3 planetas. En desktop ancho (>1300px) van fijos,
+   lado a lado (02 · activo · 03), usando "order" para acomodarlos aunque el
+   DOM empiece en el activo. Por debajo de 1300px es un carrusel horizontal
+   con scroll-snap (deslizar con el dedo): sin JS — como el activo es
+   literalmente el primer elemento del HTML y el scroll arranca en 0,
+   siempre se ve primero. ===== */
+.v3-orbit-wrap { display: flex; align-items: center; justify-content: center; gap: 40px; max-width: 2100px; margin: 0 auto; }
+.v3-globe-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.v3-world-slide { flex-shrink: 0; display: flex; justify-content: center; }
+.v3-world-slide-main { order: 2; }
+.v3-world-slide-02 { order: 1; }
+.v3-world-slide-03 { order: 3; }
+
+.v3-world-locked {
+  width: min(460px, 72vw); flex-shrink: 0; display: flex; flex-direction: column; align-items: center;
+  text-align: center; opacity: .92; transition: opacity .3s var(--ease), transform .3s var(--ease);
+  animation: v3Float 6s ease-in-out infinite;
+}
+.v3-world-locked:hover { opacity: 1; transform: translateY(-3px); }
+@media (prefers-reduced-motion: reduce) { .v3-world-locked { animation: none; } }
+.v3-world-planet-img {
+  width: min(460px, 72vw); height: min(460px, 72vw); object-fit: cover; display: block; border-radius: 50%;
+  filter: drop-shadow(0 0 34px rgba(150,110,255,.55)) drop-shadow(0 0 70px rgba(90,60,180,.35));
+  -webkit-mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
+  transition: transform .4s var(--ease);
+}
+/* Zoom suave al pasar el mouse sobre un mundo bloqueado */
+.v3-world-locked:hover .v3-world-planet-img { transform: scale(1.08); }
+@media (max-width: 1700px) {
+  .v3-world-locked, .v3-world-planet-img { width: 300px; height: 300px; }
+}
+
+/* Modo carrusel (mobile/tablet): scroll horizontal con snap, un mundo a la
+   vez, centrado. Orden del DOM tal cual (activo, 02, 03) — sin "order". */
+@media (max-width: 1300px) {
+  .v3-orbit-wrap {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    gap: 0;
+    padding: 4px 0 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .v3-orbit-wrap::-webkit-scrollbar { display: none; }
+  .v3-world-slide.v3-world-slide-main,
+  .v3-world-slide.v3-world-slide-02,
+  .v3-world-slide.v3-world-slide-03 { order: 0; }
+  .v3-world-slide {
+    width: 100%; min-width: 100%; flex-shrink: 0;
+    scroll-snap-align: center; scroll-snap-stop: always;
+  }
+  .v3-world-locked, .v3-world-planet-img { width: min(300px, 66vw); height: min(300px, 66vw); }
+}
+@media (min-width: 1301px) {
+  .v3-world-hint { display: none; }
+}
+@media (max-width: 1300px) {
+  .v3-world-hint {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: .1em;
+    color: #7fb0f5; text-transform: uppercase; opacity: .75; margin: -8px 0 4px;
+  }
+}
+
+/* Etiqueta bajo el planeta activo (Mundo 01) */
+.v3-world-active { display: flex; flex-direction: column; align-items: center; gap: 7px; margin-top: -14px; }
+.v3-world-active-eyebrow { font-family: 'Orbitron', sans-serif; font-size: 10.5px; letter-spacing: .12em; color: #7fb0f5; text-transform: uppercase; }
+.v3-world-active-name { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; letter-spacing: .03em; color: #eaf2ff; }
+.v3-world-active-pill {
+  display: inline-flex; align-items: center; gap: 6px; font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: 10px; letter-spacing: .06em; color: #00c853; text-transform: uppercase;
+  background: rgba(0,200,83,.08); border: 1px solid rgba(0,200,83,.35); padding: 5px 13px; border-radius: 100px;
+}
+.v3-world-active-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #00c853; box-shadow: 0 0 8px #00c853; }
+
+/* ===== ¿Cómo funciona la Geo Army? — ahora va debajo de los planetas, como
+   su propia sección centrada, en vez de ir pegada al lado. ===== */
+.v3-howworks { text-align: center; margin: 30px auto 0; max-width: 620px; }
 .v3-orbit-title {
   font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .04em;
-  color: #eaf2ff; text-transform: uppercase; margin-bottom: 2px;
+  color: #eaf2ff; text-transform: uppercase; margin-bottom: 14px;
 }
+.v3-orbit-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .v3-orbit-card {
   --ac: #9147ff; width: 168px; flex-shrink: 0; text-align: left;
   background: rgba(9,18,38,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -129,12 +228,6 @@
 .v3-oc-num { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 12px; color: var(--ac); letter-spacing: .05em; margin-bottom: 4px; }
 .v3-oc-body b { display: block; font-family: 'Orbitron', sans-serif; font-size: 11.5px; color: #eaf2ff; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 3px; }
 .v3-oc-body span { font-size: 10.5px; color: #9fb2d1; line-height: 1.35; display: block; }
-@media (max-width: 980px) {
-  .v3-orbit-wrap { flex-direction: column; gap: 14px; }
-  .v3-orbit-side { width: 100%; max-width: 460px; }
-}
-@media (max-width: 480px) { .v3-orbit-side { flex-direction: column; } }
-
 .v3-globe-wrap { position: relative; width: min(460px, 72vw); margin: -6px 0 -6%; animation: v3Float 6s ease-in-out infinite; flex-shrink: 0; }
 .v3-globe-wrap img {
   width: 100%; height: auto; display: block;
@@ -209,6 +302,7 @@
   padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.08);
 }
 .v3-now-ic { font-size: 16px; color: var(--ac); display: inline-flex; }
+.v3-now-ic-img { width: 16px; height: 16px; object-fit: contain; display: block; }
 .v3-now-status { display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 19px; color: var(--ac); text-transform: uppercase; }
 .v3-now-dot { width: 9px; height: 9px; border-radius: 50%; background: #5a6478; flex-shrink: 0; }
 .v3-now-dot.live { background: #00c853; box-shadow: 0 0 10px #00c853; animation: v3DotPulse 1.8s ease-in-out infinite; }
@@ -376,6 +470,7 @@
 #mgWalletGrid .v3-now-card { padding: 14px 14px 16px; gap: 8px; border-radius: 12px; }
 #mgWalletGrid .v3-now-head { font-size: 10.5px; padding-bottom: 8px; gap: 6px; }
 #mgWalletGrid .v3-now-ic { font-size: 13px; }
+#mgWalletGrid .v3-now-ic-img { width: 13px; height: 13px; }
 #mgWalletGrid .v3-now-big { font-size: 1.3rem; }
 #mgWalletGrid .v3-now-big span { font-size: .7rem; margin-left: 3px; }
 #mgWalletGrid .v3-now-sub { font-size: 10.5px; min-height: 12px; }

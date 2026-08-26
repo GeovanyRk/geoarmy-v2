@@ -169,10 +169,10 @@
           '<img class="ga-chip-ic ga-chip-ic-img" src="' + siteBase() + 'gcoin-icon.png" alt="" onerror="this.remove()"/>' + saldoTxt +
         '</span>' +
         '<span class="ga-chip ga-chip-vbucks" title="V-Bucks disponibles">' +
-          '<span class="ga-chip-ic">🎮</span>' + vbucksTxt +
+          '<img class="ga-chip-ic ga-chip-ic-img" src="' + siteBase() + 'icon-fortnite.png" alt="" onerror="this.remove()"/>' + vbucksTxt +
         '</span>' +
         '<span class="ga-chip ga-chip-owcoins" title="OW Coins disponibles">' +
-          '<span class="ga-chip-ic">🕹️</span>' + owcoinsTxt +
+          '<img class="ga-chip-ic ga-chip-ic-img" src="' + siteBase() + 'icon-overwatch.png" alt="" onerror="this.remove()"/>' + owcoinsTxt +
         '</span>' +
       '</div>';
  
