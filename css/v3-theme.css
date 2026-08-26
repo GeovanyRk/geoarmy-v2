@@ -343,24 +343,11 @@
 .v3-recent-more:hover { color: #c3e2ff; }
 .v3-recent-empty { color: #7f92b3; font-size: 13px; padding: 8px 0; }
 
-.v3-missions { margin-top: 16px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 24px; }
-.v3-missions h3 { font-family: 'Orbitron', sans-serif; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: #eaf2ff; margin-bottom: 20px; }
-
-.v3-missions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; }
-.v3-mission { display: flex; align-items: center; gap: 10px; }
-.v3-mission-ic { font-size: 17px; flex-shrink: 0; }
-.v3-mission-body { flex: 1; min-width: 0; }
-.v3-mission-body b { display: block; font-size: 12.5px; color: #eaf2ff; font-weight: 600; margin-bottom: 5px; }
-.v3-mission-bar { height: 5px; border-radius: 100px; background: rgba(255,255,255,.08); overflow: hidden; }
-.v3-mission-bar span { display: block; height: 100%; background: linear-gradient(90deg, #9147ff, #3aa0ff); border-radius: 100px; }
-.v3-missions-note { margin-top: 16px; font-size: 10.5px; color: #5f7396; line-height: 1.5; }
-
 .v3-ridge { position: relative; z-index: 1; width: 100%; height: 90px; display: block; margin-top: -60px; }
 
 @media (max-width: 980px) { .v3-now-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) {
   .v3-now-grid { grid-template-columns: 1fr; }
-  .v3-missions-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .v3-auth .v3-login-link span { display: none; }
