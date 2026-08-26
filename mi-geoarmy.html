@@ -75,10 +75,11 @@
             <div style="display:flex; align-items:center; gap:12px;">
               <img id="mgAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
               <div style="min-width:0;">
-                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px;">
+                  <span id="mgNameText">—</span><img id="mgNameFlag" src="" alt="" hidden style="width:18px; height:13px; border-radius:2px; flex-shrink:0; box-shadow:0 0 0 1px rgba(255,255,255,.25);"/>
+                </div>
                 <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
                 <div class="v3-now-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
-                  <span id="mgCountryFlag" aria-hidden="true" style="font-size:15px; line-height:1;"></span>
                   <span id="mgCountryName">Sin país configurado</span>
                   <button type="button" id="mgCountryBtn" style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Cambiar país</button>
                   <span id="mgCountryMsg" style="font-size:11px; color:#7CFC9A;"></span>
@@ -258,14 +259,25 @@
       return String.fromCodePoint(BASE + c1) + String.fromCodePoint(BASE + c2);
     }
 
+    // Imagen real de bandera (flagcdn.com, mismo servicio ya usado
+    // ampliamente y sin necesidad de subir archivos nuevos al repo). Se usa
+    // en vez del emoji Unicode de bandera porque Windows no lo renderiza
+    // como imagen — muestra el código de 2 letras en texto plano.
+    function flagImgUrl(code) {
+      return 'https://flagcdn.com/24x18/' + code.toLowerCase() + '.png';
+    }
+
     function renderCountryDisplay(code) {
-      var flagEl = document.getElementById('mgCountryFlag');
+      var flagImg = document.getElementById('mgNameFlag');
       var nameEl = document.getElementById('mgCountryName');
       if (code) {
-        flagEl.textContent = flagEmoji(code);
+        flagImg.src = flagImgUrl(code);
+        flagImg.alt = countryName(code);
+        flagImg.hidden = false;
         nameEl.textContent = countryName(code);
       } else {
-        flagEl.textContent = '🏳️';
+        flagImg.hidden = true;
+        flagImg.removeAttribute('src');
         nameEl.textContent = 'Sin país configurado';
       }
     }
@@ -290,10 +302,10 @@
           '<p>Elige el país que quieres mostrar en tu perfil de Geo Army.</p>' +
           '<form id="mgCountryForm" style="text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:10px;">' +
             '<select id="mgCountrySelectInput" required style="width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
-              '<option value="" disabled ' + (currentCode ? '' : 'selected') + '>Selecciona un país…</option>' +
+              '<option value="" disabled style="color:#111;background:#fff;" ' + (currentCode ? '' : 'selected') + '>Selecciona un país…</option>' +
               codesSorted.map(function (code) {
                 var sel = (code === currentCode) ? ' selected' : '';
-                return '<option value="' + code + '"' + sel + '>' + flagEmoji(code) + ' ' + esc(COUNTRY_NAMES[code]) + '</option>';
+                return '<option value="' + code + '" style="color:#111;background:#fff;"' + sel + '>' + flagEmoji(code) + ' ' + esc(COUNTRY_NAMES[code]) + '</option>';
               }).join('') +
             '</select>' +
             '<div id="mgCountryError" style="color:#ff8080; font-size:13px;"></div>' +
@@ -552,7 +564,7 @@
         var avatarEl = document.getElementById('mgAvatar');
         avatarEl.src = profile.avatar_url || '';
         avatarEl.style.display = profile.avatar_url ? '' : 'none';
-        document.getElementById('mgName').textContent = profile.display_name || profile.twitch_login || 'Miembro';
+        document.getElementById('mgNameText').textContent = profile.display_name || profile.twitch_login || 'Miembro';
         document.getElementById('mgLevel').textContent = 'Nivel ' + profile.level;
         document.getElementById('mgLevelBig').textContent = 'Nivel ' + profile.level;
 
