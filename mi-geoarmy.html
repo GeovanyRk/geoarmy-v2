@@ -68,68 +68,57 @@
 
     <!-- Dashboard -->
     <div id="mgDashboard" hidden>
-
-      <!-- MIS SALDOS: G-Coins (tienda-server, tarjeta fija) + wallet_balances de
-           Supabase (mgWalletGrid, generado por loadWallets()). Visualmente es
-           una sola fila; técnicamente siguen siendo dos fuentes separadas. -->
       <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">💰</span>Mis saldos</div>
-        <div class="v3-saldos-row">
-          <div class="v3-saldo-card v3-c-gold" id="gcoins">
-            <div class="v3-saldo-head"><span class="v3-saldo-ic">🪙</span>G-Coins</div>
-            <div class="v3-saldo-amt" id="mgGcoins">—<span>G</span></div>
-            <div class="v3-saldo-sub">Disponibles</div>
-            <button type="button" class="v3-saldo-link" id="mgRefreshSaldo">Actualizar saldo</button>
+        <div class="v3-now-grid">
+          <div class="v3-now-card v3-c-purple">
+            <div class="v3-now-head"><span class="v3-now-ic">👤</span>Perfil</div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img id="mgAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
+              <div style="min-width:0;">
+                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
+                <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
+                <div class="v3-now-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+                  <span id="mgCountryFlag" aria-hidden="true" style="font-size:15px; line-height:1;"></span>
+                  <span id="mgCountryName">Sin país configurado</span>
+                  <button type="button" id="mgCountryBtn" style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Cambiar país</button>
+                  <span id="mgCountryMsg" style="font-size:11px; color:#7CFC9A;"></span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="mgWalletGrid">
-            <div class="v3-table-empty">Cargando…</div>
+
+          <div class="v3-now-card v3-c-gold" id="gcoins">
+            <div class="v3-now-head"><span class="v3-now-ic">🪙</span>G-Coins</div>
+            <div class="v3-now-big" id="mgGcoins">—<span>G</span></div>
+            <div class="v3-now-sub">G-Coins disponibles</div>
+            <button type="button" class="v3-now-btn" id="mgRefreshSaldo" style="border:none; cursor:pointer; font-family:'Orbitron',sans-serif;">Actualizar saldo</button>
+          </div>
+
+          <div class="v3-now-card v3-c-blue">
+            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Ranking</div>
+            <div class="v3-now-big" id="mgRank">—</div>
+            <div class="v3-now-sub">Ranking Geo Army</div>
           </div>
         </div>
       </div>
 
-      <!-- MI PERFIL + PROGRESO -->
-      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-account-row">
-          <div class="v3-profile-card v3-c-purple">
-            <img id="mgAvatar" src="" alt="" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
-            <div style="min-width:0;">
-              <div class="v3-now-header-sm" style="margin:0 0 8px;"><span class="v3-now-ic">👤</span>Mi perfil</div>
-              <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div>
-              <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
-              <div id="mgCountry" class="v3-now-sub" hidden></div>
-            </div>
+      <div class="v3-xp-card">
+        <div class="v3-xp-inner">
+          <div class="v3-xp-top">
+            <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
+            <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
           </div>
-
-          <div class="v3-xp-inner" style="margin:0;">
-            <div class="v3-now-header-sm" style="margin:0 0 12px;"><span class="v3-now-ic">📈</span>Progreso</div>
-            <div class="v3-xp-top">
-              <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
-              <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
-            </div>
-            <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
-            <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
-          </div>
+          <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
+          <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
         </div>
       </div>
 
-      <!-- RANKING: todavía no conectado (ver loadRankingTable()). Se deja como
-           placeholder compacto; mgRankBody sigue en el DOM (oculto) para cuando
-           se conecte el ranking real, sin tener que tocar el JS. -->
-      <div class="v3-table-wrap" id="ranking" style="margin-top:1.6rem;">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking</div>
-        <div class="v3-table-card v3-ranking-placeholder">
-          <div class="v3-now-sub">Tu posición en el ranking Geo Army</div>
-          <div class="v3-now-big v3-now-big-sm v3-c-blue" id="mgRank">—</div>
-        </div>
-        <div hidden>
-          <table>
-            <thead>
-              <tr><th>#</th><th>Usuario</th><th>Nivel</th><th>G-Coins</th></tr>
-            </thead>
-            <tbody id="mgRankBody">
-              <tr><td colspan="4" class="v3-table-empty">Cargando…</td></tr>
-            </tbody>
-          </table>
+      <!-- Mis recompensas: saldos reales de wallet_balances (Supabase). GCOIN
+           sigue aparte, viene de tienda-server (ver tarjeta G-Coins arriba). -->
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🎁</span>Mis recompensas</div>
+        <div class="v3-now-grid" id="mgWalletGrid">
+          <div class="v3-table-empty">Cargando…</div>
         </div>
       </div>
 
@@ -138,6 +127,20 @@
         <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
         <div id="mgRequestsList">
           <div class="v3-table-empty">Cargando…</div>
+        </div>
+      </div>
+
+      <div class="v3-table-wrap" id="ranking">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking Geo Army</div>
+        <div class="v3-table-card">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Usuario</th><th>Nivel</th><th>G-Coins</th></tr>
+            </thead>
+            <tbody id="mgRankBody">
+              <tr><td colspan="4" class="v3-table-empty">Cargando…</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -160,6 +163,7 @@
   <script>
   (function () {
     var XP_PER_LEVEL = 1000; // debe coincidir con xp_to_level() en supabase/schema.sql
+    var currentCountryCode = null; // solo lectura de estado en memoria para el botón "Cambiar país"
 
     function esc(s) {
       return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
@@ -172,8 +176,8 @@
     // no tiene fila en wallet_balances y no se toca aquí (ver tarjeta G-Coins arriba,
     // que sigue leyendo el saldo real de tienda-server como siempre).
     var WALLET_CURRENCIES = [
-      { code: 'VBUCKS',     label: 'Fortnite',  unit: 'V-Bucks',  icon: '<img class="v3-now-ic-img" src="icon-fortnite.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(127918)))"/>', accent: 'v3-c-purple', decimals: 0 },
-      { code: 'OWCOINS',    label: 'Overwatch', unit: 'OW Coins', icon: '<img class="v3-now-ic-img" src="icon-overwatch.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(128377)))"/>', accent: 'v3-c-blue',   decimals: 0 },
+      { code: 'VBUCKS',     label: 'Fortnite',  unit: 'V-Bucks',  icon: '🎮', accent: 'v3-c-purple', decimals: 0 },
+      { code: 'OWCOINS',    label: 'Overwatch', unit: 'OW Coins', icon: '🕹️', accent: 'v3-c-blue',   decimals: 0 },
       { code: 'PAYPAL_USD', label: 'PayPal',    unit: 'USD',      icon: '💵', accent: 'v3-c-gold',   decimals: 2 },
       { code: 'TWITCH_SUB', label: 'Twitch',    unit: 'Subs',     icon: '🟣', accent: 'v3-c-purple', decimals: 0 }
     ];
@@ -182,6 +186,152 @@
       pending: 'Pendiente', approved: 'Aprobado', delivered: 'Entregado',
       rejected: 'Rechazado', cancelled: 'Cancelada'
     };
+
+    // ===== Mi país (set_my_country RPC) =====
+    // Mismo listado de 249 códigos ISO 3166-1 alpha-2 que valida
+    // set_my_country() en supabase/migracion-perfil-pais-rol.sql — si un
+    // código no está aquí, la RPC tampoco lo va a aceptar. Si el código SÍ
+    // es válido pero por algún motivo faltara su nombre aquí, se muestra el
+    // propio código como texto (ver countryName()) en vez de romper la UI.
+    var COUNTRY_NAMES = {
+      AD:'Andorra', AE:'Emiratos Árabes Unidos', AF:'Afganistán', AG:'Antigua y Barbuda', AI:'Anguila',
+      AL:'Albania', AM:'Armenia', AO:'Angola', AQ:'Antártida', AR:'Argentina', AS:'Samoa Americana',
+      AT:'Austria', AU:'Australia', AW:'Aruba', AX:'Islas Åland', AZ:'Azerbaiyán',
+      BA:'Bosnia y Herzegovina', BB:'Barbados', BD:'Bangladés', BE:'Bélgica', BF:'Burkina Faso',
+      BG:'Bulgaria', BH:'Baréin', BI:'Burundi', BJ:'Benín', BL:'San Bartolomé', BM:'Bermudas',
+      BN:'Brunéi', BO:'Bolivia', BQ:'Bonaire, San Eustaquio y Saba', BR:'Brasil', BS:'Bahamas',
+      BT:'Bután', BV:'Isla Bouvet', BW:'Botsuana', BY:'Bielorrusia', BZ:'Belice',
+      CA:'Canadá', CC:'Islas Cocos', CD:'República Democrática del Congo', CF:'República Centroafricana',
+      CG:'República del Congo', CH:'Suiza', CI:'Costa de Marfil', CK:'Islas Cook', CL:'Chile',
+      CM:'Camerún', CN:'China', CO:'Colombia', CR:'Costa Rica', CU:'Cuba', CV:'Cabo Verde',
+      CW:'Curazao', CX:'Isla de Navidad', CY:'Chipre', CZ:'Chequia',
+      DE:'Alemania', DJ:'Yibuti', DK:'Dinamarca', DM:'Dominica', DO:'República Dominicana', DZ:'Argelia',
+      EC:'Ecuador', EE:'Estonia', EG:'Egipto', EH:'Sahara Occidental', ER:'Eritrea', ES:'España', ET:'Etiopía',
+      FI:'Finlandia', FJ:'Fiyi', FK:'Islas Malvinas', FM:'Micronesia', FO:'Islas Feroe', FR:'Francia',
+      GA:'Gabón', GB:'Reino Unido', GD:'Granada', GE:'Georgia', GF:'Guayana Francesa', GG:'Guernsey',
+      GH:'Ghana', GI:'Gibraltar', GL:'Groenlandia', GM:'Gambia', GN:'Guinea', GP:'Guadalupe',
+      GQ:'Guinea Ecuatorial', GR:'Grecia', GS:'Georgia del Sur y las Islas Sandwich del Sur', GT:'Guatemala',
+      GU:'Guam', GW:'Guinea-Bisáu', GY:'Guyana',
+      HK:'Hong Kong', HM:'Islas Heard y McDonald', HN:'Honduras', HR:'Croacia', HT:'Haití', HU:'Hungría',
+      ID:'Indonesia', IE:'Irlanda', IL:'Israel', IM:'Isla de Man', IN:'India',
+      IO:'Territorio Británico del Océano Índico', IQ:'Irak', IR:'Irán', IS:'Islandia', IT:'Italia',
+      JE:'Jersey', JM:'Jamaica', JO:'Jordania', JP:'Japón',
+      KE:'Kenia', KG:'Kirguistán', KH:'Camboya', KI:'Kiribati', KM:'Comoras', KN:'San Cristóbal y Nieves',
+      KP:'Corea del Norte', KR:'Corea del Sur', KW:'Kuwait', KY:'Islas Caimán', KZ:'Kazajistán',
+      LA:'Laos', LB:'Líbano', LC:'Santa Lucía', LI:'Liechtenstein', LK:'Sri Lanka', LR:'Liberia',
+      LS:'Lesoto', LT:'Lituania', LU:'Luxemburgo', LV:'Letonia', LY:'Libia',
+      MA:'Marruecos', MC:'Mónaco', MD:'Moldavia', ME:'Montenegro', MF:'San Martín', MG:'Madagascar',
+      MH:'Islas Marshall', MK:'Macedonia del Norte', ML:'Malí', MM:'Myanmar', MN:'Mongolia', MO:'Macao',
+      MP:'Islas Marianas del Norte', MQ:'Martinica', MR:'Mauritania', MS:'Montserrat', MT:'Malta',
+      MU:'Mauricio', MV:'Maldivas', MW:'Malaui', MX:'México', MY:'Malasia', MZ:'Mozambique',
+      NA:'Namibia', NC:'Nueva Caledonia', NE:'Níger', NF:'Isla Norfolk', NG:'Nigeria', NI:'Nicaragua',
+      NL:'Países Bajos', NO:'Noruega', NP:'Nepal', NR:'Nauru', NU:'Niue', NZ:'Nueva Zelanda',
+      OM:'Omán',
+      PA:'Panamá', PE:'Perú', PF:'Polinesia Francesa', PG:'Papúa Nueva Guinea', PH:'Filipinas',
+      PK:'Pakistán', PL:'Polonia', PM:'San Pedro y Miquelón', PN:'Islas Pitcairn', PR:'Puerto Rico',
+      PS:'Palestina', PT:'Portugal', PW:'Palaos', PY:'Paraguay',
+      QA:'Catar',
+      RE:'Reunión', RO:'Rumania', RS:'Serbia', RU:'Rusia', RW:'Ruanda',
+      SA:'Arabia Saudita', SB:'Islas Salomón', SC:'Seychelles', SD:'Sudán', SE:'Suecia', SG:'Singapur',
+      SH:'Santa Elena', SI:'Eslovenia', SJ:'Svalbard y Jan Mayen', SK:'Eslovaquia', SL:'Sierra Leona',
+      SM:'San Marino', SN:'Senegal', SO:'Somalia', SR:'Surinam', SS:'Sudán del Sur',
+      ST:'Santo Tomé y Príncipe', SV:'El Salvador', SX:'Sint Maarten', SY:'Siria', SZ:'Esuatini',
+      TC:'Islas Turcas y Caicos', TD:'Chad', TF:'Territorios Australes Franceses', TG:'Togo',
+      TH:'Tailandia', TJ:'Tayikistán', TK:'Tokelau', TL:'Timor Oriental', TM:'Turkmenistán', TN:'Túnez',
+      TO:'Tonga', TR:'Turquía', TT:'Trinidad y Tobago', TV:'Tuvalu', TW:'Taiwán', TZ:'Tanzania',
+      UA:'Ucrania', UG:'Uganda', UM:'Islas Ultramarinas Menores de EE. UU.', US:'Estados Unidos',
+      UY:'Uruguay', UZ:'Uzbekistán',
+      VA:'Ciudad del Vaticano', VC:'San Vicente y las Granadinas', VE:'Venezuela',
+      VG:'Islas Vírgenes Británicas', VI:'Islas Vírgenes de EE. UU.', VN:'Vietnam', VU:'Vanuatu',
+      WF:'Wallis y Futuna', WS:'Samoa',
+      YE:'Yemen', YT:'Mayotte',
+      ZA:'Sudáfrica', ZM:'Zambia', ZW:'Zimbabue'
+    };
+
+    function countryName(code) { return COUNTRY_NAMES[code] || code; }
+
+    function flagEmoji(code) {
+      if (!code || code.length !== 2) return '🏳️';
+      var BASE = 0x1F1E6, A = 'A'.charCodeAt(0);
+      var c1 = code.charCodeAt(0) - A, c2 = code.charCodeAt(1) - A;
+      if (c1 < 0 || c1 > 25 || c2 < 0 || c2 > 25) return '🏳️';
+      return String.fromCodePoint(BASE + c1) + String.fromCodePoint(BASE + c2);
+    }
+
+    function renderCountryDisplay(code) {
+      var flagEl = document.getElementById('mgCountryFlag');
+      var nameEl = document.getElementById('mgCountryName');
+      if (code) {
+        flagEl.textContent = flagEmoji(code);
+        nameEl.textContent = countryName(code);
+      } else {
+        flagEl.textContent = '🏳️';
+        nameEl.textContent = 'Sin país configurado';
+      }
+    }
+
+    // Único lugar del frontend que llama set_my_country. Nunca se usa
+    // sb.from('profiles').update(...) para esto — ese camino ya está
+    // cerrado a propósito (ver migracion-perfil-pais-rol.sql), y aunque no
+    // lo estuviera, esta RPC es la única vía que valida el país de verdad.
+    function openCountryModal(sb, currentCode, onSaved) {
+      var sending = false;
+      var codesSorted = Object.keys(COUNTRY_NAMES).sort(function (a, b) {
+        return COUNTRY_NAMES[a].localeCompare(COUNTRY_NAMES[b], 'es');
+      });
+
+      var overlay = document.createElement('div');
+      overlay.className = 'ga-modal-overlay';
+      overlay.innerHTML =
+        '<div class="ga-modal">' +
+          '<button type="button" class="ga-modal-close" aria-label="Cerrar">✕</button>' +
+          '<div class="ga-modal-logo">🌍</div>' +
+          '<h3>Cambiar país</h3>' +
+          '<p>Elige el país que quieres mostrar en tu perfil de Geo Army.</p>' +
+          '<form id="mgCountryForm" style="text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:10px;">' +
+            '<select id="mgCountrySelectInput" required style="width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
+              '<option value="" disabled ' + (currentCode ? '' : 'selected') + '>Selecciona un país…</option>' +
+              codesSorted.map(function (code) {
+                var sel = (code === currentCode) ? ' selected' : '';
+                return '<option value="' + code + '"' + sel + '>' + flagEmoji(code) + ' ' + esc(COUNTRY_NAMES[code]) + '</option>';
+              }).join('') +
+            '</select>' +
+            '<div id="mgCountryError" style="color:#ff8080; font-size:13px;"></div>' +
+            '<button type="submit" class="ga-twitch-btn" id="mgCountrySubmit">Guardar país</button>' +
+          '</form>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+      overlay.querySelector('.ga-modal-close').addEventListener('click', function () { overlay.remove(); });
+
+      overlay.querySelector('#mgCountryForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (sending) return;
+        sending = true;
+        var submitBtn = document.getElementById('mgCountrySubmit');
+        var errEl = document.getElementById('mgCountryError');
+        errEl.textContent = '';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Guardando…';
+
+        var selected = document.getElementById('mgCountrySelectInput').value;
+
+        try {
+          var res = await sb.rpc('set_my_country', { p_country_code: selected });
+          if (res.error) throw res.error;
+          overlay.remove();
+          // El país anterior en pantalla solo se reemplaza tras la
+          // confirmación de la RPC — si falla, se queda como estaba.
+          onSaved(res.data && res.data.country_code ? res.data.country_code : selected);
+        } catch (err) {
+          console.warn('[mi-geoarmy] error cambiando de país', err);
+          errEl.textContent = (err && err.message) ? err.message : 'No se pudo guardar el país. Intenta de nuevo.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Guardar país';
+          sending = false;
+        }
+      });
+    }
 
     function findCurrency(code) {
       for (var i = 0; i < WALLET_CURRENCIES.length; i++) {
@@ -406,9 +556,8 @@
         document.getElementById('mgLevel').textContent = 'Nivel ' + profile.level;
         document.getElementById('mgLevelBig').textContent = 'Nivel ' + profile.level;
 
-        var countryEl = document.getElementById('mgCountry');
-        if (profile.country_code) { countryEl.hidden = false; countryEl.textContent = profile.country_code; }
-        else countryEl.hidden = true;
+        currentCountryCode = profile.country_code || null;
+        renderCountryDisplay(currentCountryCode);
 
         var dentro = (profile.xp || 0) % XP_PER_LEVEL;
         document.getElementById('mgXpText').textContent = dentro.toLocaleString() + ' / ' + XP_PER_LEVEL.toLocaleString() + ' XP';
@@ -442,6 +591,15 @@
           return;
         }
         await refreshSaldo(sb, session);
+      });
+      document.getElementById('mgCountryBtn').addEventListener('click', function () {
+        openCountryModal(sb, currentCountryCode, function (nuevoCodigo) {
+          currentCountryCode = nuevoCodigo;
+          renderCountryDisplay(currentCountryCode);
+          var msgEl = document.getElementById('mgCountryMsg');
+          msgEl.textContent = '✅ País actualizado';
+          setTimeout(function () { msgEl.textContent = ''; }, 2500);
+        });
       });
       sb.auth.onAuthStateChange(function () { loadDashboard(sb); });
       loadDashboard(sb);
