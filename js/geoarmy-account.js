@@ -107,6 +107,22 @@
     if (r.error) { console.warn('[geoarmy-account] no se pudo leer el perfil', r.error); return null; }
     return r.data;
   }
+
+  // Solo lectura, para el header compacto (avatar + nombre + bandera +
+  // insignia mientras el usuario navega). RPC ya existente en Supabase,
+  // no se toca ni se duplica su lógica acá. Si falla por lo que sea, el
+  // header cae de vuelta a "sin bandera / sin insignia" sin romper nada.
+  async function fetchCompactProfile() {
+    try {
+      var r = await sb.rpc('my_compact_profile');
+      if (r.error) { console.warn('[geoarmy-account] no se pudo leer my_compact_profile()', r.error); return null; }
+      var row = Array.isArray(r.data) ? r.data[0] : r.data;
+      return row || null;
+    } catch (e) {
+      console.warn('[geoarmy-account] error leyendo my_compact_profile()', e);
+      return null;
+    }
+  }
  
   // Lectura mínima y aislada, solo para los chips de resumen del widget global
   // (visible en todas las páginas). NO reemplaza ni duplica loadWallets() de
@@ -148,12 +164,26 @@
     document.getElementById('gaOpenLogin').addEventListener('click', openLoginModal);
   }
  
-  function renderLoggedIn(slot, profile, saldo, miniWallets) {
+  function renderLoggedIn(slot, profile, saldo, miniWallets, compact) {
     var nombre = profile.display_name || profile.twitch_login || 'Miembro';
     var avatar = profile.avatar_url
       ? '<img src="' + esc(profile.avatar_url) + '" alt="" class="ga-avatar"/>'
       : '<span class="ga-avatar ga-avatar-fallback">' + esc(nombre[0] || '?') + '</span>';
     var saldoTxt = saldo == null ? '—' : Number(saldo).toLocaleString();
+
+    // Bandera + insignia del pill compacto (header). country_code/rank_code
+    // vienen de my_compact_profile() — ver fetchCompactProfile(). Si esa RPC
+    // falló o el país no está configurado, simplemente no se muestra nada
+    // ahí (sin placeholder raro, tal como se pidió).
+    var ranks = window.GeoArmyRanks;
+    var countryCode = compact && compact.country_code;
+    var rankCode = compact && compact.rank_code;
+    var flagHtml = (ranks && countryCode)
+      ? '<img class="ga-flag" src="' + esc(ranks.flagImgUrl(countryCode)) + '" alt="" title="' + esc(countryCode) + '" onerror="this.remove()"/>'
+      : '';
+    var badgeHtml = (ranks && rankCode)
+      ? '<img class="ga-badge" src="' + esc(ranks.rankBadgeUrl(rankCode, siteBase())) + '" alt="' + esc(ranks.rankName(rankCode)) + '" title="' + esc(ranks.rankName(rankCode)) + '" onerror="this.remove()"/>'
+      : '';
  
     // Resumen rápido de saldos, arriba del listado de opciones del dropdown.
     // G-Coins reusa el mismo `saldo` que ya trae tienda-server (sin segunda
@@ -181,8 +211,7 @@
         '<button type="button" class="ga-account-btn ga-logged-in" id="gaToggleMenu">' +
           '<span class="ga-dot"></span>' + avatar +
           '<span class="ga-name">' + esc(nombre) + '</span>' +
-          '<span class="ga-sep">·</span>' +
-          '<span class="ga-gcoins">' + saldoTxt + ' G</span>' +
+          flagHtml + badgeHtml +
         '</button>' +
         '<div class="ga-dropdown" id="gaDropdown" hidden>' +
           balancesRow +
@@ -265,7 +294,8 @@
       if (cached) saldo = cached.valor;
     }
     var miniWallets = await fetchMiniWallets(session.user.id);
-    renderLoggedIn(slot, profile, saldo, miniWallets);
+    var compact = await fetchCompactProfile();
+    renderLoggedIn(slot, profile, saldo, miniWallets, compact);
   }
  
   sb.auth.onAuthStateChange(function () { render(); });
