@@ -45,8 +45,20 @@
 .v3-nebula-br { bottom: 0; right: 0; }
 @media (max-width: 900px) { .v3-nebula { opacity: .55; width: 380px; } }
 .v3-nav { position: relative; z-index: 3; }
-.v3-nav-inner { max-width: 1320px; margin: 0 auto; padding: 22px 1.5rem 0; display: flex; align-items: center; justify-content: space-between; }
-.v3-logo { display: flex; align-items: center; gap: 12px; }
+/* .v3-nav-inner tiene solo 2 hijos directos (.v3-logo y .v3-auth), sin
+   ancho fijo en ninguno de los dos — a ancho de ventana chico, su suma
+   puede superar el ancho disponible. Antes eso se resolvía "solo" (en
+   realidad NO se resolvía: .v3-page tiene overflow:hidden para recortar
+   las nebulosas decorativas, así que cualquier desborde del nav quedaba
+   recortado en silencio, incluyendo el botón "Únete"). flex-wrap es la
+   red de seguridad estructural: si de verdad no cabe, .v3-auth pasa a su
+   propia línea completa en vez de cortarse — nunca queda oculto. */
+.v3-nav-inner {
+  max-width: 1320px; margin: 0 auto; padding: 22px 1.5rem 0;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; row-gap: 10px;
+}
+.v3-logo { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 .v3-logo-mark {
   width: 42px; height: 42px; flex-shrink: 0; overflow: hidden;
   background: #04101f;
@@ -56,7 +68,11 @@
 }
 .v3-logo-mark img { width: 100%; height: 100%; object-fit: cover; }
 .v3-wordmark { font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: .12em; font-size: 19px; color: #eaf2ff; }
-.v3-auth { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.v3-auth { display: flex; align-items: center; gap: 20px; min-width: 0; flex-shrink: 1; }
+/* El widget de cuenta (avatar+nombre+bandera+insignia) es lo único del
+   header con contenido variable en longitud (el nombre de Twitch). Es el
+   que debe absorber la reducción de espacio primero — nunca el botón. */
+#geoAccountWidget { min-width: 0; }
 .v3-login-link { display: flex; align-items: center; gap: 7px; font-size: 14px; color: #b9cdea; transition: color .25s; }
 .v3-login-link:hover { color: #fff; }
 .v3-join-btn {
@@ -66,6 +82,19 @@
   flex-shrink: 0; white-space: nowrap;
 }
 .v3-join-btn:hover { transform: translateY(-2px); }
+
+/* ---- Nav: degradación gradual antes de llegar al flex-wrap de emergencia.
+   A estos anchos, el nombre de usuario se acorta más y el logo/botón
+   pierden un poco de padding — así el layout de una sola línea
+   [LOGO] ... [cuenta][Únete] se mantiene en mucho más rango de anchos, y
+   .v3-nav-inner solo tiene que partirse a dos líneas en casos extremos. ---- */
+@media (max-width: 760px) {
+  .v3-nav-inner { padding: 16px 1rem 0; column-gap: 14px; }
+  .v3-auth { gap: 12px; }
+  .v3-wordmark { font-size: 15px; }
+  .v3-logo-mark { width: 34px; height: 34px; }
+  .v3-join-btn { padding: 9px 16px; font-size: 11.5px; }
+}
 
 /* Nav real (accesible/funcional) oculto — sigue alimentando el sistema de paneles y los tabs de móvil */
 .v3-page .nav-links { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
@@ -81,13 +110,18 @@
 .v3-marker-icon {
   width: 46px; height: 46px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; font-size: 20px;
-  background: rgba(8,16,34,.8); border: 1px solid rgba(150,200,255,.55);
-  box-shadow: 0 0 18px rgba(90,170,255,.55);
+  background: rgba(8,16,34,.88); border: 1px solid rgba(150,200,255,.55);
+  box-shadow: 0 0 18px rgba(90,170,255,.55), inset 0 0 0 1px rgba(0,0,0,.25);
   transition: transform .3s var(--ease), box-shadow .3s var(--ease);
 }
+/* El badge de Fortnite tenía una esquina con solo .35 de opacidad — sobre
+   zonas claras del planeta el relleno casi desaparecía y la "F" se leía
+   mal (el bug real detrás de "el pin de Fortnite casi desaparece"). Ahora
+   el degradado es opaco de punta a punta como el resto de los pins, sin
+   perder el tinte azul que lo distingue. */
 .v3-marker-fn {
   font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 19px; font-style: italic;
-  color: #eaf6ff; background: linear-gradient(150deg, rgba(58,160,255,.35), rgba(8,16,34,.85));
+  color: #eaf6ff; background: linear-gradient(150deg, rgba(40,110,205,.85), rgba(8,16,34,.94));
   border-color: rgba(120,190,255,.8); text-shadow: 0 0 10px rgba(150,210,255,.8);
 }
 .v3-marker-stem { width: 2px; height: 26px; background: linear-gradient(to bottom, rgba(150,200,255,.85), rgba(150,200,255,.1)); }

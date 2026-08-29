@@ -710,6 +710,9 @@ html.panels-ready .panel.is-active { display: block; }
 .ga-twitch-btn:hover { transform: translateY(-2px); }
 .ga-twitch-btn:hover::before { transform: translateX(120%); }
 
+@media (max-width: 760px) {
+  .ga-name { max-width: 64px; }
+}
 @media (max-width: 480px) {
   .ga-name { display: none; }
   .ga-dropdown { right: -10px; }
