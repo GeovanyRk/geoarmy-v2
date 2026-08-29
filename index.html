@@ -88,48 +88,53 @@
         </picture>
 
         <!-- Nav en forma de marcadores sobre el planeta -->
-        <!-- 8 pines en octágono alrededor del centro del planeta, separación
-             pareja de 45° cada uno, ligeramente más cerca del centro que la
-             versión anterior para que se sientan pegados a la esfera visible
-             en vez de flotando en el espacio vacío más allá de su borde. -->
+        <!-- Posiciones ajustadas por COMPOSICIÓN, no por simetría matemática:
+             cada --mx/--my se eligió muestreando el brillo real de
+             geo-army-globe.jpg debajo de cada pin (script de verificación)
+             para caer sobre zonas oscuras del planeta, con buen espacio
+             entre pins y respecto al logo. Ya no son un octágono perfecto. -->
         <div class="v3-planet-nav" id="v3PlanetNav">
-          <a href="#ganadores" style="--mx:50%; --my:22%;">
+          <a href="#ganadores" style="--mx:52%; --my:28%;">
             <span class="v3-marker-label">Ganadores</span>
             <span class="v3-marker-icon">👑</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="ranking.html" style="--mx:74%; --my:29%;">
+          <a href="ranking.html" style="--mx:72%; --my:29%;">
             <span class="v3-marker-label">Ranking</span>
             <span class="v3-marker-icon">🏆</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="fortnite.html" style="--mx:78%; --my:45%;">
+          <!-- Fortnite: antes en 78%/45% caía sobre una franja clara del
+               planeta y, combinado con el fondo semitransparente del badge,
+               casi desaparecía. Ahora en zona oscura verificada (~78 de
+               brillo vs ~137 antes) además del fix de opacidad del badge. -->
+          <a href="fortnite.html" style="--mx:80%; --my:56%;">
             <span class="v3-marker-label">Fortnite</span>
             <span class="v3-marker-icon v3-marker-fn">F</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="puntos.html" style="--mx:72%; --my:62%;">
+          <a href="puntos.html" style="--mx:74%; --my:68%;">
             <span class="v3-marker-label">Puntos</span>
             <span class="v3-marker-icon">⭐</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="alcancia.html" style="--mx:50%; --my:68%;">
+          <a href="alcancia.html" style="--mx:50%; --my:70%;">
             <span class="v3-marker-label">Alcancía</span>
             <span class="v3-marker-icon">🐷</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="#solicitudes" style="--mx:28%; --my:62%;">
+          <a href="#solicitudes" style="--mx:28%; --my:64%;">
             <span class="v3-marker-label">Solicitudes</span>
             <span class="v3-marker-icon">📋</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="tienda.html" style="--mx:22%; --my:45%;">
+          <a href="tienda.html" style="--mx:26%; --my:41%;">
             <span class="v3-marker-label">Tienda</span>
             <span class="v3-marker-icon">🛒</span>
             <span class="v3-marker-stem"></span>
@@ -137,7 +142,7 @@
           </a>
           <!-- Misiones: todavía no hay página/sistema de cuentas real detrás,
                así que el pin es solo decorativo por ahora (no navega). -->
-          <a href="#" onclick="event.preventDefault();" style="--mx:26%; --my:29%;">
+          <a href="#" onclick="event.preventDefault();" style="--mx:27%; --my:29%;">
             <span class="v3-marker-label">Misiones</span>
             <span class="v3-marker-icon">🎯</span>
             <span class="v3-marker-stem"></span>
