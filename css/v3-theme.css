@@ -415,12 +415,63 @@
   .v3-table-card tbody td::before { content: attr(data-label); font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(234,242,255,.4); }
 }
 
+/* ===== Ranking Geo Army (xp_leaderboard) — filas compactas, no tabla.
+   #1/#2/#3 reciben un poco más de presencia (medalla, insignia/avatar un
+   poco más grandes, color del número) pero el mismo layout que el resto. */
+.gr-rank-card { padding: 4px 0; }
+.gr-rank-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 18px; border-bottom: 1px solid rgba(255,255,255,.06);
+  transition: background .2s var(--ease);
+}
+.gr-rank-row:last-child { border-bottom: 0; }
+.gr-rank-row:hover { background: rgba(58,160,255,.06); }
+.gr-rank-pos {
+  width: 38px; flex-shrink: 0; text-align: left;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px; color: #8fb0e0; white-space: nowrap;
+}
+.gr-rank-row.gr-top .gr-rank-pos { font-size: 14px; }
+.gr-rank-row.gr-top1 .gr-rank-pos { color: #ffd23f; }
+.gr-rank-row.gr-top2 .gr-rank-pos { color: #d7dee8; }
+.gr-rank-row.gr-top3 .gr-rank-pos { color: #e0a06a; }
+.gr-rank-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: #1c2740; }
+.gr-rank-avatar-fallback {
+  display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 12px; color: #eaf2ff; background: #4a3a8a;
+}
+.gr-rank-row.gr-top .gr-rank-avatar { width: 32px; height: 32px; box-shadow: 0 0 0 2px rgba(255,255,255,.14); }
+.gr-rank-flag { width: 17px; height: 12px; border-radius: 2px; object-fit: cover; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
+/* Insignia con más presencia que en el header (23px), sin volverse enorme. */
+.gr-rank-badge { width: 26px; height: 26px; object-fit: contain; flex-shrink: 0; }
+.gr-rank-row.gr-top .gr-rank-badge { width: 32px; height: 32px; }
+.gr-rank-id { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex: 1 1 auto; }
+.gr-rank-name { font-weight: 600; font-size: 13.5px; color: #eaf2ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gr-rank-rankname { font-size: 11px; color: #7f92b3; white-space: nowrap; flex-shrink: 0; }
+.gr-rank-xp {
+  margin-left: auto; flex-shrink: 0; padding-left: 10px;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px; color: #ffd23f; white-space: nowrap;
+}
+.gr-rank-loading { text-align: center; color: #7f92b3; padding: 30px 18px; font-size: 13px; }
+/* Empty state: columna centrada con separación explícita vía gap (no
+   depende de márgenes de tags sueltos, así no se pueden pegar entre sí). */
+.gr-rank-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 9px; padding: 54px 24px; min-height: 168px;
+}
+.gr-rank-empty-ic { font-size: 30px; line-height: 1; }
+.gr-rank-empty-title { font-family: 'Orbitron', sans-serif; font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; color: #eaf2ff; }
+.gr-rank-empty-sub { font-size: 12.5px; color: #a9bad6; max-width: 320px; line-height: 1.5; }
+@media (max-width: 480px) {
+  .gr-rank-flag { display: none; }
+  .gr-rank-rankname { max-width: 74px; overflow: hidden; text-overflow: ellipsis; }
+}
+
 /* =====================================================================
    MI GEO ARMY — dashboard de cuenta (mi-geoarmy.html)
    Todo lo de abajo es solo presentación: no crea ni renombra ningún id/
    clase que el script inline de mi-geoarmy.html use para leer/escribir
    datos (mgAvatar, mgName, mgGcoins, mgWalletGrid, mgRequestsList,
-   mgRankBody, etc. siguen intactos).
+   mgRankList, etc. siguen intactos).
    ===================================================================== */
 
 /* ---- Mis saldos: fila compacta de 5 (G-Coins fija + 4 de wallet_balances) ---- */
