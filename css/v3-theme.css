@@ -124,13 +124,12 @@
   color: #eaf6ff; background: linear-gradient(150deg, rgba(40,110,205,.85), rgba(8,16,34,.94));
   border-color: rgba(120,190,255,.8); text-shadow: 0 0 10px rgba(150,210,255,.8);
 }
-.v3-marker-stem { width: 2px; height: 26px; background: linear-gradient(to bottom, rgba(150,200,255,.85), rgba(150,200,255,.1)); }
-.v3-marker-ring {
-  width: 20px; height: 8px; border-radius: 50%; margin-top: -2px;
-  background: radial-gradient(circle, rgba(120,190,255,.9), transparent 72%);
-  box-shadow: 0 0 16px 3px rgba(90,170,255,.5);
-  animation: v3RingPulse 2.4s ease-in-out infinite;
-}
+/* Pedido explícito: los pins quedan solo como el círculo con el ícono,
+   sin el tallo/línea ni el anillo pulsante de abajo. Se ocultan acá, en la
+   regla compartida (.v3-marker-stem/.v3-marker-ring), así que aplica a los
+   8 pins a la vez sin tocarlos uno por uno ni tocar el HTML. */
+.v3-marker-stem { display: none; }
+.v3-marker-ring { display: none; }
 .v3-marker-label {
   order: -1; margin-bottom: 6px;
   font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: .05em; white-space: nowrap;
@@ -147,7 +146,6 @@
 @media (max-width: 560px) {
   .v3-marker-icon { width: 36px; height: 36px; font-size: 15px; }
   .v3-marker-fn { font-size: 14px; }
-  .v3-marker-stem { height: 18px; }
 }
 
 /* ===== Hero: globo + wordmark ===== */
