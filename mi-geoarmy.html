@@ -81,7 +81,7 @@
                 <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
                 <div class="v3-now-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
                   <span id="mgCountryName">Sin país configurado</span>
-                  <button type="button" id="mgCountryBtn" style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Cambiar país</button>
+                  <button type="button" id="mgCountryBtn" hidden style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Elegir país</button>
                   <span id="mgCountryMsg" style="font-size:11px; color:#7CFC9A;"></span>
                 </div>
               </div>
@@ -160,6 +160,7 @@
   </footer>
 
   <script src="js/premium.js"></script>
+  <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
   <script>
   (function () {
@@ -267,18 +268,30 @@
       return 'https://flagcdn.com/24x18/' + code.toLowerCase() + '.png';
     }
 
+    // Una vez que profile.country_code tiene valor, el botón para
+    // elegir/cambiar país se OCULTA por completo (no solo se deshabilita):
+    // sin botón, sin enlace, sin forma de abrir el modal desde esta
+    // sección — la única salida es que un admin resetee country_code a
+    // NULL desde el backend (admin_reset_user_country, todavía no
+    // implementada). Como esta función se vuelve a llamar cada vez que
+    // loadDashboard() recarga el perfil, el día que eso pase el botón
+    // "Elegir país" reaparece solo, sin ningún cambio de código adicional.
     function renderCountryDisplay(code) {
       var flagImg = document.getElementById('mgNameFlag');
       var nameEl = document.getElementById('mgCountryName');
+      var btnEl = document.getElementById('mgCountryBtn');
       if (code) {
         flagImg.src = flagImgUrl(code);
         flagImg.alt = countryName(code);
         flagImg.hidden = false;
         nameEl.textContent = countryName(code);
+        btnEl.hidden = true;
       } else {
         flagImg.hidden = true;
         flagImg.removeAttribute('src');
         nameEl.textContent = 'Sin país configurado';
+        btnEl.hidden = false;
+        btnEl.textContent = 'Elegir país';
       }
     }
 
