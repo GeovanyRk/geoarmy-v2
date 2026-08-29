@@ -611,6 +611,24 @@ html.panels-ready .panel.is-active { display: block; }
 .ga-sep { color: var(--text3); }
 .ga-gcoins { color: var(--gold); font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
 
+/* Header compacto (rangos): tarjeta futurista sutil — borde morado fino +
+   glow leve, solo en el estado logueado. El estado logueado-fuera sigue
+   con el borde neutro de siempre (.ga-account-btn base). */
+.ga-logged-in {
+  border-color: rgba(145,71,255,.35);
+  box-shadow: 0 0 0 1px rgba(145,71,255,.06), 0 0 14px rgba(145,71,255,.12);
+}
+.ga-logged-in:hover {
+  border-color: rgba(145,71,255,.55);
+  box-shadow: 0 0 0 1px rgba(145,71,255,.1), 0 0 18px rgba(145,71,255,.2);
+}
+.ga-flag { width: 18px; height: 13px; border-radius: 2px; object-fit: cover; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
+/* Insignia un poco más chica que el avatar (24px), a propósito. */
+.ga-badge { width: 19px; height: 19px; object-fit: contain; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .ga-flag { display: none; }
+}
+
 .ga-account-wrap { position: relative; }
 .ga-dropdown {
   position: absolute; top: calc(100% + 10px); right: 0; min-width: 210px; max-width: 260px;
