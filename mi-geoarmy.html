@@ -643,16 +643,23 @@
     // nunca se usa y el ranking sigue leyendo xp_leaderboard de Supabase como
     // siempre. No escribe nada en Supabase. BORRAR este bloque (y su uso más
     // abajo) una vez aprobado el diseño de las filas.
+    // Thresholds reales (min_xp por rango) usados SOLO para que este mock
+    // arme pares xp/rango consistentes — no es una copia de xp_to_rank(),
+    // es nada más el dato con el que se armó este preview a mano:
+    // BRONZE_3 0, BRONZE_2 700, BRONZE_1 1500, SILVER_3 2500, SILVER_2 4000,
+    // SILVER_1 6000, GOLD_3 8500, GOLD_2 11500, GOLD_1 15000, PLATINUM_3 19000,
+    // PLATINUM_2 23500, PLATINUM_1 28500, DIAMOND 34000, MASTER 45500,
+    // LEGENDARY 60000.
     function rankPreviewMockRows() {
       return [
         { position: 1, display_name: 'ShadowMX',    country_code: 'MX', rank_code: 'LEGENDARY',  rank_name: 'Legendario',  xp: 152000, avatar_url: null },
-        { position: 2, display_name: 'LunaGamer',    country_code: 'AR', rank_code: 'MASTER',     rank_name: 'Maestro',     xp: 98000,  avatar_url: null },
-        { position: 3, display_name: 'Vortex_SV',    country_code: 'SV', rank_code: 'DIAMOND',    rank_name: 'Diamante',    xp: 61000,  avatar_url: null },
+        { position: 2, display_name: 'LunaGamer',    country_code: 'AR', rank_code: 'MASTER',     rank_name: 'Maestro',     xp: 52000,  avatar_url: null },
+        { position: 3, display_name: 'Vortex_SV',    country_code: 'SV', rank_code: 'DIAMOND',    rank_name: 'Diamante',    xp: 39800,  avatar_url: null },
         { position: 4, display_name: 'PixelQueen',   country_code: 'ES', rank_code: 'PLATINUM_2', rank_name: 'Platino II',  xp: 23900,  avatar_url: null },
-        { position: 5, display_name: 'NightFury_CO', country_code: 'CO', rank_code: 'GOLD_1',     rank_name: 'Oro I',       xp: 14200,  avatar_url: null },
-        { position: 6, display_name: 'TacoBlaster',  country_code: 'US', rank_code: 'SILVER_3',   rank_name: 'Plata III',   xp: 8100,   avatar_url: null },
-        { position: 7, display_name: 'Kroket_BR',    country_code: 'BR', rank_code: 'BRONZE_2',   rank_name: 'Bronce II',   xp: 3200,   avatar_url: null },
-        { position: 8, display_name: 'NuevoRecluta', country_code: 'CL', rank_code: 'BRONZE_1',   rank_name: 'Bronce I',    xp: 900,    avatar_url: null }
+        { position: 5, display_name: 'NightFury_CO', country_code: 'CO', rank_code: 'GOLD_1',     rank_name: 'Oro I',       xp: 16200,  avatar_url: null },
+        { position: 6, display_name: 'TacoBlaster',  country_code: 'US', rank_code: 'SILVER_3',   rank_name: 'Plata III',   xp: 3100,   avatar_url: null },
+        { position: 7, display_name: 'Kroket_BR',    country_code: 'BR', rank_code: 'BRONZE_1',   rank_name: 'Bronce I',    xp: 2100,   avatar_url: null },
+        { position: 8, display_name: 'NuevoRecluta', country_code: 'CL', rank_code: 'BRONZE_2',   rank_name: 'Bronce II',   xp: 950,    avatar_url: null }
       ];
     }
 
