@@ -152,6 +152,34 @@
       ];
     }
 
+    // Ranking.html tiene su PROPIO cliente de Supabase, independiente del
+    // que arma js/geoarmy-account.js para el widget de cuenta. Antes este
+    // archivo esperaba a window.GeoArmyAccount.client (creado por otro
+    // script), y si por lo que fuera ese objeto no llegaba a existir a
+    // tiempo, la tabla se quedaba en "Cargando…" para siempre. Ahora
+    // ranking.html no depende de nada externo para leer xp_leaderboard:
+    // crea su propio cliente de solo-lectura con la misma URL/anon key
+    // públicas que ya usa el resto del sitio (js/geoarmy-config.js).
+    function getRankingClient() {
+      try {
+        if (!window.supabase || !window.supabase.createClient) return null;
+        if (!window.GEOARMY_SUPABASE_URL || !window.GEOARMY_SUPABASE_ANON_KEY) return null;
+        return window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.warn('[ranking] no se pudo crear el cliente de Supabase', e);
+        return null;
+      }
+    }
+
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error('timeout')); }, ms);
+        })
+      ]);
+    }
+
     async function loadRanking() {
       var list = document.getElementById('rkList');
       if (!list) return;
@@ -164,15 +192,21 @@
         }
       } catch (e) {}
 
+      var sb = getRankingClient();
+      if (!sb) {
+        list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+        return;
+      }
+
       try {
-        if (!window.GeoArmyAccount || !window.GeoArmyAccount.client) {
-          list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
-          return;
-        }
-        var sb = window.GeoArmyAccount.client;
         // Ranking público: se lee igual haya o no sesión iniciada (misma
         // vista de solo lectura xp_leaderboard, sin gate de login).
-        var res = await sb.from('xp_leaderboard').select('*').order('xp', { ascending: false }).limit(50);
+        // Con timeout de 8s para que la pantalla nunca se quede pegada
+        // en "Cargando…" indefinidamente, pase lo que pase.
+        var res = await withTimeout(
+          sb.from('xp_leaderboard').select('*').order('xp', { ascending: false }).limit(50),
+          8000
+        );
         if (res.error) {
           console.warn('[ranking] no se pudo leer xp_leaderboard', res.error);
           list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
