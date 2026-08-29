@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ranking Geo Army — GeoArmy</title>
+  <meta name="description" content="Ranking oficial de la comunidad Geo Army: compite, sube de rango y llega al #1."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <div class="v3-page" style="min-height:100vh;">
+    <div class="v3-stars"></div>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="tienda.html">Tienda</a>
+          <a href="fortnite.html">Fortnite</a>
+          <a href="puntos.html">Puntos</a>
+          <a href="alcancia.html">Alcancía</a>
+        </div>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="v3-page-hero">
+      <div class="v3-tagline" style="letter-spacing:.28em;">RANKING</div>
+      <h1 class="v3-page-title">Ranking Geo Army</h1>
+      <p class="v3-page-sub">Compite. Sube de rango. Llega al #1.</p>
+    </section>
+
+    <!-- Ranking completo — solo lectura de xp_leaderboard. Público: se
+         muestra haya o no sesión iniciada, igual que cualquier leaderboard. -->
+    <div class="v3-table-wrap" id="rankingFull">
+      <div class="v3-table-card gr-rank-card">
+        <div id="rkList" class="gr-rank-list">
+          <div class="gr-rank-loading">Cargando…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-ranks.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+
+    function renderRankEmpty(list) {
+      list.innerHTML =
+        '<div class="gr-rank-empty">' +
+          '<div class="gr-rank-empty-ic">🏆</div>' +
+          '<div class="gr-rank-empty-title">El ranking aún está vacío</div>' +
+          '<div class="gr-rank-empty-sub">Sé el primero en ganar XP y entrar al ranking.</div>' +
+        '</div>';
+    }
+
+    function renderRankRows(list, rows) {
+      var ranks = window.GeoArmyRanks;
+      list.innerHTML = rows.map(function (row) {
+        var pos = row.position;
+        var topClass = pos === 1 ? ' gr-top gr-top1' : pos === 2 ? ' gr-top gr-top2' : pos === 3 ? ' gr-top gr-top3' : '';
+        var medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : '';
+        var avatar = row.avatar_url
+          ? '<img class="gr-rank-avatar" src="' + esc(row.avatar_url) + '" alt=""/>'
+          : '<span class="gr-rank-avatar gr-rank-avatar-fallback">' + esc((row.display_name || '?')[0] || '?') + '</span>';
+        var flag = row.country_code
+          ? '<img class="gr-rank-flag" src="' + esc(ranks ? ranks.flagImgUrl(row.country_code) : '') + '" alt="" onerror="this.remove()"/>'
+          : '';
+        var badge = row.rank_code
+          ? '<img class="gr-rank-badge" src="' + esc(ranks ? ranks.rankBadgeUrl(row.rank_code) : '') + '" alt="" onerror="this.remove()"/>'
+          : '';
+        var rankNameTxt = esc(row.rank_name || (ranks ? ranks.rankName(row.rank_code) : row.rank_code || ''));
+        var xpTxt = Number(row.xp || 0).toLocaleString() + ' XP';
+        return (
+          '<div class="gr-rank-row' + topClass + '">' +
+            '<div class="gr-rank-pos">' + medal + '#' + esc(pos) + '</div>' +
+            avatar + flag + badge +
+            '<div class="gr-rank-id">' +
+              '<span class="gr-rank-name">' + esc(row.display_name || 'Miembro') + '</span>' +
+              '<span class="gr-rank-rankname">' + rankNameTxt + '</span>' +
+            '</div>' +
+            '<div class="gr-rank-xp">' + xpTxt + '</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    // =====================================================================
+    // PREVIEW VISUAL TEMPORAL — SOLO PARA APROBAR DISEÑO, NO ES DATO REAL.
+    // Se activa únicamente si la URL trae ?rankPreview=1 (ej.
+    // ranking.html?rankPreview=1). Sin ese parámetro, esta función nunca se
+    // usa y el ranking sigue leyendo xp_leaderboard de Supabase como
+    // siempre. No escribe nada en Supabase. BORRAR este bloque (y su uso
+    // más abajo) una vez aprobado cualquier ajuste visual futuro de las filas.
+    function rankPreviewMockRows() {
+      return [
+        { position: 1, display_name: 'ShadowMX',    country_code: 'MX', rank_code: 'LEGENDARY',  rank_name: 'Legendario',  xp: 152000, avatar_url: null },
+        { position: 2, display_name: 'LunaGamer',    country_code: 'AR', rank_code: 'MASTER',     rank_name: 'Maestro',     xp: 52000,  avatar_url: null },
+        { position: 3, display_name: 'Vortex_SV',    country_code: 'SV', rank_code: 'DIAMOND',    rank_name: 'Diamante',    xp: 39800,  avatar_url: null },
+        { position: 4, display_name: 'PixelQueen',   country_code: 'ES', rank_code: 'PLATINUM_2', rank_name: 'Platino II',  xp: 23900,  avatar_url: null },
+        { position: 5, display_name: 'NightFury_CO', country_code: 'CO', rank_code: 'GOLD_1',     rank_name: 'Oro I',       xp: 16200,  avatar_url: null },
+        { position: 6, display_name: 'TacoBlaster',  country_code: 'US', rank_code: 'SILVER_3',   rank_name: 'Plata III',   xp: 3100,   avatar_url: null },
+        { position: 7, display_name: 'Kroket_BR',    country_code: 'BR', rank_code: 'BRONZE_1',   rank_name: 'Bronce I',    xp: 2100,   avatar_url: null },
+        { position: 8, display_name: 'NuevoRecluta', country_code: 'CL', rank_code: 'BRONZE_2',   rank_name: 'Bronce II',   xp: 950,    avatar_url: null }
+      ];
+    }
+
+    async function loadRanking() {
+      var list = document.getElementById('rkList');
+      if (!list) return;
+
+      // Preview temporal (ver nota arriba) — no toca Supabase para nada.
+      try {
+        if (new URLSearchParams(window.location.search).get('rankPreview') === '1') {
+          renderRankRows(list, rankPreviewMockRows());
+          return;
+        }
+      } catch (e) {}
+
+      try {
+        if (!window.GeoArmyAccount || !window.GeoArmyAccount.client) {
+          list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+          return;
+        }
+        var sb = window.GeoArmyAccount.client;
+        // Ranking público: se lee igual haya o no sesión iniciada (misma
+        // vista de solo lectura xp_leaderboard, sin gate de login).
+        var res = await sb.from('xp_leaderboard').select('*').order('xp', { ascending: false }).limit(50);
+        if (res.error) {
+          console.warn('[ranking] no se pudo leer xp_leaderboard', res.error);
+          list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+          return;
+        }
+        var rows = res.data || [];
+        if (!rows.length) {
+          renderRankEmpty(list);
+          return;
+        }
+        renderRankRows(list, rows);
+      } catch (e) {
+        console.warn('[ranking] error cargando xp_leaderboard', e);
+        list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRanking);
+  })();
+  </script>
+</body>
+</html>
