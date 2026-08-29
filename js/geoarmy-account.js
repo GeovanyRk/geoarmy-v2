@@ -223,7 +223,9 @@
           '<a href="mi-geoarmy.html#gcoins" class="ga-drop-item">' +
             '<img class="ga-drop-ic-img" src="' + siteBase() + 'gcoin-icon.png" alt="" onerror="this.remove()"/> Mis G-Coins' +
           '</a>' +
-          '<a href="ranking.html" class="ga-drop-item">🏆 Ranking</a>' +
+          // Ranking NO va aquí a propósito — ya tiene acceso propio desde el
+          // pin del mundo en index.html, la tarjeta resumen de mi-geoarmy.html
+          // y ranking.html; este menú es solo opciones de cuenta.
           // "Panel Admin" NUNCA aparece en el navbar público — solo aquí, dentro
           // del dropdown de la propia cuenta, y solo si profiles.role === 'admin'.
           // Esto es únicamente ocultar el enlace (UX): la protección real está
@@ -237,14 +239,13 @@
         '</div>' +
       '</div>';
  
-    var btn = document.getElementById('gaToggleMenu');
-    var dd = document.getElementById('gaDropdown');
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      dd.hidden = !dd.hidden;
-    });
-    document.addEventListener('click', function () { dd.hidden = true; });
-    dd.addEventListener('click', function (e) { e.stopPropagation(); });
+    // Abrir/cerrar el dropdown: NO se cablea acá con listeners nuevos en
+    // cada render (eso es lo que causaba que dejara de cerrarse — cada
+    // re-render de renderLoggedIn() sumaba otro listener de "click fuera"
+    // pegado a document, que nunca se limpia). El comportamiento real vive
+    // en initDropdownGlobalBehavior(), que se registra UNA sola vez para
+    // toda la página sin importar cuántas veces se vuelva a dibujar este
+    // botón/menú (ver esa función más abajo).
     document.getElementById('gaLogout').addEventListener('click', async function () {
       await sb.auth.signOut();
       try { sessionStorage.removeItem(CACHE_KEY); } catch (e) {}
@@ -298,6 +299,53 @@
     renderLoggedIn(slot, profile, saldo, miniWallets, compact);
   }
  
+  // ===== Dropdown de cuenta: abrir/cerrar, GLOBAL y una sola vez =====
+  // Se registra una única vez por carga de página (guardado en
+  // window para blindarlo incluso si este script se llegara a incluir dos
+  // veces por error). btn/dd se buscan por id en cada evento, nunca se
+  // guardan en una variable capturada — así siempre apuntan al botón/menú
+  // que existe AHORA en el DOM, sin importar cuántas veces render() haya
+  // vuelto a dibujar #geoAccountWidget desde adentro (login, cambio de
+  // saldo, refresh de sesión, etc.). Esto es lo que faltaba: antes cada
+  // render() sumaba un listener nuevo de "click fuera" pegado a document
+  // que nunca se limpiaba, y el menú dejaba de cerrarse bien después de
+  // un rato. No toca sesión/login/datos — solo abrir/cerrar.
+  function initDropdownGlobalBehavior() {
+    if (window.__gaDropdownGlobalInit) return;
+    window.__gaDropdownGlobalInit = true;
+
+    function closeDropdown() {
+      var dd = document.getElementById('gaDropdown');
+      if (dd) dd.hidden = true;
+    }
+
+    // click (cubre tap en móvil: los navegadores disparan "click" al tocar).
+    document.addEventListener('click', function (e) {
+      var btn = document.getElementById('gaToggleMenu');
+      var dd = document.getElementById('gaDropdown');
+      if (!btn || !dd) return;
+
+      if (btn.contains(e.target)) {
+        dd.hidden = !dd.hidden;
+        return;
+      }
+      if (dd.contains(e.target)) {
+        // Clic en una opción del menú: se cierra ya mismo, antes de que
+        // la navegación (si la hay) descargue la página.
+        dd.hidden = true;
+        return;
+      }
+      // Clic afuera de todo: cierra si estaba abierto.
+      if (!dd.hidden) dd.hidden = true;
+    });
+
+    // Tecla ESC cierra el menú si está abierto.
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc') closeDropdown();
+    });
+  }
+  initDropdownGlobalBehavior();
+
   sb.auth.onAuthStateChange(function () { render(); });
   document.addEventListener('DOMContentLoaded', render);
 })();
