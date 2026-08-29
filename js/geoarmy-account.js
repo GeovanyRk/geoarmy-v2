@@ -223,7 +223,7 @@
           '<a href="mi-geoarmy.html#gcoins" class="ga-drop-item">' +
             '<img class="ga-drop-ic-img" src="' + siteBase() + 'gcoin-icon.png" alt="" onerror="this.remove()"/> Mis G-Coins' +
           '</a>' +
-          '<a href="mi-geoarmy.html#ranking" class="ga-drop-item">🏆 Ranking</a>' +
+          '<a href="ranking.html" class="ga-drop-item">🏆 Ranking</a>' +
           // "Panel Admin" NUNCA aparece en el navbar público — solo aquí, dentro
           // del dropdown de la propia cuenta, y solo si profiles.role === 'admin'.
           // Esto es únicamente ocultar el enlace (UX): la protección real está
