@@ -423,12 +423,71 @@
   border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 1.6rem 1.8rem;
   box-shadow: 0 20px 40px -30px rgba(145,71,255,.35);
 }
-.v3-xp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-.v3-xp-level { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1rem; color: #eaf2ff; }
-.v3-xp-text { font-size: 13px; color: #9fb2d1; }
 .v3-xp-bar-bg { height: 8px; border-radius: 100px; background: rgba(255,255,255,.08); overflow: hidden; }
 .v3-xp-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #9147ff, #3aa0ff); border-radius: 100px; transition: width .6s ease; }
 .v3-xp-note { margin-top: 10px; font-size: 11.5px; color: #5f7396; }
+
+/* ===== Perfil Grande: tarjeta de rango (reemplaza el bloque de Nivel/XP) =====
+   Reusa el mismo contenedor .v3-xp-card/.v3-xp-inner (mismo fondo, borde,
+   glow morado y radios que ya tenía esa sección) y solo cambia lo de
+   adentro: 2 columnas en desktop (rango grande | progreso), 1 columna
+   apilada en mobile. */
+.v3-rank-grid { display: flex; align-items: center; gap: 34px; }
+.v3-rank-left {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  flex-shrink: 0; min-width: 180px; text-align: center;
+}
+.v3-rank-badge-big {
+  width: 128px; height: 128px; object-fit: contain;
+  filter: drop-shadow(0 0 24px rgba(145,71,255,.45));
+}
+.v3-rank-name-big {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.5rem;
+  letter-spacing: .04em; text-transform: uppercase; color: #eaf2ff;
+}
+.v3-rank-xp-big { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.05rem; color: #9fb2d1; }
+
+.v3-rank-right { flex: 1; min-width: 0; padding-left: 34px; border-left: 1px solid rgba(255,255,255,.08); }
+.v3-rank-progress-title {
+  font-family: 'Orbitron', sans-serif; font-size: .72rem; letter-spacing: .1em;
+  text-transform: uppercase; color: #7fb0f5; margin-bottom: 10px;
+}
+.v3-rank-progress-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.v3-rank-progress-text { font-size: 13px; color: #eaf2ff; }
+.v3-rank-progress-pct { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: #b48cff; }
+
+.v3-rank-next { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+.v3-rank-next-label {
+  font-family: 'Orbitron', sans-serif; font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; color: #7fb0f5; margin-bottom: 10px;
+}
+.v3-rank-next-row { display: flex; align-items: center; gap: 12px; }
+.v3-rank-next-badge { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.v3-rank-next-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: .85rem; letter-spacing: .03em; text-transform: uppercase; color: #eaf2ff; }
+.v3-rank-next-xp { font-size: 12px; color: #9fb2d1; margin-top: 2px; }
+
+.v3-rank-max { padding: 10px 0 4px; }
+.v3-rank-max-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: .05em;
+  text-transform: uppercase; color: #eaf2ff; text-shadow: 0 0 16px rgba(145,71,255,.5);
+}
+
+.v3-rank-position { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+.v3-rank-position-label {
+  font-family: 'Orbitron', sans-serif; font-size: .68rem; letter-spacing: .1em;
+  text-transform: uppercase; color: #7fb0f5; margin-bottom: 6px;
+}
+.v3-rank-position-value { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.3rem; color: #eaf2ff; }
+.v3-rank-position-sub { font-size: 12px; color: #9fb2d1; margin-top: 2px; }
+
+@media (max-width: 760px) {
+  .v3-rank-grid { flex-direction: column; text-align: center; }
+  .v3-rank-right { padding-left: 0; border-left: none; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.08); width: 100%; }
+  .v3-rank-progress-row { justify-content: center; gap: 14px; }
+  .v3-rank-next-row { justify-content: center; }
+  .v3-rank-next-row > div { text-align: left; }
+  .v3-rank-position { text-align: center; }
+}
 
 .v3-table-wrap { position: relative; z-index: 2; max-width: 1320px; margin: 2.2rem auto 0; padding: 0 1.5rem 70px; }
 .v3-table-card {
