@@ -603,6 +603,12 @@ html.panels-ready .panel.is-active { display: block; }
   box-shadow: 0 0 8px var(--green); flex-shrink: 0;
 }
 .ga-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+/* El nombre puede ser largo (nick de Twitch); sin este límite empuja el
+   pill de cuenta hasta que el nav se desborda y el overflow:hidden de
+   .v3-page recorta lo que sobra por la derecha — incluyendo el botón
+   "Únete a Geo Army". Con max-width + ellipsis el pill nunca crece sin
+   límite, así que el nav ya no se desborda a ningún ancho de pantalla. */
+.ga-name { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ga-avatar-fallback {
   display: flex; align-items: center; justify-content: center;
   background: var(--accent); color: #fff; font-size: 11px; font-weight: 700;
