@@ -307,6 +307,10 @@
 .v3-now-dot { width: 9px; height: 9px; border-radius: 50%; background: #5a6478; flex-shrink: 0; }
 .v3-now-dot.live { background: #00c853; box-shadow: 0 0 10px #00c853; animation: v3DotPulse 1.8s ease-in-out infinite; }
 .v3-now-sub { font-size: 12.5px; color: #9fb2d1; min-height: 14px; }
+/* Tarjeta resumen de Ranking (mi-geoarmy.html): línea de nombre de rango,
+   entre el número grande (#mgRank) y la línea de XP (#mgRankSub). */
+#mgRankName { font-weight: 600; color: #c3d4ef; min-height: 0; }
+#mgRankName:empty { display: none; }
 .v3-now-big { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 2rem; color: var(--ac); line-height: 1.08; }
 .v3-now-big span { font-size: .85rem; font-weight: 700; color: #c9d6ec; text-transform: uppercase; margin-left: 4px; }
 .v3-now-big-sm { font-size: 1.4rem; }
@@ -471,7 +475,8 @@
    Todo lo de abajo es solo presentación: no crea ni renombra ningún id/
    clase que el script inline de mi-geoarmy.html use para leer/escribir
    datos (mgAvatar, mgName, mgGcoins, mgWalletGrid, mgRequestsList,
-   mgRankList, etc. siguen intactos).
+   mgRank/mgRankName/mgRankSub, etc. siguen intactos). El leaderboard
+   completo (.gr-rank-*) vive en ranking.html, no acá.
    ===================================================================== */
 
 /* ---- Mis saldos: fila compacta de 5 (G-Coins fija + 4 de wallet_balances) ---- */
