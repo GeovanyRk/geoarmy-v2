@@ -105,14 +105,51 @@
         </div>
       </div>
 
+      <!-- Perfil Grande — tarjeta de rango. Reemplaza por completo el bloque
+           legado de "Nivel X / X,000 XP" (arriba se calculaba todo en el
+           cliente con profile.xp % 1000). Ahora TODO sale tal cual de
+           my_rank_summary() (ver loadRankCard() más abajo): xp, rank_code,
+           progress_pct, xp_into_tier/xp_to_next, next_*, position, top_pct.
+           No se recalcula nada acá. -->
       <div class="v3-xp-card">
-        <div class="v3-xp-inner">
-          <div class="v3-xp-top">
-            <span class="v3-xp-level" id="mgLevelBig">Nivel 1</span>
-            <span class="v3-xp-text" id="mgXpText">0 / 1,000 XP</span>
+        <div class="v3-xp-inner v3-rank-grid">
+          <div class="v3-rank-left">
+            <img id="rankBadgeBig" class="v3-rank-badge-big" src="" alt="" hidden onerror="this.hidden=true;"/>
+            <div id="rankNameBig" class="v3-rank-name-big">—</div>
+            <div id="rankXpBig" class="v3-rank-xp-big">— XP</div>
           </div>
-          <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="mgXpBarFill"></div></div>
-          <p class="v3-xp-note">La fórmula de nivel es provisional para esta Fase 1 y puede ajustarse más adelante sin perder tu XP acumulada.</p>
+          <div class="v3-rank-right">
+            <div id="rankProgressBlock" hidden>
+              <div class="v3-rank-progress-title">Progreso al siguiente rango</div>
+              <div class="v3-rank-progress-row">
+                <span id="rankProgressText" class="v3-rank-progress-text">— / — XP</span>
+                <span id="rankProgressPct" class="v3-rank-progress-pct">—%</span>
+              </div>
+              <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="rankProgressFill"></div></div>
+              <p id="rankProgressNote" class="v3-xp-note"></p>
+
+              <div class="v3-rank-next">
+                <div class="v3-rank-next-label">Siguiente rango</div>
+                <div class="v3-rank-next-row">
+                  <img id="rankNextBadge" class="v3-rank-next-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
+                  <div>
+                    <div id="rankNextName" class="v3-rank-next-name">—</div>
+                    <div id="rankNextXp" class="v3-rank-next-xp">— XP</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="rankMaxBlock" class="v3-rank-max" hidden>
+              <div class="v3-rank-max-title">🏆 Rango máximo alcanzado</div>
+            </div>
+
+            <div class="v3-rank-position">
+              <div class="v3-rank-position-label">Posición global</div>
+              <div id="rankPositionValue" class="v3-rank-position-value">—</div>
+              <div id="rankPositionSub" class="v3-rank-position-sub"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -153,7 +190,6 @@
   <script src="js/geoarmy-account.js"></script>
   <script>
   (function () {
-    var XP_PER_LEVEL = 1000; // debe coincidir con xp_to_level() en supabase/schema.sql
     var currentCountryCode = null; // solo lectura de estado en memoria para el botón "Cambiar país"
 
     function esc(s) {
@@ -591,6 +627,113 @@
     // página — ver ranking.html. Acá solo queda el resumen personal
     // (loadRankSummary, arriba), que enlaza a esa página.
 
+    // ===== Perfil Grande: tarjeta grande de rango =====
+    // Reemplaza el bloque legado de "Nivel X / X,000 XP". Todo lo que se
+    // pinta acá sale tal cual de my_rank_summary() — nunca se recalcula xp,
+    // porcentaje ni "XP para el siguiente rango" en el cliente. Es una
+    // llamada independiente de loadRankSummary() (la tarjetita de arriba),
+    // a propósito: mismo patrón que ya usa ranking.html (cada tarjeta arma
+    // su propio pedido), para no arriesgar esa tarjeta que ya funciona.
+    async function loadRankCard(sb) {
+      var badgeBig = document.getElementById('rankBadgeBig');
+      var nameBig = document.getElementById('rankNameBig');
+      var xpBig = document.getElementById('rankXpBig');
+      var progressBlock = document.getElementById('rankProgressBlock');
+      var maxBlock = document.getElementById('rankMaxBlock');
+      var progressText = document.getElementById('rankProgressText');
+      var progressPct = document.getElementById('rankProgressPct');
+      var progressFill = document.getElementById('rankProgressFill');
+      var progressNote = document.getElementById('rankProgressNote');
+      var nextBadge = document.getElementById('rankNextBadge');
+      var nextName = document.getElementById('rankNextName');
+      var nextXp = document.getElementById('rankNextXp');
+      var positionValue = document.getElementById('rankPositionValue');
+      var positionSub = document.getElementById('rankPositionSub');
+      if (!nameBig) return;
+
+      var ranks = window.GeoArmyRanks;
+
+      function fallback() {
+        if (badgeBig) badgeBig.hidden = true;
+        nameBig.textContent = '—';
+        xpBig.textContent = '— XP';
+        if (progressBlock) progressBlock.hidden = true;
+        if (maxBlock) maxBlock.hidden = true;
+        positionValue.textContent = '—';
+        positionSub.textContent = '';
+      }
+
+      try {
+        var res = await sb.rpc('my_rank_summary');
+        if (res.error) {
+          console.warn('[mi-geoarmy] no se pudo leer my_rank_summary() (tarjeta de rango)', res.error);
+          fallback();
+          return;
+        }
+        var row = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!row) { fallback(); return; }
+
+        // ---- Lado izquierdo: rango actual ----
+        var code = row.current_code;
+        var name = row.current_name || (ranks ? ranks.rankName(code) : code) || '—';
+        if (badgeBig) {
+          var url = ranks ? ranks.rankBadgeUrl(code) : null;
+          if (url) { badgeBig.src = url; badgeBig.alt = name; badgeBig.hidden = false; }
+          else { badgeBig.hidden = true; }
+        }
+        nameBig.textContent = name;
+        xpBig.textContent = Number(row.xp || 0).toLocaleString() + ' XP';
+
+        // ---- Lado derecho: progreso normal, o "rango máximo" si aplica ----
+        if (row.is_max_rank) {
+          if (progressBlock) progressBlock.hidden = true;
+          if (maxBlock) maxBlock.hidden = false;
+        } else {
+          if (maxBlock) maxBlock.hidden = true;
+          if (progressBlock) progressBlock.hidden = false;
+
+          var toNext = Number(row.xp_to_next || 0);
+          // Texto = xp total del usuario / next_min_xp (umbral absoluto del
+          // siguiente rango), tal cual vienen los dos del backend. NO es
+          // xp_into_tier / (xp_into_tier+xp_to_next): eso da el ancho de
+          // ESTE tier nada más (ej. "400/5,000" en vez de "23,900/28,500"
+          // para alguien en Platino II) y no es lo que se quiere mostrar acá.
+          progressText.textContent = Number(row.xp || 0).toLocaleString() + ' / ' + Number(row.next_min_xp || 0).toLocaleString() + ' XP';
+
+          // La barra usa progress_pct directo del backend, nunca un cálculo propio.
+          var pct = Number(row.progress_pct || 0);
+          progressPct.textContent = pct + '%';
+          progressFill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+
+          var nextNameTxt = row.next_name || (ranks ? ranks.rankName(row.next_code) : row.next_code) || '';
+          progressNote.textContent = toNext.toLocaleString() + ' XP para ' + nextNameTxt;
+
+          if (nextBadge) {
+            var nurl = ranks ? ranks.rankBadgeUrl(row.next_code) : null;
+            if (nurl) { nextBadge.src = nurl; nextBadge.alt = nextNameTxt; nextBadge.hidden = false; }
+            else { nextBadge.hidden = true; }
+          }
+          nextName.textContent = nextNameTxt;
+          // "SIGUIENTE RANGO" muestra el umbral fijo del siguiente rango
+          // (next_min_xp), no lo que falta (eso ya se ve arriba, en la nota
+          // de la barra) — así el número no "se mueve" mientras ganas XP.
+          nextXp.textContent = Number(row.next_min_xp || 0).toLocaleString() + ' XP';
+        }
+
+        // ---- Posición global: solo lo que ya viene del backend ----
+        if (row.position == null) {
+          positionValue.innerHTML = '<span style="font-size:.85rem;">Sin posición todavía</span>';
+          positionSub.textContent = 'Gana XP para entrar al ranking';
+        } else {
+          positionValue.textContent = '#' + row.position;
+          positionSub.textContent = (row.top_pct != null) ? ('Top ' + row.top_pct + '%') : '';
+        }
+      } catch (e) {
+        console.warn('[mi-geoarmy] error cargando my_rank_summary() (tarjeta de rango)', e);
+        fallback();
+      }
+    }
+
     async function loadDashboard(sb) {
       var loggedOutEl = document.getElementById('mgLoggedOut');
       var dashEl = document.getElementById('mgDashboard');
@@ -611,20 +754,16 @@
         avatarEl.style.display = profile.avatar_url ? '' : 'none';
         document.getElementById('mgNameText').textContent = profile.display_name || profile.twitch_login || 'Miembro';
         document.getElementById('mgLevel').textContent = 'Nivel ' + profile.level;
-        document.getElementById('mgLevelBig').textContent = 'Nivel ' + profile.level;
 
         currentCountryCode = profile.country_code || null;
         renderCountryDisplay(currentCountryCode);
-
-        var dentro = (profile.xp || 0) % XP_PER_LEVEL;
-        document.getElementById('mgXpText').textContent = dentro.toLocaleString() + ' / ' + XP_PER_LEVEL.toLocaleString() + ' XP';
-        document.getElementById('mgXpBarFill').style.width = Math.min(100, (dentro / XP_PER_LEVEL) * 100) + '%';
 
         await refreshSaldo(sb, session);
         await loadWallets(sb, session.user.id);
         await loadMyRequests(sb, session.user.id);
 
         loadRankSummary(sb);
+        loadRankCard(sb);
       } catch (e) {
         console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
         loggedOutEl.hidden = false;
