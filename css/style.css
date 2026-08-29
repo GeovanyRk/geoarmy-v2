@@ -644,6 +644,17 @@ html.panels-ready .panel.is-active { display: block; }
   box-shadow: var(--card-shadow); padding: 8px; display: flex; flex-direction: column;
   gap: 2px; z-index: 200;
 }
+/* Causa real de que el menú se quedara "pegado abierto": esta regla pone
+   display:flex sin condición. El atributo `hidden` que usa geoarmy-account.js
+   para abrir/cerrar (dd.hidden = true/false) depende de la regla del propio
+   navegador `[hidden]{display:none}`, pero esa regla es de origen UA (la más
+   baja prioridad del cascade) y CUALQUIER regla de autor con `display`
+   -como la de arriba- la gana siempre, sin importar especificidad. Resultado:
+   togglear `hidden` no tenía ningún efecto visual — el dropdown estaba
+   siempre en display:flex por debajo. Con esta regla, [hidden] vuelve a
+   ganar (misma especificidad + más selectores + viene después en el
+   archivo) y el toggle de JS ya controla la visibilidad de verdad. */
+.ga-dropdown[hidden] { display: none; }
 
 /* Resumen rápido de saldos, arriba del listado de opciones del dropdown. */
 .ga-balances {
