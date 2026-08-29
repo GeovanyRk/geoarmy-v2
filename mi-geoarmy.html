@@ -133,15 +133,10 @@
 
       <div class="v3-table-wrap" id="ranking">
         <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Ranking Geo Army</div>
-        <div class="v3-table-card">
-          <table>
-            <thead>
-              <tr><th>#</th><th>Usuario</th><th>Nivel</th><th>G-Coins</th></tr>
-            </thead>
-            <tbody id="mgRankBody">
-              <tr><td colspan="4" class="v3-table-empty">Cargando…</td></tr>
-            </tbody>
-          </table>
+        <div class="v3-table-card gr-rank-card">
+          <div id="mgRankList" class="gr-rank-list">
+            <div class="gr-rank-loading">Cargando…</div>
+          </div>
         </div>
       </div>
     </div>
@@ -551,12 +546,63 @@
       }
     }
 
-    // El ranking real (xp_leaderboard / gcoin_leaderboard del schema nuevo)
-    // todavía no está conectado aquí a propósito — primero se prueba el
-    // login real con Twitch, el ranking se conecta en un paso aparte.
-    function loadRankingTable() {
-      var tbody = document.getElementById('mgRankBody');
-      tbody.innerHTML = '<tr><td colspan="4" class="v3-table-empty">Ranking próximamente.</td></tr>';
+    // Ranking real — solo lectura de xp_leaderboard (ver especificación del
+    // backend). Esta vista solo trae perfiles con xp > 0, ya viene ordenada
+    // (xp DESC, created_at ASC, id ASC) y no expone IDs internos; por eso acá
+    // solo se pide .order('xp', ...) como respaldo del lado del cliente, sin
+    // inventar ningún criterio de desempate nuevo. Nunca escribe nada.
+    async function loadRankingTable(sb) {
+      var list = document.getElementById('mgRankList');
+      if (!list) return;
+      var ranks = window.GeoArmyRanks;
+      try {
+        var res = await sb.from('xp_leaderboard').select('*').order('xp', { ascending: false }).limit(50);
+        if (res.error) {
+          console.warn('[mi-geoarmy] no se pudo leer xp_leaderboard', res.error);
+          list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+          return;
+        }
+        var rows = res.data || [];
+        if (!rows.length) {
+          list.innerHTML =
+            '<div class="gr-rank-empty">' +
+              '<div class="gr-rank-empty-ic">🏆</div>' +
+              '<b>El ranking aún está vacío</b>' +
+              '<span>Sé el primero en ganar XP y entrar al ranking.</span>' +
+            '</div>';
+          return;
+        }
+        list.innerHTML = rows.map(function (row) {
+          var pos = row.position;
+          var topClass = pos === 1 ? ' gr-top gr-top1' : pos === 2 ? ' gr-top gr-top2' : pos === 3 ? ' gr-top gr-top3' : '';
+          var medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : '';
+          var avatar = row.avatar_url
+            ? '<img class="gr-rank-avatar" src="' + esc(row.avatar_url) + '" alt=""/>'
+            : '<span class="gr-rank-avatar gr-rank-avatar-fallback">' + esc((row.display_name || '?')[0] || '?') + '</span>';
+          var flag = row.country_code
+            ? '<img class="gr-rank-flag" src="' + esc(ranks ? ranks.flagImgUrl(row.country_code) : '') + '" alt="" onerror="this.remove()"/>'
+            : '';
+          var badge = row.rank_code
+            ? '<img class="gr-rank-badge" src="' + esc(ranks ? ranks.rankBadgeUrl(row.rank_code) : '') + '" alt="" onerror="this.remove()"/>'
+            : '';
+          var rankNameTxt = esc(row.rank_name || (ranks ? ranks.rankName(row.rank_code) : row.rank_code || ''));
+          var xpTxt = Number(row.xp || 0).toLocaleString() + ' XP';
+          return (
+            '<div class="gr-rank-row' + topClass + '">' +
+              '<div class="gr-rank-pos">' + medal + '#' + esc(pos) + '</div>' +
+              avatar + flag + badge +
+              '<div class="gr-rank-id">' +
+                '<span class="gr-rank-name">' + esc(row.display_name || 'Miembro') + '</span>' +
+                '<span class="gr-rank-rankname">' + rankNameTxt + '</span>' +
+              '</div>' +
+              '<div class="gr-rank-xp">' + xpTxt + '</div>' +
+            '</div>'
+          );
+        }).join('');
+      } catch (e) {
+        console.warn('[mi-geoarmy] error cargando xp_leaderboard', e);
+        list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+      }
     }
 
     async function loadDashboard(sb) {
@@ -595,7 +641,7 @@
         // Ranking real: pendiente, ver nota en loadRankingTable().
         document.getElementById('mgRank').textContent = 'Próximamente';
 
-        loadRankingTable();
+        loadRankingTable(sb);
       } catch (e) {
         console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
         loggedOutEl.hidden = false;
