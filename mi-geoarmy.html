@@ -89,7 +89,7 @@
           </div>
 
           <div class="v3-now-card v3-c-gold" id="gcoins">
-            <div class="v3-now-head"><span class="v3-now-ic">🪙</span>G-Coins</div>
+            <div class="v3-now-head"><img class="v3-now-ic-img" src="gcoin-icon.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(129689)))"/>G-Coins</div>
             <div class="v3-now-big" id="mgGcoins">—<span>G</span></div>
             <div class="v3-now-sub">G-Coins disponibles</div>
             <button type="button" class="v3-now-btn" id="mgRefreshSaldo" style="border:none; cursor:pointer; font-family:'Orbitron',sans-serif;">Actualizar saldo</button>
@@ -98,7 +98,7 @@
           <div class="v3-now-card v3-c-blue">
             <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Ranking</div>
             <div class="v3-now-big" id="mgRank">—</div>
-            <div class="v3-now-sub">Ranking Geo Army</div>
+            <div class="v3-now-sub" id="mgRankSub">Ranking Geo Army</div>
           </div>
         </div>
       </div>
@@ -173,8 +173,8 @@
     // no tiene fila en wallet_balances y no se toca aquí (ver tarjeta G-Coins arriba,
     // que sigue leyendo el saldo real de tienda-server como siempre).
     var WALLET_CURRENCIES = [
-      { code: 'VBUCKS',     label: 'Fortnite',  unit: 'V-Bucks',  icon: '🎮', accent: 'v3-c-purple', decimals: 0 },
-      { code: 'OWCOINS',    label: 'Overwatch', unit: 'OW Coins', icon: '🕹️', accent: 'v3-c-blue',   decimals: 0 },
+      { code: 'VBUCKS',     label: 'Fortnite',  unit: 'V-Bucks',  icon: '<img class="v3-now-ic-img" src="icon-fortnite.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(127918)))"/>', accent: 'v3-c-purple', decimals: 0 },
+      { code: 'OWCOINS',    label: 'Overwatch', unit: 'OW Coins', icon: '<img class="v3-now-ic-img" src="icon-overwatch.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(128377)))"/>', accent: 'v3-c-blue',   decimals: 0 },
       { code: 'PAYPAL_USD', label: 'PayPal',    unit: 'USD',      icon: '💵', accent: 'v3-c-gold',   decimals: 2 },
       { code: 'TWITCH_SUB', label: 'Twitch',    unit: 'Subs',     icon: '🟣', accent: 'v3-c-purple', decimals: 0 }
     ];
@@ -546,15 +546,128 @@
       }
     }
 
+    // Tarjeta resumen "Ranking" (arriba, junto a Perfil/G-Coins) — solo
+    // lectura de my_rank_summary(). Muestra el estado REAL de la cuenta:
+    // sin posición todavía si position === null (caso actual, 0 XP), o
+    // #posición + rango + XP una vez que exista posición. Nunca inventa
+    // datos ni calcula nada que ya venga resuelto del backend.
+    async function loadRankSummary(sb) {
+      var el = document.getElementById('mgRank');
+      var subEl = document.getElementById('mgRankSub');
+      if (!el) return;
+      try {
+        var res = await sb.rpc('my_rank_summary');
+        if (res.error) {
+          console.warn('[mi-geoarmy] no se pudo leer my_rank_summary()', res.error);
+          el.textContent = '—';
+          if (subEl) subEl.textContent = 'Ranking Geo Army';
+          return;
+        }
+        var row = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!row) {
+          el.textContent = '—';
+          if (subEl) subEl.textContent = 'Ranking Geo Army';
+          return;
+        }
+        if (row.position == null) {
+          // Mismo patrón que ya usa la tarjeta de G-Coins (mgGcoins) cuando
+          // el contenido es una frase en vez de un número grande: se achica
+          // con un <span> inline en vez de mostrar la frase al tamaño de
+          // número gigante por defecto de .v3-now-big.
+          el.innerHTML = '<span style="font-size:.9rem;">Sin posición todavía</span>';
+          if (subEl) subEl.textContent = 'Gana XP para entrar al ranking';
+        } else {
+          el.textContent = '#' + row.position;
+          if (subEl) {
+            var rankTxt = row.current_name || '';
+            var xpTxt = Number(row.xp || 0).toLocaleString() + ' XP';
+            subEl.textContent = rankTxt ? (rankTxt + ' · ' + xpTxt) : xpTxt;
+          }
+        }
+      } catch (e) {
+        console.warn('[mi-geoarmy] error cargando my_rank_summary()', e);
+        el.textContent = '—';
+        if (subEl) subEl.textContent = 'Ranking Geo Army';
+      }
+    }
+
     // Ranking real — solo lectura de xp_leaderboard (ver especificación del
     // backend). Esta vista solo trae perfiles con xp > 0, ya viene ordenada
     // (xp DESC, created_at ASC, id ASC) y no expone IDs internos; por eso acá
     // solo se pide .order('xp', ...) como respaldo del lado del cliente, sin
     // inventar ningún criterio de desempate nuevo. Nunca escribe nada.
+    function renderRankEmpty(list) {
+      list.innerHTML =
+        '<div class="gr-rank-empty">' +
+          '<div class="gr-rank-empty-ic">🏆</div>' +
+          '<div class="gr-rank-empty-title">El ranking aún está vacío</div>' +
+          '<div class="gr-rank-empty-sub">Sé el primero en ganar XP y entrar al ranking.</div>' +
+        '</div>';
+    }
+
+    function renderRankRows(list, rows) {
+      var ranks = window.GeoArmyRanks;
+      list.innerHTML = rows.map(function (row) {
+        var pos = row.position;
+        var topClass = pos === 1 ? ' gr-top gr-top1' : pos === 2 ? ' gr-top gr-top2' : pos === 3 ? ' gr-top gr-top3' : '';
+        var medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : '';
+        var avatar = row.avatar_url
+          ? '<img class="gr-rank-avatar" src="' + esc(row.avatar_url) + '" alt=""/>'
+          : '<span class="gr-rank-avatar gr-rank-avatar-fallback">' + esc((row.display_name || '?')[0] || '?') + '</span>';
+        var flag = row.country_code
+          ? '<img class="gr-rank-flag" src="' + esc(ranks ? ranks.flagImgUrl(row.country_code) : '') + '" alt="" onerror="this.remove()"/>'
+          : '';
+        var badge = row.rank_code
+          ? '<img class="gr-rank-badge" src="' + esc(ranks ? ranks.rankBadgeUrl(row.rank_code) : '') + '" alt="" onerror="this.remove()"/>'
+          : '';
+        var rankNameTxt = esc(row.rank_name || (ranks ? ranks.rankName(row.rank_code) : row.rank_code || ''));
+        var xpTxt = Number(row.xp || 0).toLocaleString() + ' XP';
+        return (
+          '<div class="gr-rank-row' + topClass + '">' +
+            '<div class="gr-rank-pos">' + medal + '#' + esc(pos) + '</div>' +
+            avatar + flag + badge +
+            '<div class="gr-rank-id">' +
+              '<span class="gr-rank-name">' + esc(row.display_name || 'Miembro') + '</span>' +
+              '<span class="gr-rank-rankname">' + rankNameTxt + '</span>' +
+            '</div>' +
+            '<div class="gr-rank-xp">' + xpTxt + '</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    // =====================================================================
+    // PREVIEW VISUAL TEMPORAL — SOLO PARA APROBAR DISEÑO, NO ES DATO REAL.
+    // Se activa únicamente si la URL trae ?rankPreview=1 (ej.
+    // mi-geoarmy.html?rankPreview=1#ranking). Sin ese parámetro, esta función
+    // nunca se usa y el ranking sigue leyendo xp_leaderboard de Supabase como
+    // siempre. No escribe nada en Supabase. BORRAR este bloque (y su uso más
+    // abajo) una vez aprobado el diseño de las filas.
+    function rankPreviewMockRows() {
+      return [
+        { position: 1, display_name: 'ShadowMX',    country_code: 'MX', rank_code: 'LEGENDARY',  rank_name: 'Legendario',  xp: 152000, avatar_url: null },
+        { position: 2, display_name: 'LunaGamer',    country_code: 'AR', rank_code: 'MASTER',     rank_name: 'Maestro',     xp: 98000,  avatar_url: null },
+        { position: 3, display_name: 'Vortex_SV',    country_code: 'SV', rank_code: 'DIAMOND',    rank_name: 'Diamante',    xp: 61000,  avatar_url: null },
+        { position: 4, display_name: 'PixelQueen',   country_code: 'ES', rank_code: 'PLATINUM_2', rank_name: 'Platino II',  xp: 23900,  avatar_url: null },
+        { position: 5, display_name: 'NightFury_CO', country_code: 'CO', rank_code: 'GOLD_1',     rank_name: 'Oro I',       xp: 14200,  avatar_url: null },
+        { position: 6, display_name: 'TacoBlaster',  country_code: 'US', rank_code: 'SILVER_3',   rank_name: 'Plata III',   xp: 8100,   avatar_url: null },
+        { position: 7, display_name: 'Kroket_BR',    country_code: 'BR', rank_code: 'BRONZE_2',   rank_name: 'Bronce II',   xp: 3200,   avatar_url: null },
+        { position: 8, display_name: 'NuevoRecluta', country_code: 'CL', rank_code: 'BRONZE_1',   rank_name: 'Bronce I',    xp: 900,    avatar_url: null }
+      ];
+    }
+
     async function loadRankingTable(sb) {
       var list = document.getElementById('mgRankList');
       if (!list) return;
-      var ranks = window.GeoArmyRanks;
+
+      // Preview temporal (ver nota arriba) — no toca Supabase para nada.
+      try {
+        if (new URLSearchParams(window.location.search).get('rankPreview') === '1') {
+          renderRankRows(list, rankPreviewMockRows());
+          return;
+        }
+      } catch (e) {}
+
       try {
         var res = await sb.from('xp_leaderboard').select('*').order('xp', { ascending: false }).limit(50);
         if (res.error) {
@@ -564,41 +677,10 @@
         }
         var rows = res.data || [];
         if (!rows.length) {
-          list.innerHTML =
-            '<div class="gr-rank-empty">' +
-              '<div class="gr-rank-empty-ic">🏆</div>' +
-              '<b>El ranking aún está vacío</b>' +
-              '<span>Sé el primero en ganar XP y entrar al ranking.</span>' +
-            '</div>';
+          renderRankEmpty(list);
           return;
         }
-        list.innerHTML = rows.map(function (row) {
-          var pos = row.position;
-          var topClass = pos === 1 ? ' gr-top gr-top1' : pos === 2 ? ' gr-top gr-top2' : pos === 3 ? ' gr-top gr-top3' : '';
-          var medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : '';
-          var avatar = row.avatar_url
-            ? '<img class="gr-rank-avatar" src="' + esc(row.avatar_url) + '" alt=""/>'
-            : '<span class="gr-rank-avatar gr-rank-avatar-fallback">' + esc((row.display_name || '?')[0] || '?') + '</span>';
-          var flag = row.country_code
-            ? '<img class="gr-rank-flag" src="' + esc(ranks ? ranks.flagImgUrl(row.country_code) : '') + '" alt="" onerror="this.remove()"/>'
-            : '';
-          var badge = row.rank_code
-            ? '<img class="gr-rank-badge" src="' + esc(ranks ? ranks.rankBadgeUrl(row.rank_code) : '') + '" alt="" onerror="this.remove()"/>'
-            : '';
-          var rankNameTxt = esc(row.rank_name || (ranks ? ranks.rankName(row.rank_code) : row.rank_code || ''));
-          var xpTxt = Number(row.xp || 0).toLocaleString() + ' XP';
-          return (
-            '<div class="gr-rank-row' + topClass + '">' +
-              '<div class="gr-rank-pos">' + medal + '#' + esc(pos) + '</div>' +
-              avatar + flag + badge +
-              '<div class="gr-rank-id">' +
-                '<span class="gr-rank-name">' + esc(row.display_name || 'Miembro') + '</span>' +
-                '<span class="gr-rank-rankname">' + rankNameTxt + '</span>' +
-              '</div>' +
-              '<div class="gr-rank-xp">' + xpTxt + '</div>' +
-            '</div>'
-          );
-        }).join('');
+        renderRankRows(list, rows);
       } catch (e) {
         console.warn('[mi-geoarmy] error cargando xp_leaderboard', e);
         list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
@@ -638,9 +720,7 @@
         await loadWallets(sb, session.user.id);
         await loadMyRequests(sb, session.user.id);
 
-        // Ranking real: pendiente, ver nota en loadRankingTable().
-        document.getElementById('mgRank').textContent = 'Próximamente';
-
+        loadRankSummary(sb);
         loadRankingTable(sb);
       } catch (e) {
         console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
