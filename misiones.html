@@ -203,6 +203,11 @@
           row.progress_target !== null && row.progress_target !== undefined) {
         var count = Number(row.progress_count);
         var target = Number(row.progress_target);
+        // "pct" es PURAMENTE el ancho visual de la barra -- no se guarda,
+        // no se reasigna a count/target, y no participa en qué badge o
+        // texto de estado se muestra (eso sale solo de row.status). Ni
+        // count ni target se modifican en ningún momento: se pintan tal
+        // cual los devolvió la RPC un par de líneas más abajo.
         var pct = target > 0 ? Math.max(0, Math.min(100, (count / target) * 100)) : 0;
         progressHtml =
           '<div class="ms-progress">' +
@@ -240,26 +245,89 @@
       list.innerHTML = rows.map(renderMissionCard).join('');
     }
 
+    // Misiones.html NO depende de que window.GeoArmyAccount ya se haya
+    // inicializado para leer la RPC -- ese fue el problema que tuvimos en
+    // ranking.html (si ese objeto tardaba o fallaba, la página se quedaba
+    // pegada en "Cargando…" para siempre). En vez de eso, se usa
+    // exactamente el mismo patrón robusto que ranking.html resolvió con
+    // getRankingClient(): un cliente propio de Supabase, construido con
+    // la URL/anon key OFICIALES del sitio (window.GEOARMY_SUPABASE_URL /
+    // GEOARMY_SUPABASE_ANON_KEY, definidas una sola vez en
+    // js/geoarmy-config.js) -- sin duplicar ni inventar ninguna
+    // configuración nueva. La sesión de Twitch queda persistida por
+    // Supabase en localStorage bajo ese mismo proyecto, así que este
+    // cliente ve la sesión ya iniciada aunque sea una instancia de JS
+    // distinta a la que arma geoarmy-account.js para el widget de cuenta.
+    var msClientCache = null;
+    function getMissionsClient() {
+      if (msClientCache) return msClientCache;
+      try {
+        if (!window.supabase || !window.supabase.createClient) return null;
+        if (!window.GEOARMY_SUPABASE_URL || !window.GEOARMY_SUPABASE_ANON_KEY) return null;
+        msClientCache = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+        return msClientCache;
+      } catch (e) {
+        console.warn('[misiones] no se pudo crear el cliente de Supabase', e);
+        return null;
+      }
+    }
+
+    // Espera a que una condición se cumpla sin bloquear ni fallar de
+    // inmediato -- para el caso en que el SDK de Supabase o la config del
+    // sitio tarden un instante en quedar listos. Nunca es un error falso
+    // inmediato: solo se rinde después de agotar el tiempo de espera.
+    function waitFor(check, timeoutMs, intervalMs) {
+      return new Promise(function (resolve) {
+        var start = Date.now();
+        (function poll() {
+          if (check()) { resolve(true); return; }
+          if (Date.now() - start >= timeoutMs) { resolve(false); return; }
+          setTimeout(poll, intervalMs || 100);
+        })();
+      });
+    }
+
+    // Mismo helper que ranking.html: ninguna llamada a Supabase puede
+    // dejar la página pegada en "Cargando…" indefinidamente.
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error('timeout')); }, ms);
+        })
+      ]);
+    }
+
     async function loadMissions() {
       var list = document.getElementById('msList');
       if (!list) return;
 
-      var acc = window.GeoArmyAccount;
-      var sb = acc && acc.client;
+      // Hasta 5s de espera real a que window.supabase y la config oficial
+      // estén disponibles -- no un error falso apenas se dispara
+      // DOMContentLoaded.
+      var ready = await waitFor(function () {
+        return !!(window.supabase && window.supabase.createClient &&
+          window.GEOARMY_SUPABASE_URL && window.GEOARMY_SUPABASE_ANON_KEY);
+      }, 5000, 100);
+
+      var sb = ready ? getMissionsClient() : null;
       if (!sb) {
         renderError(list);
         return;
       }
 
       try {
-        var sessionRes = await sb.auth.getSession();
+        var sessionRes = await withTimeout(sb.auth.getSession(), 8000);
         var session = sessionRes && sessionRes.data && sessionRes.data.session;
         if (!session) {
           renderLoggedOut(list);
           return;
         }
 
-        var res = await sb.rpc('my_missions_status');
+        // Única llamada de datos de toda la página. No se recalcula
+        // progreso, días, fechas ni estados acá -- eso vive enteramente
+        // en my_missions_status().
+        var res = await withTimeout(sb.rpc('my_missions_status'), 8000);
         if (res.error) {
           console.warn('[misiones] no se pudo leer my_missions_status', res.error);
           renderError(list);
