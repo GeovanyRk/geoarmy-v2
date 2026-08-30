@@ -78,7 +78,7 @@
                 <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px;">
                   <span id="mgNameText">—</span><img id="mgNameFlag" src="" alt="" hidden style="width:18px; height:13px; border-radius:2px; flex-shrink:0; box-shadow:0 0 0 1px rgba(255,255,255,.25);"/>
                 </div>
-                <div id="mgLevel" class="v3-now-sub">Nivel 1</div>
+                <div id="mgLevel" class="v3-now-sub">—</div>
                 <div class="v3-now-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
                   <span id="mgCountryName">Sin país configurado</span>
                   <button type="button" id="mgCountryBtn" hidden style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Elegir país</button>
@@ -127,9 +127,18 @@
               </div>
               <div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" id="rankProgressFill"></div></div>
               <p id="rankProgressNote" class="v3-xp-note"></p>
+            </div>
 
-              <div class="v3-rank-next">
-                <div class="v3-rank-next-label">Siguiente rango</div>
+            <div id="rankMaxBlock" class="v3-rank-max" hidden>
+              <div class="v3-rank-max-title">🏆 Rango máximo alcanzado</div>
+            </div>
+
+            <!-- Siguiente rango + Posición global: dos bloques compactos uno
+                 al lado del otro en desktop, apilados en mobile (mismo
+                 .v3-rank-bottom-row de abajo maneja ambos breakpoints). -->
+            <div class="v3-rank-bottom-row">
+              <div id="rankNextWrap" class="v3-rank-mini v3-rank-next" hidden>
+                <div class="v3-rank-mini-label">Siguiente rango</div>
                 <div class="v3-rank-next-row">
                   <img id="rankNextBadge" class="v3-rank-next-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
                   <div>
@@ -138,16 +147,12 @@
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div id="rankMaxBlock" class="v3-rank-max" hidden>
-              <div class="v3-rank-max-title">🏆 Rango máximo alcanzado</div>
-            </div>
-
-            <div class="v3-rank-position">
-              <div class="v3-rank-position-label">Posición global</div>
-              <div id="rankPositionValue" class="v3-rank-position-value">—</div>
-              <div id="rankPositionSub" class="v3-rank-position-sub"></div>
+              <div class="v3-rank-mini v3-rank-position">
+                <div class="v3-rank-mini-label">Posición global</div>
+                <div id="rankPositionValue" class="v3-rank-position-value">—</div>
+                <div id="rankPositionSub" class="v3-rank-position-sub"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -644,11 +649,15 @@
       var progressPct = document.getElementById('rankProgressPct');
       var progressFill = document.getElementById('rankProgressFill');
       var progressNote = document.getElementById('rankProgressNote');
+      var nextWrap = document.getElementById('rankNextWrap');
       var nextBadge = document.getElementById('rankNextBadge');
       var nextName = document.getElementById('rankNextName');
       var nextXp = document.getElementById('rankNextXp');
       var positionValue = document.getElementById('rankPositionValue');
       var positionSub = document.getElementById('rankPositionSub');
+      // El "Nivel X" legado de la tarjeta de Perfil (arriba) también sale de
+      // acá — mismo dato (current_name), sin pedirlo de nuevo a Supabase.
+      var levelSlot = document.getElementById('mgLevel');
       if (!nameBig) return;
 
       var ranks = window.GeoArmyRanks;
@@ -659,8 +668,10 @@
         xpBig.textContent = '— XP';
         if (progressBlock) progressBlock.hidden = true;
         if (maxBlock) maxBlock.hidden = true;
+        if (nextWrap) nextWrap.hidden = true;
         positionValue.textContent = '—';
         positionSub.textContent = '';
+        if (levelSlot) levelSlot.textContent = '—';
       }
 
       try {
@@ -676,6 +687,7 @@
         // ---- Lado izquierdo: rango actual ----
         var code = row.current_code;
         var name = row.current_name || (ranks ? ranks.rankName(code) : code) || '—';
+        if (levelSlot) levelSlot.textContent = name;
         if (badgeBig) {
           var url = ranks ? ranks.rankBadgeUrl(code) : null;
           if (url) { badgeBig.src = url; badgeBig.alt = name; badgeBig.hidden = false; }
@@ -688,9 +700,14 @@
         if (row.is_max_rank) {
           if (progressBlock) progressBlock.hidden = true;
           if (maxBlock) maxBlock.hidden = false;
+          // Sin siguiente rango cuando ya se llegó al máximo — solo queda
+          // el bloque de Posición Global (ver v3-rank-bottom-row en el CSS,
+          // se acomoda solo a un bloque cuando el otro está oculto).
+          if (nextWrap) nextWrap.hidden = true;
         } else {
           if (maxBlock) maxBlock.hidden = true;
           if (progressBlock) progressBlock.hidden = false;
+          if (nextWrap) nextWrap.hidden = false;
 
           var toNext = Number(row.xp_to_next || 0);
           // Texto = xp total del usuario / next_min_xp (umbral absoluto del
@@ -753,7 +770,10 @@
         avatarEl.src = profile.avatar_url || '';
         avatarEl.style.display = profile.avatar_url ? '' : 'none';
         document.getElementById('mgNameText').textContent = profile.display_name || profile.twitch_login || 'Miembro';
-        document.getElementById('mgLevel').textContent = 'Nivel ' + profile.level;
+        // El "Nivel X" legado se quitó de acá — mgLevel ahora lo llena
+        // loadRankCard() con el rango real (current_name de
+        // my_rank_summary()), reusando la misma llamada de la tarjeta
+        // grande en vez de pedirlo de nuevo.
 
         currentCountryCode = profile.country_code || null;
         renderCountryDisplay(currentCountryCode);
