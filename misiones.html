@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Misiones — GeoArmy</title>
+  <meta name="description" content="Misiones oficiales de Geo Army: gana XP cada día y sube de rango."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <!-- ===================================================================
+       Estilos SOLO de esta página (tarjetas de misión, barra de progreso,
+       badge "Próximamente"). A propósito NO se tocan css/v3-theme.css ni
+       css/style.css -- esta página reutiliza sus clases compartidas
+       (.v3-nav, .v3-page-hero, .v3-xp-bar-bg/.v3-xp-bar-fill, etc.) y solo
+       agrega lo que le falta, con prefijo "ms-" para no chocar con nada.
+       =================================================================== -->
+  <style>
+    .ms-wrap { max-width: 900px; margin: 0 auto; padding: 0 20px 80px; }
+    .ms-grid { display: flex; flex-direction: column; gap: 16px; }
+    .ms-card {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 20px 22px;
+    }
+    .ms-card.ms-soon { opacity: .55; }
+    .ms-icon {
+      flex: 0 0 auto;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      background: rgba(255,255,255,.06);
+      border-radius: 12px;
+    }
+    .ms-body { flex: 1 1 auto; min-width: 0; }
+    .ms-top-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .ms-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: #fff; }
+    .ms-reward { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: #b48cff; white-space: nowrap; }
+    .ms-desc { font-size: 13px; color: #b9c2d6; margin: 0 0 10px; line-height: 1.5; }
+    .ms-badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 100px;
+      white-space: nowrap;
+    }
+    .ms-badge-available { background: rgba(58,160,255,.18); color: #7fc4ff; }
+    .ms-badge-progress { background: rgba(145,71,255,.18); color: #b48cff; }
+    .ms-badge-done { background: rgba(60,200,120,.18); color: #6fe3a1; }
+    .ms-badge-soon { background: rgba(255,255,255,.08); color: #9aa3b8; }
+    .ms-progress { margin-top: 10px; }
+    .ms-progress-row { display: flex; justify-content: space-between; font-size: 12px; color: #b9c2d6; margin-bottom: 6px; }
+    .ms-state { padding: 40px 0; text-align: center; color: #b9c2d6; }
+    .ms-login-btn {
+      display: inline-block; margin-top: 14px;
+      background: linear-gradient(90deg,#9147ff,#3aa0ff);
+      color: #fff; font-weight: 600; font-size: 14px;
+      padding: 10px 22px; border-radius: 100px; border: none; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <div class="v3-page" style="min-height:100vh;">
+    <div class="v3-stars"></div>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="tienda.html">Tienda</a>
+          <a href="fortnite.html">Fortnite</a>
+          <a href="puntos.html">Puntos</a>
+          <a href="alcancia.html">Alcancía</a>
+        </div>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="v3-page-hero">
+      <div class="v3-tagline" style="letter-spacing:.28em;">MISIONES</div>
+      <h1 class="v3-page-title">Gana XP. Sube de rango.</h1>
+      <p class="v3-page-sub">Completa misiones y avanza dentro de Geo Army.</p>
+    </section>
+
+    <!-- Misiones — estado exclusivamente desde supabase.rpc('my_missions_status').
+         No se recalcula progreso, días, fechas ni estados en el cliente: lo
+         único que hace este bloque es pintar, tarjeta por tarjeta, la fila
+         que la RPC ya devuelve resuelta. -->
+    <div class="ms-wrap" id="missionsWrap">
+      <div id="msList" class="ms-grid">
+        <div class="ms-state">Cargando…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+
+    // Solo decorativo: emoji por mission_code. No es dato de la RPC, no
+    // afecta estado ni progreso -- puramente presentación.
+    var ICONS = {
+      DAILY_VISIT: '📅',
+      WEEKLY_ACTIVE: '🔥',
+      WEEKLY_PERFECT: '⭐',
+      TWITCH_DAILY_REWARD: '🟣',
+      STREAM_RETWEET: '🔁'
+    };
+
+    // Solo traducción de la etiqueta visible para cada valor exacto de
+    // "status" que devuelve la RPC -- no reinterpreta ni recalcula el
+    // estado, solo lo muestra en español.
+    var STATUS_LABEL = {
+      available: 'Disponible',
+      in_progress: 'En progreso',
+      completed_today: 'Completada hoy',
+      completed_this_week: 'Completada esta semana',
+      coming_soon: 'Próximamente'
+    };
+
+    var STATUS_BADGE_CLASS = {
+      available: 'ms-badge-available',
+      in_progress: 'ms-badge-progress',
+      completed_today: 'ms-badge-done',
+      completed_this_week: 'ms-badge-done',
+      coming_soon: 'ms-badge-soon'
+    };
+
+    function renderLoggedOut(list) {
+      list.innerHTML =
+        '<div class="ms-state">' +
+          'Inicia sesión con Twitch para ver tus misiones.' +
+          '<br/><button type="button" class="ms-login-btn" id="msLoginBtn">Iniciar sesión</button>' +
+        '</div>';
+      var btn = document.getElementById('msLoginBtn');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          if (window.GeoArmyAccount && window.GeoArmyAccount.openLogin) {
+            window.GeoArmyAccount.openLogin();
+          }
+        });
+      }
+    }
+
+    function renderError(list) {
+      list.innerHTML = '<div class="ms-state">No se pudieron cargar las misiones.</div>';
+    }
+
+    function renderMissionCard(row) {
+      var code = row.mission_code;
+      var icon = ICONS[code] || '🎯';
+      var isSoon = row.status === 'coming_soon';
+      var badgeClass = STATUS_BADGE_CLASS[row.status] || 'ms-badge-soon';
+      var badgeLabel = STATUS_LABEL[row.status] || esc(row.status);
+
+      var progressHtml = '';
+      if (row.progress_count !== null && row.progress_count !== undefined &&
+          row.progress_target !== null && row.progress_target !== undefined) {
+        var count = Number(row.progress_count);
+        var target = Number(row.progress_target);
+        var pct = target > 0 ? Math.max(0, Math.min(100, (count / target) * 100)) : 0;
+        progressHtml =
+          '<div class="ms-progress">' +
+            '<div class="ms-progress-row">' +
+              '<span>' + esc(count) + ' / ' + esc(target) + '</span>' +
+            '</div>' +
+            '<div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" style="width:' + pct + '%;"></div></div>' +
+          '</div>';
+      }
+
+      return (
+        '<div class="ms-card' + (isSoon ? ' ms-soon' : '') + '">' +
+          '<div class="ms-icon">' + icon + '</div>' +
+          '<div class="ms-body">' +
+            '<div class="ms-top-row">' +
+              '<span class="ms-name">' + esc(row.name) + '</span>' +
+              '<span class="ms-reward">+' + esc(row.xp_reward) + ' XP</span>' +
+              '<span class="ms-badge ' + badgeClass + '">' + esc(badgeLabel) + '</span>' +
+            '</div>' +
+            '<p class="ms-desc">' + esc(row.description) + '</p>' +
+            progressHtml +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    function renderMissions(list, rows) {
+      if (!rows || !rows.length) {
+        list.innerHTML = '<div class="ms-state">No hay misiones disponibles ahora mismo.</div>';
+        return;
+      }
+      // Orden ya viene fijo desde la RPC (DAILY_VISIT, WEEKLY_ACTIVE,
+      // WEEKLY_PERFECT, TWITCH_DAILY_REWARD, STREAM_RETWEET) -- no se
+      // reordena acá.
+      list.innerHTML = rows.map(renderMissionCard).join('');
+    }
+
+    async function loadMissions() {
+      var list = document.getElementById('msList');
+      if (!list) return;
+
+      var acc = window.GeoArmyAccount;
+      var sb = acc && acc.client;
+      if (!sb) {
+        renderError(list);
+        return;
+      }
+
+      try {
+        var sessionRes = await sb.auth.getSession();
+        var session = sessionRes && sessionRes.data && sessionRes.data.session;
+        if (!session) {
+          renderLoggedOut(list);
+          return;
+        }
+
+        var res = await sb.rpc('my_missions_status');
+        if (res.error) {
+          console.warn('[misiones] no se pudo leer my_missions_status', res.error);
+          renderError(list);
+          return;
+        }
+
+        var rows = res.data || [];
+        renderMissions(list, rows);
+      } catch (e) {
+        console.warn('[misiones] error cargando my_missions_status', e);
+        renderError(list);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadMissions);
+  })();
+  </script>
+</body>
+</html>
