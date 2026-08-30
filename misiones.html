@@ -343,6 +343,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', loadMissions);
+
+    // El auto-claim GLOBAL de DAILY_VISIT vive en js/geoarmy-account.js
+    // (no acá) -- corre apenas se confirma sesión, en cualquier página del
+    // sitio. Esta página no lo dispara ni lo duplica: solo escucha el
+    // evento que geoarmy-account.js dispara cuando ese claim se aplicó de
+    // verdad (applied=true), y vuelve a pedir my_missions_status() para
+    // que "Visita diaria" pase a completed_today y el progreso semanal se
+    // actualice -- sin recalcular nada acá, solo repitiendo la misma
+    // llamada de siempre. Registrado ya (no dentro de DOMContentLoaded)
+    // porque el claim es async y siempre llega bastante después de que
+    // este script termine de parsear.
+    document.addEventListener('geoarmy:daily-visit-claimed', function () {
+      loadMissions();
+    });
   })();
   </script>
 </body>
