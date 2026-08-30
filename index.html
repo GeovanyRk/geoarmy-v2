@@ -106,11 +106,13 @@
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <!-- Fortnite: antes en 78%/45% caía sobre una franja clara del
-               planeta y, combinado con el fondo semitransparente del badge,
-               casi desaparecía. Ahora en zona oscura verificada (~78 de
-               brillo vs ~137 antes) además del fix de opacidad del badge. -->
-          <a href="fortnite.html" style="--mx:80%; --my:56%;">
+          <!-- Fortnite: el planeta tiene el texto "GEO ARMY" grabado con
+               glow en una franja horizontal ~43%-54% de alto (no se veía en
+               el análisis de brillo por pin porque se mezclaba con nubes/
+               continentes claros). En 80%/56% el badge todavía rozaba la
+               "Y" de ARMY. Bajado a 60% para quedar debajo de esa franja
+               con margen, sobre una zona oscura confirmada (~66 de brillo). -->
+          <a href="fortnite.html" style="--mx:80%; --my:60%;">
             <span class="v3-marker-label">Fortnite</span>
             <span class="v3-marker-icon v3-marker-fn">F</span>
             <span class="v3-marker-stem"></span>
@@ -134,15 +136,18 @@
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="tienda.html" style="--mx:26%; --my:41%;">
+          <!-- Tienda también rozaba el borde superior de la misma franja de
+               texto "GEO ARMY" (letras G/E) en 41%. Subido a 37% para
+               despejarla. -->
+          <a href="tienda.html" style="--mx:24%; --my:37%;">
             <span class="v3-marker-label">Tienda</span>
             <span class="v3-marker-icon">🛒</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <!-- Misiones: todavía no hay página/sistema de cuentas real detrás,
-               así que el pin es solo decorativo por ahora (no navega). -->
-          <a href="#" onclick="event.preventDefault();" style="--mx:27%; --my:29%;">
+          <!-- Misiones: página en producción, la RPC my_missions_status()
+               ya está activa -- el pin navega a misiones.html. -->
+          <a href="misiones.html" style="--mx:27%; --my:29%;">
             <span class="v3-marker-label">Misiones</span>
             <span class="v3-marker-icon">🎯</span>
             <span class="v3-marker-stem"></span>
