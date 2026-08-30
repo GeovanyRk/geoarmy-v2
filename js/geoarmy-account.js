@@ -275,6 +275,48 @@
     });
   }
  
+  // ===== Auto-claim de DAILY_VISIT: primera visita autenticada del dia =====
+  // Global a proposito -- vive aca (no en misiones.html ni en ninguna
+  // pagina puntual) porque este es el unico lugar donde TODAS las paginas
+  // del sitio confirman sesion. Se dispara una sola vez por carga de
+  // pagina, apenas se sabe que hay sesion real, sin bloquear el resto de
+  // render() (perfil/saldo/header siguen su curso en paralelo).
+  //
+  // Anti-duplicados: dailyVisitClaimStarted se pone en true de forma
+  // SINCRONICA, antes de cualquier await -- render() se dispara tanto en
+  // DOMContentLoaded como en CADA evento de onAuthStateChange (que puede
+  // disparar varias veces por carga: INITIAL_SESSION, SIGNED_IN,
+  // TOKEN_REFRESHED, etc.), asi que sin este flag se llamaria la RPC de
+  // mas cada vez que render() se re-ejecuta. El motor (claim_daily_visit())
+  // ya es idempotente por dia/usuario -- esto solo evita llamadas de red
+  // innecesarias, no XP duplicado (eso ya esta resuelto en backend).
+  //
+  // No recalcula XP, no toca profiles, no toca SQL/RPC -- unicamente
+  // invoca la RPC existente tal cual.
+  var dailyVisitClaimStarted = false;
+  function autoClaimDailyVisit() {
+    if (dailyVisitClaimStarted) return;
+    dailyVisitClaimStarted = true;
+    sb.rpc('claim_daily_visit').then(function (res) {
+      if (res.error) {
+        // Nunca se muestra como error al usuario -- solo se registra.
+        console.warn('[geoarmy-account] claim_daily_visit fallo', res.error);
+        return;
+      }
+      var row = Array.isArray(res.data) ? res.data[0] : res.data;
+      // applied=false significa "ya reclamada hoy" -- no es un error, no
+      // se muestra ni se dispara nada.
+      if (row && row.applied) {
+        try {
+          document.dispatchEvent(new CustomEvent('geoarmy:daily-visit-claimed', { detail: row }));
+        } catch (e) {}
+      }
+    }).catch(function (e) {
+      // Falla de red u otra: warning, nunca rompe la navegacion.
+      console.warn('[geoarmy-account] claim_daily_visit error de red', e);
+    });
+  }
+
   async function render() {
     var slot = document.getElementById('geoAccountWidget');
     if (!slot) return;
@@ -282,6 +324,11 @@
     var sessionRes = await sb.auth.getSession();
     var session = sessionRes.data && sessionRes.data.session;
     if (!session) { renderLoggedOut(slot); return; }
+
+    // Fire-and-forget: no se espera este resultado para nada de lo que
+    // sigue -- el header/perfil se renderiza igual, tarde o temprano la
+    // visita del dia queda registrada.
+    autoClaimDailyVisit();
  
     var profile = await fetchProfile(session.user.id);
     if (!profile) { renderLoggedOut(slot); return; }
