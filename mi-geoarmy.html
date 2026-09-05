@@ -17,7 +17,7 @@
     gtag('config', 'G-VT78CC8X2V');
   </script>
   <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="lib/supabase.min.js"></script>
   <script src="js/geoarmy-config.js"></script>
   <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
@@ -167,23 +167,21 @@
         </div>
       </div>
 
-      <!-- Cuentas vinculadas: SOLO diseño por ahora. El botón "Conectar X" no
-           dispara ningún flujo (sin fetch/Supabase/Edge Functions/OAuth) —
-           se cablea en una pasada aparte una vez aprobado esto. El backend
-           real (x-member-connect-start/callback, profile_x_accounts, etc.)
-           no se toca ni se cuestiona desde acá.
-           Los dos estados (no conectado / conectado) se pueden previsualizar
-           con ?xPreview=connected en la URL — mismo patrón ya usado en
-           ranking.html (?rankPreview=1). Sin ese parámetro se asume NO
-           conectado, que es el estado real por defecto hasta que exista la
-           lógica. Quitar ese preview cuando se cablee el estado real. -->
+      <!-- Cuentas vinculadas: UI cableada al backend real de X (ya validado
+           en producción — no se toca acá). El estado conectado/no conectado
+           se lee de public.profile_x_accounts (RLS ya limita esto a la fila
+           del propio usuario) dentro de loadDashboard() -> loadXAccount().
+           El botón dispara únicamente x-member-connect-start vía fetch con
+           el access_token de la sesión — ver el listener de #xConnectBtn
+           más abajo. Nada de SQL/Edge Functions/OAuth se modifica desde
+           acá. -->
       <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
         <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🔗</span>Cuentas vinculadas</div>
 
-        <!-- Banner de resultado del flujo de conexión (?x_connect=...).
-             Oculto por defecto; solo se muestra si la URL trae el query
-             param. Todavía no se limpia la URL después de mostrarlo (queda
-             para cuando se apruebe esa parte). -->
+        <!-- Banner de resultado del flujo de conexión (?x_connect=...) o de
+             un fallo al iniciar el flujo desde el botón. Oculto por
+             defecto; initXAccountUI() limpia el query param de la URL
+             después de pintarlo (ver más abajo). -->
         <div id="xConnectBanner" class="v3-x-banner" hidden>
           <span id="xConnectBannerIc" class="v3-x-banner-ic"></span>
           <span id="xConnectBannerText"></span>
@@ -199,11 +197,10 @@
               </div>
               <div id="xConnected" hidden>
                 <div class="v3-x-title"><span class="v3-x-check">✓</span> X conectado</div>
-                <p class="v3-x-username" id="xUsername">@usuario</p>
+                <p class="v3-x-username" id="xUsername"></p>
               </div>
             </div>
           </div>
-          <!-- Sin lógica todavía: el botón no tiene addEventListener. -->
           <button type="button" class="v3-btn-secondary v3-x-connect-btn" id="xConnectBtn">Conectar X</button>
         </div>
       </div>
@@ -825,6 +822,7 @@
 
         loadRankSummary(sb);
         loadRankCard(sb);
+        loadXAccount(sb, session.user.id);
       } catch (e) {
         console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
         loggedOutEl.hidden = false;
@@ -832,11 +830,15 @@
       }
     }
 
-    // ===== Cuentas vinculadas (X): SOLO visual, sin lógica real todavía =====
-    // No llama a Supabase, Edge Functions ni OAuth. Únicamente lee query
-    // params ya presentes en la URL para decidir qué texto/estado pintar.
-    // No depende de la sesión de Supabase, así que se ejecuta directo (no
-    // dentro de whenReady) y funciona incluso antes de que cargue el resto.
+    // ===== Cuentas vinculadas (X) =====
+    // El estado conectado/no conectado NUNCA se decide por query param — se
+    // lee de verdad en loadXAccount() (ver abajo), llamada desde
+    // loadDashboard() en cada carga/refresh de sesión. Acá solo vive: (1) el
+    // banner visual de ?x_connect=... (puramente informativo — no controla
+    // el estado de la tarjeta) y (2) el click de #xConnectBtn que dispara el
+    // backend real de X. Nada de SQL/Edge Functions/OAuth se toca ni se
+    // reimplementa: el botón solo llama a x-member-connect-start, que ya
+    // existe y está validado en producción.
     var X_CONNECT_MESSAGES = {
       success:         { tone: 'ok',      ic: '✓', text: 'Cuenta de X conectada correctamente.' },
       conflict:        { tone: 'warn',    ic: '⚠', text: 'Esta cuenta de X no puede vincularse a este perfil.' },
@@ -847,43 +849,103 @@
       error:           { tone: 'error',   ic: '⚠', text: 'Ocurrió un error al conectar X. Inténtalo nuevamente.' }
     };
 
+    // Reutilizado tanto por el banner de ?x_connect= como por el error
+    // genérico del botón "Conectar X" (mismo componente visual, ya
+    // aprobado, en vez de inventar uno nuevo para el caso de error del
+    // botón).
+    function showXConnectBanner(tone, ic, text) {
+      var banner = document.getElementById('xConnectBanner');
+      var bannerIc = document.getElementById('xConnectBannerIc');
+      var bannerText = document.getElementById('xConnectBannerText');
+      if (!banner) return;
+      banner.className = 'v3-x-banner v3-x-banner-' + tone;
+      if (bannerIc) bannerIc.textContent = ic;
+      if (bannerText) bannerText.textContent = text;
+      banner.hidden = false;
+    }
+
     function initXAccountUI() {
       try {
         var params = new URLSearchParams(window.location.search);
-
-        // Banner de resultado (?x_connect=...). Todavía no se limpia el
-        // query param de la URL — queda para cuando se apruebe esa parte.
-        var banner = document.getElementById('xConnectBanner');
-        var bannerIc = document.getElementById('xConnectBannerIc');
-        var bannerText = document.getElementById('xConnectBannerText');
         var resultKey = params.get('x_connect');
-        if (banner && resultKey && X_CONNECT_MESSAGES[resultKey]) {
+        if (resultKey && X_CONNECT_MESSAGES[resultKey]) {
           var msg = X_CONNECT_MESSAGES[resultKey];
-          banner.className = 'v3-x-banner v3-x-banner-' + msg.tone;
-          if (bannerIc) bannerIc.textContent = msg.ic;
-          if (bannerText) bannerText.textContent = msg.text;
-          banner.hidden = false;
-        }
+          showXConnectBanner(msg.tone, msg.ic, msg.text);
 
-        // Preview TEMPORAL del estado "conectado" vía ?xPreview=connected
-        // (mismo patrón que ?rankPreview=1 en ranking.html) — no es una
-        // lectura real de profile_x_accounts. Sin este parámetro, la tarjeta
-        // siempre muestra "no conectado", que es el estado real por defecto
-        // hasta que exista la lógica de verdad. Quitar este bloque cuando
-        // se cablee esa lectura real.
-        if (params.get('xPreview') === 'connected') {
-          var notConnected = document.getElementById('xNotConnected');
-          var connected = document.getElementById('xConnected');
-          var xBtn = document.getElementById('xConnectBtn');
-          if (notConnected) notConnected.hidden = true;
-          if (connected) connected.hidden = false;
-          if (xBtn) xBtn.hidden = true;
+          // Ya se pintó el mensaje — se limpia SOLO x_connect de la URL
+          // (sin recargar), dejando intactos cualquier otro query param y
+          // el hash. Si por lo que sea falla (navegador viejo, etc.), no
+          // pasa nada grave: el peor caso es que el param se quede en la
+          // URL, el banner ya se mostró igual.
+          try {
+            params.delete('x_connect');
+            var newSearch = params.toString();
+            var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+            window.history.replaceState(null, '', newUrl);
+          } catch (e) {}
         }
       } catch (e) {
-        console.warn('[mi-geoarmy] error en initXAccountUI (solo UI, sin datos reales)', e);
+        console.warn('[mi-geoarmy] error en initXAccountUI', e);
       }
     }
     initXAccountUI();
+
+    // Lectura real de public.profile_x_accounts — RLS ya restringe esto a
+    // la fila del propio usuario (authenticated SELECT solo su propia
+    // fila), así que el filtro por profile_id acá es cinturón-y-tirantes,
+    // no la única protección. Solo se pide x_username: nunca x_user_id, ni
+    // ningún otro campo. maybeSingle() en vez de single() porque "no tener
+    // fila todavía" (no conectado) es un resultado válido, no un error.
+    async function loadXAccount(sb, userId) {
+      var notConnected = document.getElementById('xNotConnected');
+      var connected = document.getElementById('xConnected');
+      var btn = document.getElementById('xConnectBtn');
+      var usernameEl = document.getElementById('xUsername');
+      if (!notConnected || !connected) return;
+
+      function renderNotConnected() {
+        notConnected.hidden = false;
+        connected.hidden = true;
+        if (btn) btn.hidden = false;
+      }
+
+      // Fail closed: si la lectura falla (error o excepción), NO se asume
+      // "no conectado" — eso mostraría el botón "Conectar X" cuando en
+      // realidad no se sabe el estado real, y podría llevar a iniciar una
+      // conexión sobre una cuenta que ya está vinculada. Se ocultan ambos
+      // estados y el botón, y se avisa con el banner ya existente.
+      function renderUnknown() {
+        notConnected.hidden = true;
+        connected.hidden = true;
+        if (btn) btn.hidden = true;
+        showXConnectBanner('error', '⚠', 'No pudimos verificar el estado de tu cuenta de X. Recarga la página.');
+      }
+
+      try {
+        var res = await sb.from('profile_x_accounts').select('x_username').eq('profile_id', userId).maybeSingle();
+        if (res.error) {
+          console.warn('[mi-geoarmy] no se pudo leer profile_x_accounts', res.error);
+          renderUnknown();
+          return;
+        }
+        var row = res.data;
+        if (!row) {
+          // Consulta exitosa, sin fila: "no conectado" es un resultado
+          // legítimo acá, no una falla.
+          renderNotConnected();
+          return;
+        }
+        notConnected.hidden = true;
+        connected.hidden = false;
+        if (btn) btn.hidden = true;
+        // x_username es solo metadata visual — si viniera null/vacío no se
+        // inventa nada, el título "X conectado" ya alcanza por sí solo.
+        if (usernameEl) usernameEl.textContent = row.x_username ? ('@' + row.x_username) : '';
+      } catch (e) {
+        console.warn('[mi-geoarmy] error leyendo profile_x_accounts', e);
+        renderUnknown();
+      }
+    }
 
     whenReady(function () {
       var sb = window.GeoArmyAccount.client;
@@ -908,6 +970,47 @@
           setTimeout(function () { msgEl.textContent = ''; }, 2500);
         });
       });
+
+      // ===== Conectar X: dispara x-member-connect-start (ya validado en
+      // producción). El frontend NUNCA decide profile_id/x_user_id/state/
+      // verifier — solo manda el access_token de la sesión actual y el
+      // backend deriva todo lo demás. La authorize_url que responde no se
+      // imprime ni se guarda en ningún lado: se navega directo con
+      // location.assign() y se descarta. =====
+      document.getElementById('xConnectBtn').addEventListener('click', async function () {
+        var btn = this;
+        if (btn.disabled) return; // evita doble click / doble request
+        var originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Conectando…';
+        try {
+          var sessionRes = await sb.auth.getSession();
+          var session = sessionRes.data && sessionRes.data.session;
+          if (!session || !session.access_token) {
+            // Sin sesión no se inicia OAuth.
+            btn.disabled = false;
+            btn.textContent = originalText;
+            return;
+          }
+          var res = await fetch(window.GEOARMY_SUPABASE_URL + '/functions/v1/x-member-connect-start', {
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer ' + session.access_token,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (!res.ok) throw new Error('x-member-connect-start respondió ' + res.status);
+          var body = await res.json();
+          if (!body || !body.authorize_url) throw new Error('x-member-connect-start no devolvió authorize_url');
+          window.location.assign(body.authorize_url);
+        } catch (e) {
+          console.warn('[mi-geoarmy] no se pudo iniciar la conexión con X', e);
+          btn.disabled = false;
+          btn.textContent = originalText;
+          showXConnectBanner('error', '⚠', 'No se pudo iniciar la conexión con X. Inténtalo nuevamente.');
+        }
+      });
+
       sb.auth.onAuthStateChange(function () { loadDashboard(sb); });
       loadDashboard(sb);
     });
