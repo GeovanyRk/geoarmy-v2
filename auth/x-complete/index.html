@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Pagina transitoria, nunca debe indexarse ni aparecer en resultados de
+       busqueda, y nunca debe filtrar hacia donde vino el usuario (esta URL
+       puede llevar, brevemente, code/state en el fragment antes de que el
+       script de abajo lo limpie). -->
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Conectando tu cuenta de X… — GeoArmy</title>
+  <style>
+    /* Estilos minimos e inline a proposito -- esta pagina no carga ninguna
+       hoja de estilos externa (a diferencia de auth/callback/index.html):
+       es transitoria, vive unos milisegundos, y "evitar recursos externos
+       innecesarios" es un requisito explicito de esta pieza. */
+    body { margin: 0; background: #0a0a14; color: #eaf2ff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+    .xc-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+    .xc-card { max-width: 420px; }
+    .xc-tag { letter-spacing: .28em; font-size: 12px; color: #a9bad6; margin-bottom: .6rem; }
+    .xc-title { font-size: 1.4rem; margin: 0 0 1.2rem; }
+    .xc-spin {
+      display: inline-block; width: 34px; height: 34px; border-radius: 50%;
+      border: 3px solid rgba(169,112,255,.25); border-top-color: #a970ff;
+      animation: xcSpin 0.8s linear infinite; margin-bottom: .9rem;
+    }
+    @keyframes xcSpin { to { transform: rotate(360deg); } }
+    .xc-msg { color: #a9bad6; font-size: 14px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="xc-wrap">
+    <div class="xc-card" id="xcCard">
+      <div class="xc-tag">MI GEO ARMY</div>
+      <h1 class="xc-title">Conectando tu cuenta de X…</h1>
+      <div class="xc-spin" id="xcSpin"></div>
+      <p class="xc-msg" id="xcMsg">Un momento, estamos terminando la conexion.</p>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // =====================================================================
+    // auth/x-complete/index.html -- finalizacion del flujo "Conectar X"
+    // (arquitectura V3, pieza 6/N). Pagina PURAMENTE transitoria: recibe el
+    // resultado temporal del GET publico de x-member-connect-callback via
+    // URL fragment, y hace el POST autenticado que realmente vincula la
+    // cuenta. NO implementa: boton "Conectar X" (vive en mi-geoarmy.html,
+    // fuera de esta pieza), XP, webhook, SQL, ni ninguna Edge Function --
+    // unicamente llama al POST de x-member-connect-callback, ya desplegado
+    // y aprobado.
+    //
+    // CAMBIOS EN V2 (solo estos dos, nada mas del flujo se toco):
+    //   1. FAIL CLOSED si history.replaceState() falla: V1 hacia un
+    //      console.warn y seguia procesando igual. Eso ya no esta
+    //      permitido -- si no podemos limpiar la URL de inmediato, no hay
+    //      forma segura de garantizar que code/state (que pueden seguir
+    //      visibles en la barra del navegador) no terminen expuestos por
+    //      mas tiempo del necesario mientras esta pagina sigue haciendo
+    //      trabajo adicional. V2 corta ahi mismo: no carga NADA (ni
+    //      siquiera supabase-js), no hace ningun POST, y navega de
+    //      inmediato a un destino fijo sin fragmento. Ver el bloque
+    //      try/catch un poco mas abajo.
+    //   2. Ya no se carga supabase-js desde jsdelivr con la etiqueta
+    //      mutable "@2" (cdn.jsdelivr.net/npm/@supabase/supabase-js@2/...).
+    //      Esta pagina maneja el JWT de sesion y {code,state} despues de
+    //      esa carga, asi que depender de una URL cuyo contenido puede
+    //      cambiar sin aviso (aunque hoy sea la misma libreria legitima) es
+    //      una superficie de confianza innecesaria para una pagina de este
+    //      nivel de sensibilidad. En su lugar se carga una copia local,
+    //      FIJADA a una version exacta, servida desde el mismo origen:
+    //      geoarmy-v2/lib/supabase.min.js (ver ese archivo para el detalle
+    //      de que version exacta es y como se verifico su integridad antes
+    //      de fijarla). geoarmy-account.js NO se toco: solo necesita que
+    //      window.supabase.createClient ya exista cuando el se ejecuta, sin
+    //      importar de que URL se cargo -- el archivo local expone
+    //      exactamente la misma API UMD que el CDN.
+    //
+    // PASO 0, ANTES DE CUALQUIER OTRA COSA (ni siquiera cargar supabase-js):
+    // leer el fragment y limpiar la barra del navegador. Esta pagina
+    // deliberadamente NO tiene ningun <script src> externo en el HTML (a
+    // diferencia de auth/callback/index.html, que carga supabase-js de
+    // forma estatica en el <head>): incluso supabase-js se carga de forma
+    // DINAMICA mas abajo, y solo DESPUES de este bloque, y solo SI este
+    // bloque tuvo exito. Esto es a proposito: el fragment (#code=...&state=...)
+    // puede contener material sensible de un flujo OAuth en curso, y la
+    // instruccion de esta pieza es limpiar la URL "antes de hacer cualquier
+    // request de red adicional" -- la forma mas literal de cumplir eso es
+    // no iniciar NINGUNA request (ni siquiera la de una libreria estatica)
+    // hasta despues de la limpieza, y si la limpieza en si misma fallara,
+    // no iniciar ninguna request en absoluto (fail closed, ver V2 arriba).
+    // =====================================================================
+
+    var rawHash = window.location.hash || '';
+    var fragmentParams = new URLSearchParams(rawHash.replace(/^#/, ''));
+
+    // Se extraen UNICAMENTE estos tres valores. Cualquier otra clave que el
+    // fragment pudiera traer nunca se lee. Los valores crudos viven
+    // SOLAMENTE en estas variables locales (closure de esta IIFE) -- nunca
+    // se escriben en localStorage/sessionStorage/cookies/IndexedDB, nunca en
+    // el DOM visible, nunca en un console.log.
+    var fragCode = fragmentParams.get('code');
+    var fragState = fragmentParams.get('state');
+    var fragXConnect = fragmentParams.get('x_connect');
+
+    // Limpieza INMEDIATA de la barra del navegador, antes de cualquier otra
+    // linea de codigo que haga red (carga de scripts incluida). Se usa
+    // exactamente window.location.pathname (sin query ni fragment) como
+    // destino, tal como se pidio.
+    //
+    // FAIL CLOSED (V2): si replaceState() falla, no hay forma segura de
+    // garantizar que code/state dejen de estar visibles en la barra del
+    // navegador en un tiempo acotado. En vez de continuar de todas formas
+    // (comportamiento de V1), esta rama corta el procesamiento por
+    // completo AQUI MISMO: no se carga supabase-js, no se carga
+    // geoarmy-config.js, no se carga geoarmy-account.js, no hay POST. Se
+    // navega de inmediato, con location.replace(), a un destino fijo SIN
+    // fragmento -- el mismo efecto de "limpiar la URL" que perseguia
+    // replaceState, solo que logrado por otro medio (una navegacion real
+    // en vez de una reescritura de la entrada actual del historial). El
+    // log, si lo hay, es un evento fijo sin datos: nunca se imprime el
+    // objeto de excepcion (podria variar entre navegadores y no aporta
+    // nada que valga la pena capturar aqui).
+    try {
+      window.history.replaceState(null, '', window.location.pathname);
+    } catch (e) {
+      console.error('x_complete_replacestate_failed');
+      window.location.replace('https://geoarmy.tv/geoarmy-v2/mi-geoarmy.html?x_connect=error');
+      return;
+    }
+
+    // =====================================================================
+    // Destinos fijos, server-side, literales. NUNCA se acepta un
+    // "return_to" ni se deriva un destino de query/fragment/config -- estas
+    // son las UNICAS URLs a las que esta pagina redirige.
+    // =====================================================================
+    var MI_GEOARMY_URL = 'https://geoarmy.tv/geoarmy-v2/mi-geoarmy.html';
+
+    function goToMiGeoArmy(xConnectValue) {
+      // xConnectValue SIEMPRE es uno de un conjunto fijo de tokens cortos
+      // definidos en este mismo archivo (ver todas las llamadas mas abajo)
+      // -- nunca un valor tomado del fragment, del body de una respuesta, ni
+      // de ningun dato de X/Supabase. Por eso es seguro concatenarlo
+      // directamente: no es input, es una constante elegida por esta misma
+      // funcion en cada punto de llamada.
+      // location.replace() en vez de location.href: esta pagina transitoria
+      // nunca debe quedar en el historial (evita que "atras" regrese a un
+      // estado a medio procesar).
+      window.location.replace(MI_GEOARMY_URL + '?x_connect=' + xConnectValue);
+    }
+
+    // =====================================================================
+    // Enrutamiento segun lo que trajo el fragment. x_connect tiene
+    // precedencia: si X ya nos dijo "cancelled" o "error", no hay nada que
+    // procesar. Cualquier otro valor de x_connect no reconocido tambien se
+    // trata como error generico (nunca se reenvia tal cual a la query).
+    // =====================================================================
+    if (fragXConnect === 'cancelled') {
+      goToMiGeoArmy('cancelled');
+      return;
+    }
+
+    if (fragXConnect !== null) {
+      // 'error' explicito, o cualquier otro valor no reconocido -- mismo
+      // destino generico.
+      goToMiGeoArmy('error');
+      return;
+    }
+
+    // Limites de tamaño identicos, por diseño, a MAX_CODE_LEN/MAX_STATE_LEN
+    // en x-member-connect-callback/index.ts -- un code/state que ya
+    // excederia ese limite del lado del callback nunca deberia ni siquiera
+    // intentarse contra el (evita una llamada de red condenada a un
+    // 400/malformado, y evita construir requests de tamaño arbitrario a
+    // partir de un fragment que, en la practica, viene de una redireccion
+    // de X que nosotros no controlamos).
+    var MAX_CODE_LEN = 512;
+    var MAX_STATE_LEN = 512;
+
+    var codeOk = typeof fragCode === 'string' && fragCode.length > 0 && fragCode.length <= MAX_CODE_LEN;
+    var stateOk = typeof fragState === 'string' && fragState.length > 0 && fragState.length <= MAX_STATE_LEN;
+
+    if (!codeOk || !stateOk) {
+      // Sin x_connect Y sin un code/state utilizable: pagina abierta
+      // directamente, fragment vacio, o malformado de alguna otra forma.
+      // No se intenta ningun POST.
+      goToMiGeoArmy('error');
+      return;
+    }
+
+    // A partir de aqui, code/state ya estan validados en forma. Se guardan
+    // en estas dos constantes (siguen siendo variables en memoria de esta
+    // misma IIFE, nunca persistidas) para el resto del flujo.
+    var code = fragCode;
+    var state = fragState;
+
+    // =====================================================================
+    // Carga dinamica y en cadena de supabase-js (copia local fijada) ->
+    // geoarmy-config.js -> geoarmy-account.js, para reusar EXACTAMENTE el
+    // mismo cliente/sesion que ya usa el resto de Geo Army V2
+    // (GeoArmyAccount.client) -- nunca se crea un segundo cliente/sistema
+    // de autenticacion en esta pagina.
+    //
+    // SITE_BASE_BOOTSTRAP: mismo valor y mismo motivo ya documentado en
+    // auth/callback/index.html -- esta pagina tambien vive 2 niveles
+    // adentro (auth/x-complete/index.html), asi que una ruta relativa como
+    // "../../js/geoarmy-config.js" dependeria de que el navegador resuelva
+    // esa ruta contra la URL exacta con la que el host sirvio la pagina, y
+    // algunos hosts quitan la barra final de una URL de carpeta. Por eso
+    // este valor se declara aqui LITERAL y se combina con
+    // window.location.origin para construir rutas absolutas -- incluida,
+    // en V2, la ruta hacia la copia local de supabase-js
+    // (SITE_BASE_BOOTSTRAP + 'lib/supabase.min.js'). DEBE ser identico al
+    // GEOARMY_SITE_BASE real de js/geoarmy-config.js -- se compara y se
+    // avisa (console.warn, nunca bloqueante) si quedaron desincronizados,
+    // igual que ya hace auth/callback/index.html.
+    // =====================================================================
+    var SITE_BASE_BOOTSTRAP = '/geoarmy-v2/';
+
+    function showError(text) {
+      var spin = document.getElementById('xcSpin');
+      var msg = document.getElementById('xcMsg');
+      if (spin) spin.outerHTML = '<div style="font-size:32px;margin-bottom:.75rem;">⚠️</div>';
+      if (msg) msg.textContent = text;
+    }
+
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function () { resolve(); };
+        s.onerror = function () { reject(new Error('no se pudo cargar ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+
+    // Bandera de "ya en proceso", en memoria unicamente (nunca en storage),
+    // para blindar contra una doble ejecucion accidental del POST. El flujo
+    // de esta pagina es lineal (una sola llamada de arranque, sin listeners
+    // de click que puedan disparar dos veces), pero se deja esta guarda
+    // explicita tal como se pidio.
+    var processing = false;
+
+    // Como consume_x_link_state() en el backend consume el state de forma
+    // ONE-SHOT, un fallo de red DESPUES de haber enviado el POST no se
+    // reintenta jamas con el mismo code/state: si el POST ya salio, el
+    // intento se considera terminado (exitoso o fallido) y cualquier
+    // reintento automatico con los mismos valores esta condenado a
+    // "invalid_state" de todas formas, ademas de arriesgar reenviar datos
+    // sensibles. Un fallo de red se trata igual que "cualquier otro error".
+    async function finishLink(accessToken) {
+      if (processing) return; // doble ejecucion -- no-op.
+      processing = true;
+
+      var res;
+      try {
+        res = await fetch('https://zhegmjppvpgvrnhlevsc.supabase.co/functions/v1/x-member-connect-callback', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + accessToken,
+            'Content-Type': 'application/json',
+          },
+          // Unicamente code/state. Nunca profile_id, x_user_id, x_username
+          // ni code_verifier -- la identidad del perfil la decide el
+          // callback exclusivamente a partir del JWT verificado + el state
+          // consumido, nunca de nada que este cliente pueda mandarle.
+          body: JSON.stringify({ code: code, state: state }),
+        });
+      } catch (networkErr) {
+        // Fallo de red genuino (sin respuesta HTTP en absoluto). No hay
+        // reintento automatico -- el usuario debera iniciar "Conectar X" de
+        // nuevo desde mi-geoarmy.html si quiere reintentar.
+        console.warn('[x-complete] fallo de red haciendo el POST de finalizacion', networkErr);
+        goToMiGeoArmy('error');
+        return;
+      }
+
+      var body = null;
+      try {
+        body = await res.json();
+      } catch (parseErr) {
+        // Respuesta sin JSON valido -- tratado como error generico, nunca
+        // se asume exito ni se reintenta.
+        body = null;
+      }
+
+      // Mapeo defensivo: se exige que el status Y la forma del body
+      // coincidan con lo documentado en x-member-connect-callback antes de
+      // tomar la rama de exito/conflicto/error especifico -- si el status
+      // "coincide" pero el body no trae la forma esperada, se cae al caso
+      // generico en vez de asumir. Nunca se propaga a la query nada del
+      // body salvo estos tokens fijos.
+      if (res.status === 200 && body && body.status === 'ok') {
+        goToMiGeoArmy('success');
+        return;
+      }
+      if (res.status === 409 && body && body.status === 'conflict') {
+        goToMiGeoArmy('conflict');
+        return;
+      }
+      if (res.status === 401) {
+        goToMiGeoArmy('session_expired');
+        return;
+      }
+      if (res.status === 400 && body && body.error === 'invalid_state') {
+        goToMiGeoArmy('invalid_state');
+        return;
+      }
+      if (res.status === 403 && body && body.error === 'link_not_allowed') {
+        goToMiGeoArmy('not_allowed');
+        return;
+      }
+
+      // Cualquier otra combinacion (incluye 500 internal_error, y cualquier
+      // status/forma no contemplada arriba).
+      goToMiGeoArmy('error');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // V2: ya no se carga supabase-js desde jsdelivr con la etiqueta
+      // mutable "@2" -- se carga la copia local fijada (mismo origen que
+      // esta pagina), ver geoarmy-v2/lib/supabase.min.js para el detalle
+      // de version exacta y verificacion de integridad. Todo lo que sigue
+      // (geoarmy-config.js, geoarmy-account.js) ya era same-origin desde
+      // V1 -- con este cambio, TODOS los scripts que esta pagina carga
+      // despues de limpiar el fragment son same-origin, sin excepcion.
+      loadScript(window.location.origin + SITE_BASE_BOOTSTRAP + 'lib/supabase.min.js')
+        .then(function () {
+          return loadScript(window.location.origin + SITE_BASE_BOOTSTRAP + 'js/geoarmy-config.js');
+        })
+        .then(function () {
+          if (window.GEOARMY_SITE_BASE && window.GEOARMY_SITE_BASE !== SITE_BASE_BOOTSTRAP) {
+            console.warn(
+              '[x-complete] GEOARMY_SITE_BASE de geoarmy-config.js (' + window.GEOARMY_SITE_BASE + ') ' +
+              'no coincide con el bootstrap de esta pagina (' + SITE_BASE_BOOTSTRAP + '). Actualiza ambos.'
+            );
+          }
+          return loadScript(window.location.origin + SITE_BASE_BOOTSTRAP + 'js/geoarmy-account.js');
+        })
+        .then(function () {
+          // geoarmy-account.js expone window.GeoArmyAccount.client -- la
+          // MISMA instancia de supabase-js que usa el resto del sitio para
+          // la sesion actual. No se crea ningun cliente nuevo aqui.
+          if (!window.GeoArmyAccount || !window.GeoArmyAccount.client) {
+            showError('No se pudo cargar el sistema de cuentas de Geo Army.');
+            goToMiGeoArmy('error');
+            return;
+          }
+          return window.GeoArmyAccount.client.auth.getSession().then(function (sessionRes) {
+            var session = sessionRes && sessionRes.data && sessionRes.data.session;
+            var accessToken = session && session.access_token;
+            if (sessionRes.error || !session || !accessToken) {
+              // Sin sesion real: no se intenta adivinar ni recuperar un
+              // profile_id de ningun otro lado. No hay POST.
+              console.warn('[x-complete] no hay sesion Supabase activa', sessionRes.error);
+              goToMiGeoArmy('session_expired');
+              return;
+            }
+            return finishLink(accessToken);
+          });
+        })
+        .catch(function (e) {
+          console.warn('[x-complete] error inicializando el sistema de cuentas', e);
+          goToMiGeoArmy('error');
+        });
+    });
+  })();
+  </script>
+</body>
+</html>
