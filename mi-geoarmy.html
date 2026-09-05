@@ -167,6 +167,47 @@
         </div>
       </div>
 
+      <!-- Cuentas vinculadas: SOLO diseño por ahora. El botón "Conectar X" no
+           dispara ningún flujo (sin fetch/Supabase/Edge Functions/OAuth) —
+           se cablea en una pasada aparte una vez aprobado esto. El backend
+           real (x-member-connect-start/callback, profile_x_accounts, etc.)
+           no se toca ni se cuestiona desde acá.
+           Los dos estados (no conectado / conectado) se pueden previsualizar
+           con ?xPreview=connected en la URL — mismo patrón ya usado en
+           ranking.html (?rankPreview=1). Sin ese parámetro se asume NO
+           conectado, que es el estado real por defecto hasta que exista la
+           lógica. Quitar ese preview cuando se cablee el estado real. -->
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🔗</span>Cuentas vinculadas</div>
+
+        <!-- Banner de resultado del flujo de conexión (?x_connect=...).
+             Oculto por defecto; solo se muestra si la URL trae el query
+             param. Todavía no se limpia la URL después de mostrarlo (queda
+             para cuando se apruebe esa parte). -->
+        <div id="xConnectBanner" class="v3-x-banner" hidden>
+          <span id="xConnectBannerIc" class="v3-x-banner-ic"></span>
+          <span id="xConnectBannerText"></span>
+        </div>
+
+        <div class="v3-x-card">
+          <div class="v3-x-card-main">
+            <span class="v3-x-ic">𝕏</span>
+            <div class="v3-x-info">
+              <div id="xNotConnected">
+                <div class="v3-x-title">Conecta tu cuenta de X</div>
+                <p class="v3-x-desc">Se utilizará para verificar futuras misiones e interacciones de Geo Army.</p>
+              </div>
+              <div id="xConnected" hidden>
+                <div class="v3-x-title"><span class="v3-x-check">✓</span> X conectado</div>
+                <p class="v3-x-username" id="xUsername">@usuario</p>
+              </div>
+            </div>
+          </div>
+          <!-- Sin lógica todavía: el botón no tiene addEventListener. -->
+          <button type="button" class="v3-btn-secondary v3-x-connect-btn" id="xConnectBtn">Conectar X</button>
+        </div>
+      </div>
+
       <!-- Mis solicitudes: historial de redemption_requests del propio usuario. -->
       <div class="v3-table-wrap" id="misSolicitudes">
         <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
@@ -790,6 +831,59 @@
         dashEl.hidden = true;
       }
     }
+
+    // ===== Cuentas vinculadas (X): SOLO visual, sin lógica real todavía =====
+    // No llama a Supabase, Edge Functions ni OAuth. Únicamente lee query
+    // params ya presentes en la URL para decidir qué texto/estado pintar.
+    // No depende de la sesión de Supabase, así que se ejecuta directo (no
+    // dentro de whenReady) y funciona incluso antes de que cargue el resto.
+    var X_CONNECT_MESSAGES = {
+      success:         { tone: 'ok',      ic: '✓', text: 'Cuenta de X conectada correctamente.' },
+      conflict:        { tone: 'warn',    ic: '⚠', text: 'Esta cuenta de X no puede vincularse a este perfil.' },
+      cancelled:       { tone: 'neutral', ic: 'ℹ', text: 'Conexión con X cancelada.' },
+      session_expired: { tone: 'error',   ic: '⚠', text: 'Tu sesión expiró. Inicia sesión nuevamente.' },
+      invalid_state:   { tone: 'error',   ic: '⚠', text: 'Este intento de conexión ya no es válido. Inténtalo nuevamente.' },
+      not_allowed:     { tone: 'warn',    ic: '⚠', text: 'No pudimos completar esta vinculación.' },
+      error:           { tone: 'error',   ic: '⚠', text: 'Ocurrió un error al conectar X. Inténtalo nuevamente.' }
+    };
+
+    function initXAccountUI() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+
+        // Banner de resultado (?x_connect=...). Todavía no se limpia el
+        // query param de la URL — queda para cuando se apruebe esa parte.
+        var banner = document.getElementById('xConnectBanner');
+        var bannerIc = document.getElementById('xConnectBannerIc');
+        var bannerText = document.getElementById('xConnectBannerText');
+        var resultKey = params.get('x_connect');
+        if (banner && resultKey && X_CONNECT_MESSAGES[resultKey]) {
+          var msg = X_CONNECT_MESSAGES[resultKey];
+          banner.className = 'v3-x-banner v3-x-banner-' + msg.tone;
+          if (bannerIc) bannerIc.textContent = msg.ic;
+          if (bannerText) bannerText.textContent = msg.text;
+          banner.hidden = false;
+        }
+
+        // Preview TEMPORAL del estado "conectado" vía ?xPreview=connected
+        // (mismo patrón que ?rankPreview=1 en ranking.html) — no es una
+        // lectura real de profile_x_accounts. Sin este parámetro, la tarjeta
+        // siempre muestra "no conectado", que es el estado real por defecto
+        // hasta que exista la lógica de verdad. Quitar este bloque cuando
+        // se cablee esa lectura real.
+        if (params.get('xPreview') === 'connected') {
+          var notConnected = document.getElementById('xNotConnected');
+          var connected = document.getElementById('xConnected');
+          var xBtn = document.getElementById('xConnectBtn');
+          if (notConnected) notConnected.hidden = true;
+          if (connected) connected.hidden = false;
+          if (xBtn) xBtn.hidden = true;
+        }
+      } catch (e) {
+        console.warn('[mi-geoarmy] error en initXAccountUI (solo UI, sin datos reales)', e);
+      }
+    }
+    initXAccountUI();
 
     whenReady(function () {
       var sb = window.GeoArmyAccount.client;
