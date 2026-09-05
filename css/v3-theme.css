@@ -348,6 +348,14 @@
   border-left: 3px solid rgba(150,190,255,.6); border-radius: 8px;
   padding: 11px 16px; margin-bottom: 14px;
 }
+/* Mismo bug que ya se corrigió en .ga-dropdown: el atributo `hidden` que
+   pone initXAccountUI() depende de la regla del navegador
+   [hidden]{display:none}, pero esa regla es de origen UA (la prioridad
+   más baja del cascade) y CUALQUIER regla de autor con `display` -como la
+   de arriba- la gana siempre, sin importar especificidad. Resultado: sin
+   esto, el banner quedaba visible (con su padding/borde/margen) incluso
+   con el atributo `hidden` puesto, cuando no hay ?x_connect=... en la URL. */
+.v3-x-banner[hidden] { display: none; }
 .v3-x-banner-ic { flex-shrink: 0; font-size: 13px; line-height: 1; }
 .v3-x-banner-ok { border-left-color: #00c853; }
 .v3-x-banner-ok .v3-x-banner-ic { color: #00c853; }
