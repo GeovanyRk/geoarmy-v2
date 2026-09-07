@@ -160,6 +160,7 @@
       in_progress: 'En progreso',
       completed_today: 'Completada hoy',
       completed_this_week: 'Completada esta semana',
+      claimed: 'Completada ✓',
       coming_soon: 'Próximamente'
     };
 
@@ -168,6 +169,7 @@
       in_progress: 'ms-badge-progress',
       completed_today: 'ms-badge-done',
       completed_this_week: 'ms-badge-done',
+      claimed: 'ms-badge-done',
       coming_soon: 'ms-badge-soon'
     };
 
@@ -197,6 +199,10 @@
       var isSoon = row.status === 'coming_soon';
       var badgeClass = STATUS_BADGE_CLASS[row.status] || 'ms-badge-soon';
       var badgeLabel = STATUS_LABEL[row.status] || esc(row.status);
+      // Solo copy visual: la RPC sigue devolviendo el mismo row.name; esto
+      // únicamente cambia cómo se pinta ese texto exacto en pantalla, sin
+      // tocar mission_code, status, XP ni progreso de ninguna misión.
+      var displayName = (row.name === 'Activo de la semana') ? 'Activo esta semana' : row.name;
 
       var progressHtml = '';
       if (row.progress_count !== null && row.progress_count !== undefined &&
@@ -223,7 +229,7 @@
           '<div class="ms-icon">' + icon + '</div>' +
           '<div class="ms-body">' +
             '<div class="ms-top-row">' +
-              '<span class="ms-name">' + esc(row.name) + '</span>' +
+              '<span class="ms-name">' + esc(displayName) + '</span>' +
               '<span class="ms-reward">+' + esc(row.xp_reward) + ' XP</span>' +
               '<span class="ms-badge ' + badgeClass + '">' + esc(badgeLabel) + '</span>' +
             '</div>' +
