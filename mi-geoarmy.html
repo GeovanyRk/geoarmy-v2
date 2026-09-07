@@ -158,6 +158,31 @@
         </div>
       </div>
 
+      <!-- Misiones: solo lectura desde my_missions_status() (RPC ya validada
+           en producción). Solo STREAM_RETWEET tiene botón de reclamar
+           (POST claim-stream-retweet) — las otras 4 misiones se completan
+           solas en el backend, acá solo se muestra su estado/progreso.
+           Nombre y descripción vienen del backend (public.missions vía la
+           RPC); NO hay mapeo estático de esos textos en frontend, solo el
+           ícono decorativo por mission_code (ver MISSION_ICONS). -->
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🎯</span>Misiones</div>
+        <p class="v3-missions-sub">Completa misiones y gana XP para subir de rango.</p>
+
+        <!-- Banner de resultado del claim de STREAM_RETWEET (granted,
+             cooldown, not_connected, etc.) — mismo lenguaje visual que el
+             banner de Cuentas vinculadas, instancia propia para no mezclar
+             mensajes de dos secciones distintas. -->
+        <div id="missionsBanner" class="v3-x-banner" hidden>
+          <span id="missionsBannerIc" class="v3-x-banner-ic"></span>
+          <span id="missionsBannerText"></span>
+        </div>
+
+        <div class="v3-missions-grid" id="missionsGrid">
+          <div class="v3-table-empty">Cargando…</div>
+        </div>
+      </div>
+
       <!-- Mis recompensas: saldos reales de wallet_balances (Supabase). GCOIN
            sigue aparte, viene de tienda-server (ver tarjeta G-Coins arriba). -->
       <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
@@ -175,7 +200,7 @@
            el access_token de la sesión — ver el listener de #xConnectBtn
            más abajo. Nada de SQL/Edge Functions/OAuth se modifica desde
            acá. -->
-      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+      <div class="v3-now-section" id="cuentasVinculadas" style="margin-top:6px; padding-bottom:0;">
         <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🔗</span>Cuentas vinculadas</div>
 
         <!-- Banner de resultado del flujo de conexión (?x_connect=...) o de
@@ -789,6 +814,250 @@
       }
     }
 
+    // ===== Misiones (my_missions_status()) =====
+    // Nombre y descripción vienen del backend (public.missions vía la RPC)
+    // — nunca se mapean acá. Lo único que se mapea en frontend es el ícono
+    // decorativo por mission_code (puramente cosmético, igual que las
+    // insignias de rango en js/geoarmy-ranks.js) y el texto/tono de cada
+    // `status`. Solo STREAM_RETWEET tiene botón de reclamar: las otras 4
+    // misiones no tienen endpoint de claim, se completan solas en el
+    // backend y acá solo se lee su estado/progreso.
+    var MISSION_ICONS = {
+      DAILY_VISIT: '🌐',
+      TWITCH_DAILY_REWARD: '💜',
+      STREAM_RETWEET: '🐦',
+      WEEKLY_ACTIVE: '🔥',
+      WEEKLY_PERFECT: '⚡'
+    };
+
+    // Los 5 valores de STREAM_RETWEET (available/claimed/in_progress/
+    // cooldown/no_active_instance) están confirmados por el backend. Los
+    // demás (available/completed/inactive) son la mejor suposición
+    // razonable para las otras 4 misiones — cualquier status no listado
+    // acá cae al fallback humanizado de missionStatusLabel() en vez de
+    // romper o mostrar texto crudo sin sentido.
+    var MISSION_STATUS_LABELS = {
+      available:          { text: 'Disponible',         tone: 'ok' },
+      completed:          { text: 'Completada',         tone: 'done' },
+      claimed:            { text: 'Completada',         tone: 'done' },
+      in_progress:        { text: 'En progreso',        tone: 'progress' },
+      cooldown:           { text: 'Disponible pronto',  tone: 'muted' },
+      no_active_instance: { text: 'No disponible ahora', tone: 'muted' },
+      mission_inactive:   { text: 'Próximamente',        tone: 'muted' },
+      inactive:           { text: 'Próximamente',        tone: 'muted' }
+    };
+
+    function missionStatusLabel(status, cadence) {
+      var m = MISSION_STATUS_LABELS[status];
+      if (!m) {
+        // Fallback: humaniza el código tal cual venga (ej. "some_status" ->
+        // "Some status") en vez de mostrar "undefined" o romper el render.
+        var text = String(status || '—').replace(/_/g, ' ');
+        text = text.charAt(0).toUpperCase() + text.slice(1);
+        return { text: text, tone: 'muted' };
+      }
+      if (m.tone === 'done') {
+        var suffix = cadence === 'daily' ? ' hoy' : (cadence === 'weekly' ? ' esta semana' : '');
+        return { text: 'Completada' + suffix + ' ✓', tone: 'done' };
+      }
+      return m;
+    }
+
+    // my_missions_status() no trae retry_after (no se le agregó esa
+    // columna para no romper nada existente). El formato exacto de
+    // retry_after (segundos vs. timestamp ISO) no está confirmado, así que
+    // se manejan ambos casos en vez de asumir uno solo.
+    function formatRetryAfter(status, retryAfter) {
+      var label = status === 'in_progress' ? 'Verificando' : 'Disponible en';
+      var seconds = null;
+      if (typeof retryAfter === 'number') {
+        seconds = retryAfter;
+      } else if (typeof retryAfter === 'string') {
+        var asDate = new Date(retryAfter);
+        if (!isNaN(asDate.getTime())) {
+          seconds = Math.max(0, Math.round((asDate.getTime() - Date.now()) / 1000));
+        }
+      }
+      if (seconds == null) return label + ' ' + retryAfter;
+      if (seconds <= 0) return 'Disponible pronto';
+      var mins = Math.ceil(seconds / 60);
+      if (mins < 60) return label + ' ' + mins + ' min';
+      return label + ' ' + Math.round(mins / 60) + ' h';
+    }
+
+    function showMissionsBanner(tone, ic, html) {
+      var banner = document.getElementById('missionsBanner');
+      var bannerIc = document.getElementById('missionsBannerIc');
+      var bannerText = document.getElementById('missionsBannerText');
+      if (!banner) return;
+      banner.className = 'v3-x-banner v3-x-banner-' + tone;
+      if (bannerIc) bannerIc.textContent = ic;
+      // Los textos de acá son siempre literales fijos escritos en este
+      // archivo (CLAIM_MESSAGES de abajo) — nunca contenido crudo del
+      // backend — por eso es seguro usar innerHTML (necesario para el
+      // enlace de "not_connected" a Cuentas vinculadas).
+      if (bannerText) bannerText.innerHTML = html;
+      banner.hidden = false;
+    }
+
+    function renderMissionCard(m) {
+      var icon = MISSION_ICONS[m.mission_code] || '🎯';
+      var statusInfo = missionStatusLabel(m.status, m.cadence);
+      var doneClass = statusInfo.tone === 'done' ? ' v3-mission-done' : '';
+      var hasProgress = m.progress_target != null && m.progress_count != null;
+      var progressHtml = '';
+      if (hasProgress) {
+        var pct = m.progress_target > 0 ? Math.max(0, Math.min(100, (m.progress_count / m.progress_target) * 100)) : 0;
+        progressHtml =
+          '<div class="v3-mission-progress">' +
+            '<div class="v3-xp-bar-bg"><div class="v3-xp-bar-fill" style="width:' + pct + '%"></div></div>' +
+            '<div class="v3-mission-progress-text">' + esc(m.progress_count) + ' / ' + esc(m.progress_target) + '</div>' +
+          '</div>';
+      }
+      var btnHtml = '';
+      if (m.mission_code === 'STREAM_RETWEET') {
+        var canClaim = m.status === 'available';
+        btnHtml = '<button type="button" class="v3-btn-secondary v3-mission-btn" data-mission-code="STREAM_RETWEET"' + (canClaim ? '' : ' disabled') + '>Reclamar</button>';
+      }
+      return (
+        '<div class="v3-mission-card' + doneClass + '" data-mission-code="' + esc(m.mission_code) + '">' +
+          '<div class="v3-mission-head"><span class="v3-mission-ic">' + icon + '</span><span class="v3-mission-name">' + esc(m.name) + '</span></div>' +
+          '<p class="v3-mission-desc">' + esc(m.description || '') + '</p>' +
+          progressHtml +
+          '<div class="v3-mission-foot">' +
+            '<span class="v3-mission-xp">+' + Number(m.xp_reward || 0).toLocaleString() + ' XP</span>' +
+            '<span class="v3-mission-status v3-mission-status-' + statusInfo.tone + '">' + esc(statusInfo.text) + '</span>' +
+          '</div>' +
+          btnHtml +
+        '</div>'
+      );
+    }
+
+    async function loadMissions(sb) {
+      var grid = document.getElementById('missionsGrid');
+      if (!grid) return;
+      try {
+        var res = await sb.rpc('my_missions_status');
+        if (res.error) {
+          console.warn('[mi-geoarmy] no se pudo leer my_missions_status()', res.error);
+          grid.innerHTML = '<div class="v3-table-empty">No se pudieron cargar las misiones.</div>';
+          return;
+        }
+        var rows = res.data || [];
+        if (!rows.length) {
+          grid.innerHTML = '<div class="v3-table-empty">No hay misiones disponibles por ahora.</div>';
+          return;
+        }
+        grid.innerHTML = rows.map(renderMissionCard).join('');
+
+        // STREAM_RETWEET en cooldown/in_progress: my_missions_status() no
+        // trae retry_after, así que se complementa con la única fuente que
+        // sí lo tiene (my_stream_retweet_status()) para mostrar el tiempo
+        // exacto en vez de solo "Disponible pronto".
+        var retweetRow = null;
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].mission_code === 'STREAM_RETWEET') { retweetRow = rows[i]; break; }
+        }
+        if (retweetRow && (retweetRow.status === 'cooldown' || retweetRow.status === 'in_progress')) {
+          refreshRetweetRetryAfter(sb);
+        }
+      } catch (e) {
+        console.warn('[mi-geoarmy] error cargando my_missions_status()', e);
+        grid.innerHTML = '<div class="v3-table-empty">No se pudieron cargar las misiones.</div>';
+      }
+    }
+
+    async function refreshRetweetRetryAfter(sb) {
+      try {
+        var res = await sb.rpc('my_stream_retweet_status');
+        if (res.error) { console.warn('[mi-geoarmy] no se pudo leer my_stream_retweet_status()', res.error); return; }
+        var row = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!row || row.retry_after == null) return;
+        var card = document.querySelector('.v3-mission-card[data-mission-code="STREAM_RETWEET"]');
+        if (!card) return;
+        var statusEl = card.querySelector('.v3-mission-status');
+        if (statusEl) statusEl.textContent = formatRetryAfter(row.status, row.retry_after);
+      } catch (e) {
+        console.warn('[mi-geoarmy] error leyendo my_stream_retweet_status()', e);
+      }
+    }
+
+    // Mensajes fijos por resultado de claim-stream-retweet. "not_connected"
+    // enlaza a la sección Cuentas vinculadas (id="cuentasVinculadas") en
+    // vez de simplemente decir "conecta tu cuenta" sin acción posible.
+    var CLAIM_MESSAGES = {
+      already_claimed:     { tone: 'neutral', ic: 'ℹ', text: 'Ya reclamaste esta misión.' },
+      not_retweeted:        { tone: 'warn',    ic: '⚠', text: 'Todavía no detectamos tu RT. Espera un momento e inténtalo de nuevo.' },
+      cooldown:             { tone: 'warn',    ic: '⚠', text: 'Esta misión está en cooldown. Podrás reclamarla más tarde.' },
+      in_progress:          { tone: 'neutral', ic: 'ℹ', text: 'Tu RT se está verificando. Intenta de nuevo en un momento.' },
+      not_connected:        { tone: 'warn',    ic: '⚠', text: 'Conecta tu cuenta de X para reclamar esta misión. <a href="#cuentasVinculadas" class="v3-mission-link">Ir a Cuentas vinculadas</a>' },
+      mission_inactive:     { tone: 'neutral', ic: 'ℹ', text: 'Esta misión no está activa por ahora.' },
+      no_active_instance:   { tone: 'neutral', ic: 'ℹ', text: 'No hay ningún stream activo para verificar ahora mismo.' },
+      session_expired:      { tone: 'error',   ic: '⚠', text: 'Tu sesión expiró. Inicia sesión nuevamente.' },
+      verification_failed:  { tone: 'error',   ic: '⚠', text: 'No pudimos verificar tu RT. Inténtalo más tarde.' },
+      internal_error:       { tone: 'error',   ic: '⚠', text: 'Ocurrió un error. Inténtalo nuevamente.' }
+    };
+
+    // Único listener de clicks para reclamar misiones, delegado sobre el
+    // grid entero (no uno por tarjeta) — así sobrevive a que loadMissions()
+    // vuelva a reescribir el HTML del grid en cada refresh, sin acumular
+    // listeners duplicados (mismo aprendizaje que ya se aplicó al dropdown
+    // de cuenta). El frontend NUNCA manda profile_id/tweet_id/XP: el POST
+    // va solo con el access_token, igual que x-member-connect-start.
+    async function handleClaimStreamRetweet(sb, btn) {
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Verificando…';
+      try {
+        var sessionRes = await sb.auth.getSession();
+        var session = sessionRes.data && sessionRes.data.session;
+        if (!session || !session.access_token) {
+          showMissionsBanner('error', '⚠', 'Tu sesión expiró. Inicia sesión nuevamente.');
+          btn.disabled = false;
+          btn.textContent = originalText;
+          return;
+        }
+
+        var res = await fetch(window.GEOARMY_SUPABASE_URL + '/functions/v1/claim-stream-retweet', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + session.access_token,
+            'Content-Type': 'application/json'
+          }
+        });
+        var body = null;
+        try { body = await res.json(); } catch (e) {}
+        var result = (body && (body.result || body.status)) || (res.ok ? null : 'internal_error');
+
+        if (result === 'granted') {
+          showMissionsBanner('ok', '✓', '🎉 Misión reclamada.');
+        } else {
+          var retryTxt = '';
+          if (body && body.retry_after != null && (result === 'not_retweeted' || result === 'cooldown')) {
+            retryTxt = ' ' + formatRetryAfter(result, body.retry_after);
+          }
+          var msg = CLAIM_MESSAGES[result] || CLAIM_MESSAGES.internal_error;
+          showMissionsBanner(msg.tone, msg.ic, msg.text + retryTxt);
+        }
+
+        // Se refresca sin importar el resultado: el estado real siempre lo
+        // decide el backend, nunca lo que asumió el frontend antes del
+        // click. Esto también restaura el botón (la tarjeta se re-renderiza
+        // completa con el status fresco).
+        await loadMissions(sb);
+        // Refresca también el resumen/rango de XP existente (funciones ya
+        // aprobadas, sin tocarlas) — así si hubo "granted" se ve reflejado
+        // sin recargar la página.
+        loadRankSummary(sb);
+        loadRankCard(sb);
+      } catch (e) {
+        console.warn('[mi-geoarmy] error reclamando STREAM_RETWEET', e);
+        showMissionsBanner('error', '⚠', 'Ocurrió un error. Inténtalo nuevamente.');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
     async function loadDashboard(sb) {
       var loggedOutEl = document.getElementById('mgLoggedOut');
       var dashEl = document.getElementById('mgDashboard');
@@ -823,6 +1092,7 @@
         loadRankSummary(sb);
         loadRankCard(sb);
         loadXAccount(sb, session.user.id);
+        loadMissions(sb);
       } catch (e) {
         console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
         loggedOutEl.hidden = false;
@@ -1009,6 +1279,15 @@
           btn.textContent = originalText;
           showXConnectBanner('error', '⚠', 'No se pudo iniciar la conexión con X. Inténtalo nuevamente.');
         }
+      });
+
+      // Delegado en el contenedor (no por tarjeta): loadMissions() reescribe
+      // el innerHTML del grid en cada refresh, así que un listener por botón
+      // se perdería/duplicaría. Solo STREAM_RETWEET renderiza un botón.
+      document.getElementById('missionsGrid').addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.v3-mission-btn') : null;
+        if (!btn || btn.disabled) return;
+        handleClaimStreamRetweet(sb, btn);
       });
 
       sb.auth.onAuthStateChange(function () { loadDashboard(sb); });
