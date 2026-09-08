@@ -226,14 +226,20 @@
           // Ranking NO va aquí a propósito — ya tiene acceso propio desde el
           // pin del mundo en index.html, la tarjeta resumen de mi-geoarmy.html
           // y ranking.html; este menú es solo opciones de cuenta.
-          // "Panel Admin" NUNCA aparece en el navbar público — solo aquí, dentro
-          // del dropdown de la propia cuenta, y solo si profiles.role === 'admin'.
-          // Esto es únicamente ocultar el enlace (UX): la protección real está
-          // del lado del servidor en admin_list_redemption_requests()/
-          // admin_update_redemption_status() (ver migracion-panel-admin-v2.sql),
-          // que rechazan a cualquiera que no sea admin aunque conozca la URL.
+          // Los enlaces de admin NUNCA aparecen en el navbar público — solo
+          // aquí, dentro del dropdown de la propia cuenta, y solo si
+          // profiles.role === 'admin'. Esto es únicamente ocultar el enlace
+          // (UX): la protección real está del lado del servidor en
+          // admin_list_redemption_requests()/admin_update_redemption_status()
+          // (ver migracion-panel-admin-v2.sql) y en
+          // admin_list_store_fulfillments_v2()/admin_update_store_fulfillment_v2()
+          // (ver Migración 005 de Tienda V2) — ambas rechazan a cualquiera
+          // que no sea admin aunque conozca la URL. Dos paneles admin
+          // independientes hoy (recompensas de canje / fulfillments de
+          // Tienda V2), cada uno su propio enlace -- no comparten backend.
           (profile.role === 'admin'
-            ? '<a href="admin/recompensas/" class="ga-drop-item">🛠️ Panel Admin</a>'
+            ? '<a href="admin/recompensas/" class="ga-drop-item">🛠️ Recompensas</a>' +
+              '<a href="admin/fulfillments/" class="ga-drop-item">📦 Fulfillments</a>'
             : '') +
           '<button type="button" class="ga-drop-item ga-drop-danger" id="gaLogout">🚪 Cerrar sesión</button>' +
         '</div>' +
