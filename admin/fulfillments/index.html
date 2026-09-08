@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex"/>
+  <title>Panel de Fulfillments — GeoArmy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* Estilos mínimos propios: esta página nunca debe depender de que
+       css/style.css / css/v3-theme.css lleguen a tiempo (ver nota de
+       SITE_BASE_BOOTSTRAP más abajo) ni de clases específicas de esas hojas,
+       porque es una página nueva y aislada (panel interno, no público).
+       Mismo lenguaje visual que admin/recompensas/ (paleta .pnl-*, mismo
+       tema oscuro) -- se reutilizan las clases ya existentes ahí y se
+       agregan solo las nuevas que esta vista necesita (tabla, filtros,
+       modal, toast, badges de estado nuevos). */
+    :root { color-scheme: dark; }
+    body { background:#0a0a14; color:#eaf2ff; font-family:'Inter',sans-serif; margin:0; }
+    .pnl-wrap { max-width:1180px; margin:0 auto; padding:32px 20px 80px; }
+    .pnl-tag { letter-spacing:.28em; font-size:12px; color:#a9bad6; margin-bottom:.4rem; }
+    .pnl-title { font-family:'Space Grotesk',sans-serif; font-size:1.8rem; margin:0 0 6px; }
+    .pnl-sub { color:#a9bad6; font-size:14px; margin:0 0 28px; }
+    .pnl-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:20px; text-align:center; }
+    .pnl-spin { display:inline-block; width:30px; height:30px; border-radius:50%; border:3px solid rgba(169,112,255,.25); border-top-color:#a970ff; animation:pnlSpin .8s linear infinite; margin-bottom:.75rem; }
+    @keyframes pnlSpin { to { transform:rotate(360deg); } }
+    .pnl-btn { display:inline-flex; align-items:center; gap:8px; background:#9147ff; color:#fff; border:none; border-radius:10px; padding:10px 18px; font-weight:600; cursor:pointer; font-size:14px; }
+    .pnl-btn:disabled { opacity:.45; cursor:not-allowed; }
+    .pnl-btn.approve { background:#2ecc71; }
+    .pnl-btn.reject { background:#e05263; }
+    .pnl-btn.deliver { background:#9147ff; }
+    .pnl-btn.ghost { background:rgba(255,255,255,.08); }
+    .pnl-btn.small { padding:7px 14px; font-size:13px; }
+    .pnl-row { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px 18px; margin-bottom:14px; }
+    .pnl-row-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+    .pnl-user { display:flex; align-items:center; gap:10px; }
+    .pnl-avatar { width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid rgba(145,71,255,.5); flex-shrink:0; background:#222; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; }
+    .pnl-name { font-weight:600; font-size:15px; }
+    .pnl-login { color:#a9bad6; font-size:12px; }
+    .pnl-badge { font-size:11px; padding:4px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:.05em; font-weight:700; white-space:nowrap; }
+    .pnl-badge.pending    { background:rgba(255,193,7,.15);  color:#ffc107; }
+    .pnl-badge.ready      { background:rgba(52,152,219,.15); color:#3498db; }
+    .pnl-badge.processing { background:rgba(169,112,255,.15); color:#a970ff; }
+    .pnl-badge.fulfilled  { background:rgba(46,204,113,.15); color:#2ecc71; }
+    .pnl-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin:14px 0; font-size:13px; }
+    .pnl-grid div span { display:block; color:#a9bad6; font-size:11px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; }
+    .pnl-notes { width:100%; box-sizing:border-box; margin:10px 0; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; font-family:inherit; font-size:13px; resize:vertical; }
+    .pnl-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+    .pnl-err { color:#ff8080; font-size:13px; margin-top:8px; }
+    .pnl-empty { color:#a9bad6; text-align:center; padding:40px 0; }
+
+    /* ----- Filtros ----- */
+    .pnl-toolbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:20px; }
+    .pnl-search { flex:1 1 220px; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; font-family:inherit; font-size:14px; }
+    .pnl-toggle { display:flex; align-items:center; gap:8px; font-size:13px; color:#a9bad6; user-select:none; cursor:pointer; }
+
+    /* ----- Tabla (desktop) ----- */
+    .pnl-table-wrap { display:none; overflow-x:auto; border:1px solid rgba(255,255,255,.08); border-radius:14px; }
+    .pnl-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .pnl-table th, .pnl-table td { padding:12px 14px; text-align:left; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top; }
+    .pnl-table th { color:#a9bad6; font-size:11px; text-transform:uppercase; letter-spacing:.05em; background:rgba(255,255,255,.03); }
+    .pnl-table tr:last-child td { border-bottom:none; }
+    .pnl-table td .pnl-notes-cell { color:#a9bad6; font-size:12px; max-width:220px; overflow-wrap:anywhere; }
+    .pnl-table td .pnl-order-id { font-family:monospace; font-size:12px; color:#a9bad6; }
+
+    /* ----- Cards (mobile) ----- */
+    .pnl-cards { display:block; }
+
+    @media (min-width: 860px) {
+      .pnl-table-wrap { display:block; }
+      .pnl-cards { display:none; }
+    }
+
+    .pnl-loadmore-wrap { text-align:center; margin-top:20px; }
+
+    /* ----- Modal ----- */
+    .pnl-modal-overlay { position:fixed; inset:0; background:rgba(5,5,10,.72); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+    .pnl-modal { background:#12121e; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:26px; max-width:440px; width:100%; }
+    .pnl-modal h3 { margin:0 0 14px; font-family:'Space Grotesk',sans-serif; font-size:1.2rem; }
+    .pnl-modal-line { display:flex; justify-content:space-between; gap:10px; font-size:13px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+    .pnl-modal-line span:first-child { color:#a9bad6; }
+    .pnl-modal-warn { background:rgba(255,193,7,.1); border:1px solid rgba(255,193,7,.3); color:#ffdd88; border-radius:10px; padding:10px 12px; font-size:13px; margin-top:14px; }
+    .pnl-modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:18px; }
+
+    /* ----- Toast ----- */
+    .pnl-toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1a1a2a; border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:12px 20px; font-size:13px; z-index:60; box-shadow:0 8px 24px rgba(0,0,0,.4); }
+    .pnl-toast.success { border-color:rgba(46,204,113,.4); color:#2ecc71; }
+    .pnl-toast.error { border-color:rgba(255,128,128,.4); color:#ff8080; }
+  </style>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch). Copia local ya
+       existente y verificada (fijada a 2.115.0) -- sin fallback al CDN. -->
+  <script src="/geoarmy-v2/lib/supabase.min.js"></script>
+</head>
+<body>
+  <div class="pnl-wrap">
+    <div class="pnl-tag">GEO ARMY — PANEL INTERNO</div>
+    <h1 class="pnl-title">Tienda — Fulfillments</h1>
+    <p class="pnl-sub">Gestionar la entrega manual de recompensas de la Tienda V2. Cada acción pasa por las funciones seguras del backend (nunca se edita la orden, el benefit ni el wallet directamente).</p>
+
+    <div id="pnlLoading" class="pnl-card">
+      <div class="pnl-spin"></div>
+      <p>Verificando tu sesión…</p>
+    </div>
+
+    <div id="pnlLoggedOut" class="pnl-card" hidden>
+      <p>Necesitas iniciar sesión con tu cuenta de Twitch para entrar aquí.</p>
+      <button type="button" class="pnl-btn" id="pnlLoginBtn" style="margin-top:10px;">Continuar con Twitch</button>
+    </div>
+
+    <div id="pnlForbidden" class="pnl-card" hidden>
+      <p>Tu cuenta no tiene permisos de administrador. Esta sección no está disponible.</p>
+    </div>
+
+    <div id="pnlPanel" hidden>
+      <div class="pnl-toolbar">
+        <input type="text" class="pnl-search" id="pnlSearch" placeholder="Buscar por producto, nombre o usuario de Twitch…">
+        <label class="pnl-toggle">
+          <input type="checkbox" id="pnlShowFulfilled">
+          Mostrar también entregados
+        </label>
+      </div>
+
+      <div id="pnlListErr" class="pnl-err"></div>
+
+      <div class="pnl-table-wrap">
+        <table class="pnl-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Producto</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Precio</th>
+              <th>Beneficio</th>
+              <th>Notas</th>
+              <th>Orden</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="pnlTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="pnl-cards" id="pnlCards"></div>
+
+      <div class="pnl-loadmore-wrap">
+        <button type="button" class="pnl-btn ghost small" id="pnlLoadMore" hidden>Cargar más</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ===== Bootstrap de la carpeta base de este despliegue =====
+    // Esta página vive 2 niveles adentro (admin/fulfillments/index.html),
+    // igual que admin/recompensas/index.html y auth/callback/index.html --
+    // mismo problema de fondo (algunos hosts quitan la barra final de una
+    // URL de carpeta y rompen "../../"), mismo patrón de solución: valor
+    // LITERAL, nunca adivinado de la URL. DEBE ser idéntico a
+    // GEOARMY_SITE_BASE de js/geoarmy-config.js.
+    var SITE_BASE_BOOTSTRAP = '/geoarmy-v2/';
+
+    // Mismo mecanismo de "volver a donde estaba" que js/geoarmy-account.js
+    // (misma clave literal, aunque este archivo no importa ese módulo):
+    // auth/callback/ lee sessionStorage[RETURN_TO_KEY] y redirige ahí en
+    // vez de caer al fallback (mi-geoarmy.html) -- así el admin vuelve
+    // exactamente a /geoarmy-v2/admin/fulfillments/ tras el login.
+    var RETURN_TO_KEY = 'geoarmy_return_to_v1';
+
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = function () { resolve(); };
+        s.onerror = function () { reject(new Error('no se pudo cargar ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+
+    // ------------------------------------------------------------------
+    // Seguridad DOM: TODO dato que viene de la RPC/DB (display_name,
+    // twitch_login, product_name_snapshot, product_code_snapshot,
+    // processing_notes, IDs, etc.) se inserta EXCLUSIVAMENTE vía
+    // textContent / createTextNode / atributos asignados directamente por
+    // DOM (setAttribute/propiedad). innerHTML solo se usa para markup
+    // ESTÁTICO controlado por este archivo (esqueletos de fila/card/modal
+    // con placeholders vacíos) -- nunca con contenido remoto interpolado.
+    // ------------------------------------------------------------------
+    function setText(el, value) {
+      el.textContent = (value === null || value === undefined || value === '') ? '—' : String(value);
+    }
+
+    var STATUS_LABELS = {
+      pending: 'Pendiente',
+      ready: 'Listo',
+      processing: 'En proceso',
+      fulfilled: 'Entregado'
+    };
+
+    var TYPE_LABELS = {
+      manual: 'Manual',
+      manual_fortnite_gift: 'Regalo Fortnite (manual)'
+    };
+
+    // pending -> ready -> processing -> fulfilled. fulfilled no tiene
+    // acción (sin botón). Coincide exactamente con la máquina de estados
+    // V1 aprobada del backend (Migración 005) -- este mapa es solo UX, la
+    // única fuente real de verdad sigue siendo admin_update_store_fulfillment_v2.
+    var ACTIONS_BY_STATUS = {
+      pending:    { to: 'ready',      label: 'Marcar listo',    cls: 'approve' },
+      ready:      { to: 'processing', label: 'Procesar',        cls: 'approve' },
+      processing: { to: 'fulfilled',  label: 'Marcar entregado', cls: 'deliver' }
+    };
+
+    // Mapa fijo SQLSTATE(:DETAIL) -> mensaje amigable. Nunca se muestra
+    // error.message crudo, SQL, ni nombres internos de tablas/funciones.
+    var ERROR_MESSAGES = {
+      '42501:auth_required': 'Tu sesión expiró. Vuelve a iniciar sesión.',
+      '42501:admin_role_required': 'Tu cuenta no tiene permisos de administrador.',
+      '22023:invalid_to_status': 'Estado destino inválido.',
+      '22023:illegal_transition': 'Esa acción ya no es válida — puede que el estado haya cambiado. Actualiza la lista.',
+      '22023:fulfillment_type_not_manual': 'Este fulfillment no se gestiona de forma manual.',
+      '22023:order_not_processing_benefits': 'La orden ya no está en un estado que permita esta acción.',
+      '23505:request_id_conflict': 'Esta acción ya se había enviado con otro contenido. Cierra y vuelve a intentarlo.',
+      'P0002': 'No se encontró el fulfillment. Puede que ya no exista o haya cambiado de estado.'
+    };
+    var FALLBACK_ERROR = 'No se pudo completar la acción. Intenta nuevamente.';
+    var FALLBACK_LIST_ERROR = 'No se pudieron cargar los fulfillments. Intenta nuevamente.';
+
+    function mapError(err) {
+      if (!err) return FALLBACK_ERROR;
+      var code = err.code || '';
+      var detail = err.details || '';
+      if (code === 'P0002') return ERROR_MESSAGES['P0002'];
+      var key = code + (detail ? (':' + detail) : '');
+      return ERROR_MESSAGES[key] || FALLBACK_ERROR;
+    }
+
+    // Falla de transporte (red caída, timeout, DNS, 5xx no traducido por
+    // PostgREST): postgrest-js devuelve code:'' en ese caso (nunca lanza
+    // excepción) -- este es el discriminador confiable ya usado en el
+    // diseño de la Edge Function de compra GCOIN de este mismo proyecto.
+    function isTransportError(err) {
+      return !!err && !err.code;
+    }
+
+    function fmtFecha(iso) {
+      if (!iso) return '';
+      try { return new Date(iso).toLocaleString('es', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+      catch (e) { return iso; }
+    }
+
+    function fmtPrice(amountMinor, currencyCode) {
+      if (amountMinor === null || amountMinor === undefined || !currencyCode) return '—';
+      var n = Number(amountMinor);
+      if (currencyCode === 'USD') return '$' + (n / 100).toFixed(2);
+      return n.toLocaleString() + ' ' + currencyCode;
+    }
+
+    function shortOrderId(id) {
+      if (!id) return '—';
+      return String(id).slice(0, 8) + '…';
+    }
+
+    function show(id) {
+      ['pnlLoading', 'pnlLoggedOut', 'pnlForbidden', 'pnlPanel'].forEach(function (x) {
+        document.getElementById(x).hidden = (x !== id);
+      });
+    }
+
+    function showToast(message, variant) {
+      var existing = document.querySelector('.pnl-toast');
+      if (existing) existing.remove();
+      var t = document.createElement('div');
+      t.className = 'pnl-toast ' + (variant || 'success');
+      setText(t, message);
+      document.body.appendChild(t);
+      setTimeout(function () { t.remove(); }, 3200);
+    }
+
+    // ===================================================================
+    // Estado de listado (keyset real, nunca offset)
+    // ===================================================================
+    var PAGE_SIZE = 50; // fijado explícitamente también en p_limit (ver fetchPage) --
+                         // page.length === PAGE_SIZE no depende del default oculto del servidor.
+    var state = {
+      rows: [],
+      cursorCreatedAt: null,
+      cursorId: null,
+      hasMore: false,
+      loading: false,
+      includeFulfilled: false,
+      searchText: '',
+      // Token de consulta: cada reset (cambio de filtro/búsqueda) lo
+      // incrementa e inicia una nueva request SIN esperar a que una
+      // anterior en vuelo termine. Cada request captura su propia versión
+      // al arrancar; si al resolver ya no coincide con state.queryVersion,
+      // es una respuesta vieja y se descarta sin tocar rows/cursor/hasMore
+      // ni el estado global de loading (que pertenece a la request más
+      // reciente). "Cargar más" (reset=false) NO incrementa la versión --
+      // ahí sí se bloquea una segunda request concurrente de la misma
+      // versión (ver chequeo de state.loading más abajo).
+      queryVersion: 0
+    };
+
+    var sbClient = null;
+
+    function currentStatuses() {
+      return state.includeFulfilled
+        ? ['pending', 'ready', 'processing', 'fulfilled']
+        : ['pending', 'ready', 'processing'];
+    }
+
+    async function fetchPage(reset) {
+      if (reset) {
+        state.queryVersion += 1;
+      } else if (state.loading) {
+        // "Cargar más": sí bloquea doble request concurrente de la misma
+        // versión (a diferencia de un reset, que siempre puede arrancar
+        // una consulta nueva aunque esta siga pendiente).
+        return;
+      }
+      var myVersion = state.queryVersion;
+      state.loading = true;
+      var listErrEl = document.getElementById('pnlListErr');
+      listErrEl.textContent = '';
+      document.getElementById('pnlLoadMore').disabled = true;
+
+      if (reset) {
+        state.rows = [];
+        state.cursorCreatedAt = null;
+        state.cursorId = null;
+        state.hasMore = false;
+      }
+
+      var params = {
+        p_statuses: currentStatuses(),
+        p_fulfillment_types: ['manual', 'manual_fortnite_gift'],
+        p_search_text: state.searchText || null,
+        p_cursor_created_at: state.cursorCreatedAt,
+        p_cursor_id: state.cursorId,
+        p_limit: PAGE_SIZE
+      };
+
+      try {
+        var res = await sbClient.rpc('admin_list_store_fulfillments_v2', params);
+
+        // Una respuesta vieja (de una request que ya no es la última
+        // versión, porque un reset posterior la superó) nunca puede
+        // modificar rows/cursor/hasMore ni el loading/UI global -- eso le
+        // pertenece exclusivamente a la request más reciente.
+        if (myVersion !== state.queryVersion) return;
+
+        if (res.error) {
+          console.warn('[admin/fulfillments] error listando', res.error);
+          listErrEl.textContent = FALLBACK_LIST_ERROR;
+          return;
+        }
+        var page = res.data || [];
+        state.rows = reset ? page : state.rows.concat(page);
+        state.hasMore = page.length === PAGE_SIZE;
+        if (page.length) {
+          var last = page[page.length - 1];
+          state.cursorCreatedAt = last.created_at;
+          state.cursorId = last.fulfillment_id;
+        }
+        renderList();
+      } catch (e) {
+        if (myVersion !== state.queryVersion) return;
+        console.warn('[admin/fulfillments] error de red listando', e);
+        listErrEl.textContent = FALLBACK_LIST_ERROR;
+      } finally {
+        if (myVersion === state.queryVersion) {
+          state.loading = false;
+          document.getElementById('pnlLoadMore').disabled = false;
+        }
+      }
+    }
+
+    // ===================================================================
+    // Render de tabla (desktop) + cards (mobile) -- misma data, dos
+    // representaciones DOM, visibilidad alternada por CSS (media query),
+    // nunca por JS -- así no depende de listeners de resize.
+    // ===================================================================
+    function renderList() {
+      var tbody = document.getElementById('pnlTableBody');
+      var cardsWrap = document.getElementById('pnlCards');
+      tbody.innerHTML = '';
+      cardsWrap.innerHTML = '';
+
+      if (!state.rows.length) {
+        var emptyMsg = 'No hay fulfillments en este filtro por ahora.';
+        var trEmpty = document.createElement('tr');
+        var tdEmpty = document.createElement('td');
+        tdEmpty.colSpan = 10;
+        tdEmpty.className = 'pnl-empty';
+        setText(tdEmpty, emptyMsg);
+        trEmpty.appendChild(tdEmpty);
+        tbody.appendChild(trEmpty);
+
+        var cardEmpty = document.createElement('div');
+        cardEmpty.className = 'pnl-empty';
+        setText(cardEmpty, emptyMsg);
+        cardsWrap.appendChild(cardEmpty);
+      } else {
+        state.rows.forEach(function (row) {
+          tbody.appendChild(buildTableRow(row));
+          cardsWrap.appendChild(buildCard(row));
+        });
+      }
+
+      document.getElementById('pnlLoadMore').hidden = !state.hasMore;
+    }
+
+    function userLabel(row) {
+      return row.display_name || row.twitch_login || 'Miembro';
+    }
+
+    function buildActionButton(row) {
+      var actionDef = ACTIONS_BY_STATUS[row.fulfillment_status];
+      if (!actionDef) return null;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pnl-btn small ' + actionDef.cls;
+      setText(btn, actionDef.label);
+      btn.addEventListener('click', function () { openActionModal(row, actionDef); });
+      return btn;
+    }
+
+    function buildTableRow(row) {
+      var tr = document.createElement('tr');
+
+      var tdUser = document.createElement('td');
+      var nameDiv = document.createElement('div');
+      nameDiv.className = 'pnl-name';
+      setText(nameDiv, userLabel(row));
+      var loginDiv = document.createElement('div');
+      loginDiv.className = 'pnl-login';
+      setText(loginDiv, row.twitch_login ? ('@' + row.twitch_login) : '');
+      tdUser.appendChild(nameDiv);
+      tdUser.appendChild(loginDiv);
+
+      var tdProduct = document.createElement('td');
+      var prodDiv = document.createElement('div');
+      setText(prodDiv, row.product_name_snapshot);
+      var prodCode = document.createElement('div');
+      prodCode.className = 'pnl-login';
+      setText(prodCode, row.product_code_snapshot);
+      tdProduct.appendChild(prodDiv);
+      tdProduct.appendChild(prodCode);
+
+      var tdType = document.createElement('td');
+      setText(tdType, TYPE_LABELS[row.fulfillment_type] || row.fulfillment_type);
+
+      var tdStatus = document.createElement('td');
+      var badge = document.createElement('span');
+      badge.className = 'pnl-badge ' + row.fulfillment_status;
+      setText(badge, STATUS_LABELS[row.fulfillment_status] || row.fulfillment_status);
+      tdStatus.appendChild(badge);
+
+      var tdDate = document.createElement('td');
+      setText(tdDate, fmtFecha(row.created_at));
+
+      var tdPrice = document.createElement('td');
+      setText(tdPrice, fmtPrice(row.unit_amount_minor_snapshot, row.currency_code_snapshot));
+
+      var tdBenefit = document.createElement('td');
+      setText(tdBenefit, row.benefit_type_snapshot);
+
+      var tdNotes = document.createElement('td');
+      var notesSpan = document.createElement('div');
+      notesSpan.className = 'pnl-notes-cell';
+      setText(notesSpan, row.processing_notes);
+      tdNotes.appendChild(notesSpan);
+
+      var tdOrder = document.createElement('td');
+      var orderSpan = document.createElement('span');
+      orderSpan.className = 'pnl-order-id';
+      orderSpan.title = row.order_id || '';
+      setText(orderSpan, shortOrderId(row.order_id));
+      tdOrder.appendChild(orderSpan);
+
+      var tdAction = document.createElement('td');
+      var btn = buildActionButton(row);
+      if (btn) tdAction.appendChild(btn);
+      else setText(tdAction, '');
+
+      [tdUser, tdProduct, tdType, tdStatus, tdDate, tdPrice, tdBenefit, tdNotes, tdOrder, tdAction]
+        .forEach(function (td) { tr.appendChild(td); });
+
+      return tr;
+    }
+
+    function buildCard(row) {
+      var card = document.createElement('div');
+      card.className = 'pnl-row';
+
+      var top = document.createElement('div');
+      top.className = 'pnl-row-top';
+
+      var userWrap = document.createElement('div');
+      userWrap.className = 'pnl-user';
+      var avatar = document.createElement('span');
+      avatar.className = 'pnl-avatar';
+      setText(avatar, (userLabel(row)[0] || '?').toUpperCase());
+      var nameWrap = document.createElement('div');
+      var nameDiv = document.createElement('div');
+      nameDiv.className = 'pnl-name';
+      setText(nameDiv, userLabel(row));
+      var loginDiv = document.createElement('div');
+      loginDiv.className = 'pnl-login';
+      setText(loginDiv, row.twitch_login ? ('@' + row.twitch_login) : '');
+      nameWrap.appendChild(nameDiv);
+      nameWrap.appendChild(loginDiv);
+      userWrap.appendChild(avatar);
+      userWrap.appendChild(nameWrap);
+
+      var badge = document.createElement('span');
+      badge.className = 'pnl-badge ' + row.fulfillment_status;
+      setText(badge, STATUS_LABELS[row.fulfillment_status] || row.fulfillment_status);
+
+      top.appendChild(userWrap);
+      top.appendChild(badge);
+      card.appendChild(top);
+
+      var grid = document.createElement('div');
+      grid.className = 'pnl-grid';
+
+      var fields = [
+        ['Producto', row.product_name_snapshot],
+        ['Tipo', TYPE_LABELS[row.fulfillment_type] || row.fulfillment_type],
+        ['Fecha', fmtFecha(row.created_at)],
+        ['Precio', fmtPrice(row.unit_amount_minor_snapshot, row.currency_code_snapshot)],
+        ['Beneficio', row.benefit_type_snapshot],
+        ['Orden', shortOrderId(row.order_id)]
+      ];
+      fields.forEach(function (f) {
+        var cell = document.createElement('div');
+        var label = document.createElement('span');
+        setText(label, f[0]);
+        cell.appendChild(label);
+        var valueNode = document.createTextNode(f[1] === null || f[1] === undefined || f[1] === '' ? '—' : String(f[1]));
+        cell.appendChild(valueNode);
+        grid.appendChild(cell);
+      });
+      card.appendChild(grid);
+
+      if (row.processing_notes) {
+        var notesDiv = document.createElement('div');
+        notesDiv.className = 'pnl-login';
+        var notesLabel = document.createTextNode('Notas: ');
+        notesDiv.appendChild(notesLabel);
+        var notesValue = document.createTextNode(row.processing_notes);
+        notesDiv.appendChild(notesValue);
+        card.appendChild(notesDiv);
+      }
+
+      var actionsWrap = document.createElement('div');
+      actionsWrap.className = 'pnl-actions';
+      var btn = buildActionButton(row);
+      if (btn) actionsWrap.appendChild(btn);
+      card.appendChild(actionsWrap);
+
+      return card;
+    }
+
+    // ===================================================================
+    // Modal de confirmación + idempotencia
+    // ===================================================================
+    var modalState = {
+      overlay: null,
+      row: null,
+      actionDef: null,
+      requestId: null,
+      confirmBtn: null,
+      cancelBtn: null,
+      errEl: null,
+      // Payload congelado en el PRIMER submit del intento actual
+      // ({fulfillmentId, toStatus, note}) -- todos los retries (mismo
+      // requestId) lo reusan tal cual, nunca vuelven a leer el textarea.
+      // null hasta el primer submit; se resetea al abrir/cerrar el modal.
+      attemptPayload: null,
+      // Referencia al <textarea> de la nota de este modal -- se deshabilita
+      // en el primer submit para que no pueda editarse durante retries.
+      notesInput: null,
+      // true mientras admin_update_store_fulfillment_v2 está en vuelo para
+      // el intento actual. Mientras sea true: Cancelar queda deshabilitado,
+      // el click en el overlay no cierra el modal, el requestId no se
+      // descarta, y no puede abrirse otra acción (openActionModal se
+      // niega si ya hay un modal abierto, ver más abajo) -- así no puede
+      // iniciarse una segunda mutación en paralelo desde esta página.
+      inFlight: false
+    };
+
+    function openActionModal(row, actionDef) {
+      // No puede iniciarse otra acción mientras ya hay un modal abierto
+      // (en vuelo o no) -- solo un intento a la vez en esta página.
+      if (modalState.overlay) return;
+
+      // Nuevo requestId al INICIAR la acción (al abrir el modal), no al
+      // confirmar -- se conserva durante todo este intento (reintentos por
+      // error de red reusan el mismo id); se descarta si se cierra/cancela.
+      modalState.row = row;
+      modalState.actionDef = actionDef;
+      modalState.requestId = crypto.randomUUID();
+      modalState.attemptPayload = null;
+      modalState.inFlight = false;
+
+      var overlay = document.createElement('div');
+      overlay.className = 'pnl-modal-overlay';
+
+      var modal = document.createElement('div');
+      modal.className = 'pnl-modal';
+
+      var h3 = document.createElement('h3');
+      setText(h3, actionDef.label);
+      modal.appendChild(h3);
+
+      function addLine(labelText, valueText) {
+        var line = document.createElement('div');
+        line.className = 'pnl-modal-line';
+        var l = document.createElement('span');
+        setText(l, labelText);
+        var v = document.createElement('span');
+        setText(v, valueText);
+        line.appendChild(l);
+        line.appendChild(v);
+        modal.appendChild(line);
+      }
+
+      addLine('Usuario', userLabel(row) + (row.twitch_login ? (' (@' + row.twitch_login + ')') : ''));
+      addLine('Producto', row.product_name_snapshot);
+      addLine('Estado actual', STATUS_LABELS[row.fulfillment_status] || row.fulfillment_status);
+      addLine('Nuevo estado', STATUS_LABELS[actionDef.to] || actionDef.to);
+
+      var notesLabel = document.createElement('div');
+      notesLabel.className = 'pnl-login';
+      notesLabel.style.marginTop = '12px';
+      setText(notesLabel, 'Nota (opcional)');
+      modal.appendChild(notesLabel);
+
+      var notesInput = document.createElement('textarea');
+      notesInput.className = 'pnl-notes';
+      notesInput.rows = 3;
+      notesInput.maxLength = 1000;
+      modal.appendChild(notesInput);
+
+      if (actionDef.to === 'fulfilled') {
+        var warn = document.createElement('div');
+        warn.className = 'pnl-modal-warn';
+        setText(warn, 'Esta acción marcará la recompensa como entregada y puede completar la orden.');
+        modal.appendChild(warn);
+      }
+
+      var errEl = document.createElement('div');
+      errEl.className = 'pnl-err';
+      modal.appendChild(errEl);
+
+      var actionsWrap = document.createElement('div');
+      actionsWrap.className = 'pnl-modal-actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.type = 'button';
+      cancelBtn.className = 'pnl-btn ghost';
+      setText(cancelBtn, 'Cancelar');
+      cancelBtn.addEventListener('click', function () {
+        if (modalState.inFlight) return; // Cancelar deshabilitado mientras hay mutación en vuelo.
+        closeActionModal();
+      });
+
+      var confirmBtn = document.createElement('button');
+      confirmBtn.type = 'button';
+      confirmBtn.className = 'pnl-btn ' + actionDef.cls;
+      setText(confirmBtn, 'Confirmar');
+      confirmBtn.addEventListener('click', function () {
+        performAction(row, actionDef, notesInput.value, confirmBtn, errEl);
+      });
+
+      actionsWrap.appendChild(cancelBtn);
+      actionsWrap.appendChild(confirmBtn);
+      modal.appendChild(actionsWrap);
+
+      overlay.appendChild(modal);
+      overlay.addEventListener('click', function (e) {
+        if (modalState.inFlight) return; // click en el overlay NO cierra mientras hay mutación en vuelo.
+        if (e.target === overlay) closeActionModal();
+      });
+      document.body.appendChild(overlay);
+
+      modalState.overlay = overlay;
+      modalState.confirmBtn = confirmBtn;
+      modalState.cancelBtn = cancelBtn;
+      modalState.errEl = errEl;
+      modalState.notesInput = notesInput;
+    }
+
+    function closeActionModal() {
+      // Nunca se cierra mientras hay una mutación en vuelo (ver guardas en
+      // Cancelar/overlay arriba, y en performAction abajo) -- esto es una
+      // segunda barrera defensiva. Cerrar/cancelar descarta el requestId Y
+      // el payload congelado -- una acción nueva (abrir el modal de nuevo)
+      // genera un UUID y un payload nuevos.
+      if (modalState.inFlight) return;
+      if (modalState.overlay) modalState.overlay.remove();
+      modalState.overlay = null;
+      modalState.row = null;
+      modalState.actionDef = null;
+      modalState.requestId = null;
+      modalState.attemptPayload = null;
+      modalState.notesInput = null;
+      modalState.confirmBtn = null;
+      modalState.cancelBtn = null;
+      modalState.errEl = null;
+    }
+
+    async function performAction(row, actionDef, noteRaw, confirmBtn, errEl) {
+      // Doble click / doble submit bloqueado mientras el request está
+      // pendiente.
+      if (confirmBtn.disabled) return;
+
+      // Congela el payload del intento en el PRIMER submit -- fulfillmentId/
+      // toStatus/note quedan fijos junto con el requestId ya congelado al
+      // abrir el modal. Todos los reintentos subsiguientes (mismo modal,
+      // mismo requestId) reusan este mismo objeto tal cual: nunca se vuelve
+      // a leer ni a recalcular desde el textarea. El textarea se deshabilita
+      // aquí mismo para que tampoco pueda editarse durante los reintentos.
+      // Si el admin quiere cambiar la nota, tiene que cancelar este modal y
+      // abrir la acción de nuevo (requestId y payload nuevos).
+      if (!modalState.attemptPayload) {
+        var normalizedNote = noteRaw && noteRaw.trim() ? noteRaw.trim() : null;
+        modalState.attemptPayload = {
+          fulfillmentId: row.fulfillment_id,
+          toStatus: actionDef.to,
+          note: normalizedNote
+        };
+        if (modalState.notesInput) modalState.notesInput.disabled = true;
+      }
+      var payload = modalState.attemptPayload;
+
+      confirmBtn.disabled = true;
+      if (modalState.cancelBtn) modalState.cancelBtn.disabled = true;
+      modalState.inFlight = true;
+      errEl.textContent = '';
+      var originalLabel = confirmBtn.textContent;
+      setText(confirmBtn, 'Procesando…');
+
+      var requestId = modalState.requestId; // mismo id durante todo el intento
+
+      function reenableForRetry() {
+        // La RPC ya resolvió (con error de transporte o error lógico): deja
+        // de estar en vuelo. NO se descarta requestId, NO se cierra el
+        // modal -- el admin decide si reintenta (mismo requestId) o
+        // cancela.
+        modalState.inFlight = false;
+        confirmBtn.disabled = false;
+        if (modalState.cancelBtn) modalState.cancelBtn.disabled = false;
+        setText(confirmBtn, originalLabel);
+      }
+
+      try {
+        var res = await sbClient.rpc('admin_update_store_fulfillment_v2', {
+          p_fulfillment_id: payload.fulfillmentId,
+          p_to_status: payload.toStatus,
+          p_request_id: requestId,
+          p_admin_note: payload.note
+        });
+
+        if (res.error) {
+          if (isTransportError(res.error)) {
+            // Falla de transporte: se permite reintentar con EXACTAMENTE el
+            // mismo requestId -- se re-habilita el mismo botón, sin generar
+            // uno nuevo.
+            console.warn('[admin/fulfillments] fallo de red/transporte', res.error);
+            errEl.textContent = 'Fallo de conexión. Puedes reintentar.';
+          } else {
+            // Error lógico ya recibido correctamente desde la RPC: NO se
+            // reintenta automáticamente. El botón se re-habilita para que
+            // el admin decida (mismo requestId, mismo intento) o cancele.
+            console.warn('[admin/fulfillments] error logico de la RPC', res.error);
+            errEl.textContent = mapError(res.error);
+          }
+          reenableForRetry();
+          return;
+        }
+
+        var data = res.data || {};
+        modalState.inFlight = false; // resuelto con éxito -- ya se puede cerrar normalmente.
+        applyLocalUpdate(payload.fulfillmentId, data, payload.note);
+        showToast('Actualizado a "' + (STATUS_LABELS[data.fulfillment_status] || data.fulfillment_status) + '".', 'success');
+        closeActionModal();
+      } catch (e) {
+        // Excepción real (no debería ocurrir con supabase-js v2, que
+        // captura fallos de transporte internamente, pero se cubre por si
+        // acaso) -- se trata igual que una falla de transporte.
+        console.warn('[admin/fulfillments] excepcion inesperada', e);
+        errEl.textContent = 'Fallo de conexión. Puedes reintentar.';
+        reenableForRetry();
+      }
+    }
+
+    // Parchea localmente la fila afectada con la respuesta de la RPC (sin
+    // volver a llamar admin_list_store_fulfillments_v2 ni recargar la
+    // página) y mantiene los filtros/cursor actuales. Si el nuevo estado es
+    // "fulfilled" y la vista actual no incluye entregados, la fila
+    // desaparece del listado. `note` es la nota YA normalizada (trim,
+    // '' -> null) que se envió en esta misma llamada -- si es null, se
+    // conserva processing_notes anterior, igual que hace el backend
+    // (NULLIF(btrim(p_admin_note),'') + "solo se actualiza si no es NULL").
+    function applyLocalUpdate(fulfillmentId, data, note) {
+      var idx = -1;
+      for (var i = 0; i < state.rows.length; i++) {
+        if (state.rows[i].fulfillment_id === fulfillmentId) { idx = i; break; }
+      }
+      if (idx === -1) return;
+
+      if (data.fulfillment_status === 'fulfilled' && !state.includeFulfilled) {
+        state.rows.splice(idx, 1);
+      } else {
+        state.rows[idx].fulfillment_status = data.fulfillment_status;
+        state.rows[idx].processing_status = data.resulting_processing_status;
+        state.rows[idx].order_status = data.resulting_order_status;
+        if (note !== null) {
+          state.rows[idx].processing_notes = note;
+        }
+      }
+      renderList();
+    }
+
+    // ===================================================================
+    // Filtros: búsqueda (debounced) + toggle de "mostrar entregados".
+    // Cualquier cambio resetea el cursor y recarga desde la primera
+    // página.
+    // ===================================================================
+    var searchDebounceHandle = null;
+    function wireFilters() {
+      document.getElementById('pnlSearch').addEventListener('input', function (e) {
+        var value = e.target.value;
+        clearTimeout(searchDebounceHandle);
+        searchDebounceHandle = setTimeout(function () {
+          state.searchText = value.trim();
+          fetchPage(true);
+        }, 350);
+      });
+
+      document.getElementById('pnlShowFulfilled').addEventListener('change', function (e) {
+        state.includeFulfilled = !!e.target.checked;
+        fetchPage(true);
+      });
+
+      document.getElementById('pnlLoadMore').addEventListener('click', function () {
+        fetchPage(false);
+      });
+    }
+
+    // ===================================================================
+    // Auth / gate -- idéntico patrón a admin/recompensas/index.html.
+    // ===================================================================
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!window.supabase || !window.supabase.createClient) {
+        show('pnlForbidden');
+        document.getElementById('pnlForbidden').querySelector('p').textContent = 'No se pudo cargar el sistema de cuentas (supabase-js).';
+        return;
+      }
+
+      loadScript(window.location.origin + SITE_BASE_BOOTSTRAP + 'js/geoarmy-config.js').then(function () {
+        if (!window.GEOARMY_SUPABASE_URL || window.GEOARMY_SUPABASE_URL.indexOf('TU-PROYECTO') !== -1) {
+          show('pnlForbidden');
+          document.getElementById('pnlForbidden').querySelector('p').textContent = 'Falta configurar Supabase en js/geoarmy-config.js.';
+          return;
+        }
+
+        sbClient = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
+        wireFilters();
+
+        document.getElementById('pnlLoginBtn').addEventListener('click', function () {
+          try {
+            sessionStorage.setItem(
+              RETURN_TO_KEY,
+              window.location.pathname + window.location.hash
+            );
+          } catch (e) {}
+          sbClient.auth.signInWithOAuth({
+            provider: 'twitch',
+            options: { redirectTo: window.location.origin + SITE_BASE_BOOTSTRAP + 'auth/callback/' }
+          });
+        });
+
+        async function checkAccess() {
+          var sessionRes = await sbClient.auth.getSession();
+          var session = sessionRes.data && sessionRes.data.session;
+          if (!session) { show('pnlLoggedOut'); return; }
+
+          // Esta lectura de profiles.role es solo para decidir QUÉ SE
+          // MUESTRA (UX). La protección real está del lado del servidor: si
+          // esta cuenta no es admin, admin_list_store_fulfillments_v2() y
+          // admin_update_store_fulfillment_v2() rechazan la llamada igual,
+          // sin importar lo que haga esta página.
+          var profRes = await sbClient.from('profiles').select('role').eq('id', session.user.id).single();
+          if (profRes.error || !profRes.data || profRes.data.role !== 'admin') {
+            show('pnlForbidden');
+            return;
+          }
+
+          show('pnlPanel');
+          if (!state.rows.length) fetchPage(true);
+        }
+
+        sbClient.auth.onAuthStateChange(function () { checkAccess(); });
+        checkAccess();
+      }).catch(function (e) {
+        console.warn('[admin/fulfillments] no se pudo cargar geoarmy-config.js', e);
+        show('pnlForbidden');
+        document.getElementById('pnlForbidden').querySelector('p').textContent = 'No se pudo cargar la configuración de Supabase.';
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
