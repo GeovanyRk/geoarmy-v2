@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Puntos Geo Army — GeoArmy</title>
+  <meta name="description" content="Ranking de Puntos Geo Army: gana puntos por chatear en el stream siendo suscriptor y canjéalos por G-coins y el Pase de Batalla."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="GeoArmy" class="nav-logo-img"/>
+        GeoArmy
+      </a>
+      <div class="nav-links">
+        <a href="index.html#inicio">Geo Army</a>
+        <a href="tienda.html">Tienda</a>
+        <a href="fortnite.html">Fortnite</a>
+        <a href="index.html#ganadores">Ganadores</a>
+        <a href="puntos.html" style="color:var(--text);">Puntos</a>
+        <a href="alcancia.html">Alcancía</a>
+        <a href="independencia.html">Independencia</a>
+        <a href="index.html#solicitudes">Solicitudes</a>
+      </div>
+      <a href="https://twitch.tv/geovannyrk" target="_blank" class="btn-nav">Ver stream →</a>
+    </div>
+  </nav>
+
+  <section class="section" id="puntos">
+    <style>
+      #puntos .pt-wrap{max-width:940px;margin:0 auto;}
+      #puntos .pt-stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 22px;}
+      #puntos .pt-chip{flex:1;min-width:120px;background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);transition:transform .35s var(--ease),border-color .35s var(--ease);}
+      #puntos .pt-chip:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.18);}
+      #puntos .pt-chip b{font-family:'Space Grotesk',sans-serif;font-size:2rem;line-height:1;display:block;color:#a970ff;}
+      #puntos .pt-chip span{font-size:.7rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.5);}
+      #puntos .pt-rank-card{background:linear-gradient(180deg, rgba(169,112,255,.09), rgba(169,112,255,.03)), var(--bg2);border:1px solid rgba(169,112,255,.25);border-radius:20px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--card-shadow);}
+      #puntos .pt-rank-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;color:#a970ff;margin-bottom:10px;}
+      #puntos .pt-rank-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+      #puntos .pt-rank-row:last-child{border-bottom:0;}
+      #puntos .pt-rank-pos{width:28px;flex-shrink:0;font-size:1.1rem;text-align:center;}
+      #puntos .pt-rank-name{flex:1;font-weight:600;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+      #puntos .pt-rank-total{color:#a970ff;font-family:'Space Grotesk',sans-serif;font-size:.88rem;white-space:nowrap;}
+      #puntos .pt-rank-empty{padding:14px 4px;color:rgba(255,255,255,.5);font-size:.9rem;text-align:center;}
+      #puntos .pt-search{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:12px;font-size:.95rem;font-family:inherit;margin-bottom:14px;}
+      #puntos .pt-search::placeholder{color:rgba(255,255,255,.4);}
+      #puntos .pt-search:focus{outline:2px solid var(--accent-light);outline-offset:1px;}
+      #puntos .pt-card{background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow);}
+      #puntos table{width:100%;border-collapse:collapse;}
+      #puntos thead th{font-family:'Space Grotesk',sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;text-align:left;color:rgba(255,255,255,.45);padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+      #puntos tbody td{padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.05);font-size:.93rem;vertical-align:middle;color:#fff;}
+      #puntos tbody tr:last-child td{border-bottom:0;}
+      #puntos tbody tr:hover{background:rgba(169,112,255,.07);}
+      #puntos .pt-pts{color:#a970ff;font-family:'Space Grotesk',sans-serif;}
+      #puntos .pt-empty{padding:44px 20px;text-align:center;color:rgba(255,255,255,.5);}
+      #puntos .pt-empty b{display:block;color:#fff;font-family:'Space Grotesk',sans-serif;margin-bottom:6px;font-size:1.05rem;}
+      #puntos .pt-foot{margin-top:16px;color:rgba(255,255,255,.4);font-size:.78rem;text-align:right;}
+      #puntos .pt-canje-card{background:linear-gradient(180deg, rgba(255,210,63,.07), rgba(255,210,63,.02)), var(--bg2);border:1px solid rgba(255,210,63,.22);border-radius:20px;padding:22px 24px;margin-top:24px;box-shadow:var(--card-shadow);}
+      #puntos .pt-canje-title{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:#ffd23f;margin-bottom:6px;}
+      #puntos .pt-canje-desc{color:rgba(255,255,255,.6);font-size:.9rem;line-height:1.6;margin-bottom:16px;}
+      #puntos .pt-login-btn{position:relative;overflow:hidden;isolation:isolate;font-family:'Space Grotesk',sans-serif;font-weight:700;border:none;border-radius:var(--radius-sm);padding:12px 24px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),#6c1fe0);transition:transform .35s var(--ease);box-shadow:0 10px 26px -12px rgba(145,71,255,.55);}
+      #puntos .pt-login-btn:hover{transform:translateY(-2px);}
+      #puntos .pt-canje-saldo{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 18px;margin-bottom:16px;}
+      #puntos .pt-canje-saldo-nombre{font-weight:600;color:#fff;font-size:.95rem;}
+      #puntos .pt-canje-saldo-valor{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;color:#a970ff;}
+      #puntos .pt-paquetes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
+      #puntos .pt-paquete{background:var(--bg3);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease);}
+      #puntos .pt-paquete:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.2);box-shadow:0 16px 34px -18px rgba(0,0,0,.5);}
+      #puntos .pt-paquete-img{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+      #puntos .pt-paquete-img img{width:52%;height:52%;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.45));transition:transform .4s var(--ease);}
+      #puntos .pt-paquete:hover .pt-paquete-img img{transform:scale(1.08) rotate(-3deg);}
+      #puntos .pt-paquete-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:5px;flex:1;}
+      #puntos .pt-paquete-tag{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
+      #puntos .pt-paquete-nombre{font-family:'Space Grotesk',sans-serif;font-size:1.04rem;color:#fff;font-weight:600;margin-bottom:2px;}
+      #puntos .pt-paquete-recibe{display:flex;align-items:center;gap:5px;font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:10px;}
+      #puntos .pt-paquete-recibe img{width:15px;height:15px;}
+      #puntos .pt-paquete-precio{font-family:'Space Grotesk',sans-serif;font-weight:700;color:#fff;font-size:1rem;margin-top:auto;margin-bottom:12px;}
+      #puntos .pt-paquete.pt-r-basico .pt-paquete-img{background:radial-gradient(circle at 50% 38%, rgba(169,112,255,.4), rgba(169,112,255,.04) 70%);}
+      #puntos .pt-paquete.pt-r-basico{border-top:3px solid #a970ff;}
+      #puntos .pt-paquete.pt-r-basico .pt-paquete-tag{color:#a970ff;}
+      #puntos .pt-paquete.pt-r-plus .pt-paquete-img{background:radial-gradient(circle at 50% 38%, rgba(70,224,208,.4), rgba(70,224,208,.04) 70%);}
+      #puntos .pt-paquete.pt-r-plus{border-top:3px solid #46e0d0;}
+      #puntos .pt-paquete.pt-r-plus .pt-paquete-tag{color:#46e0d0;}
+      #puntos .pt-paquete.pt-r-elite .pt-paquete-img{background:radial-gradient(circle at 50% 38%, rgba(255,210,63,.4), rgba(255,210,63,.04) 70%);}
+      #puntos .pt-paquete.pt-r-elite{border-top:3px solid #ffd23f;}
+      #puntos .pt-paquete.pt-r-elite .pt-paquete-tag{color:#ffd23f;}
+      #puntos .pt-canjear-btn{width:100%;font-family:'Space Grotesk',sans-serif;font-weight:700;border:none;padding:12px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),#6c1fe0);transition:opacity .2s,filter .2s;}
+      #puntos .pt-canjear-btn:hover:not(:disabled){filter:brightness(1.15);}
+      #puntos .pt-canjear-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--bg2);}
+      #puntos .pt-canje-msg{margin-top:14px;font-size:.85rem;color:rgba(255,255,255,.6);text-align:center;}
+      #puntos .pt-oculto{display:none!important;}
+      @media(max-width:620px){
+        #puntos thead{display:none;}
+        #puntos tbody tr{display:block;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+        #puntos tbody td{display:flex;justify-content:space-between;gap:12px;border:0;padding:8px 16px;}
+        #puntos tbody td::before{content:attr(data-label);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);}
+        #puntos tbody td.pt-user-cell::before{content:"";}
+      }
+    </style>
+    <div class="section-inner">
+      <div class="section-header" data-decor="PUNTOS">
+        <div class="section-tag">Puntos Geo Army</div>
+        <h2>Ranking de Puntos</h2>
+        <p>Los suscriptores ganan puntos automáticamente por chatear en el stream, más un cofre sorpresa cada rato. Se canjean por G-coins y el Pase de Batalla.</p>
+      </div>
+      <div class="pt-wrap" data-reveal>
+        <div class="pt-stats">
+          <div class="pt-chip"><b id="ptTotal">0</b><span>Suscriptores con puntos</span></div>
+          <div class="pt-chip"><b id="ptLider">—</b><span>Líder actual</span></div>
+          <div class="pt-chip"><b id="ptSuma">0</b><span>Puntos ganados en total</span></div>
+        </div>
+        <div class="pt-rank-card">
+          <div class="pt-rank-title">🪙 Top 10</div>
+          <div id="ptRankBody"></div>
+        </div>
+        <input id="ptSearch" class="pt-search" type="search" placeholder="Buscar por usuario…" aria-label="Buscar en el ranking de puntos">
+        <div class="pt-card">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Usuario</th><th>Ganado</th><th>Gastado</th><th>Saldo actual</th></tr>
+            </thead>
+            <tbody id="ptBody"></tbody>
+          </table>
+        </div>
+        <div class="pt-foot" id="ptUpdated">Cargando…</div>
+
+        <div class="pt-canje-card">
+          <div class="pt-canje-title">🎁 Canjea tus puntos por G-coins</div>
+          <p class="pt-canje-desc">10 Puntos Geo Army = 1 G-coin. Inicia sesión con Twitch, elige un paquete y tus G-coins se acreditan al instante en la <a href="tienda.html" style="color:#ffd23f;">Tienda de la Geo Army</a>.</p>
+
+          <button id="pcLoginBtn" class="pt-login-btn">Iniciar sesión con Twitch</button>
+
+          <div id="pcSaldoBox" class="pt-canje-saldo pt-oculto">
+            <div>
+              <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);">Conectado como</div>
+              <div id="pcUsuarioNombre" class="pt-canje-saldo-nombre"></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);">Tus Puntos Geo Army</div>
+              <div class="pt-canje-saldo-valor"><span id="pcSaldoValor">0</span> pts</div>
+            </div>
+          </div>
+
+          <div id="pcPaquetes" class="pt-paquetes pt-oculto"></div>
+          <p id="pcMsg" class="pt-canje-msg"></p>
+        </div>
+      </div>
+    </div>
+    <script>
+    (function(){
+      var DATA = [];
+      function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+      function renderRanking(){
+        var box = document.getElementById('ptRankBody');
+        if(!DATA.length){
+          box.innerHTML = '<div class="pt-rank-empty">Todavía nadie tiene Puntos Geo Army. ¡Sé el primero chateando en el stream! 🪙</div>';
+          return;
+        }
+        var medallas = ['🥇','🥈','🥉'];
+        box.innerHTML = DATA.slice(0,10).map(function(u,i){
+          var medalla = medallas[i] || ((i+1)+'.');
+          return '<div class="pt-rank-row">'+
+            '<span class="pt-rank-pos">'+medalla+'</span>'+
+            '<span class="pt-rank-name">'+esc(u.usuario)+'</span>'+
+            '<span class="pt-rank-total">'+u.saldo.toLocaleString()+' pts</span>'+
+          '</div>';
+        }).join('');
+      }
+      function render(){
+        var q = document.getElementById('ptSearch').value.trim().toLowerCase();
+        var rows = DATA;
+        if(q) rows = rows.filter(function(u){return (u.usuario||'').toLowerCase().indexOf(q)>-1;});
+        var tb = document.getElementById('ptBody');
+        if(!rows.length){
+          tb.innerHTML = '<tr><td colspan="4" class="pt-empty"><b>Sin resultados</b>Nadie con ese nombre todavía.</td></tr>';
+        } else {
+          tb.innerHTML = rows.map(function(u,i){
+            return '<tr>'+
+              '<td data-label="#">'+(i+1)+'</td>'+
+              '<td data-label="Usuario" class="pt-user-cell">'+esc(u.usuario)+'</td>'+
+              '<td data-label="Ganado">'+u.ganado.toLocaleString()+'</td>'+
+              '<td data-label="Gastado">'+u.gastado.toLocaleString()+'</td>'+
+              '<td data-label="Saldo actual" class="pt-pts">'+u.saldo.toLocaleString()+'</td>'+
+            '</tr>';
+          }).join('');
+        }
+        document.getElementById('ptTotal').textContent = DATA.length;
+        document.getElementById('ptLider').textContent = DATA.length ? DATA[0].usuario : '—';
+        document.getElementById('ptSuma').textContent = DATA.reduce(function(a,u){return a+u.ganado;},0).toLocaleString();
+      }
+      function load(){
+        fetch('puntos.json?t='+Date.now(),{cache:'no-store'})
+          .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+          .then(function(j){
+            DATA = Object.keys(j).map(function(k){
+              var u = j[k];
+              var ganado = typeof u.ganado === 'number' ? u.ganado : (u.puntos || 0);
+              var gastado = typeof u.gastado === 'number' ? u.gastado : 0;
+              return { usuario: u.usuario, ganado: ganado, gastado: gastado, saldo: ganado - gastado };
+            }).sort(function(a,b){return b.saldo-a.saldo;});
+            document.getElementById('ptUpdated').textContent =
+              'Actualizado ' + new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+            render();
+            renderRanking();
+          })
+          .catch(function(){
+            DATA = [];
+            document.getElementById('ptUpdated').textContent = 'Vista previa (sin puntos.json todavía)';
+            render();
+            renderRanking();
+          });
+      }
+      document.getElementById('ptSearch').addEventListener('input', render);
+      load();
+      setInterval(load, 30000);
+    })();
+    </script>
+    <script>
+    (function(){
+      // ====== CONFIGURA ESTO ======
+      // API del bot en el VPS (Caddy enruta /api/puntos/* hacia el bot — ver LEEME-canje-puntos.md)
+      var API_BASE = 'https://geoarmy.duckdns.org';
+
+      // Mismo Client ID que usa tienda.html para el login de Twitch
+      var TWITCH_CLIENT_ID = '3spb0xbi38qc8ng1zwcoz5081lp524';
+      var REDIRECT_URI = window.location.origin + window.location.pathname;
+
+      // Debe coincidir con PAQUETES en puntosCanje.js (geoarmy-bot)
+      var PAQUETES = [
+        { puntos: 250, gcoins: 25 },
+        { puntos: 500, gcoins: 50 },
+        { puntos: 1000, gcoins: 100 }
+      ];
+      // ================================
+
+      var loginBtn = document.getElementById('pcLoginBtn');
+      var saldoBox = document.getElementById('pcSaldoBox');
+      var paquetesBox = document.getElementById('pcPaquetes');
+      var msg = document.getElementById('pcMsg');
+
+      var twitchAccessToken = null;
+      var usuario = null;
+      var saldo = 0;
+
+      function authHeaders(){ return { Authorization: 'Bearer ' + twitchAccessToken }; }
+
+      // ---- operación Puntos -> GCOIN pendiente, persistida en sessionStorage ----
+      // El backend solo permite UNA operación pendiente por usuario (por
+      // twitchUserId) -- ver claveOperacionPendiente().
+      function claveOperacionPendiente(twitchUserId){
+        return 'geoarmy-puntos-gcoin-pending:' + twitchUserId;
+      }
+      // Devuelve null si no hay ninguna operación pendiente guardada, el
+      // objeto { clientRequestId, puntos } si la hay, o lanza si
+      // sessionStorage no se puede leer (el caller debe abortar el canje).
+      function leerOperacionPendiente(twitchUserId){
+        var raw = sessionStorage.getItem(claveOperacionPendiente(twitchUserId));
+        return raw ? JSON.parse(raw) : null;
+      }
+      // Lanza si sessionStorage no se puede escribir (el caller debe
+      // abortar el canje antes del fetch).
+      function guardarOperacionPendiente(twitchUserId, datos){
+        sessionStorage.setItem(claveOperacionPendiente(twitchUserId), JSON.stringify(datos));
+      }
+      function borrarOperacionPendiente(twitchUserId){
+        try { sessionStorage.removeItem(claveOperacionPendiente(twitchUserId)); } catch (e) { /* nada que hacer */ }
+      }
+
+      function pedirLogin(){
+        var params = new URLSearchParams({
+          client_id: TWITCH_CLIENT_ID,
+          redirect_uri: REDIRECT_URI,
+          response_type: 'token',
+          scope: ''
+        });
+        window.location.href = 'https://id.twitch.tv/oauth2/authorize?' + params;
+      }
+
+      // Nombres y "rareza" (color de acento) de cada paquete, estilo tienda de
+      // ítems — en el mismo orden que PAQUETES. Si agregas un paquete nuevo,
+      // agrega también su nombre y rareza aquí (si faltan, usa el último).
+      var PAQUETE_NOMBRES = ['Paquete Inicial', 'Paquete Plus', 'Paquete Elite'];
+      var PAQUETE_RAREZAS = ['pt-r-basico', 'pt-r-plus', 'pt-r-elite'];
+
+      function renderPaquetes(){
+        paquetesBox.innerHTML = PAQUETES.map(function(p, i){
+          var puede = saldo >= p.puntos;
+          var rareza = PAQUETE_RAREZAS[i] || PAQUETE_RAREZAS[PAQUETE_RAREZAS.length - 1];
+          var nombre = PAQUETE_NOMBRES[i] || (p.puntos.toLocaleString() + ' pts');
+          return '<div class="pt-paquete ' + rareza + '">' +
+            '<div class="pt-paquete-img"><img src="gcoin-icon.png" alt="G-coins"></div>' +
+            '<div class="pt-paquete-body">' +
+              '<span class="pt-paquete-tag">Canje Geo Army</span>' +
+              '<span class="pt-paquete-nombre">' + nombre + '</span>' +
+              '<span class="pt-paquete-recibe"><img src="gcoin-icon.png" alt="">Recibes ' + p.gcoins + ' G-coins</span>' +
+              '<span class="pt-paquete-precio">🪙 ' + p.puntos.toLocaleString() + ' pts</span>' +
+            '</div>' +
+            '<button class="pt-canjear-btn" data-puntos="' + p.puntos + '" ' + (puede ? '' : 'disabled') + '>' +
+              (puede ? 'Canjear' : 'Puntos insuficientes') +
+            '</button>' +
+          '</div>';
+        }).join('');
+        Array.prototype.forEach.call(paquetesBox.querySelectorAll('button'), function(btn){
+          btn.addEventListener('click', function(){ canjear(parseInt(btn.getAttribute('data-puntos'), 10)); });
+        });
+      }
+
+      function cargarSaldo(){
+        return fetch(API_BASE + '/api/puntos/saldo', { headers: authHeaders() })
+          .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+          .then(function(res){
+            if(!res.ok){ msg.textContent = res.data.error || 'No se pudo cargar tu saldo.'; return; }
+            saldo = res.data.puntos;
+            document.getElementById('pcSaldoValor').textContent = saldo.toLocaleString();
+            paquetesBox.classList.remove('pt-oculto');
+            renderPaquetes();
+          })
+          .catch(function(){ msg.textContent = 'Error de conexión con el bot. Intenta de nuevo.'; });
+      }
+
+      function canjear(puntos){
+        var paquete = PAQUETES.filter(function(p){ return p.puntos === puntos; })[0];
+        if(!paquete) return;
+        if(!confirm('¿Canjear ' + paquete.puntos + ' Puntos Geo Army por ' + paquete.gcoins + ' G-coins?')) return;
+
+        var twitchUserId = usuario && usuario.id;
+        var clientRequestId;
+        try {
+          var pendiente = leerOperacionPendiente(twitchUserId);
+          if(pendiente && pendiente.puntos !== paquete.puntos){
+            // Ya hay una operación pendiente de OTRO paquete -- no se crea
+            // otro UUID ni se llama al backend hasta que esa se resuelva.
+            msg.textContent = 'Tienes un canje pendiente de otro paquete (' + pendiente.puntos.toLocaleString() + ' pts). Espera a que termine o reinténtalo antes de iniciar uno nuevo.';
+            return;
+          }
+          if(pendiente && pendiente.puntos === paquete.puntos){
+            // Mismo paquete pendiente -- se reutiliza EXACTAMENTE el mismo UUID.
+            clientRequestId = pendiente.clientRequestId;
+          } else {
+            // Canje nuevo -- se genera y se guarda ANTES del fetch.
+            clientRequestId = crypto.randomUUID();
+            guardarOperacionPendiente(twitchUserId, { clientRequestId: clientRequestId, puntos: paquete.puntos });
+          }
+        } catch (e) {
+          // sessionStorage no se pudo leer o guardar -- se aborta el canje
+          // antes del fetch, nunca se llama al backend sin poder persistir
+          // el clientRequestId.
+          msg.textContent = 'No se puede iniciar un canje seguro en este navegador. Recarga la página e intenta de nuevo.';
+          return;
+        }
+
+        msg.textContent = 'Procesando…';
+        fetch(API_BASE + '/api/puntos/canjear-gcoins', {
+          method: 'POST',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+          body: JSON.stringify({ puntos: paquete.puntos, clientRequestId: clientRequestId })
+        })
+          .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+          .then(function(res){
+            if(!res.ok){
+              // Cualquier error (red, 400 de puntos insuficientes, 409 en
+              // proceso, 500/502/503/504, etc.) CONSERVA la operación
+              // pendiente -- la prioridad es no perder el UUID de una
+              // operación que pueda necesitar recovery. Solo se borra tras
+              // un 200 exitoso, más abajo.
+              msg.textContent = res.data.error || 'No se pudo canjear.';
+              return;
+            }
+            borrarOperacionPendiente(twitchUserId);
+            saldo = res.data.puntosRestantes;
+            document.getElementById('pcSaldoValor').textContent = saldo.toLocaleString();
+            renderPaquetes();
+            msg.textContent = '¡Listo! Se acreditaron ' + res.data.gcoinsAcreditados + ' G-coins en tu cuenta. Ve a la Tienda para gastarlos.';
+          })
+          .catch(function(){
+            // Error de red: no sabemos si el backend llegó a procesar el
+            // canje -- se conserva la operación pendiente para un reintento
+            // seguro.
+            msg.textContent = 'Error de conexión con el bot. Intenta de nuevo.';
+          });
+      }
+
+      function init(){
+        loginBtn.addEventListener('click', pedirLogin);
+
+        var hash = new URLSearchParams(window.location.hash.replace('#', '?'));
+        var accessToken = hash.get('access_token');
+        if(accessToken){
+          // Página independiente: al terminar el login solo limpiamos el hash,
+          // no hace falta el truco de "#puntos" que se usaba en index.html
+          // para el sistema de paneles.
+          history.replaceState(null, '', window.location.pathname);
+          twitchAccessToken = accessToken;
+
+          fetch('https://api.twitch.tv/helix/users', {
+            headers: { 'Client-ID': TWITCH_CLIENT_ID, Authorization: 'Bearer ' + accessToken }
+          })
+            .then(function(r){ return r.json(); })
+            .then(function(data){
+              var u = data.data && data.data[0];
+              if(!u) return;
+              usuario = { id: u.id, login: u.login, display_name: u.display_name };
+              loginBtn.classList.add('pt-oculto');
+              saldoBox.classList.remove('pt-oculto');
+              document.getElementById('pcUsuarioNombre').textContent = usuario.display_name;
+              cargarSaldo();
+            });
+        }
+      }
+
+      init();
+    })();
+    </script>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="js/premium.js"></script>
+</body>
+</html>
