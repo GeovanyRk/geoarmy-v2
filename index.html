@@ -52,6 +52,7 @@
     <!-- Nav real oculto: mantiene vivo el sistema de paneles / tabs de móvil, no se ve en pantalla -->
     <div class="nav-links" aria-hidden="true">
       <a href="#inicio">Geo Army</a>
+      <a href="#comunidad">Comunidad</a>
       <a href="tienda.html">Tienda</a>
       <a href="fortnite.html">Fortnite</a>
       <a href="#ganadores">Ganadores</a>
@@ -153,6 +154,16 @@
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
+          <!-- Comunidad: la única forma de llegar al panel #comunidad es este
+               pin (igual que Ganadores/Solicitudes) -- posición elegida por
+               brillo real de la imagen (zona de tierra, sin overlap con el
+               texto "GEO ARMY" ni con los demás pins). -->
+          <a href="#comunidad" style="--mx:78%; --my:39%;">
+            <span class="v3-marker-label">Comunidad</span>
+            <span class="v3-marker-icon">💬</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
         </div>
         </div>
 
@@ -180,7 +191,15 @@
       </div>
 
       <div class="v3-world-hint">‹ Desliza para explorar ›</div>
+    </section>
 
+    <!-- COMUNIDAD: antes vivía dentro de #inicio (debajo del selector de
+         mundos); movido a su propia pestaña/panel para que la página
+         principal sea solo el hero/selector de mundos. Mismo contenido,
+         mismos IDs, mismos scripts -- no se tocó ninguna lógica, solo se
+         relocalizó el HTML dentro de .v3-page para conservar el fondo de
+         estrellas/nebulosas. -->
+    <section class="section panel" id="comunidad">
       <div class="v3-howworks">
         <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
         <div class="v3-orbit-row">

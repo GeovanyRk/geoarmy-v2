@@ -6,8 +6,11 @@
   <title>Puntos Geo Army — GeoArmy</title>
   <meta name="description" content="Ranking de Puntos Geo Army: gana puntos por chatear en el stream siendo suscriptor y canjéalos por G-coins y el Pase de Batalla."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
+  <!-- Tema V2 (espacial/holográfico) — mismo archivo compartido que usa
+       index.html, solo para el shell visual (nav/fondo). No se tocó. -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -20,26 +23,29 @@
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo">
-        <img src="logo.png" alt="GeoArmy" class="nav-logo-img"/>
-        GeoArmy
-      </a>
-      <div class="nav-links">
-        <a href="index.html#inicio">Geo Army</a>
-        <a href="tienda.html">Tienda</a>
-        <a href="fortnite.html">Fortnite</a>
-        <a href="index.html#ganadores">Ganadores</a>
-        <a href="puntos.html" style="color:var(--text);">Puntos</a>
-        <a href="alcancia.html">Alcancía</a>
-        <a href="independencia.html">Independencia</a>
-        <a href="index.html#solicitudes">Solicitudes</a>
+  <!-- Shell visual V2: mismo fondo espacial/nebulosas/nav que index.html.
+       Envuelve solo el nav (banda corta) -- el contenido de #puntos no se
+       movió ni un pixel, sigue exactamente igual, solo cambia lo que hay
+       arriba de él. No se tocó ningún endpoint, fetch, login, ranking,
+       clientRequestId ni lógica de Puntos -> GCOIN. -->
+  <div class="v3-page" style="min-height:220px;">
+    <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-auth">
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
+        </div>
       </div>
-      <a href="https://twitch.tv/geovannyrk" target="_blank" class="btn-nav">Ver stream →</a>
-    </div>
-  </nav>
+    </nav>
+  </div>
 
   <section class="section" id="puntos">
     <style>

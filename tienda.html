@@ -6,8 +6,11 @@
   <title>Tienda de G-coins — GeoArmy</title>
   <meta name="description" content="Canjea tus G-coins de la Geo Army por recompensas del canal."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
+  <!-- Tema V2 (espacial/holográfico) — mismo archivo compartido que usa
+       index.html, solo para el shell visual (nav/fondo). No se tocó. -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
   <script>
@@ -19,7 +22,7 @@
 
   <style>
     /* ===== Tienda de G-coins — estilos con prefijo ti- para no chocar con style.css ===== */
-    .ti-hero { position: relative; padding: 4.5rem 1.5rem 1.5rem; text-align: center; overflow: hidden; isolation: isolate; }
+    .ti-hero { position: relative; z-index: 2; padding: 4.5rem 1.5rem 1.5rem; text-align: center; overflow: hidden; isolation: isolate; }
     .ti-hero::before {
       content: ""; position: absolute; inset: -20% -10% auto -10%; height: 130%; z-index: -1;
       background:
@@ -197,26 +200,29 @@
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo">
-        <img src="logo.png" alt="GeoArmy" class="nav-logo-img"/>
-        GeoArmy
-      </a>
-      <div class="nav-links">
-        <a href="index.html#inicio">Geo Army</a>
-        <a href="tienda.html" style="color:var(--text);">Tienda</a>
-        <a href="fortnite.html">Fortnite</a>
-        <a href="index.html#ganadores">Ganadores</a>
-        <a href="puntos.html">Puntos</a>
-        <a href="alcancia.html">Alcancía</a>
-        <a href="independencia.html">Independencia</a>
-        <a href="index.html#solicitudes">Solicitudes</a>
+  <!-- Shell visual V2: mismo fondo espacial/nebulosas/nav que index.html.
+       Envuelve solo nav + hero (igual que en index.html las secciones de
+       abajo -Ganadores/Solicitudes- quedan fuera de .v3-page). No se tocó
+       ningún endpoint, fetch, login ni lógica de catálogo/canje. -->
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-auth">
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
+        </div>
       </div>
-      <a href="https://twitch.tv/geovannyrk" target="_blank" class="btn-nav">Ver stream →</a>
-    </div>
-  </nav>
+    </nav>
 
   <!-- HERO TIENDA -->
   <section class="ti-hero">
@@ -240,6 +246,7 @@
       <p id="tiUsuarioTag" class="ti-usuario-tag ti-oculto">Conectado como <strong id="tiUsuarioNombre"></strong></p>
     </div>
   </section>
+  </div>
 
   <div class="ti-filtros">
     <button class="ti-filtro-btn active" data-cat="todos">Todos</button>
