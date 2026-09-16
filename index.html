@@ -95,13 +95,13 @@
              para caer sobre zonas oscuras del planeta, con buen espacio
              entre pins y respecto al logo. Ya no son un octágono perfecto. -->
         <div class="v3-planet-nav" id="v3PlanetNav">
-          <a href="#ganadores" style="--mx:52%; --my:28%;">
+          <a href="#ganadores" style="--mx:33.9%; --my:26.7%;">
             <span class="v3-marker-label">Ganadores</span>
             <span class="v3-marker-icon">👑</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="ranking.html" style="--mx:72%; --my:29%;">
+          <a href="ranking.html" style="--mx:65.6%; --my:32.8%;">
             <span class="v3-marker-label">Ranking</span>
             <span class="v3-marker-icon">🏆</span>
             <span class="v3-marker-stem"></span>
@@ -113,25 +113,25 @@
                continentes claros). En 80%/56% el badge todavía rozaba la
                "Y" de ARMY. Bajado a 60% para quedar debajo de esa franja
                con margen, sobre una zona oscura confirmada (~66 de brillo). -->
-          <a href="fortnite.html" style="--mx:80%; --my:60%;">
+          <a href="fortnite.html" style="--mx:56.1%; --my:63.3%;">
             <span class="v3-marker-label">Fortnite</span>
             <span class="v3-marker-icon v3-marker-fn">F</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="puntos.html" style="--mx:74%; --my:68%;">
+          <a href="puntos.html" style="--mx:70.6%; --my:66.6%;">
             <span class="v3-marker-label">Puntos</span>
             <span class="v3-marker-icon">⭐</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="alcancia.html" style="--mx:50%; --my:70%;">
+          <a href="alcancia.html" style="--mx:34.5%; --my:76.7%;">
             <span class="v3-marker-label">Alcancía</span>
             <span class="v3-marker-icon">🐷</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="#solicitudes" style="--mx:28%; --my:64%;">
+          <a href="#solicitudes" style="--mx:21.4%; --my:65.0%;">
             <span class="v3-marker-label">Solicitudes</span>
             <span class="v3-marker-icon">📋</span>
             <span class="v3-marker-stem"></span>
@@ -140,7 +140,7 @@
           <!-- Tienda también rozaba el borde superior de la misma franja de
                texto "GEO ARMY" (letras G/E) en 41%. Subido a 37% para
                despejarla. -->
-          <a href="tienda.html" style="--mx:24%; --my:37%;">
+          <a href="tienda.html" style="--mx:46.4%; --my:42.6%;">
             <span class="v3-marker-label">Tienda</span>
             <span class="v3-marker-icon">🛒</span>
             <span class="v3-marker-stem"></span>
@@ -148,7 +148,7 @@
           </a>
           <!-- Misiones: página en producción, la RPC my_missions_status()
                ya está activa -- el pin navega a misiones.html. -->
-          <a href="misiones.html" style="--mx:27%; --my:29%;">
+          <a href="misiones.html" style="--mx:27.5%; --my:37.3%;">
             <span class="v3-marker-label">Misiones</span>
             <span class="v3-marker-icon">🎯</span>
             <span class="v3-marker-stem"></span>
@@ -158,8 +158,8 @@
                pin (igual que Ganadores/Solicitudes) -- posición elegida por
                brillo real de la imagen (zona de tierra, sin overlap con el
                texto "GEO ARMY" ni con los demás pins). -->
-          <a href="#comunidad" style="--mx:78%; --my:39%;">
-            <span class="v3-marker-label">Comunidad</span>
+          <a href="#comunidad" style="--mx:75.0%; --my:45.5%;">
+            <span class="v3-marker-label v3-marker-label-community"><span>¿Eres nuevo?</span><strong>Entra acá</strong></span>
             <span class="v3-marker-icon">💬</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
@@ -175,10 +175,30 @@
         </div>
         </div>
 
-        <!-- Mundo 02: bloqueado, próximo evento (decorativo por ahora) -->
+        <!-- Mundo 02: Halloween, bloqueado hasta el 1 de octubre 2026
+             (America/New_York). Overlay/candado/texto/countdown son HTML+CSS
+             reales (no quemados en la imagen) -- ver css/v3-theme.css
+             (clases v3-wl-*) y el script "v3-wl-countdown" al final del
+             body. No se tocó Mundo 01, Mundo 03, pines, fondo ni backend. -->
         <div class="v3-world-slide v3-world-slide-02">
-        <div class="v3-world-locked" data-reveal>
-          <img src="world-02.jpg" alt="Mundo 02 — Próximamente" class="v3-world-planet-img" loading="lazy"/>
+        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T00:00:00-04:00" id="wlHalloween">
+          <div class="v3-wl-orb">
+            <img src="world-02-halloween-v2.png" alt="Mundo 02 — Halloween" class="v3-world-planet-img v3-wl-img" loading="lazy"/>
+            <span class="v3-wl-tint" aria-hidden="true"></span>
+            <span class="v3-wl-lockbadge" aria-hidden="true">🔒</span>
+          </div>
+          <div class="v3-wl-eyebrow">Mundo 02</div>
+          <div class="v3-wl-title">Halloween</div>
+          <div class="v3-wl-sub">Se desbloquea el 1 de octubre</div>
+          <div class="v3-wl-countdown" id="wlHalloweenCountdown" aria-live="polite">
+            <span class="v3-wl-seg"><b id="wlD">--</b><i>D</i></span>
+            <span class="v3-wl-colon">:</span>
+            <span class="v3-wl-seg"><b id="wlH">--</b><i>H</i></span>
+            <span class="v3-wl-colon">:</span>
+            <span class="v3-wl-seg"><b id="wlM">--</b><i>M</i></span>
+            <span class="v3-wl-colon">:</span>
+            <span class="v3-wl-seg"><b id="wlS">--</b><i>S</i></span>
+          </div>
         </div>
         </div>
 
@@ -200,6 +220,11 @@
          relocalizó el HTML dentro de .v3-page para conservar el fondo de
          estrellas/nebulosas. -->
     <section class="section panel" id="comunidad">
+      <div class="v3-community-intro" data-reveal>
+        <div class="v3-tagline">EL CUARTEL GENERAL DE LA COMUNIDAD</div>
+        <p class="v3-sub">Un punto de encuentro para gamers. Compite, gana premios y forma parte de la comunidad.</p>
+      </div>
+
       <div class="v3-howworks">
         <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
         <div class="v3-orbit-row">
@@ -217,9 +242,6 @@
           </div>
         </div>
       </div>
-
-      <div class="v3-tagline">EL CUARTEL GENERAL DE LA COMUNIDAD</div>
-      <p class="v3-sub">Un punto de encuentro para gamers. Compite, gana premios y forma parte de la comunidad.</p>
 
       <div class="v3-live-pill" id="live-badge">
         <span class="live-dot"></span>
@@ -741,6 +763,53 @@
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
+  <script>
+  // ===== V3: countdown real de Mundo 02 (Halloween) hasta el 1 de octubre,
+  // calculado en el navegador contra la fecha ISO en data-unlock-iso (ya
+  // trae el offset -04:00 de America/New_York, así que Date.now() -- que es
+  // UTC -- se compara correctamente sin importar la zona horaria del
+  // visitante). Envuelto en try/catch, no toca nada más de la página. =====
+  (function () {
+    try {
+      var wrap = document.getElementById('wlHalloween');
+      if (!wrap) return;
+      var unlockAt = new Date(wrap.getAttribute('data-unlock-iso')).getTime();
+      if (isNaN(unlockAt)) return;
+
+      var box = document.getElementById('wlHalloweenCountdown');
+      var dEl = document.getElementById('wlD');
+      var hEl = document.getElementById('wlH');
+      var mEl = document.getElementById('wlM');
+      var sEl = document.getElementById('wlS');
+
+      function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+      var timer = null;
+      function tick() {
+        var diff = unlockAt - Date.now();
+        if (diff <= 0) {
+          if (box) box.innerHTML = '<span class="v3-wl-available">¡Disponible!</span>';
+          // Preparado: agregar esta clase es lo único que hace falta para
+          // que el CSS (ver .v3-wl-halloween.is-unlocked en v3-theme.css)
+          // quite visualmente el tinte oscuro y el candado.
+          wrap.classList.add('is-unlocked');
+          if (timer) clearInterval(timer);
+          return;
+        }
+        var s = Math.floor(diff / 1000);
+        var d = Math.floor(s / 86400); s -= d * 86400;
+        var h = Math.floor(s / 3600); s -= h * 3600;
+        var m = Math.floor(s / 60); s -= m * 60;
+        if (dEl) dEl.textContent = pad(d);
+        if (hEl) hEl.textContent = pad(h);
+        if (mEl) mEl.textContent = pad(m);
+        if (sEl) sEl.textContent = pad(s);
+      }
+      tick();
+      timer = setInterval(tick, 1000);
+    } catch (e) { console.warn('[v3-wl-countdown]', e); }
+  })();
+  </script>
   <script>
   // ===== V3: conecta los marcadores del planeta con el sistema de paneles =====
   // (el nav real .nav-links está oculto y sigue funcionando para móvil/JS;
