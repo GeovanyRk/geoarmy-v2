@@ -57,7 +57,7 @@
       <a href="fortnite.html">Fortnite</a>
       <a href="#ganadores">Ganadores</a>
       <a href="puntos.html">Puntos</a>
-      <a href="alcancia.html">Alcancía</a>
+      <a href="alcancia.html" aria-disabled="true">Alcancía (Próximamente)</a>
       <a href="#solicitudes">Solicitudes</a>
     </div>
 
@@ -125,9 +125,18 @@
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="alcancia.html" style="--mx:34.5%; --my:76.7%;">
-            <span class="v3-marker-label">Alcancía</span>
-            <span class="v3-marker-icon">🐷</span>
+          <!-- Alcancía: función pospuesta para más adelante. El pin se
+               conserva visible, en su misma posición/icono, pero queda
+               bloqueado (aria-disabled + preventDefault en el script de más
+               abajo, sin popup/alert) y muestra "Próximamente" bajo el
+               nombre. No se toca alcancia.html ni su backend, solo deja de
+               ser accesible desde la navegación. -->
+          <a href="alcancia.html" style="--mx:34.5%; --my:76.7%;" aria-disabled="true">
+            <span class="v3-marker-label v3-marker-label-soon">
+              <span class="v3-marker-soon-name">Alcancía</span>
+              <span class="v3-marker-soon-tag">Próximamente</span>
+            </span>
+            <span class="v3-marker-icon v3-marker-icon-soon">🐷</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
@@ -742,6 +751,23 @@
         });
       });
     } catch (e) { console.warn('[v3-planet-nav]', e); }
+  })();
+  </script>
+  <script>
+  // ===== V3: Alcancía pospuesta -- pin/enlace visible pero no navegable =====
+  // Cubre el pin del planeta Y el link oculto de .nav-links (y su clon en la
+  // tira de tabs de móvil, que hereda aria-disabled al clonarse). Sin popup,
+  // sin alert: simplemente no navega. No toca alcancia.html ni su backend.
+  (function () {
+    try {
+      var soonLinks = document.querySelectorAll('a[aria-disabled="true"]');
+      soonLinks.forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); });
+        a.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
+        });
+      });
+    } catch (e) { console.warn('[v3-soon-links]', e); }
   })();
   </script>
 </body>

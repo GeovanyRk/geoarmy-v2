@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ranking Geo Army — GeoArmy</title>
-  <meta name="description" content="Ranking oficial de la comunidad Geo Army: compite, sube de rango y llega al #1."/>
+  <meta name="description" content="Ranking oficial de la comunidad Geo Army: tu rango, tu XP, tu posición y el leaderboard global."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
@@ -21,6 +21,213 @@
   <script src="js/geoarmy-config.js"></script>
   <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
+
+  <style>
+  /* =====================================================================
+     RANKING GEO ARMY — página de progresión competitiva. Prefijo rk- para
+     no chocar con nada de v3-theme.css ni de otras páginas (mismo criterio
+     que comunidad.html: solo se reutiliza el "shell" compartido .v3-page/
+     .v3-stars/.v3-nav/.v3-page-links/.v3-auth/.v3-sr-only). Todos los
+     números que se ven acá vienen tal cual de my_rank_summary()/
+     xp_leaderboard — nada se recalcula en el cliente.
+     ===================================================================== */
+
+  /* ---------- HERO ---------- */
+  .rk-hero { position: relative; isolation: isolate; overflow: hidden; padding: 88px 1.5rem 18px; text-align: center; }
+  /* Si no hay sesión, la ficha "Tu rango actual" (#rkMyRank) y el bloque de
+     progreso quedan hidden (display:none, ver atributo HTML) y no ocupan
+     espacio -- pero heredaban igual el padding-bottom pensado para cuando SÍ
+     se ven, dejando un hueco vacío grande antes de "Ruta de rangos". Con
+     :has() (soportado en los navegadores actuales) el hero se acorta solo
+     cuando esa ficha está oculta, sin JS y sin duplicar el hero. */
+  .rk-hero:has(#rkMyRank[hidden]) { padding-bottom: 6px; }
+  .rk-hero::before {
+    content: ""; position: absolute; inset: -20% -10% auto -10%; height: 140%; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(34% 42% at 25% 15%, rgba(58,160,255,.13), transparent 65%),
+      radial-gradient(32% 40% at 78% 30%, rgba(145,71,255,.16), transparent 65%);
+    filter: blur(18px);
+  }
+  .rk-hero-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .rk-hero-grid {
+    position: absolute; inset: -10%;
+    background-image:
+      linear-gradient(rgba(150,190,255,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(150,190,255,.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(55% 55% at 50% 22%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(55% 55% at 50% 22%, #000 0%, transparent 78%);
+  }
+  .rk-eyebrow { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: .32em; text-transform: uppercase; color: #ffd23f; text-shadow: 0 0 16px rgba(255,210,63,.4); margin-bottom: 14px; }
+  .rk-title {
+    font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: .02em; line-height: 1.03;
+    font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 0 0 12px;
+    background: linear-gradient(120deg, #eaf4ff 10%, #9fc9ff 45%, #c9a3ff 90%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 24px rgba(120,170,255,.25));
+  }
+  .rk-sub { font-size: 15.5px; color: var(--text2); max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+
+  /* Ficha "Tu rango actual" */
+  .rk-mycard {
+    position: relative; max-width: 340px; margin: 0 auto; padding: 26px 24px 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+    border: 1px solid rgba(150,190,255,.22);
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    box-shadow: 0 30px 60px -30px rgba(58,160,255,.35);
+  }
+  .rk-mycard-label { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--text2); margin-bottom: 14px; }
+  .rk-mycard-badge { width: 84px; height: 84px; object-fit: contain; margin: 0 auto 10px; display: block; filter: drop-shadow(0 0 22px rgba(150,190,255,.5)); }
+  .rk-mycard-name { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: clamp(1.3rem, 3.4vw, 1.7rem); color: #eaf2ff; text-shadow: 0 0 20px rgba(150,190,255,.35); }
+  .rk-mycard-xp { font-size: 14px; color: #ffd23f; font-weight: 700; margin-top: 4px; }
+  .rk-mycard-pos {
+    display: inline-block; margin-top: 14px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11.5px;
+    letter-spacing: .08em; text-transform: uppercase; color: #04101f; background: linear-gradient(135deg, #ffe89a, #ffd23f);
+    padding: 7px 18px; border-radius: 100px;
+  }
+
+  @media (max-width: 700px) { .rk-hero { padding: 66px 1.2rem 32px; } }
+
+  /* ---------- SECTION TITLE (compartido) ---------- */
+  .rk-section-title {
+    display: flex; align-items: center; gap: 16px; justify-content: center;
+    font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: .26em;
+    text-transform: uppercase; color: var(--text2); max-width: 900px; margin: 0 auto 28px;
+  }
+  .rk-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent); }
+
+  /* ---------- PROGRESO ---------- */
+  .rk-progress-section { position: relative; z-index: 2; padding: 40px 1.5rem 10px; }
+  .rk-progress-card {
+    max-width: 640px; margin: 0 auto; padding: 24px 26px;
+    background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.01));
+    border: 1px solid rgba(255,255,255,.09);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  }
+  .rk-progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .rk-progress-row span:first-child { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; color: #eaf2ff; }
+  .rk-progress-row span:last-child { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; color: #00d4ff; text-shadow: 0 0 14px rgba(0,212,255,.5); }
+  .rk-bar-bg { position: relative; height: 12px; border-radius: 100px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); overflow: hidden; }
+  .rk-bar-fill {
+    height: 100%; border-radius: 100px; width: 0%;
+    background: linear-gradient(90deg, #3aa0ff, #9147ff, #00d4ff);
+    background-size: 200% 100%; animation: rkBarShine 3s linear infinite;
+    box-shadow: 0 0 14px rgba(120,190,255,.6); transition: width .6s var(--ease);
+  }
+  @keyframes rkBarShine { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+  @media (prefers-reduced-motion: reduce) { .rk-bar-fill { animation: none; } }
+  .rk-progress-note { margin: 10px 0 0; font-size: 12.5px; color: var(--text2); }
+  .rk-next-row { display: flex; align-items: center; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); flex-wrap: wrap; }
+  .rk-next-label { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--text2); }
+  .rk-next-badge { width: 30px; height: 30px; object-fit: contain; }
+  .rk-next-row #rkNextName { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: #eaf2ff; }
+  .rk-next-xp { font-size: 12px; color: #ffd23f; margin-left: 4px; }
+  .rk-max-block { text-align: center; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 15px; color: #ffd23f; text-shadow: 0 0 16px rgba(255,210,63,.5); padding: 6px 0; }
+
+  /* ---------- RUTA DE RANGOS ---------- */
+  .rk-ladder-section { position: relative; z-index: 2; padding: 26px 1.5rem 10px; }
+  .rk-ladder-row { display: flex; gap: 10px; overflow-x: auto; max-width: 1100px; margin: 0 auto; padding: 6px 2px 14px; scrollbar-width: thin; }
+  .rk-ladder-row::-webkit-scrollbar { height: 6px; }
+  .rk-ladder-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 100px; }
+  .rk-ladder-step {
+    flex: 0 0 auto; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 14px 8px; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px; opacity: .45; transition: opacity .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .rk-ladder-badge { width: 40px; height: 40px; object-fit: contain; }
+  .rk-ladder-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10px; letter-spacing: .03em; text-transform: uppercase; color: #eaf2ff; text-align: center; line-height: 1.25; }
+  .rk-ladder-step.is-done { opacity: .75; border-color: rgba(0,200,83,.3); }
+  .rk-ladder-step.is-future { opacity: .4; }
+  .rk-ladder-step.is-current {
+    opacity: 1; transform: translateY(-4px) scale(1.05); border-color: rgba(255,210,63,.6);
+    background: linear-gradient(180deg, rgba(255,210,63,.12), rgba(255,210,63,.03));
+    box-shadow: 0 10px 26px -12px rgba(255,210,63,.55);
+  }
+  .rk-ladder-step.is-current .rk-ladder-name { color: #ffd23f; }
+
+  /* ---------- LEADERBOARD ---------- */
+  .rk-board-section { position: relative; z-index: 2; padding: 46px 1.5rem 60px; }
+  .rk-top3-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 900px; margin: 0 auto 20px; }
+  .rk-top-card {
+    position: relative; text-align: center; padding: 26px 14px 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.01));
+    border: 1px solid rgba(255,255,255,.1);
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  }
+  .rk-top-1 { order: 2; padding-top: 34px; border-color: rgba(255,210,63,.4); box-shadow: 0 20px 50px -22px rgba(255,210,63,.55); transform: translateY(-10px); }
+  .rk-top-2 { order: 1; border-color: rgba(200,210,230,.3); }
+  .rk-top-3 { order: 3; border-color: rgba(224,160,106,.32); }
+  .rk-top-medal { font-size: 28px; margin-bottom: 6px; }
+  .rk-top-1 .rk-top-medal { font-size: 36px; }
+  .rk-top-avawrap { position: relative; width: 64px; height: 64px; margin: 0 auto 8px; }
+  .rk-top-1 .rk-top-avawrap { width: 78px; height: 78px; }
+  .rk-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.2); display: block; }
+  .rk-avatar-fallback { display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 35% 30%, #1d2b52, #0a1122); font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 22px; color: #c9d6ec; }
+  .rk-flag { position: absolute; right: -2px; bottom: -2px; width: 22px; height: 16px; border-radius: 3px; box-shadow: 0 0 0 2px #0a0f1a; }
+  .rk-badge-ic { width: 30px; height: 30px; object-fit: contain; margin: 0 auto 4px; display: block; }
+  .rk-top-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; color: #eaf2ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-top-rankname { font-size: 11.5px; color: var(--text2); margin-top: 2px; }
+  .rk-top-xp { margin-top: 8px; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; color: #ffd23f; }
+
+  .rk-list-card {
+    max-width: 900px; margin: 0 auto;
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008));
+    border: 1px solid rgba(255,255,255,.08); border-radius: 16px; overflow: hidden;
+  }
+  .rk-row { display: flex; align-items: center; gap: 12px; padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,.05); transition: background .2s; }
+  .rk-row:last-child { border-bottom: 0; }
+  .rk-row:hover { background: rgba(150,190,255,.05); }
+  .rk-row-pos { width: 40px; flex-shrink: 0; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: var(--text2); }
+  .rk-row .rk-avatar { width: 34px; height: 34px; }
+  .rk-row .rk-avatar-fallback { font-size: 14px; }
+  .rk-row .rk-flag { width: 17px; height: 12px; }
+  .rk-row .rk-badge-ic { width: 22px; height: 22px; margin: 0; }
+  .rk-row-id { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .rk-row-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: #eaf2ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-row-rankname { font-size: 11px; color: var(--text2); }
+  .rk-row-xp { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13px; color: #ffd23f; flex-shrink: 0; }
+
+  .rk-loading, .rk-empty { text-align: center; padding: 50px 20px; color: var(--text2); }
+  .rk-empty-ic { font-size: 32px; margin-bottom: 10px; }
+  .rk-empty-title { font-family: 'Orbitron', sans-serif; font-weight: 700; color: #eaf2ff; margin-bottom: 6px; }
+  .rk-empty-sub { font-size: 13px; }
+
+  /* Tu posición */
+  .rk-mypos {
+    max-width: 900px; margin: 20px auto 0; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 16px 22px; background: linear-gradient(90deg, rgba(58,160,255,.1), rgba(145,71,255,.08));
+    border: 1px solid rgba(120,190,255,.3); border-radius: 100px;
+  }
+  .rk-mypos-label { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: #9fc9ff; }
+  .rk-mypos-pos { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 22px; color: #fff; }
+  .rk-mypos-id { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .rk-mypos-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13.5px; color: #eaf2ff; }
+  .rk-mypos-rank { font-size: 11.5px; color: var(--text2); }
+  .rk-mypos-xp { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; color: #ffd23f; white-space: nowrap; }
+
+  @media (max-width: 700px) {
+    .rk-top3-row { grid-template-columns: 1fr; max-width: 340px; }
+    .rk-top-1, .rk-top-2, .rk-top-3 { order: initial; transform: none; }
+    .rk-mypos { border-radius: 16px; justify-content: center; text-align: center; }
+  }
+
+  /* ---------- MISIONES CTA ---------- */
+  .rk-missions-cta {
+    position: relative; z-index: 2; max-width: 700px; margin: 0 auto 70px; padding: 30px 28px; text-align: center;
+    background: linear-gradient(180deg, rgba(255,210,63,.07), rgba(255,210,63,.015));
+    border: 1px solid rgba(255,210,63,.25);
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+  .rk-missions-title { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.2rem; color: #eaf2ff; margin-bottom: 8px; }
+  .rk-missions-sub { color: var(--text2); font-size: 14px; margin-bottom: 18px; }
+  .rk-missions-btn {
+    display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px;
+    color: #04101f; background: linear-gradient(135deg, #ffe89a, #ffd23f); padding: 12px 26px;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition: transform .3s var(--ease); text-decoration: none;
+  }
+  .rk-missions-btn:hover { transform: translateY(-3px); }
+  </style>
 </head>
 <body>
 
@@ -41,7 +248,6 @@
           <a href="tienda.html">Tienda</a>
           <a href="fortnite.html">Fortnite</a>
           <a href="puntos.html">Puntos</a>
-          <a href="alcancia.html">Alcancía</a>
         </div>
         <div class="v3-auth">
           <div id="geoAccountWidget"></div>
@@ -50,20 +256,83 @@
     </nav>
 
     <!-- HERO -->
-    <section class="v3-page-hero">
-      <div class="v3-tagline" style="letter-spacing:.28em;">RANKING</div>
-      <h1 class="v3-page-title">Ranking Geo Army</h1>
-      <p class="v3-page-sub">Compite. Sube de rango. Llega al #1.</p>
+    <section class="rk-hero" data-reveal>
+      <div class="rk-hero-bg" aria-hidden="true"><div class="rk-hero-grid"></div></div>
+      <div class="rk-eyebrow">Sistema competitivo</div>
+      <h1 class="rk-title">RANKING GEO ARMY</h1>
+      <p class="rk-sub">Compite, gana XP y sube de rango dentro de la comunidad.</p>
+
+      <!-- Ficha "Tu rango actual" — solo si hay sesión iniciada. Todo sale
+           tal cual de my_rank_summary() (ver loadMyRank() más abajo), la
+           misma RPC que antes usaba mi-geoarmy.html para su tarjeta grande. -->
+      <div class="rk-mycard" id="rkMyRank" hidden>
+        <div class="rk-mycard-label">Tu rango actual</div>
+        <img id="rkMyBadge" class="rk-mycard-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
+        <div id="rkMyName" class="rk-mycard-name">—</div>
+        <div id="rkMyXp" class="rk-mycard-xp">— XP</div>
+        <div id="rkMyPos" class="rk-mycard-pos">—</div>
+      </div>
     </section>
 
-    <!-- Ranking completo — solo lectura de xp_leaderboard. Público: se
-         muestra haya o no sesión iniciada, igual que cualquier leaderboard. -->
-    <div class="v3-table-wrap" id="rankingFull">
-      <div class="v3-table-card gr-rank-card">
-        <div id="rkList" class="gr-rank-list">
-          <div class="gr-rank-loading">Cargando…</div>
+    <!-- PROGRESO AL SIGUIENTE RANGO — oculto sin sesión o sin datos aún -->
+    <section class="rk-progress-section" id="rkProgressSection" hidden data-reveal>
+      <div class="rk-section-title"><span class="rk-line"></span>Progreso al siguiente rango<span class="rk-line"></span></div>
+      <div class="rk-progress-card">
+        <div id="rkProgressBlock">
+          <div class="rk-progress-row">
+            <span id="rkProgressText">— / — XP</span>
+            <span id="rkProgressPct">—%</span>
+          </div>
+          <div class="rk-bar-bg"><div class="rk-bar-fill" id="rkProgressFill"></div></div>
+          <p id="rkProgressNote" class="rk-progress-note"></p>
+          <div class="rk-next-row" id="rkNextWrap">
+            <span class="rk-next-label">Siguiente rango</span>
+            <img id="rkNextBadge" class="rk-next-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
+            <span id="rkNextName">—</span>
+            <span id="rkNextXp" class="rk-next-xp">— XP</span>
+          </div>
+        </div>
+        <div id="rkMaxBlock" class="rk-max-block" hidden>🏆 Rango máximo alcanzado</div>
+      </div>
+    </section>
+
+    <!-- RUTA DE RANGOS — pública, orden y nombres desde js/geoarmy-ranks.js -->
+    <section class="rk-ladder-section" data-reveal>
+      <div class="rk-section-title"><span class="rk-line"></span>Ruta de rangos<span class="rk-line"></span></div>
+      <div class="rk-ladder-row" id="rkLadderRow"></div>
+    </section>
+
+    <!-- LEADERBOARD — solo lectura de xp_leaderboard. Público: se muestra
+         haya o no sesión iniciada, igual que cualquier leaderboard. -->
+    <section class="rk-board-section" data-reveal>
+      <div class="rk-section-title"><span class="rk-line"></span>Leaderboard<span class="rk-line"></span></div>
+      <div class="rk-top3-row" id="rkTop3"></div>
+      <div class="rk-list-card">
+        <div id="rkList" class="rk-list">
+          <div class="rk-loading">Cargando…</div>
         </div>
       </div>
+
+      <!-- Tu posición — solo si hay sesión y ya existe posición, aunque no
+           esté visible dentro de las filas cargadas arriba. -->
+      <div class="rk-mypos" id="rkMyPosCard" hidden>
+        <div>
+          <div class="rk-mypos-label">Tu posición</div>
+          <div class="rk-mypos-pos" id="rkMyPosBig">—</div>
+        </div>
+        <div class="rk-mypos-id">
+          <div class="rk-mypos-name" id="rkMyPosName">—</div>
+          <div class="rk-mypos-rank" id="rkMyPosRank">—</div>
+        </div>
+        <div class="rk-mypos-xp" id="rkMyPosXp">— XP</div>
+      </div>
+    </section>
+
+    <!-- MISIONES: solo un CTA, la lógica real vive en misiones.html -->
+    <div class="rk-missions-cta" data-reveal>
+      <div class="rk-missions-title">¿Quieres subir de rango?</div>
+      <p class="rk-missions-sub">Completa misiones para conseguir XP.</p>
+      <a href="misiones.html" class="rk-missions-btn">Ver misiones ›</a>
     </div>
   </div>
 
@@ -92,74 +361,18 @@
       });
     }
 
-    function renderRankEmpty(list) {
-      list.innerHTML =
-        '<div class="gr-rank-empty">' +
-          '<div class="gr-rank-empty-ic">🏆</div>' +
-          '<div class="gr-rank-empty-title">El ranking aún está vacío</div>' +
-          '<div class="gr-rank-empty-sub">Sé el primero en ganar XP y entrar al ranking.</div>' +
-        '</div>';
-    }
-
-    function renderRankRows(list, rows) {
-      var ranks = window.GeoArmyRanks;
-      list.innerHTML = rows.map(function (row) {
-        var pos = row.position;
-        var topClass = pos === 1 ? ' gr-top gr-top1' : pos === 2 ? ' gr-top gr-top2' : pos === 3 ? ' gr-top gr-top3' : '';
-        var medal = pos === 1 ? '🥇 ' : pos === 2 ? '🥈 ' : pos === 3 ? '🥉 ' : '';
-        var avatar = row.avatar_url
-          ? '<img class="gr-rank-avatar" src="' + esc(row.avatar_url) + '" alt=""/>'
-          : '<span class="gr-rank-avatar gr-rank-avatar-fallback">' + esc((row.display_name || '?')[0] || '?') + '</span>';
-        var flag = row.country_code
-          ? '<img class="gr-rank-flag" src="' + esc(ranks ? ranks.flagImgUrl(row.country_code) : '') + '" alt="" onerror="this.remove()"/>'
-          : '';
-        var badge = row.rank_code
-          ? '<img class="gr-rank-badge" src="' + esc(ranks ? ranks.rankBadgeUrl(row.rank_code) : '') + '" alt="" onerror="this.remove()"/>'
-          : '';
-        var rankNameTxt = esc(row.rank_name || (ranks ? ranks.rankName(row.rank_code) : row.rank_code || ''));
-        var xpTxt = Number(row.xp || 0).toLocaleString() + ' XP';
-        return (
-          '<div class="gr-rank-row' + topClass + '">' +
-            '<div class="gr-rank-pos">' + medal + '#' + esc(pos) + '</div>' +
-            avatar + flag + badge +
-            '<div class="gr-rank-id">' +
-              '<span class="gr-rank-name">' + esc(row.display_name || 'Miembro') + '</span>' +
-              '<span class="gr-rank-rankname">' + rankNameTxt + '</span>' +
-            '</div>' +
-            '<div class="gr-rank-xp">' + xpTxt + '</div>' +
-          '</div>'
-        );
-      }).join('');
-    }
-
-    // =====================================================================
-    // PREVIEW VISUAL TEMPORAL — SOLO PARA APROBAR DISEÑO, NO ES DATO REAL.
-    // Se activa únicamente si la URL trae ?rankPreview=1 (ej.
-    // ranking.html?rankPreview=1). Sin ese parámetro, esta función nunca se
-    // usa y el ranking sigue leyendo xp_leaderboard de Supabase como
-    // siempre. No escribe nada en Supabase. BORRAR este bloque (y su uso
-    // más abajo) una vez aprobado cualquier ajuste visual futuro de las filas.
-    function rankPreviewMockRows() {
-      return [
-        { position: 1, display_name: 'ShadowMX',    country_code: 'MX', rank_code: 'LEGENDARY',  rank_name: 'Legendario',  xp: 152000, avatar_url: null },
-        { position: 2, display_name: 'LunaGamer',    country_code: 'AR', rank_code: 'MASTER',     rank_name: 'Maestro',     xp: 52000,  avatar_url: null },
-        { position: 3, display_name: 'Vortex_SV',    country_code: 'SV', rank_code: 'DIAMOND',    rank_name: 'Diamante',    xp: 39800,  avatar_url: null },
-        { position: 4, display_name: 'PixelQueen',   country_code: 'ES', rank_code: 'PLATINUM_2', rank_name: 'Platino II',  xp: 23900,  avatar_url: null },
-        { position: 5, display_name: 'NightFury_CO', country_code: 'CO', rank_code: 'GOLD_1',     rank_name: 'Oro I',       xp: 16200,  avatar_url: null },
-        { position: 6, display_name: 'TacoBlaster',  country_code: 'US', rank_code: 'SILVER_3',   rank_name: 'Plata III',   xp: 3100,   avatar_url: null },
-        { position: 7, display_name: 'Kroket_BR',    country_code: 'BR', rank_code: 'BRONZE_1',   rank_name: 'Bronce I',    xp: 2100,   avatar_url: null },
-        { position: 8, display_name: 'NuevoRecluta', country_code: 'CL', rank_code: 'BRONZE_2',   rank_name: 'Bronce II',   xp: 950,    avatar_url: null }
-      ];
-    }
+    // Orden oficial de rangos: se deriva de js/geoarmy-ranks.js (mismo mapa
+    // que usa el resto del sitio) — nunca se duplica esa lista acá.
+    var RANK_ORDER = window.GeoArmyRanks ? Object.keys(window.GeoArmyRanks.names) : [];
 
     // Ranking.html tiene su PROPIO cliente de Supabase, independiente del
-    // que arma js/geoarmy-account.js para el widget de cuenta. Antes este
-    // archivo esperaba a window.GeoArmyAccount.client (creado por otro
-    // script), y si por lo que fuera ese objeto no llegaba a existir a
-    // tiempo, la tabla se quedaba en "Cargando…" para siempre. Ahora
-    // ranking.html no depende de nada externo para leer xp_leaderboard:
-    // crea su propio cliente de solo-lectura con la misma URL/anon key
-    // públicas que ya usa el resto del sitio (js/geoarmy-config.js).
+    // que arma js/geoarmy-account.js para el widget de cuenta. Se usa tanto
+    // para el leaderboard público (xp_leaderboard) como para los datos
+    // personales (my_rank_summary()) cuando hay sesión — misma URL/anon key
+    // públicas que ya usa el resto del sitio (js/geoarmy-config.js), y la
+    // sesión persistida en localStorage se comparte entre clientes del mismo
+    // proyecto, así que sb.auth.getSession() funciona igual que en las
+    // demás páginas sin depender de window.GeoArmyAccount.
     function getRankingClient() {
       try {
         if (!window.supabase || !window.supabase.createClient) return null;
@@ -180,51 +393,280 @@
       ]);
     }
 
-    async function loadRanking() {
-      var list = document.getElementById('rkList');
-      if (!list) return;
+    // ===================================================================
+    // RUTA DE RANGOS — construida una sola vez desde RANK_ORDER (estático,
+    // sin llamada a Supabase). markLadderCurrent() solo compara ÍNDICES
+    // dentro de esa lista (posición en el orden oficial), nunca XP.
+    // ===================================================================
+    function buildLadder() {
+      var el = document.getElementById('rkLadderRow');
+      var ranks = window.GeoArmyRanks;
+      if (!el || !ranks || !RANK_ORDER.length) return;
+      el.innerHTML = RANK_ORDER.map(function (code, i) {
+        var name = ranks.rankName(code);
+        var url = ranks.rankBadgeUrl(code);
+        return (
+          '<div class="rk-ladder-step is-future" data-code="' + esc(code) + '" data-idx="' + i + '">' +
+            (url ? '<img class="rk-ladder-badge" src="' + esc(url) + '" alt="" onerror="this.hidden=true;"/>' : '') +
+            '<div class="rk-ladder-name">' + esc(name) + '</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
 
-      // Preview temporal (ver nota arriba) — no toca Supabase para nada.
-      try {
-        if (new URLSearchParams(window.location.search).get('rankPreview') === '1') {
-          renderRankRows(list, rankPreviewMockRows());
-          return;
-        }
-      } catch (e) {}
+    function markLadderCurrent(code) {
+      var el = document.getElementById('rkLadderRow');
+      if (!el) return;
+      var idx = code ? RANK_ORDER.indexOf(code) : -1;
+      Array.prototype.forEach.call(el.querySelectorAll('.rk-ladder-step'), function (step) {
+        var i = Number(step.getAttribute('data-idx'));
+        step.classList.remove('is-current', 'is-done', 'is-future');
+        if (idx < 0) { step.classList.add('is-future'); return; }
+        if (i < idx) step.classList.add('is-done');
+        else if (i === idx) step.classList.add('is-current');
+        else step.classList.add('is-future');
+      });
+    }
 
-      var sb = getRankingClient();
+    // ===================================================================
+    // LEADERBOARD — misma consulta de siempre a xp_leaderboard, ordenada por
+    // xp desc, límite 50. Solo se divide visualmente top3 / resto usando
+    // row.position (que ya viene resuelto de la vista): no se recalculan
+    // posiciones acá.
+    // ===================================================================
+    function medalFor(pos) { return pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : ''; }
+
+    function rowParts(row) {
+      var ranks = window.GeoArmyRanks;
+      var avatar = row.avatar_url
+        ? '<img class="rk-avatar" src="' + esc(row.avatar_url) + '" alt=""/>'
+        : '<span class="rk-avatar rk-avatar-fallback">' + esc((row.display_name || '?')[0] || '?') + '</span>';
+      var flag = row.country_code
+        ? '<img class="rk-flag" src="' + esc(ranks ? ranks.flagImgUrl(row.country_code) : '') + '" alt="" onerror="this.remove()"/>'
+        : '';
+      var badge = row.rank_code
+        ? '<img class="rk-badge-ic" src="' + esc(ranks ? ranks.rankBadgeUrl(row.rank_code) : '') + '" alt="" onerror="this.remove()"/>'
+        : '';
+      var rankNameTxt = esc(row.rank_name || (ranks ? ranks.rankName(row.rank_code) : row.rank_code || ''));
+      return { avatar: avatar, flag: flag, badge: badge, rankNameTxt: rankNameTxt };
+    }
+
+    function renderTop3(rows) {
+      var el = document.getElementById('rkTop3');
+      if (!el) return;
+      el.innerHTML = rows.map(function (row) {
+        var p = rowParts(row);
+        var pos = row.position;
+        return (
+          '<div class="rk-top-card rk-top-' + esc(pos) + '">' +
+            '<div class="rk-top-medal">' + medalFor(pos) + '</div>' +
+            '<div class="rk-top-avawrap">' + p.avatar + p.flag + '</div>' +
+            p.badge +
+            '<div class="rk-top-name">' + esc(row.display_name || 'Miembro') + '</div>' +
+            '<div class="rk-top-rankname">' + p.rankNameTxt + '</div>' +
+            '<div class="rk-top-xp">' + Number(row.xp || 0).toLocaleString() + ' XP</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    function renderRest(rows) {
+      var el = document.getElementById('rkList');
+      if (!el) return;
+      if (!rows.length) { el.innerHTML = ''; return; }
+      el.innerHTML = rows.map(function (row) {
+        var p = rowParts(row);
+        return (
+          '<div class="rk-row">' +
+            '<div class="rk-row-pos">#' + esc(row.position) + '</div>' +
+            p.avatar + p.flag + p.badge +
+            '<div class="rk-row-id">' +
+              '<span class="rk-row-name">' + esc(row.display_name || 'Miembro') + '</span>' +
+              '<span class="rk-row-rankname">' + p.rankNameTxt + '</span>' +
+            '</div>' +
+            '<div class="rk-row-xp">' + Number(row.xp || 0).toLocaleString() + ' XP</div>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    function renderBoardEmpty() {
+      var top3El = document.getElementById('rkTop3');
+      var listEl = document.getElementById('rkList');
+      if (top3El) top3El.innerHTML = '';
+      if (listEl) {
+        listEl.innerHTML =
+          '<div class="rk-empty">' +
+            '<div class="rk-empty-ic">🏆</div>' +
+            '<div class="rk-empty-title">El ranking aún está vacío</div>' +
+            '<div class="rk-empty-sub">Sé el primero en ganar XP y entrar al ranking.</div>' +
+          '</div>';
+      }
+    }
+
+    async function loadRanking(sb) {
+      var listEl = document.getElementById('rkList');
+      if (!listEl) return;
       if (!sb) {
-        list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+        listEl.innerHTML = '<div class="rk-loading">No se pudo cargar el ranking.</div>';
         return;
       }
-
       try {
         // Ranking público: se lee igual haya o no sesión iniciada (misma
-        // vista de solo lectura xp_leaderboard, sin gate de login).
-        // Con timeout de 8s para que la pantalla nunca se quede pegada
-        // en "Cargando…" indefinidamente, pase lo que pase.
+        // vista de solo lectura xp_leaderboard, sin gate de login). Timeout
+        // de 8s para que la pantalla nunca se quede pegada en "Cargando…".
         var res = await withTimeout(
           sb.from('xp_leaderboard').select('*').order('xp', { ascending: false }).limit(50),
           8000
         );
         if (res.error) {
           console.warn('[ranking] no se pudo leer xp_leaderboard', res.error);
-          list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+          listEl.innerHTML = '<div class="rk-loading">No se pudo cargar el ranking.</div>';
           return;
         }
         var rows = res.data || [];
-        if (!rows.length) {
-          renderRankEmpty(list);
-          return;
-        }
-        renderRankRows(list, rows);
+        if (!rows.length) { renderBoardEmpty(); return; }
+        renderTop3(rows.filter(function (r) { return r.position <= 3; }));
+        renderRest(rows.filter(function (r) { return r.position > 3; }));
       } catch (e) {
         console.warn('[ranking] error cargando xp_leaderboard', e);
-        list.innerHTML = '<div class="gr-rank-loading">No se pudo cargar el ranking.</div>';
+        listEl.innerHTML = '<div class="rk-loading">No se pudo cargar el ranking.</div>';
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadRanking);
+    // ===================================================================
+    // MI RANGO — hero (rango actual), progreso al siguiente rango y "Tu
+    // posición". Todo sale de my_rank_summary() (misma RPC/campos que antes
+    // usaba la tarjeta grande de mi-geoarmy.html: current_code, current_name,
+    // xp, is_max_rank, progress_pct, xp_to_next, next_min_xp, next_code,
+    // next_name, position, top_pct). El nombre para "Tu posición" se lee de
+    // profiles.display_name, la misma columna que ya usa mi-geoarmy.html
+    // para el mismo propósito -- no es un dato nuevo ni inventado.
+    // ===================================================================
+    async function loadMyRank(sb) {
+      var heroCard = document.getElementById('rkMyRank');
+      var progSection = document.getElementById('rkProgressSection');
+      var posCard = document.getElementById('rkMyPosCard');
+      if (!heroCard) return;
+      var ranks = window.GeoArmyRanks;
+
+      function hideAll() {
+        heroCard.hidden = true;
+        if (progSection) progSection.hidden = true;
+        if (posCard) posCard.hidden = true;
+        markLadderCurrent(null);
+      }
+
+      try {
+        var sessionRes = await sb.auth.getSession();
+        var session = sessionRes.data && sessionRes.data.session;
+        if (!session) { hideAll(); return; }
+
+        var res = await sb.rpc('my_rank_summary');
+        if (res.error) {
+          console.warn('[ranking] no se pudo leer my_rank_summary()', res.error);
+          hideAll();
+          return;
+        }
+        var row = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (!row) { hideAll(); return; }
+
+        var name = row.current_name || (ranks ? ranks.rankName(row.current_code) : row.current_code) || '—';
+        var badgeUrl = ranks ? ranks.rankBadgeUrl(row.current_code) : null;
+
+        // ---- Hero: tu rango actual ----
+        heroCard.hidden = false;
+        var badgeEl = document.getElementById('rkMyBadge');
+        if (badgeEl) {
+          if (badgeUrl) { badgeEl.src = badgeUrl; badgeEl.alt = name; badgeEl.hidden = false; }
+          else badgeEl.hidden = true;
+        }
+        document.getElementById('rkMyName').textContent = name;
+        document.getElementById('rkMyXp').textContent = Number(row.xp || 0).toLocaleString() + ' XP';
+        var posEl = document.getElementById('rkMyPos');
+        posEl.textContent = (row.position == null) ? 'Sin posición todavía' : ('#' + row.position + ' GLOBAL');
+
+        // ---- Progreso al siguiente rango ----
+        if (progSection) {
+          var progressBlock = document.getElementById('rkProgressBlock');
+          var maxBlock = document.getElementById('rkMaxBlock');
+          progSection.hidden = false;
+          if (row.is_max_rank) {
+            if (progressBlock) progressBlock.hidden = true;
+            if (maxBlock) maxBlock.hidden = false;
+          } else {
+            if (maxBlock) maxBlock.hidden = true;
+            if (progressBlock) progressBlock.hidden = false;
+
+            // Texto = xp total del usuario / next_min_xp (umbral absoluto),
+            // tal cual vienen del backend -- mismo criterio que ya usaba
+            // mi-geoarmy.html, nunca xp_into_tier/(xp_into_tier+xp_to_next).
+            document.getElementById('rkProgressText').textContent =
+              Number(row.xp || 0).toLocaleString() + ' / ' + Number(row.next_min_xp || 0).toLocaleString() + ' XP';
+
+            var pct = Number(row.progress_pct || 0);
+            document.getElementById('rkProgressPct').textContent = pct + '%';
+            document.getElementById('rkProgressFill').style.width = Math.max(0, Math.min(100, pct)) + '%';
+
+            var nextNameTxt = row.next_name || (ranks ? ranks.rankName(row.next_code) : row.next_code) || '';
+            document.getElementById('rkProgressNote').textContent =
+              Number(row.xp_to_next || 0).toLocaleString() + ' XP para ' + nextNameTxt;
+
+            var nextBadgeEl = document.getElementById('rkNextBadge');
+            var nurl = ranks ? ranks.rankBadgeUrl(row.next_code) : null;
+            if (nextBadgeEl) {
+              if (nurl) { nextBadgeEl.src = nurl; nextBadgeEl.alt = nextNameTxt; nextBadgeEl.hidden = false; }
+              else nextBadgeEl.hidden = true;
+            }
+            document.getElementById('rkNextName').textContent = nextNameTxt;
+            // Umbral fijo del siguiente rango (next_min_xp), no lo que falta
+            // -- eso ya se ve en la nota de la barra -- así el número no
+            // "se mueve" mientras se gana XP.
+            document.getElementById('rkNextXp').textContent = Number(row.next_min_xp || 0).toLocaleString() + ' XP';
+          }
+        }
+
+        // ---- Tu posición ----
+        if (posCard) {
+          if (row.position == null) {
+            posCard.hidden = true;
+          } else {
+            posCard.hidden = false;
+            document.getElementById('rkMyPosBig').textContent = '#' + row.position;
+            document.getElementById('rkMyPosRank').textContent = name;
+            document.getElementById('rkMyPosXp').textContent = Number(row.xp || 0).toLocaleString() + ' XP';
+            var nameEl = document.getElementById('rkMyPosName');
+            nameEl.textContent = 'Tú';
+            // Nombre real de display_name (misma columna que usa
+            // mi-geoarmy.html) -- lectura aparte porque my_rank_summary()
+            // no devuelve el nombre del perfil.
+            sb.from('profiles').select('display_name').eq('id', session.user.id).single()
+              .then(function (profRes) {
+                if (profRes && !profRes.error && profRes.data && profRes.data.display_name) {
+                  nameEl.textContent = profRes.data.display_name;
+                }
+              })
+              .catch(function () {});
+          }
+        }
+
+        markLadderCurrent(row.current_code);
+      } catch (e) {
+        console.warn('[ranking] error cargando my_rank_summary()', e);
+        hideAll();
+      }
+    }
+
+    buildLadder();
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var sb = getRankingClient();
+      loadRanking(sb);
+      if (sb) {
+        loadMyRank(sb);
+        sb.auth.onAuthStateChange(function () { loadMyRank(sb); });
+      }
+    });
   })();
   </script>
 </body>
