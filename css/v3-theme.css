@@ -837,29 +837,43 @@
   }
 }
 
-/* Comunidad: el mensaje "¿Eres nuevo? Entra acá" queda SIEMPRE visible,
-   no depende de hover/focus. */
-.v3-marker-label-community {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-}
-
-/* Comunidad: separa el mensaje del pin y añade una flecha clara hacia él. */
+/* === Comunidad CTA visible + flecha dorada === */
 .v3-marker-label-community {
   position: relative;
-  margin-bottom: 18px !important;
+  z-index: 12;
+  opacity: 1 !important;
+  transform: translate(58px, 8px) !important;
+  margin-bottom: 14px !important;
 }
 
 .v3-marker-label-community::after {
-  content: "↓";
+  content: "↙";
   position: absolute;
-  left: 50%;
-  bottom: -17px;
-  transform: translateX(-50%);
-  font-family: 'Orbitron', sans-serif;
-  font-size: 14px;
+  left: 20px;
+  bottom: -16px;
+  z-index: 13;
+  font-family: Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1;
-  color: #8fc4ff;
-  text-shadow: 0 0 8px rgba(120,190,255,.85);
+  color: #ffd54a;
+  text-shadow:
+    0 0 6px rgba(255, 223, 99, .98),
+    0 0 14px rgba(255, 200, 40, .95),
+    0 0 24px rgba(255, 170, 0, .7);
   pointer-events: none;
 }
+
+@media (max-width: 560px) {
+  .v3-marker-label-community {
+    transform: translate(48px, 8px) !important;
+    margin-bottom: 12px !important;
+  }
+
+  .v3-marker-label-community::after {
+    left: 18px;
+    bottom: -14px;
+    font-size: 27px;
+  }
+}
+
