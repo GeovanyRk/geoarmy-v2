@@ -22,6 +22,234 @@
   <script src="js/geoarmy-config.js"></script>
   <!-- Tema V3 (espacial/holográfico) — mismo archivo compartido que index.html. No se tocó. -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
+
+  <style>
+  /* =====================================================================
+     "CUARTEL GENERAL" — rediseño visual exclusivo de comunidad.html.
+     Prefijo hq- (headquarters) para no chocar con nada de v3-theme.css ni
+     de otras páginas. No se tocan clases compartidas (.v3-page, .v3-nav,
+     .v3-page-links, .v3-auth, .v3-join-btn, .v3-sr-only, .v3-now-dot,
+     .v3-recent-rank quedan sin usar aquí a propósito). Solo UI/estructura:
+     ningún ID/clase que lea main.js o el widget de cuenta se tocó.
+     ===================================================================== */
+  .hq-page-inner { position: relative; z-index: 2; }
+
+  /* ---------- HERO ---------- */
+  .hq-hero { position: relative; isolation: isolate; overflow: hidden; padding: 92px 1.5rem 54px; text-align: center; }
+  .hq-hero::before {
+    content: ""; position: absolute; inset: -20% -10% auto -10%; height: 140%; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(36% 45% at 28% 18%, rgba(0,212,255,.11), transparent 65%),
+      radial-gradient(32% 40% at 76% 32%, rgba(145,71,255,.15), transparent 65%);
+    filter: blur(18px); /* estático por rendimiento, sin animación infinita */
+  }
+  .hq-hero-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .hq-hero-grid {
+    position: absolute; inset: -10%;
+    background-image:
+      linear-gradient(rgba(120,190,255,.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,190,255,.07) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(55% 55% at 50% 38%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(55% 55% at 50% 38%, #000 0%, transparent 78%);
+  }
+  .hq-hero-radar {
+    position: absolute; top: 40%; left: 50%; width: 640px; height: 640px; transform: translate(-50%, -50%);
+    border-radius: 50%; border: 1px solid rgba(58,160,255,.14);
+  }
+  .hq-hero-radar::before, .hq-hero-radar::after {
+    content: ""; position: absolute; inset: 70px; border-radius: 50%; border: 1px solid rgba(58,160,255,.11);
+  }
+  .hq-hero-radar::after { inset: 160px; border-color: rgba(145,71,255,.14); }
+  .hq-hero-logo {
+    position: absolute; top: 40%; left: 50%; width: 560px; max-width: 78vw; transform: translate(-50%, -50%);
+    opacity: .05; filter: grayscale(1) brightness(1.8); pointer-events: none;
+  }
+  .hq-eyebrow {
+    font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: .34em;
+    text-transform: uppercase; color: #6fe0ff; text-shadow: 0 0 16px rgba(0,212,255,.5); margin-bottom: 14px;
+  }
+  .hq-title {
+    font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: .02em; line-height: 1.02;
+    font-size: clamp(2.5rem, 7vw, 4.4rem); margin: 0 0 14px;
+    background: linear-gradient(120deg, #eaf7ff 10%, #7fd8ff 45%, #c9a3ff 90%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 26px rgba(120,190,255,.25));
+  }
+  .hq-sub { font-size: clamp(1.02rem, 2.1vw, 1.28rem); font-weight: 600; color: #eaf2ff; max-width: 620px; margin: 0 auto 8px; }
+  .hq-sub2 { font-size: 15px; color: var(--text2); max-width: 540px; margin: 0 auto 30px; line-height: 1.65; }
+
+  .hq-hero-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .hq-status-module {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.045); border: 1px solid rgba(120,190,255,.28);
+    padding: 10px 20px; border-radius: 100px; transition: border-color .3s var(--ease), background .3s var(--ease);
+  }
+  .hq-status-module.is-live { border-color: rgba(0,200,83,.5); background: rgba(0,200,83,.08); }
+  .hq-status-module .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #5a6478; flex-shrink: 0; transition: background .3s; }
+  .hq-status-module .live-dot.live { background: var(--green); box-shadow: 0 0 10px var(--green); animation: v3DotPulse 1.8s ease-in-out infinite; }
+  .hq-status-text { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: #eaf2ff; white-space: nowrap; }
+
+  .hq-btn-primary, .hq-btn-ghost {
+    font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px; letter-spacing: .03em;
+    padding: 13px 26px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: transform .3s var(--ease), border-color .3s var(--ease), filter .3s var(--ease);
+    text-decoration: none;
+  }
+  .hq-btn-primary { color: #041022; background: linear-gradient(135deg, #eaf4ff, #7fd8ff); box-shadow: 0 14px 30px -12px rgba(120,190,255,.6); border: none; }
+  .hq-btn-primary:hover { transform: translateY(-3px); filter: brightness(1.05); }
+  .hq-btn-ghost { color: #eaf2ff; background: rgba(255,255,255,.04); border: 1px solid rgba(150,190,255,.35); }
+  .hq-btn-ghost:hover { transform: translateY(-3px); border-color: rgba(150,190,255,.7); }
+
+  @media (max-width: 700px) {
+    .hq-hero { padding: 70px 1.2rem 40px; }
+    .hq-hero-radar { width: 420px; height: 420px; }
+    .hq-hero-logo { width: 380px; }
+  }
+
+  /* ---------- SECTION TITLE (compartido por flujo / ahora / recientes) ---------- */
+  .hq-section-title {
+    display: flex; align-items: center; gap: 16px; justify-content: center;
+    font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11.5px; letter-spacing: .26em;
+    text-transform: uppercase; color: var(--text2); max-width: 900px; margin: 0 auto 34px;
+  }
+  .hq-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent); }
+
+  /* ---------- FLUJO: ÚNETE → PARTICIPA → GANA ---------- */
+  .hq-flow { position: relative; z-index: 2; padding: 10px 1.5rem 56px; }
+  .hq-flow-row { display: flex; align-items: flex-start; justify-content: center; max-width: 920px; margin: 0 auto; }
+  .hq-flow-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; min-width: 0; }
+  .hq-fs-node {
+    width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 20px;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.06), rgba(4,10,20,.9));
+    border: 2px solid var(--fs-ac); color: var(--fs-ac);
+    box-shadow: 0 0 22px -4px var(--fs-ac), inset 0 0 12px -4px var(--fs-ac);
+  }
+  .hq-fs-purple { --fs-ac: #c9a3ff; }
+  .hq-fs-blue   { --fs-ac: #00d4ff; }
+  .hq-fs-green  { --fs-ac: #00c853; }
+  .hq-fs-eyebrow { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--fs-ac); }
+  .hq-fs-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 17px; color: #eaf2ff; }
+  .hq-fs-desc { font-size: 12.5px; color: var(--text2); }
+  .hq-flow-conn { flex: 0 0 auto; width: clamp(28px, 7vw, 90px); height: 2px; margin-top: 29px; background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.4), rgba(255,255,255,.06)); }
+
+  @media (max-width: 700px) {
+    .hq-flow-row { flex-direction: column; align-items: stretch; gap: 8px; max-width: 360px; }
+    .hq-flow-step { flex-direction: row; text-align: left; align-items: center; }
+    .hq-flow-conn { width: 2px; height: 30px; margin: 0 0 0 29px; }
+  }
+
+  /* ---------- BENTO: AHORA EN GEO ARMY ---------- */
+  .hq-now { position: relative; z-index: 2; padding: 10px 1.5rem 60px; }
+  .hq-bento {
+    display: grid; max-width: 1100px; margin: 0 auto; gap: 16px;
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-areas: "stream discord" "stream whatsapp" "fortnite winner";
+  }
+  .hq-card-stream   { grid-area: stream; }
+  .hq-card-discord  { grid-area: discord; }
+  .hq-card-whatsapp { grid-area: whatsapp; }
+  .hq-card-fortnite { grid-area: fortnite; }
+  .hq-card-winner   { grid-area: winner; }
+
+  .hq-card {
+    --card-ac: #00d4ff;
+    position: relative; display: flex; flex-direction: column; gap: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012));
+    border: 1px solid rgba(255,255,255,.09);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    padding: 22px 22px 20px; transition: border-color .3s var(--ease), transform .3s var(--ease);
+  }
+  .hq-card::before, .hq-card::after { content: ""; position: absolute; top: 0; left: 0; background: var(--card-ac); }
+  .hq-card::before { width: 28px; height: 2px; }
+  .hq-card::after  { width: 2px; height: 28px; }
+  .hq-card:hover { border-color: rgba(255,255,255,.22); transform: translateY(-3px); }
+  .hq-card-head {
+    display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--text2);
+  }
+  .hq-ic { font-size: 15px; color: var(--card-ac); display: inline-flex; }
+  .hq-card-btn {
+    margin-top: auto; align-self: flex-start; font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 11.5px; letter-spacing: .03em; text-transform: uppercase; color: var(--card-ac);
+    display: inline-flex; align-items: center; gap: 6px; transition: color .25s, transform .25s var(--ease); padding-top: 6px;
+  }
+  .hq-card-btn:hover { color: #fff; transform: translateX(3px); }
+  .hq-card-btn-solid {
+    color: #04101f; background: var(--card-ac); padding: 10px 18px; margin-top: 12px;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  }
+  .hq-card-btn-solid:hover { color: #04101f; filter: brightness(1.12); transform: translateY(-2px); }
+
+  /* Stream: tarjeta principal, más grande */
+  .hq-card-stream { --card-ac: #00d4ff; justify-content: center; padding: 30px 26px 26px; min-height: 220px; }
+  .hq-stream-status { display: flex; align-items: center; gap: 10px; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: clamp(1.3rem, 3vw, 1.9rem); color: #eaf2ff; text-transform: uppercase; margin-top: 8px; }
+  .hq-stream-status .v3-now-dot { width: 11px; height: 11px; }
+  .hq-stream-meta { color: var(--text2); font-size: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Discord / WhatsApp: bloques secundarios, directos */
+  .hq-card-discord  { --card-ac: #7aa2ff; }
+  .hq-card-whatsapp { --card-ac: #00c853; }
+  .hq-social-row { display: flex; align-items: center; gap: 14px; }
+  .hq-social-ic { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: var(--card-ac); }
+  .hq-social-ic svg { width: 20px; height: 20px; }
+  .hq-social-title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13.5px; color: #eaf2ff; }
+  .hq-social-sub { font-size: 12px; color: var(--text2); }
+
+  /* Pavos Fortnite */
+  .hq-card-fortnite { --card-ac: #ffd23f; flex-direction: row; align-items: center; gap: 16px; }
+  .hq-ft-emoji { font-size: 32px; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(255,210,63,.5)); }
+  .hq-ft-body { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+  .hq-ft-body b { font-family: 'Orbitron', sans-serif; font-size: 14.5px; color: #eaf2ff; }
+  .hq-ft-body span { font-size: 12.5px; color: var(--text2); }
+  .hq-card-fortnite .hq-card-btn { margin-top: 0; flex-shrink: 0; }
+
+  /* Último ganador */
+  .hq-card-winner { --card-ac: #ec4899; }
+  .hq-winner-row { display: flex; align-items: center; gap: 12px; }
+  .hq-winner-ava {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; font-size: 17px;
+    background: radial-gradient(circle at 35% 30%, #2a1530, #0a0812); border: 1px solid rgba(236,72,153,.4);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hq-winner-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; color: #ec4899; }
+  .hq-winner-prize { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .hq-winner-empty { color: var(--text3); font-size: 12.5px; }
+
+  @media (max-width: 980px) {
+    .hq-bento { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .hq-bento { grid-template-columns: 1fr; grid-template-areas: "stream" "discord" "whatsapp" "fortnite" "winner"; }
+    .hq-card-fortnite { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ---------- ÚLTIMOS GANADORES: ticker horizontal compacto ---------- */
+  .hq-recent { max-width: 1100px; margin: 30px auto 0; }
+  .hq-recent-row { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent; }
+  .hq-recent-row::-webkit-scrollbar { height: 6px; }
+  .hq-recent-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 100px; }
+  .hq-recent-item {
+    flex: 0 0 auto; min-width: 190px; display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
+    padding: 11px 15px; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .hq-recent-rank {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px;
+    display: flex; align-items: center; justify-content: center; background: #1c2740; color: #eaf2ff;
+  }
+  .hq-recent-rank.g1 { background: rgba(255,210,63,.18); color: #ffd23f; }
+  .hq-recent-rank.g2 { background: rgba(215,222,232,.14); color: #d7dee8; }
+  .hq-recent-rank.g3 { background: rgba(224,160,106,.18); color: #e0a06a; }
+  .hq-recent-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px; color: #eaf2ff; white-space: nowrap; }
+  .hq-recent-prize { font-size: 11px; color: var(--text2); white-space: nowrap; }
+  .hq-recent-more { display: inline-block; margin-top: 4px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; color: #8fc4ff; }
+  .hq-recent-more:hover { color: #c3e2ff; }
+  .hq-recent-empty { color: var(--text3); font-size: 12.5px; padding: 6px 0; }
+  </style>
 </head>
 <body>
 
@@ -54,92 +282,116 @@
       </div>
     </nav>
 
-    <!-- COMUNIDAD: movido tal cual desde index.html (mismo contenido, mismos
-         IDs, mismos scripts exclusivos de esta sección) para que la página
-         principal sea solo el hero/selector de mundos. No se tocó ningún
-         endpoint, fetch, login, ranking ni lógica de premios. -->
-    <section class="section" id="comunidad">
-      <div class="v3-community-intro" data-reveal>
-        <div class="v3-tagline">EL CUARTEL GENERAL DE LA COMUNIDAD</div>
-        <p class="v3-sub">Un punto de encuentro para gamers. Compite, gana premios y forma parte de la comunidad.</p>
-      </div>
+    <div class="hq-page-inner">
 
-      <div class="v3-howworks">
-        <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
-        <div class="v3-orbit-row">
-          <div class="v3-orbit-card v3-oc-purple" data-reveal>
-            <div class="v3-oc-num">01 · ÚNETE</div>
-            <div class="v3-oc-body"><b>Comunidad</b><span>Entra a la comunidad</span></div>
+      <!-- HERO: CUARTEL GENERAL -->
+      <section class="hq-hero" data-reveal>
+        <div class="hq-hero-bg" aria-hidden="true">
+          <div class="hq-hero-grid"></div>
+          <div class="hq-hero-radar"></div>
+          <img src="logo.png" alt="" class="hq-hero-logo"/>
+        </div>
+        <div class="hq-eyebrow">Geo Army · Centro de operaciones</div>
+        <h1 class="hq-title">CUARTEL GENERAL</h1>
+        <p class="hq-sub">Todo lo que está pasando en Geo Army, en un solo lugar.</p>
+        <p class="hq-sub2">Compite, participa, gana premios y mantente conectado con la comunidad.</p>
+
+        <div class="hq-hero-actions">
+          <div class="hq-status-module" id="live-badge">
+            <span class="live-dot"></span>
+            <span id="live-label" class="v3-sr-only">Cargando...</span>
+            <span id="v3LiveText" class="hq-status-text">Cargando…</span>
           </div>
-          <div class="v3-orbit-card v3-oc-blue" data-reveal>
-            <div class="v3-oc-num">02 · PARTICIPA</div>
-            <div class="v3-oc-body"><b>En el stream</b><span>Sorteos · Ruletas</span></div>
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="hq-btn-primary">▶ Ver stream</a>
+          <button class="hq-btn-ghost" onclick="copyCode()">Código: SORTEOSRK</button>
+        </div>
+      </section>
+
+      <!-- ¿CÓMO FUNCIONA LA GEO ARMY? -->
+      <section class="hq-flow" data-reveal>
+        <div class="hq-section-title"><span class="hq-line"></span>¿Cómo funciona la Geo Army?<span class="hq-line"></span></div>
+        <div class="hq-flow-row">
+          <div class="hq-flow-step">
+            <div class="hq-fs-node hq-fs-purple">01</div>
+            <div class="hq-fs-eyebrow" style="color:#c9a3ff;">Únete</div>
+            <div class="hq-fs-name">Comunidad</div>
+            <div class="hq-fs-desc">Entra a la comunidad</div>
           </div>
-          <div class="v3-orbit-card v3-oc-green" data-reveal>
-            <div class="v3-oc-num">03 · GANA</div>
-            <div class="v3-oc-body"><b>Recompensas</b><span>Puntos · Premios</span></div>
+          <div class="hq-flow-conn"></div>
+          <div class="hq-flow-step">
+            <div class="hq-fs-node hq-fs-blue">02</div>
+            <div class="hq-fs-eyebrow" style="color:#00d4ff;">Participa</div>
+            <div class="hq-fs-name">En el stream</div>
+            <div class="hq-fs-desc">Sorteos · Ruletas</div>
+          </div>
+          <div class="hq-flow-conn"></div>
+          <div class="hq-flow-step">
+            <div class="hq-fs-node hq-fs-green">03</div>
+            <div class="hq-fs-eyebrow" style="color:#00c853;">Gana</div>
+            <div class="hq-fs-name">Recompensas</div>
+            <div class="hq-fs-desc">Puntos · Premios</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="v3-live-pill" id="live-badge">
-        <span class="live-dot"></span>
-        <span id="live-label" class="v3-sr-only">Cargando...</span>
-        <span id="v3LiveText">Cargando…</span>
-      </div>
+      <!-- AHORA EN GEO ARMY: bento -->
+      <section class="hq-now" data-reveal>
+        <div class="hq-section-title"><span class="hq-line"></span>Ahora en Geo Army<span class="hq-line"></span></div>
 
-      <div class="v3-cta-row" data-reveal>
-        <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-btn-primary">▶ Ver stream</a>
-        <button class="v3-btn-secondary" onclick="copyCode()">Explorar código: SORTEOSRK</button>
-      </div>
-
-      <div class="v3-now-section" data-reveal>
-        <div class="v3-now-header"><span class="v3-now-line"></span>Ahora en Geo Army<span class="v3-now-line"></span></div>
-
-        <div class="v3-now-grid">
-          <div class="v3-now-card v3-c-purple">
-            <div class="v3-now-head"><span class="v3-now-ic">📡</span>Stream</div>
-            <div class="v3-now-status"><span class="v3-now-dot" id="status-dot"></span><span id="status-text">Cargando...</span></div>
-            <div class="v3-now-sub"><span id="stream-game"></span> <span id="stream-viewers"></span></div>
-            <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-now-btn">Ver stream ›</a>
+        <div class="hq-bento">
+          <div class="hq-card hq-card-stream">
+            <div class="hq-card-head"><span class="hq-ic">📡</span>Stream</div>
+            <div class="hq-stream-status"><span class="v3-now-dot" id="status-dot"></span><span id="status-text">Cargando...</span></div>
+            <div class="hq-stream-meta"><span id="stream-game"></span> <span id="stream-viewers"></span></div>
+            <a href="https://twitch.tv/geovannyrk" target="_blank" class="hq-card-btn hq-card-btn-solid">Entrar al stream ›</a>
           </div>
 
-          <div class="v3-now-card v3-c-discord">
-            <div class="v3-now-head"><span class="v3-now-ic"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.106c.36.698.772 1.362 1.225 1.994a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg></span>Discord</div>
-            <div class="v3-now-big v3-now-big-sm">Únete a nuestra comunidad</div>
-            <div class="v3-now-sub">Chatea, participa y entérate de todo</div>
-            <a href="#" class="v3-now-btn">Entrar al Discord ›</a>
+          <div class="hq-card hq-card-discord">
+            <div class="hq-social-row">
+              <span class="hq-social-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.106c.36.698.772 1.362 1.225 1.994a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg></span>
+              <div>
+                <div class="hq-social-title">Discord</div>
+                <div class="hq-social-sub">Únete a nuestra comunidad</div>
+              </div>
+            </div>
+            <a href="#" class="hq-card-btn">Entrar al Discord ›</a>
           </div>
 
-          <div class="v3-now-card v3-c-whatsapp">
-            <div class="v3-now-head"><span class="v3-now-ic"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.484 1.34 5.003L2 22l5.117-1.334a9.96 9.96 0 0 0 4.887 1.28h.004c5.514 0 9.997-4.483 9.997-9.997s-4.483-9.946-9.997-9.946zm0 18.176a8.156 8.156 0 0 1-4.152-1.135l-.298-.176-3.036.792.812-2.958-.194-.304a8.163 8.163 0 0 1-1.253-4.398c0-4.51 3.67-8.18 8.18-8.18 4.508 0 8.18 3.67 8.18 8.18 0 4.51-3.672 8.18-8.18 8.18h-.06z"/></svg></span>WhatsApp</div>
-            <div class="v3-now-big v3-now-big-sm">Únete por WhatsApp</div>
-            <div class="v3-now-sub">Entérate de sorteos y avisos al instante</div>
-            <a href="#" class="v3-now-btn">Entrar al grupo ›</a>
+          <div class="hq-card hq-card-whatsapp">
+            <div class="hq-social-row">
+              <span class="hq-social-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.484 1.34 5.003L2 22l5.117-1.334a9.96 9.96 0 0 0 4.887 1.28h.004c5.514 0 9.997-4.483 9.997-9.997s-4.483-9.946-9.997-9.946zm0 18.176a8.156 8.156 0 0 1-4.152-1.135l-.298-.176-3.036.792.812-2.958-.194-.304a8.163 8.163 0 0 1-1.253-4.398c0-4.51 3.67-8.18 8.18-8.18 4.508 0 8.18 3.67 8.18 8.18 0 4.51-3.672 8.18-8.18 8.18h-.06z"/></svg></span>
+              <div>
+                <div class="hq-social-title">WhatsApp</div>
+                <div class="hq-social-sub">Avisos y sorteos al instante</div>
+              </div>
+            </div>
+            <a href="#" class="hq-card-btn">Entrar al grupo ›</a>
           </div>
 
-          <div class="v3-now-card v3-c-gold">
-            <div class="v3-now-head"><span class="v3-now-ic">🎮</span>Pavos Fortnite</div>
-            <div class="v3-now-big v3-now-big-sm">¿Necesitas pavos?</div>
-            <div class="v3-now-sub">Entra acá y consigue V-Bucks para Fortnite</div>
-            <a href="fortnite.html" class="v3-now-btn">Entra acá ›</a>
+          <div class="hq-card hq-card-fortnite">
+            <span class="hq-ft-emoji">🎮</span>
+            <div class="hq-ft-body">
+              <b>¿Necesitas pavos?</b>
+              <span>Consigue V-Bucks para Fortnite.</span>
+            </div>
+            <a href="fortnite.html" class="hq-card-btn">Entrar ›</a>
           </div>
 
-          <div class="v3-now-card v3-c-pink">
-            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Último ganador</div>
-            <div class="v3-now-winner" id="v3LastWinner">Cargando…</div>
-            <a href="index.html#ganadores" class="v3-now-btn">Ver todos ›</a>
+          <div class="hq-card hq-card-winner">
+            <div class="hq-card-head"><span class="hq-ic">🏆</span>Último ganador</div>
+            <div id="v3LastWinner">Cargando…</div>
+            <a href="index.html#ganadores" class="hq-card-btn">Ver todos ›</a>
           </div>
         </div>
 
-        <div class="v3-recent">
-          <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Últimos ganadores</div>
-          <div class="v3-recent-row" id="v3RecentRow">Cargando…</div>
-          <a href="index.html#ganadores" class="v3-recent-more">Ver Salón de la Fama ›</a>
+        <div class="hq-recent" data-reveal>
+          <div class="hq-section-title" style="margin-bottom:16px;"><span class="hq-line"></span>Últimos ganadores<span class="hq-line"></span></div>
+          <div class="hq-recent-row" id="v3RecentRow">Cargando…</div>
+          <a href="index.html#ganadores" class="hq-recent-more">Ver Salón de la Fama ›</a>
         </div>
+      </section>
 
-      </div>
-    </section>
+    </div>
   </div>
 
   <!-- FOOTER -->
@@ -159,20 +411,23 @@
   <script src="js/premium.js"></script>
   <script src="js/geoarmy-account.js"></script>
   <script>
-  // ===== V3: reescribe el texto de la píldora "en vivo" sin tocar main.js =====
-  // main.js sigue escribiendo en #live-label (ahora oculto visualmente); aquí solo
-  // observamos ese texto y mostramos una versión más útil en #v3LiveText.
+  // ===== V3: estado del stream en el módulo del hero, sin tocar main.js =====
+  // main.js sigue escribiendo en #live-label (oculto visualmente); aquí solo
+  // observamos ese texto para decidir el texto visible y el estado (vivo/offline).
   (function () {
     try {
+      var wrap = document.getElementById('live-badge');
       var label = document.getElementById('live-label');
       var out = document.getElementById('v3LiveText');
-      if (!label || !out) return;
+      if (!wrap || !label || !out) return;
       function sync() {
         var txt = label.textContent || '';
-        if (txt.indexOf('En vivo') !== -1) {
-          out.textContent = 'EN VIVO AHORA';
+        var live = txt.indexOf('En vivo') !== -1;
+        wrap.classList.toggle('is-live', live);
+        if (live) {
+          out.textContent = 'GEO ARMY ESTÁ EN VIVO';
         } else if (txt.indexOf('Fuera de línea') !== -1) {
-          out.textContent = 'Próximo stream: 7:00 PM';
+          out.textContent = 'PRÓXIMA TRANSMISIÓN · Hoy · 7:00 PM';
         } else {
           out.textContent = txt;
         }
@@ -185,7 +440,7 @@
   <script>
   // ===== V3: "Ahora en Geo Army" — Último ganador + Últimos ganadores, con datos reales de ganadores.json =====
   // Independiente del script del panel #ganadores (vive en index.html, no en esta página),
-  // envuelto en try/catch, no rompe nada si falla.
+  // envuelto en try/catch, no rompe nada si falla. Mismo fetch/orden que siempre; solo cambia el HTML que pinta.
   (function () {
     try {
       function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -203,24 +458,25 @@
       function renderLast(rows) {
         var el = document.getElementById('v3LastWinner');
         if (!el) return;
-        if (!rows.length) { el.innerHTML = '<div class="v3-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
+        if (!rows.length) { el.innerHTML = '<div class="hq-winner-empty">Todavía no hay ganadores registrados.</div>'; return; }
         var g = rows[0];
         el.innerHTML =
-          '<div class="v3-now-winner-ava">🏆</div>' +
-          '<div><div class="v3-now-winner-name">@' + esc(g.usuario) + '</div>' +
-          '<div class="v3-now-winner-prize">' + esc(g.premio) + '</div></div>';
+          '<div class="hq-winner-row">' +
+            '<div class="hq-winner-ava">🏆</div>' +
+            '<div><div class="hq-winner-name">@' + esc(g.usuario) + '</div>' +
+            '<div class="hq-winner-prize">' + esc(g.premio) + '</div></div>' +
+          '</div>';
       }
       function renderRecent(rows) {
         var el = document.getElementById('v3RecentRow');
         if (!el) return;
-        if (!rows.length) { el.innerHTML = '<div class="v3-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
+        if (!rows.length) { el.innerHTML = '<div class="hq-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
         var ranks = ['g1', 'g2', 'g3'];
-        el.innerHTML = rows.slice(0, 3).map(function (g, i) {
-          return '<div class="v3-recent-item">' +
-            '<div class="v3-recent-rank ' + ranks[i] + '">' + (i + 1) + '</div>' +
-            '<div><div class="v3-recent-name">@' + esc(g.usuario) + '</div>' +
-            '<div class="v3-recent-prize">' + esc(g.premio) + '</div>' +
-            '<div class="v3-recent-time">' + diasDesde(g.fecha) + '</div></div>' +
+        el.innerHTML = rows.slice(0, 8).map(function (g, i) {
+          return '<div class="hq-recent-item">' +
+            '<div class="hq-recent-rank ' + (ranks[i] || '') + '">' + (i + 1) + '</div>' +
+            '<div><div class="hq-recent-name">@' + esc(g.usuario) + '</div>' +
+            '<div class="hq-recent-prize">' + esc(g.premio) + ' · ' + diasDesde(g.fecha) + '</div></div>' +
             '</div>';
         }).join('');
       }
