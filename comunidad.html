@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comunidad — GeoArmy</title>
+  <meta name="description" content="El cuartel general de la comunidad GeoArmy: stream en vivo, Discord, WhatsApp y los últimos ganadores."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) — igual que index.html,
+       para que el widget de cuenta funcione también en esta página. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <!-- Tema V3 (espacial/holográfico) — mismo archivo compartido que index.html. No se tocó. -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="tienda.html">Tienda</a>
+          <a href="fortnite.html">Fortnite</a>
+          <a href="puntos.html">Puntos</a>
+          <a href="alcancia.html">Alcancía</a>
+        </div>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- COMUNIDAD: movido tal cual desde index.html (mismo contenido, mismos
+         IDs, mismos scripts exclusivos de esta sección) para que la página
+         principal sea solo el hero/selector de mundos. No se tocó ningún
+         endpoint, fetch, login, ranking ni lógica de premios. -->
+    <section class="section" id="comunidad">
+      <div class="v3-community-intro" data-reveal>
+        <div class="v3-tagline">EL CUARTEL GENERAL DE LA COMUNIDAD</div>
+        <p class="v3-sub">Un punto de encuentro para gamers. Compite, gana premios y forma parte de la comunidad.</p>
+      </div>
+
+      <div class="v3-howworks">
+        <div class="v3-orbit-title">¿Cómo funciona la Geo Army?</div>
+        <div class="v3-orbit-row">
+          <div class="v3-orbit-card v3-oc-purple" data-reveal>
+            <div class="v3-oc-num">01 · ÚNETE</div>
+            <div class="v3-oc-body"><b>Comunidad</b><span>Entra a la comunidad</span></div>
+          </div>
+          <div class="v3-orbit-card v3-oc-blue" data-reveal>
+            <div class="v3-oc-num">02 · PARTICIPA</div>
+            <div class="v3-oc-body"><b>En el stream</b><span>Sorteos · Ruletas</span></div>
+          </div>
+          <div class="v3-orbit-card v3-oc-green" data-reveal>
+            <div class="v3-oc-num">03 · GANA</div>
+            <div class="v3-oc-body"><b>Recompensas</b><span>Puntos · Premios</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="v3-live-pill" id="live-badge">
+        <span class="live-dot"></span>
+        <span id="live-label" class="v3-sr-only">Cargando...</span>
+        <span id="v3LiveText">Cargando…</span>
+      </div>
+
+      <div class="v3-cta-row" data-reveal>
+        <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-btn-primary">▶ Ver stream</a>
+        <button class="v3-btn-secondary" onclick="copyCode()">Explorar código: SORTEOSRK</button>
+      </div>
+
+      <div class="v3-now-section" data-reveal>
+        <div class="v3-now-header"><span class="v3-now-line"></span>Ahora en Geo Army<span class="v3-now-line"></span></div>
+
+        <div class="v3-now-grid">
+          <div class="v3-now-card v3-c-purple">
+            <div class="v3-now-head"><span class="v3-now-ic">📡</span>Stream</div>
+            <div class="v3-now-status"><span class="v3-now-dot" id="status-dot"></span><span id="status-text">Cargando...</span></div>
+            <div class="v3-now-sub"><span id="stream-game"></span> <span id="stream-viewers"></span></div>
+            <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-now-btn">Ver stream ›</a>
+          </div>
+
+          <div class="v3-now-card v3-c-discord">
+            <div class="v3-now-head"><span class="v3-now-ic"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.106c.36.698.772 1.362 1.225 1.994a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z"/></svg></span>Discord</div>
+            <div class="v3-now-big v3-now-big-sm">Únete a nuestra comunidad</div>
+            <div class="v3-now-sub">Chatea, participa y entérate de todo</div>
+            <a href="#" class="v3-now-btn">Entrar al Discord ›</a>
+          </div>
+
+          <div class="v3-now-card v3-c-whatsapp">
+            <div class="v3-now-head"><span class="v3-now-ic"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.484 1.34 5.003L2 22l5.117-1.334a9.96 9.96 0 0 0 4.887 1.28h.004c5.514 0 9.997-4.483 9.997-9.997s-4.483-9.946-9.997-9.946zm0 18.176a8.156 8.156 0 0 1-4.152-1.135l-.298-.176-3.036.792.812-2.958-.194-.304a8.163 8.163 0 0 1-1.253-4.398c0-4.51 3.67-8.18 8.18-8.18 4.508 0 8.18 3.67 8.18 8.18 0 4.51-3.672 8.18-8.18 8.18h-.06z"/></svg></span>WhatsApp</div>
+            <div class="v3-now-big v3-now-big-sm">Únete por WhatsApp</div>
+            <div class="v3-now-sub">Entérate de sorteos y avisos al instante</div>
+            <a href="#" class="v3-now-btn">Entrar al grupo ›</a>
+          </div>
+
+          <div class="v3-now-card v3-c-gold">
+            <div class="v3-now-head"><span class="v3-now-ic">🎮</span>Pavos Fortnite</div>
+            <div class="v3-now-big v3-now-big-sm">¿Necesitas pavos?</div>
+            <div class="v3-now-sub">Entra acá y consigue V-Bucks para Fortnite</div>
+            <a href="fortnite.html" class="v3-now-btn">Entra acá ›</a>
+          </div>
+
+          <div class="v3-now-card v3-c-pink">
+            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Último ganador</div>
+            <div class="v3-now-winner" id="v3LastWinner">Cargando…</div>
+            <a href="index.html#ganadores" class="v3-now-btn">Ver todos ›</a>
+          </div>
+        </div>
+
+        <div class="v3-recent">
+          <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🏆</span>Últimos ganadores</div>
+          <div class="v3-recent-row" id="v3RecentRow">Cargando…</div>
+          <a href="index.html#ganadores" class="v3-recent-more">Ver Salón de la Fama ›</a>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">¡Código copiado!</div>
+  <script src="js/main.js"></script>
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script>
+  // ===== V3: reescribe el texto de la píldora "en vivo" sin tocar main.js =====
+  // main.js sigue escribiendo en #live-label (ahora oculto visualmente); aquí solo
+  // observamos ese texto y mostramos una versión más útil en #v3LiveText.
+  (function () {
+    try {
+      var label = document.getElementById('live-label');
+      var out = document.getElementById('v3LiveText');
+      if (!label || !out) return;
+      function sync() {
+        var txt = label.textContent || '';
+        if (txt.indexOf('En vivo') !== -1) {
+          out.textContent = 'EN VIVO AHORA';
+        } else if (txt.indexOf('Fuera de línea') !== -1) {
+          out.textContent = 'Próximo stream: 7:00 PM';
+        } else {
+          out.textContent = txt;
+        }
+      }
+      sync();
+      new MutationObserver(sync).observe(label, { childList: true, characterData: true, subtree: true });
+    } catch (e) { console.warn('[v3-live-text]', e); }
+  })();
+  </script>
+  <script>
+  // ===== V3: "Ahora en Geo Army" — Último ganador + Últimos ganadores, con datos reales de ganadores.json =====
+  // Independiente del script del panel #ganadores (vive en index.html, no en esta página),
+  // envuelto en try/catch, no rompe nada si falla.
+  (function () {
+    try {
+      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+      function diasDesde(f) {
+        var partes = String(f || '').split('/');
+        if (partes.length !== 3) return '';
+        var d = parseInt(partes[0], 10), m = parseInt(partes[1], 10), y = parseInt(partes[2], 10);
+        if (!d || !m || !y) return '';
+        var fecha = new Date(y, m - 1, d);
+        var diff = Math.floor((new Date() - fecha) / 86400000);
+        if (diff <= 0) return 'Hoy';
+        if (diff === 1) return 'Hace 1 día';
+        return 'Hace ' + diff + ' días';
+      }
+      function renderLast(rows) {
+        var el = document.getElementById('v3LastWinner');
+        if (!el) return;
+        if (!rows.length) { el.innerHTML = '<div class="v3-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
+        var g = rows[0];
+        el.innerHTML =
+          '<div class="v3-now-winner-ava">🏆</div>' +
+          '<div><div class="v3-now-winner-name">@' + esc(g.usuario) + '</div>' +
+          '<div class="v3-now-winner-prize">' + esc(g.premio) + '</div></div>';
+      }
+      function renderRecent(rows) {
+        var el = document.getElementById('v3RecentRow');
+        if (!el) return;
+        if (!rows.length) { el.innerHTML = '<div class="v3-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
+        var ranks = ['g1', 'g2', 'g3'];
+        el.innerHTML = rows.slice(0, 3).map(function (g, i) {
+          return '<div class="v3-recent-item">' +
+            '<div class="v3-recent-rank ' + ranks[i] + '">' + (i + 1) + '</div>' +
+            '<div><div class="v3-recent-name">@' + esc(g.usuario) + '</div>' +
+            '<div class="v3-recent-prize">' + esc(g.premio) + '</div>' +
+            '<div class="v3-recent-time">' + diasDesde(g.fecha) + '</div></div>' +
+            '</div>';
+        }).join('');
+      }
+      fetch('ganadores.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+        .then(function (j) {
+          var rows = (j.ganadores || []).slice().sort(function (a, b) { return b.id - a.id; });
+          renderLast(rows);
+          renderRecent(rows);
+        })
+        .catch(function () { renderLast([]); renderRecent([]); });
+    } catch (e) { console.warn('[v3-now]', e); }
+  })();
+  </script>
+</body>
+</html>
