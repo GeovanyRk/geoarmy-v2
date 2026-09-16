@@ -843,3 +843,23 @@
   opacity: 1 !important;
   transform: translateY(0) !important;
 }
+
+/* Comunidad: separa el mensaje del pin y añade una flecha clara hacia él. */
+.v3-marker-label-community {
+  position: relative;
+  margin-bottom: 18px !important;
+}
+
+.v3-marker-label-community::after {
+  content: "↓";
+  position: absolute;
+  left: 50%;
+  bottom: -17px;
+  transform: translateX(-50%);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  line-height: 1;
+  color: #8fc4ff;
+  text-shadow: 0 0 8px rgba(120,190,255,.85);
+  pointer-events: none;
+}
