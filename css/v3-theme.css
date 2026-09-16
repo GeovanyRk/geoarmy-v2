@@ -148,6 +148,33 @@
   .v3-marker-fn { font-size: 14px; }
 }
 
+/* ===== Alcancía pospuesta: pin visible, bloqueado, con "Próximamente" =====
+   Solo afecta al pin #alcancia (aria-disabled="true" en el HTML). No toca
+   .v3-marker-label/.v3-marker-icon compartidos ni ningún otro pin. */
+.v3-marker-label-soon {
+  opacity: 1 !important; /* siempre visible, no solo al hover como el resto */
+  min-width: 100px; text-align: center; line-height: 1.3; padding: 5px 10px;
+}
+.v3-marker-soon-name {
+  display: block; font-size: 10px; letter-spacing: .05em; color: #eaf2ff;
+}
+.v3-marker-soon-tag {
+  display: block; margin-top: 2px;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 8px;
+  letter-spacing: .12em; text-transform: uppercase; color: #93a8d6; /* morado/azul tenue */
+}
+.v3-marker-icon-soon { filter: saturate(.7) brightness(.88); }
+.v3-planet-nav a[aria-disabled="true"] { cursor: not-allowed; }
+.v3-planet-nav a[aria-disabled="true"]:hover .v3-marker-icon,
+.v3-planet-nav a[aria-disabled="true"]:focus-visible .v3-marker-icon {
+  transform: none; box-shadow: 0 0 18px rgba(90,170,255,.55), inset 0 0 0 1px rgba(0,0,0,.25);
+}
+@media (max-width: 560px) {
+  .v3-marker-label-soon { min-width: 88px; padding: 4px 8px; }
+  .v3-marker-soon-name { font-size: 9px; }
+  .v3-marker-soon-tag { font-size: 7px; }
+}
+
 /* ===== Hero: globo + wordmark ===== */
 .v3-hero-stage { position: relative; z-index: 2; text-align: center; padding: 4px 1.5rem 6px; }
 .v3-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
