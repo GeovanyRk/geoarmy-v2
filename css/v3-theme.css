@@ -195,6 +195,80 @@
   .v3-world-locked, .v3-world-planet-img { width: 300px; height: 300px; }
 }
 
+/* ===== Mundo 02 — Halloween con countdown real =====
+   Overlay, candado y texto viven como HTML/CSS reales (no quemados en la
+   imagen) para poder animarlos y, más adelante, quitarlos cuando se
+   desbloquee. Todas las clases son nuevas y con prefijo v3-wl- -- no se
+   modificó ninguna regla compartida de arriba (.v3-world-locked /
+   .v3-world-planet-img), así que Mundo 03 sigue exactamente igual. */
+.v3-wl-orb { position: relative; display: inline-block; line-height: 0; }
+.v3-wl-img {
+  object-position: 50% 22%; /* castillo arriba visible, no lo recorta el cover cuadrado */
+  /* Ajuste visual (mismo glow morado que .v3-world-planet-img, más sutil) +
+     brillo/contraste/saturación para que el planeta bloqueado no se sienta
+     apagado -- reemplaza el filter compartido SOLO en este <img> (mismo
+     selector-specificity, gana por venir después en el archivo), así que
+     Mundo 03 sigue exactamente igual. */
+  filter:
+    brightness(1.13) contrast(1.12) saturate(1.18)
+    drop-shadow(0 0 30px rgba(150,110,255,.40))
+    drop-shadow(0 0 60px rgba(90,60,180,.26));
+}
+.v3-wl-tint {
+  position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  /* Overlay ~35% menos intenso que antes (.16/.6 -> .10/.39) para que el
+     castillo, árboles, cementerio y calabazas se vean sin perder el look
+     "bloqueado". */
+  background: radial-gradient(circle at 40% 30%, rgba(40,10,60,.10), rgba(8,4,18,.39) 78%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 78%, transparent 100%);
+  transition: opacity .4s var(--ease);
+}
+.v3-wl-lockbadge {
+  position: absolute; right: 8%; bottom: 12%; width: 38px; height: 38px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; background: rgba(10,4,24,.82); border: 1px solid rgba(180,120,255,.55);
+  box-shadow: 0 0 16px rgba(150,80,255,.55), inset 0 0 0 1px rgba(0,0,0,.3);
+  transition: opacity .4s var(--ease), transform .4s var(--ease);
+}
+.v3-wl-eyebrow {
+  margin-top: 14px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px;
+  letter-spacing: .22em; text-transform: uppercase; color: #b98cf5;
+}
+.v3-wl-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: clamp(17px, 3.6vw, 21px);
+  letter-spacing: .03em; color: #f2ecff; margin-top: 2px;
+  text-shadow: 0 0 18px rgba(150,90,255,.55), 0 0 30px rgba(255,140,60,.18);
+}
+.v3-wl-sub {
+  font-family: 'Orbitron', sans-serif; font-weight: 500; font-size: 10.5px;
+  letter-spacing: .07em; color: rgba(230,225,245,.6); margin-top: 4px; text-transform: uppercase;
+}
+.v3-wl-countdown {
+  display: inline-flex; align-items: baseline; gap: 7px; margin-top: 12px;
+  background: rgba(24,10,40,.34); border: 1px solid rgba(160,90,255,.28);
+  border-radius: 100px; padding: 7px 16px; font-family: 'Orbitron', sans-serif;
+}
+.v3-wl-seg { display: inline-flex; align-items: baseline; gap: 2px; }
+.v3-wl-seg b {
+  font-size: clamp(13px, 3vw, 15px); font-weight: 700; color: #ffcf8a;
+  text-shadow: 0 0 10px rgba(255,150,60,.55), 0 0 16px rgba(160,90,255,.4);
+}
+.v3-wl-seg i { font-style: normal; font-size: 9px; color: rgba(230,225,245,.5); margin-left: 1px; }
+.v3-wl-colon { color: rgba(230,225,245,.32); font-size: 12px; }
+.v3-wl-available {
+  font-weight: 700; letter-spacing: .1em; color: #ffb84a; font-size: 12.5px;
+  text-shadow: 0 0 14px rgba(255,150,60,.6);
+}
+/* Preparado para el 1 de octubre: el countdown en JS agrega "is-unlocked" a
+   .v3-wl-halloween apenas llega la fecha -- esto ya sabe quitar el tinte y
+   el candado visualmente, sin tocar el resto de la estructura del mundo. */
+.v3-wl-halloween.is-unlocked .v3-wl-tint,
+.v3-wl-halloween.is-unlocked .v3-wl-lockbadge { opacity: 0; pointer-events: none; }
+@media (max-width: 1700px) {
+  .v3-wl-lockbadge { width: 30px; height: 30px; font-size: 13px; }
+}
+
 /* Modo carrusel (mobile/tablet): scroll horizontal con snap, un mundo a la
    vez, centrado. Orden del DOM tal cual (activo, 02, 03) — sin "order". */
 @media (max-width: 1300px) {
@@ -709,3 +783,57 @@
   display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
   padding: 20px 22px;
 }
+
+/* ===== Ajuste Comunidad: llamada para nuevos + intro centrado =====
+   Solo afecta al pin #comunidad y al encabezado de la pestaña Comunidad. */
+.v3-marker-label-community {
+  min-width: 118px;
+  padding: 6px 10px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+}
+.v3-marker-label-community span,
+.v3-marker-label-community strong {
+  display: block;
+}
+.v3-marker-label-community span {
+  font-size: 9px;
+  color: #a9bad6;
+  letter-spacing: .03em;
+}
+.v3-marker-label-community strong {
+  margin-top: 2px;
+  font-size: 10px;
+  color: #eaf2ff;
+  letter-spacing: .05em;
+}
+
+#comunidad .v3-community-intro {
+  max-width: 760px;
+  margin: 0 auto 24px;
+  text-align: center;
+}
+#comunidad .v3-community-intro .v3-tagline {
+  margin: 0;
+  text-align: center;
+}
+#comunidad .v3-community-intro .v3-sub {
+  margin: 10px auto 0;
+  text-align: center;
+}
+#comunidad .v3-howworks {
+  margin-top: 0;
+}
+
+@media (max-width: 560px) {
+  .v3-marker-label-community {
+    min-width: 104px;
+    padding: 5px 8px;
+  }
+  #comunidad .v3-community-intro {
+    margin-bottom: 20px;
+    padding: 0 6px;
+  }
+}
+
