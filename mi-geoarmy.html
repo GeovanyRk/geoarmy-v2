@@ -463,9 +463,9 @@
       });
     }
 
-    // El amount NO es libre: se fija al momento de abrir el modal (el
-    // disponible actual de esa moneda) y no se vuelve a leer un input libre,
-    // tal como se pidió para esta primera prueba end-to-end.
+    // El usuario puede solicitar una parte de su saldo disponible.
+    // El backend request_redemption() sigue siendo la autoridad final:
+    // valida el monto, revisa balance-reserved y reserva exactamente lo pedido.
     function openRedeemModal(sb, cur, disponible, userId) {
       var requestKey = (window.crypto && window.crypto.randomUUID)
         ? window.crypto.randomUUID()
@@ -479,8 +479,12 @@
           '<button type="button" class="ga-modal-close" aria-label="Cerrar">✕</button>' +
           '<div class="ga-modal-logo">' + cur.icon + '</div>' +
           '<h3>Solicitar recompensa — ' + esc(cur.label) + '</h3>' +
-          '<p>Vas a solicitar <strong>' + formatWalletAmount(cur, disponible) + '</strong>. Ese monto quedará reservado mientras se procesa tu solicitud.</p>' +
+          '<p>Tienes <strong>' + formatWalletAmount(cur, disponible) + '</strong> disponibles. El monto que solicites quedará reservado mientras se procesa tu solicitud.</p>' +
           '<form id="mgRedeemForm" style="text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:10px;">' +
+            '<label style="font-size:13px; color:#a9bad6;">Cantidad a reclamar' +
+              '<input type="number" id="mgReqAmount" required min="' + (cur.decimals === 2 ? '0.01' : '1') + '" max="' + disponible + '" step="' + (cur.decimals === 2 ? '0.01' : '1') + '" placeholder="' + (cur.decimals === 2 ? 'Ej: 5.00' : 'Ej: 500') + '" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
+              '<span id="mgReqAmountHelp" style="display:block; margin-top:4px; font-size:11px; color:#7f91ad;">Disponible: ' + esc(formatWalletAmount(cur, disponible)) + '</span>' +
+            '</label>' +
             '<label style="font-size:13px; color:#a9bad6;">¿Qué estás solicitando?' +
               '<input type="text" id="mgReqItem" required maxlength="200" placeholder="Ej: Skin Fortnite de prueba" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
             '</label>' +
@@ -491,12 +495,41 @@
               '<textarea id="mgReqNotes" maxlength="1000" rows="2" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;"></textarea>' +
             '</label>' +
             '<div id="mgReqError" style="color:#ff8080; font-size:13px;"></div>' +
-            '<button type="submit" class="ga-twitch-btn" id="mgReqSubmit">Confirmar solicitud (' + formatWalletAmount(cur, disponible) + ')</button>' +
+            '<button type="submit" class="ga-twitch-btn" id="mgReqSubmit">Confirmar solicitud</button>' +
           '</form>' +
         '</div>';
       document.body.appendChild(overlay);
       overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
       overlay.querySelector('.ga-modal-close').addEventListener('click', function () { overlay.remove(); });
+
+      var amountInput = overlay.querySelector('#mgReqAmount');
+      var amountHelp = overlay.querySelector('#mgReqAmountHelp');
+      var submitBtnLive = overlay.querySelector('#mgReqSubmit');
+
+      function normalizarMonto(raw) {
+        var n = Number(raw);
+        if (!Number.isFinite(n)) return null;
+        if (cur.decimals === 0) {
+          if (!Number.isInteger(n)) return null;
+          return n;
+        }
+        return Math.round(n * 100) / 100;
+      }
+
+      function actualizarResumenMonto() {
+        var monto = normalizarMonto(amountInput.value);
+        if (monto != null && monto > 0 && monto <= disponible) {
+          submitBtnLive.textContent = 'Confirmar solicitud (' + formatWalletAmount(cur, monto) + ')';
+          amountHelp.textContent = 'Después quedarían ' + formatWalletAmount(cur, disponible - monto) + ' disponibles.';
+          amountHelp.style.color = '#7CFC9A';
+        } else {
+          submitBtnLive.textContent = 'Confirmar solicitud';
+          amountHelp.textContent = 'Disponible: ' + formatWalletAmount(cur, disponible);
+          amountHelp.style.color = '#7f91ad';
+        }
+      }
+
+      amountInput.addEventListener('input', actualizarResumenMonto);
 
       overlay.querySelector('#mgRedeemForm').addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -510,14 +543,33 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'Enviando…';
 
+        var monto = normalizarMonto(document.getElementById('mgReqAmount').value);
         var item = document.getElementById('mgReqItem').value.trim();
         var account = document.getElementById('mgReqAccount').value.trim();
         var notes = document.getElementById('mgReqNotes').value.trim();
 
+        if (monto == null || monto <= 0) {
+          errEl.textContent = cur.decimals === 0
+            ? 'Ingresa una cantidad entera mayor a 0.'
+            : 'Ingresa una cantidad válida mayor a 0.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirmar solicitud';
+          sending = false;
+          return;
+        }
+
+        if (monto > disponible) {
+          errEl.textContent = 'No puedes solicitar más de ' + formatWalletAmount(cur, disponible) + '.';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirmar solicitud';
+          sending = false;
+          return;
+        }
+
         try {
           var res = await sb.rpc('request_redemption', {
             p_currency_code: cur.code,
-            p_amount: disponible,
+            p_amount: monto,
             p_request_key: requestKey,
             p_requested_item: item || null,
             p_account_identifier: account || null,
@@ -531,7 +583,9 @@
           console.warn('[mi-geoarmy] error solicitando recompensa', err);
           errEl.textContent = (err && err.message) ? err.message : 'No se pudo enviar la solicitud. Intenta de nuevo.';
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Confirmar solicitud (' + formatWalletAmount(cur, disponible) + ')';
+          submitBtn.textContent = monto && monto > 0 && monto <= disponible
+            ? 'Confirmar solicitud (' + formatWalletAmount(cur, monto) + ')'
+            : 'Confirmar solicitud';
           sending = false;
         }
       });
