@@ -323,6 +323,48 @@
     });
   }
 
+
+  // ===== Auto-vinculado de premios pendientes de Ganadores =====
+  // Cuando el usuario ya tiene sesion/perfil, esta RPC toma SU auth.uid(),
+  // enlaza winner_records cuyo twitch_login coincide con su perfil y acredita
+  // unicamente premios pendientes elegibles que aun no tengan transaccion de
+  // wallet. El backend es la autoridad: el cliente NO envia login, monto,
+  // moneda ni profile_id.
+  //
+  // Se guarda la Promise (no solo un boolean) para que si render() se dispara
+  // varias veces por onAuthStateChange, todas las llamadas concurrentes esperen
+  // la MISMA ejecucion. Asi evitamos llamadas paralelas innecesarias y, ademas,
+  // render() puede esperar a que termine antes de leer los mini-wallets, para
+  // que un premio recien vinculado aparezca en el header desde esa misma carga.
+  var pendingWinnersClaimPromise = null;
+  function autoClaimPendingWinners() {
+    if (pendingWinnersClaimPromise) return pendingWinnersClaimPromise;
+
+    pendingWinnersClaimPromise = sb.rpc('claim_my_pending_winners').then(function (res) {
+      if (res.error) {
+        console.warn('[geoarmy-account] claim_my_pending_winners fallo', res.error);
+        return null;
+      }
+
+      var data = res.data || null;
+      if (data) {
+        var linked = Number(data.linked_records || 0);
+        var credited = Number(data.credited_rewards || 0);
+        if (linked > 0 || credited > 0) {
+          try {
+            document.dispatchEvent(new CustomEvent('geoarmy:winners-claimed', { detail: data }));
+          } catch (e) {}
+        }
+      }
+      return data;
+    }).catch(function (e) {
+      console.warn('[geoarmy-account] claim_my_pending_winners error de red', e);
+      return null;
+    });
+
+    return pendingWinnersClaimPromise;
+  }
+
   async function render() {
     var slot = document.getElementById('geoAccountWidget');
     if (!slot) return;
@@ -338,6 +380,11 @@
  
     var profile = await fetchProfile(session.user.id);
     if (!profile) { renderLoggedOut(slot); return; }
+
+    // Espera el auto-vinculado antes de leer VBUCKS/OWCOINS para que, si esta
+    // sesion acaba de heredar premios pendientes, el widget muestre el saldo
+    // actualizado en esta misma carga. DAILY_VISIT sigue independiente.
+    await autoClaimPendingWinners();
  
     var saldo = null;
     if (session.provider_token) {
