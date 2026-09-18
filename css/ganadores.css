@@ -1,0 +1,175 @@
+/* =====================================================================
+   SALÓN DE GANADORES — Geo Army. Prefijo gw- (mismo criterio que el
+   resto de páginas V2: solo se reutiliza el "shell" compartido de
+   css/v3-theme.css -- .v3-page/.v3-stars/.v3-nebula/.v3-nav*/.v3-auth/
+   .v3-join-btn). No se modifica v3-theme.css ni css/style.css.
+   Fuente de datos única: la vista pública public_winners (ver
+   ganadores.js) — esta hoja de estilos no sabe nada de eso, solo pinta
+   lo que el JS ya calculó.
+   ===================================================================== */
+
+/* ---------- HERO ---------- */
+.gw-hero { position: relative; z-index: 2; padding: 6rem 1.5rem 2.5rem; text-align: center; overflow: hidden; isolation: isolate; }
+.gw-hero::before {
+  content: ""; position: absolute; inset: -20% -10% auto -10%; height: 140%; z-index: -2;
+  background:
+    radial-gradient(34% 42% at 24% 14%, rgba(255,210,63,.14), transparent 65%),
+    radial-gradient(32% 40% at 76% 22%, rgba(145,71,255,.16), transparent 65%),
+    radial-gradient(28% 34% at 50% 100%, rgba(58,160,255,.1), transparent 65%);
+  filter: blur(16px);
+}
+.gw-hero-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.gw-hero-grid {
+  position: absolute; inset: -10%;
+  background-image:
+    linear-gradient(rgba(150,190,255,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150,190,255,.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(55% 55% at 50% 18%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(55% 55% at 50% 18%, #000 0%, transparent 78%);
+}
+.gw-hero-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+
+.gw-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--text2);
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+  padding: 8px 16px; border-radius: 100px; margin-bottom: 1.8rem;
+  transition: color .25s var(--ease), border-color .25s var(--ease), background .25s var(--ease);
+}
+.gw-back:hover { color: #fff; border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.07); }
+
+.gw-eyebrow {
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+  color: #ffd23f; text-shadow: 0 0 16px rgba(255,210,63,.4); margin-bottom: 1rem;
+}
+.gw-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: .01em; line-height: 1.04;
+  font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 0 0 .9rem;
+  background: linear-gradient(120deg, #eaf4ff 8%, #ffe89a 45%, #c9a3ff 92%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 24px rgba(255,210,63,.2));
+  text-transform: uppercase;
+}
+.gw-sub { color: var(--text2); font-size: 16px; max-width: 460px; margin: 0 auto; line-height: 1.65; }
+
+/* ---------- SKELETON (carga) ---------- */
+.gw-skel {
+  display: inline-block; width: 84px; height: 12px; border-radius: 100px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.16), rgba(255,255,255,.06));
+  background-size: 200% 100%; animation: gwShimmer 1.4s ease-in-out infinite;
+}
+@keyframes gwShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .gw-skel { animation: none; } }
+
+/* ---------- PODIO ---------- */
+.gw-podium-wrap { position: relative; z-index: 2; max-width: 900px; margin: 0 auto; padding: 1.5rem 1.5rem 0; }
+.gw-podium { display: flex; align-items: flex-end; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+.gw-slot {
+  --gw-ac: #b8c4d9;
+  position: relative; flex: 1 1 0; min-width: 150px; max-width: 230px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 30px 16px 0; border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+  border: 1px solid color-mix(in srgb, var(--gw-ac) 35%, rgba(255,255,255,.08));
+  box-shadow: 0 26px 50px -32px color-mix(in srgb, var(--gw-ac) 55%, transparent);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.gw-slot-1 { --gw-ac: #ffd23f; order: 2; transform: translateY(-20px); z-index: 2; padding-top: 40px; }
+.gw-slot-2 { --gw-ac: #c7d3ea; order: 1; }
+.gw-slot-3 { --gw-ac: #d99a5c; order: 3; }
+.gw-slot:hover { transform: translateY(-4px); }
+.gw-slot-1:hover { transform: translateY(-24px); }
+
+.gw-slot-crown { font-size: 1.4rem; position: absolute; top: -20px; filter: drop-shadow(0 0 10px rgba(255,210,63,.6)); }
+.gw-slot-medal { font-size: 2.2rem; margin-bottom: 6px; filter: drop-shadow(0 4px 10px rgba(0,0,0,.4)); }
+.gw-slot-1 .gw-slot-medal { font-size: 2.8rem; }
+
+.gw-slot-name {
+  display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.02rem; color: #fff;
+  min-height: 1.3em; word-break: break-word; margin-bottom: 4px;
+}
+.gw-slot-1 .gw-slot-name { font-size: 1.25rem; }
+.gw-slot-count { display: block; font-size: 12.5px; color: var(--gw-ac); font-weight: 600; min-height: 1.2em; margin-bottom: 14px; }
+
+.gw-slot-pedestal {
+  width: 100%; display: flex; align-items: flex-start; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.1rem; color: rgba(0,0,0,.35);
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--gw-ac) 85%, transparent), color-mix(in srgb, var(--gw-ac) 55%, transparent));
+  padding-top: 8px;
+}
+.gw-slot-1 .gw-slot-pedestal { height: 74px; }
+.gw-slot-2 .gw-slot-pedestal { height: 54px; }
+.gw-slot-3 .gw-slot-pedestal { height: 40px; }
+
+.gw-slot.is-empty { opacity: .68; }
+.gw-slot.is-empty .gw-slot-name { color: var(--text2); font-weight: 600; font-size: .92rem; }
+.gw-slot-1.is-empty .gw-slot-name { font-size: 1rem; letter-spacing: .02em; }
+
+.gw-empty-note { text-align: center; color: var(--text2); font-size: 14px; margin: 1.6rem auto 0; max-width: 420px; }
+
+/* ---------- CONTADOR ---------- */
+.gw-counter {
+  display: flex; align-items: baseline; justify-content: center; gap: 10px;
+  margin: 2.2rem auto 0; padding: 12px 26px; width: fit-content;
+  background: rgba(255,210,63,.06); border: 1px solid rgba(255,210,63,.25); border-radius: 100px;
+}
+.gw-counter-num { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.4rem; color: #ffd23f; text-shadow: 0 0 14px rgba(255,210,63,.4); }
+.gw-counter-label { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--text2); }
+
+/* ---------- ERROR ---------- */
+.gw-error { max-width: 480px; margin: 3rem auto; padding: 2rem 1.5rem; text-align: center; color: var(--text2); }
+.gw-error-ic { font-size: 30px; margin-bottom: 10px; }
+
+/* ---------- HISTORIAL ---------- */
+.gw-history-section { position: relative; z-index: 2; max-width: 900px; margin: 3.5rem auto 0; padding: 0 1.5rem 4.5rem; }
+.gw-section-title {
+  display: flex; align-items: center; gap: 16px; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .24em;
+  text-transform: uppercase; color: var(--text2); margin: 0 auto 20px;
+}
+.gw-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent); }
+
+.gw-search {
+  display: block; width: 100%; margin: 0 auto 1.4rem; max-width: 480px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); color: #fff;
+  padding: 12px 18px; border-radius: 100px; font-size: .92rem; font-family: inherit;
+}
+.gw-search::placeholder { color: rgba(255,255,255,.4); }
+.gw-search:focus { outline: 2px solid var(--accent-light); outline-offset: 1px; }
+
+.gw-list {
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.008));
+  border: 1px solid rgba(255,255,255,.08); border-radius: 18px; overflow: hidden;
+}
+.gw-row {
+  display: grid; grid-template-columns: 1.1fr 1.1fr .9fr .8fr; gap: 10px; align-items: center;
+  padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .9rem;
+}
+.gw-row:last-child { border-bottom: 0; }
+.gw-row:hover { background: rgba(255,255,255,.02); }
+.gw-row-user { font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-row-prize { color: #ffd23f; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-row-event { color: var(--text2); font-size: .85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-row-date { color: var(--text3); font-size: .82rem; text-align: right; white-space: nowrap; }
+
+.gw-row-skel { grid-template-columns: 1fr; padding: 18px 20px; }
+.gw-row-skel .gw-skel { width: 60%; height: 14px; }
+
+.gw-empty-history { padding: 40px 20px; text-align: center; color: var(--text2); font-size: .9rem; }
+
+@media (max-width: 700px) {
+  .gw-hero { padding: 4.6rem 1.2rem 2rem; }
+  .gw-podium { flex-wrap: wrap; }
+  .gw-slot-1 { order: -1; flex-basis: 100%; max-width: 260px; margin: 0 auto 1rem; transform: none; }
+  .gw-slot-1:hover { transform: translateY(-4px); }
+  .gw-slot-2, .gw-slot-3 { flex: 1 1 45%; max-width: 45%; }
+
+  .gw-row { grid-template-columns: 1fr; gap: 4px; padding: 14px 16px; }
+  .gw-row-date, .gw-row-event { text-align: left; }
+  .gw-row-prize::before { content: "🏆 "; }
+  .gw-row-event::before { content: "🎮 "; color: var(--text2); }
+  .gw-row-date::before { content: "🗓 "; color: var(--text2); }
+}
