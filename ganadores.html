@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Salón de Ganadores — GeoArmy</title>
+  <meta name="description" content="Salón de ganadores de la comunidad Geo Army: el podio de más victorias y el historial de premios entregados."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- public_winners es una vista PÚBLICA de Supabase (protegida por RLS
+       del lado del proyecto) -- misma config pública que ya usa el resto
+       del sitio (js/geoarmy-config.js). Nunca se usa aquí la service role
+       key ni ninguna clave privada. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <link rel="stylesheet" href="css/ganadores.css"/>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <!-- Shell visual V2 compartido (mismo que tienda.html/ranking.html/
+       comunidad.html): fondo espacial/nebulosas/nav. Envuelve solo nav +
+       hero; el resto de la página (podio/historial) vive fuera, igual
+       que en esas páginas. -->
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-auth">
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="gw-hero">
+      <div class="gw-hero-bg" aria-hidden="true"><div class="gw-hero-grid"></div></div>
+      <div class="gw-hero-inner" data-reveal>
+        <a href="index.html#inicio" class="gw-back">← Volver al mapa</a>
+        <div class="gw-eyebrow">✦ Salón de Ganadores ✦</div>
+        <h1 class="gw-title">Salón de Ganadores</h1>
+        <p class="gw-sub">En Geo Army cualquiera puede llegar al podio.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- PODIO TOP 3 -- se calcula 100% en ganadores.js a partir de
+       public_winners (agrupado por usuario, ordenado por victorias).
+       El estado vacío/parcial se resuelve ahí mismo, sin datos ficticios. -->
+  <section class="gw-podium-wrap">
+    <div class="gw-podium" id="gwPodium">
+      <div class="gw-slot gw-slot-2" id="gwSlot2">
+        <span class="gw-slot-medal">🥈</span>
+        <span class="gw-slot-name"><span class="gw-skel"></span></span>
+        <span class="gw-slot-count"></span>
+        <div class="gw-slot-pedestal">2</div>
+      </div>
+      <div class="gw-slot gw-slot-1" id="gwSlot1">
+        <span class="gw-slot-crown">👑</span>
+        <span class="gw-slot-medal">🥇</span>
+        <span class="gw-slot-name"><span class="gw-skel"></span></span>
+        <span class="gw-slot-count"></span>
+        <div class="gw-slot-pedestal">1</div>
+      </div>
+      <div class="gw-slot gw-slot-3" id="gwSlot3">
+        <span class="gw-slot-medal">🥉</span>
+        <span class="gw-slot-name"><span class="gw-skel"></span></span>
+        <span class="gw-slot-count"></span>
+        <div class="gw-slot-pedestal">3</div>
+      </div>
+    </div>
+    <p class="gw-empty-note" id="gwEmptyNote" hidden>Aún no hay ganadores registrados. ¿Quién será el primero?</p>
+
+    <div class="gw-counter" id="gwCounter">
+      <span class="gw-counter-num" id="gwCounterNum">0</span>
+      <span class="gw-counter-label" id="gwCounterLabel">PREMIOS REGISTRADOS</span>
+    </div>
+  </section>
+
+  <!-- Estado de error -- oculto por defecto, solo se muestra si falla la
+       consulta a Supabase (ver ganadores.js). Nunca expone el error técnico. -->
+  <div class="gw-error" id="gwErrorBox" hidden>
+    <div class="gw-error-ic">⚠️</div>
+    <p>No pudimos cargar el salón de ganadores. Intenta nuevamente.</p>
+  </div>
+
+  <!-- ÚLTIMOS GANADORES -->
+  <section class="gw-history-section" id="gwHistorySection">
+    <div class="gw-section-title"><span class="gw-line"></span>Últimos ganadores<span class="gw-line"></span></div>
+    <input id="gwSearch" class="gw-search" type="search" placeholder="Buscar ganador o premio..." aria-label="Buscar ganador o premio">
+    <div class="gw-list" id="gwHistoryList">
+      <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
+      <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
+      <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="js/premium.js"></script>
+  <script src="ganadores.js"></script>
+</body>
+</html>
