@@ -376,7 +376,15 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
     align-items: stretch;
     gap: 32px;
   }
-  .hw26-boss-info { flex: 1 1 42%; display: flex; flex-direction: column; justify-content: center; }
+  /* Cuarta pasada: antes "justify-content: center" dejaba mucho vacío
+     entre el encabezado de la página y la insignia de fase (el bloque de
+     texto quedaba centrado en toda la altura de la imagen). Con
+     flex-start el contenido arranca arriba, al mismo nivel que la
+     imagen (ambas columnas ya comparten el mismo borde superior por
+     align-items:stretch en .hw26-boss-layout) -- cierra el vacío y
+     alinea la parte superior de Morvanna con el bloque de texto, sin
+     tocar el ratio de columnas ni el ancho. */
+  .hw26-boss-info { flex: 1 1 42%; display: flex; flex-direction: column; justify-content: flex-start; }
   .hw26-boss-art { flex: 1 1 58%; }
 }
 @media (min-width: 1020px) {
@@ -436,10 +444,17 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   background: linear-gradient(0deg, rgba(6, 4, 10, 0.75) 0%, transparent 22%);
 }
 @media (min-width: 760px) {
+  /* Cuarta pasada: el borde izquierdo se funde mucho más fuerte con el
+     fondo (mayor opacidad y mayor alcance) para que Morvanna no se lea
+     como "rectángulo pegado" junto a la columna de texto; se agrega un
+     degradado muy sutil también en el borde derecho para que ese canto
+     tampoco quede como un corte duro contra el fondo. El inferior se
+     mantiene igual de suave que antes. */
   .hw26-boss-art::after {
     background:
-      linear-gradient(0deg, rgba(6, 4, 10, 0.55) 0%, transparent 20%),
-      linear-gradient(90deg, rgba(6, 4, 10, 0.75) 0%, transparent 20%);
+      linear-gradient(0deg, rgba(6, 4, 10, 0.55) 0%, transparent 22%),
+      linear-gradient(90deg, rgba(6, 4, 10, 0.9) 0%, transparent 34%),
+      linear-gradient(270deg, rgba(6, 4, 10, 0.3) 0%, transparent 10%);
   }
 }
 .hw26-boss-img {
