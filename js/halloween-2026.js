@@ -683,9 +683,250 @@
     box.innerHTML = lastEffects.slice(0, 3).map(effectCardHtml).join('');
   }
 
+  // ---------------------------------------------------------------------
+  // 5b) Cola visual de movimientos (Batalla) — SOLO presentación.
+  //
+  //     El motor/backend ya está cerrado: este bloque NUNCA calcula daño
+  //     ni curación, NUNCA decide si algo ocurrió, y NUNCA toca boss_hp/
+  //     geoarmy_hp localmente (eso lo sigue fijando renderBoss(lastState)
+  //     con halloween_2026_get_public_state(), en cada poll, igual que
+  //     antes). Esto solo LEE halloween_2026_get_public_feed(30) --mismo
+  //     RPC y mismos campos que ya usa Crónicas (log_id, entry_type,
+  //     actor_name, actor_role, action_key, boss_attack_key, effect_key,
+  //     boss_hp_delta, geoarmy_hp_delta, created_at)-- y representa cada
+  //     log nuevo como un movimiento breve, uno detrás de otro.
+  //
+  //     Dedupe: por log_id (el identificador estable real del log), nunca
+  //     por nombre/daño/timestamp -- dos jugadores pueden generar el mismo
+  //     ataque legítimamente.
+  // ---------------------------------------------------------------------
+  var MOVE_SEEN_IDS = {};      // log_id ya vistos esta sesión (dedupe real)
+  var MOVE_QUEUE = [];         // logs nuevos pendientes de animar, en orden
+  var MOVE_PLAYING = false;    // nunca se superponen dos movimientos
+  var MOVE_BASELINE_DONE = false; // primera carga: registrar sin animar
+
+  // entry_type que SÍ representa la cola como movimiento. role_selected,
+  // mission_damage, boss_attack_announced, phase_change, victory, defeat
+  // y event_started quedan fuera -- boss_attack_announced es solo el
+  // aviso de Cataclismo (ya tiene su propia presentación vía
+  // pending_attack_key/countdown, ver sección 10 del pedido) y el resto
+  // no estaba en el set de movimientos pedido.
+  function isMovementEntry(it) {
+    return it.entry_type === 'player_attack' || it.entry_type === 'boss_attack' ||
+      it.entry_type === 'heal' || it.entry_type === 'shield' ||
+      it.entry_type === 'effect_applied';
+  }
+  var DRAIN_KEYS = { drenaje_alma: 1, drenaje_demoniaco: 1 };
+
+  function fmtDelta(n) {
+    n = Math.round(Number(n) || 0);
+    var sign = n > 0 ? '+' : (n < 0 ? '−' : '');
+    return sign + fmtNum(Math.abs(n));
+  }
+
+  // Reutiliza feedItemText() (Crónicas) para no duplicar el formato
+  // narrativo -- se limpia el HTML porque acá va en texto plano.
+  function lastMoveText(item) {
+    var html = feedItemText(item);
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  }
+  function renderLastMove(item) {
+    var box = $('hw26LastMove');
+    if (!box) return;
+    box.textContent = 'ÚLTIMO MOVIMIENTO · ' + lastMoveText(item);
+    box.hidden = false;
+  }
+
+  function shakeEl(el, ms) {
+    if (!el) return;
+    el.classList.remove('hw26-shake-local');
+    void el.offsetWidth;
+    el.classList.add('hw26-shake-local');
+    setTimeout(function () { el.classList.remove('hw26-shake-local'); }, ms);
+  }
+
+  function flashHitOverlay() {
+    var el = $('hw26BossHitFlash');
+    if (!el) return;
+    el.classList.remove('is-active');
+    void el.offsetWidth;
+    el.classList.add('is-active');
+    setTimeout(function () { el.classList.remove('is-active'); }, 500);
+  }
+
+  // Crea el "pop" flotante (nombre + valor), lo saca solo del DOM al
+  // terminar -- no deja basura acumulada en sesiones largas de stream.
+  function spawnMovePop(zoneEl, nameText, valueText, extraCls, ms) {
+    if (!zoneEl) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'hw26-move-pop' + (extraCls ? ' ' + extraCls : '');
+    wrap.style.animationDuration = ms + 'ms';
+    wrap.innerHTML =
+      (nameText ? '<div class="hw26-move-name">' + esc(nameText) + '</div>' : '') +
+      (valueText ? '<div class="hw26-move-value">' + esc(valueText) + '</div>' : '');
+    zoneEl.appendChild(wrap);
+    setTimeout(function () {
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    }, ms);
+  }
+
+  var MOVE_DURATION_MS = 1500; // dentro del rango pedido de 1.2-1.8s
+
+  // Geo Army ataca a Morvanna -- zona derecha (sobre la imagen), flash
+  // blanco/violeta breve, micro shake SOLO de la imagen.
+  function playBossHit(item, done) {
+    var label = ACTION_KEY_LABEL[item.action_key] || (item.action_key || 'ATAQUE').toUpperCase();
+    spawnMovePop($('hw26MoveBoss'), label, fmtDelta(item.boss_hp_delta) + ' HP', '', MOVE_DURATION_MS);
+    shakeEl($('hw26BossImg'), 500);
+    flashHitOverlay();
+    if ($('hw26BossHpFill')) flashOnce($('hw26BossHpFill'), 'hw26-flash-hit');
+    setTimeout(done, MOVE_DURATION_MS);
+  }
+
+  // Morvanna ataca a Geo Army -- zona izquierda (sobre la barra de
+  // resistencia), flash rojo local, shake SOLO del bloque de resistencia.
+  // Cataclismo, si llega aquí como boss_attack normal (resolución real,
+  // no el aviso), usa exactamente el mismo camino -- solo se anima el
+  // resultado, nunca el anuncio de preparación (eso lo filtra
+  // isMovementEntry() al excluir boss_attack_announced).
+  function playGeoHit(item, done) {
+    var label = BOSS_ATTACK_LABEL[item.boss_attack_key] || (item.boss_attack_key || 'ATAQUE').toUpperCase();
+    spawnMovePop($('hw26MoveGeo'), label, fmtDelta(item.geoarmy_hp_delta) + ' RESISTENCIA', '', MOVE_DURATION_MS);
+    shakeEl($('hw26GeoBarBlock'), 500);
+    if ($('hw26GeoHpFill')) flashOnce($('hw26GeoHpFill'), 'hw26-flash-hit');
+    setTimeout(done, MOVE_DURATION_MS);
+  }
+
+  // Curación -- pulso dorado/verde sobre la barra Geo Army, con el valor
+  // REAL del log (nunca hardcodeado). El feed no expone qué curación
+  // canon fue (curacion_menor/pulso_vital/bendicion_guardia): si el log
+  // trae action_key se usa, si no, nombre genérico -- ver aviso final.
+  function playHeal(item, done) {
+    var label = HEAL_ACTION_LABEL[item.action_key] || 'Curación';
+    spawnMovePop($('hw26MoveGeo'), label, fmtDelta(item.geoarmy_hp_delta) + ' RESISTENCIA', 'hw26-move-pop-heal', MOVE_DURATION_MS);
+    if ($('hw26GeoHpFill')) flashOnce($('hw26GeoHpFill'), 'hw26-flash-heal');
+    setTimeout(done, MOVE_DURATION_MS);
+  }
+
+  // Escudo genérico (entry_type:'shield', sin sub-clave en el feed actual
+  // -- distinto de un log effect_applied con effect_key:'escudo_arcano',
+  // que si trae nombre propio vía playEffectAnnounce()).
+  function playShieldGeneric(item, done) {
+    spawnMovePop($('hw26MoveGeo'), 'Escudo', 'Geo Army se protegió', 'hw26-move-pop-buff', MOVE_DURATION_MS);
+    setTimeout(done, MOVE_DURATION_MS);
+  }
+
+  // Buff/debuff anunciado -- SOLO se muestra cuando el feed trae un log
+  // effect_applied real con ese effect_key (nunca inferido por el nombre
+  // de un ataque). El subtítulo de debuff (marca_bruja/herida_profana)
+  // sale de DEBUFF_SUB_LABEL usando esa misma confirmación.
+  function playEffectAnnounce(item, done) {
+    var meta = EFFECT_META[item.effect_key];
+    var title = meta ? (meta.name + ' ACTIVADO') : ((item.effect_key || 'EFECTO') + ' ACTIVADO').toUpperCase();
+    var sub = DEBUFF_SUB_LABEL[item.effect_key] || '';
+    spawnMovePop($('hw26MoveGeo'), title, sub, 'hw26-move-pop-buff', MOVE_DURATION_MS);
+    setTimeout(done, MOVE_DURATION_MS);
+  }
+
+  // Drenajes (drenaje_alma / drenaje_demoniaco) -- DOS pasos dentro del
+  // MISMO movimiento: primero se ve drenada la resistencia de Geo Army
+  // (izquierda), luego esa energía "llega" a Morvanna como HP (derecha).
+  // Usa boss_hp_delta Y geoarmy_hp_delta del MISMO log -- el feed ya trae
+  // ambos en una sola fila, no hace falta ningún cálculo nuevo.
+  function playDrain(item, done) {
+    var label = BOSS_ATTACK_LABEL[item.boss_attack_key] || (item.boss_attack_key || 'DRENAJE').toUpperCase();
+    var stepMs = 880; // 2 pasos * 880ms = 1760ms, dentro de 1.2-1.8s
+    spawnMovePop($('hw26MoveGeo'), label, fmtDelta(item.geoarmy_hp_delta) + ' RESISTENCIA', '', stepMs);
+    shakeEl($('hw26GeoBarBlock'), 500);
+    if ($('hw26GeoHpFill')) flashOnce($('hw26GeoHpFill'), 'hw26-flash-hit');
+    setTimeout(function () {
+      spawnMovePop($('hw26MoveBoss'), label, fmtDelta(item.boss_hp_delta) + ' HP MORVANNA', 'hw26-move-pop-heal', stepMs);
+      shakeEl($('hw26BossImg'), 500);
+      flashHitOverlay();
+      if ($('hw26BossHpFill')) flashOnce($('hw26BossHpFill'), 'hw26-flash-heal');
+      setTimeout(done, stepMs);
+    }, stepMs);
+  }
+
+  function playMovement(item, done) {
+    switch (item.entry_type) {
+      case 'player_attack': return playBossHit(item, done);
+      case 'boss_attack':
+        return DRAIN_KEYS[item.boss_attack_key] ? playDrain(item, done) : playGeoHit(item, done);
+      case 'heal': return playHeal(item, done);
+      case 'shield': return playShieldGeneric(item, done);
+      case 'effect_applied': return playEffectAnnounce(item, done);
+      default: done();
+    }
+  }
+
+  function processMoveQueue() {
+    if (MOVE_PLAYING) return;
+    var item = MOVE_QUEUE.shift();
+    if (!item) return;
+    MOVE_PLAYING = true;
+    playMovement(item, function () {
+      MOVE_PLAYING = false;
+      processMoveQueue();
+    });
+  }
+
+  // Detecta logs nuevos del feed ya cargado (loadFeed(), mismo poll de
+  // Batalla) y los mete en la cola, en orden cronológico. En la primera
+  // carga de la página NUNCA anima el historial: solo registra los
+  // log_id como ya vistos y muestra el último movimiento como texto (ver
+  // sección 3 del pedido) -- desde ahí, solo los logs que aparezcan
+  // DESPUÉS entran a la cola.
+  function processBattleFeed() {
+    if (lastFeed == null) return; // error de carga -- nada que procesar
+    var items = lastFeed.slice().sort(function (a, b) { return (a.log_id || 0) - (b.log_id || 0); });
+
+    if (!MOVE_BASELINE_DONE) {
+      items.forEach(function (it) { MOVE_SEEN_IDS[it.log_id] = true; });
+      MOVE_BASELINE_DONE = true;
+      var lastRelevant = null;
+      for (var i = items.length - 1; i >= 0; i--) {
+        if (isMovementEntry(items[i])) { lastRelevant = items[i]; break; }
+      }
+      if (lastRelevant) renderLastMove(lastRelevant);
+      return;
+    }
+
+    items.forEach(function (it) {
+      if (MOVE_SEEN_IDS[it.log_id]) return; // dedupe real por log_id
+      MOVE_SEEN_IDS[it.log_id] = true;
+      if (!isMovementEntry(it)) return;
+      MOVE_QUEUE.push(it);
+      renderLastMove(it);
+    });
+    processMoveQueue();
+  }
+
+  // Botones de TEST MODE (sección 15 del pedido): inyectan un log
+  // sintético con id único directo a la cola, sin pasar por loadFeed() ni
+  // Supabase -- puramente presentación, para poder probar cada tipo de
+  // movimiento y que la cola nunca superponga. Ver wireDevBar().
+  function moveTestItem(kind) {
+    var id = 'test-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+    switch (kind) {
+      case 'geo_hit': return { log_id: id, entry_type: 'player_attack', action_key: 'golpe_abismo', actor_name: 'TesterMock', boss_hp_delta: -3000 };
+      case 'boss_hit': return { log_id: id, entry_type: 'boss_attack', boss_attack_key: 'fuego_infernal', geoarmy_hp_delta: -6000 };
+      case 'heal': return { log_id: id, entry_type: 'heal', action_key: 'pulso_vital', geoarmy_hp_delta: 5000 };
+      case 'buff': return { log_id: id, entry_type: 'effect_applied', effect_key: 'escudo_arcano' };
+      case 'debuff': return { log_id: id, entry_type: 'effect_applied', effect_key: 'marca_bruja' };
+      case 'drain': return { log_id: id, entry_type: 'boss_attack', boss_attack_key: 'drenaje_alma', geoarmy_hp_delta: -8000, boss_hp_delta: 8000 };
+      default: return null;
+    }
+  }
+
   function initBattlePage() {
     loadState().then(function () { if (lastState) renderBoss(lastState); });
     loadEffects().then(renderBattleEffects);
+    // Mismo ciclo de poll que ya tenía Batalla (5s, ver POLL_INTERVAL_MS
+    // más abajo) -- sin setInterval nuevo.
+    loadFeed().then(processBattleFeed);
   }
 
   // ---------------------------------------------------------------------
@@ -879,9 +1120,20 @@
   var EFFECT_META = {
     escudo_arcano: { icon: '🛡', name: 'ESCUDO ARCANO', desc: 'Reduce el daño del próximo ataque de La Heraldo.' },
     vulnerabilidad: { icon: '🔮', name: 'VULNERABILIDAD', desc: 'Multiplica el daño de los ataques de Geo Army.' },
+    // "hechizo_vulnerabilidad" -- alias agregado para la cola de movimientos
+    // de Batalla: el canon de efectos que ya tenía esta página usa
+    // "vulnerabilidad", pero el pedido de movimientos en vivo lista
+    // "hechizo_vulnerabilidad". Dejo las DOS claves apuntando al mismo
+    // efecto para no romper nada ya aprobado en Efectos -- avisar cuál usa
+    // realmente el backend para poder borrar la que sobre.
+    hechizo_vulnerabilidad: { icon: '🔮', name: 'VULNERABILIDAD', desc: 'Multiplica el daño de los ataques de Geo Army.' },
     ruptura_arcana: { icon: '📜', name: 'RUPTURA ARCANA', desc: 'Multiplica el daño del próximo Contrato completado.' },
     marca_bruja: { icon: '🩸', name: 'MARCA DE LA BRUJA', desc: 'Reduce el daño del próximo ataque de Geo Army.' },
     herida_profana: { icon: '💀', name: 'HERIDA PROFANA', desc: 'Reduce la próxima curación de Geo Army.' },
+    // "pocion_furia" -- clave nueva pedida para la cola de movimientos,
+    // no existía antes en Efectos. Descripción de mejor esfuerzo (no hay
+    // spec previa de qué hace exactamente) -- corregir si no es así.
+    pocion_furia: { icon: '🔥', name: 'POCIÓN DE FURIA', desc: 'Aumenta temporalmente el daño de Geo Army.' },
   };
   function effectScopeLabel(scope) {
     if (scope === 'geoarmy') return 'Afecta a Geo Army';
@@ -904,10 +1156,47 @@
   // ---------------------------------------------------------------------
   // 9) PÁGINA "feed" (halloween/cronicas.html)
   // ---------------------------------------------------------------------
-  // Etiquetas narrativas para Crónicas -- solo texto de presentación, no
-  // cambian ni calculan nada del combate.
-  var ACTION_KEY_LABEL = { golpe_del_abismo: 'Golpe del Abismo' };
-  var BOSS_ATTACK_LABEL = { fuego_infernal: 'Fuego Infernal', cataclismo: 'Cataclismo' };
+  // Etiquetas narrativas para Crónicas Y para la cola de movimientos de
+  // Batalla (misma fuente única, ver playBossHit/playGeoHit/playDrain) --
+  // solo texto de presentación, no cambian ni calculan nada del combate.
+  // "golpe_abismo" es la clave canon del pedido de movimientos en vivo;
+  // dejo "golpe_del_abismo" (ya usada aquí antes) como alias por si el
+  // backend real todavía manda esa -- avisar cuál es la real para borrar
+  // la que sobre.
+  var ACTION_KEY_LABEL = {
+    golpe_del_abismo: 'Golpe del Abismo',
+    golpe_abismo: 'Golpe del Abismo',
+    aranazo_maldito: 'Arañazo Maldito',
+    ritual_sangre: 'Ritual de Sangre',
+  };
+  var BOSS_ATTACK_LABEL = {
+    fuego_infernal: 'Fuego Infernal',
+    cataclismo: 'Cataclismo',
+    zarpazo_sombrio: 'Zarpazo Sombrío',
+    maldicion_carmesi: 'Maldición Carmesí',
+    drenaje_alma: 'Drenaje de Alma',
+    marca_bruja: 'Marca de la Bruja',
+    garras_abismo: 'Garras del Abismo',
+    drenaje_demoniaco: 'Drenaje Demoníaco',
+    herida_profana: 'Herida Profana',
+  };
+  // Curaciones -- el feed real solo expone entry_type:'heal' con el delta,
+  // SIN un campo que diga cuál de las 3 curaciones canon fue (no hay
+  // action_key poblado en los logs de heal vistos hasta ahora). Si el
+  // backend real sí manda item.action_key en estos logs, se usa aquí; si
+  // no, se cae a un nombre genérico -- ver playHeal().
+  var HEAL_ACTION_LABEL = {
+    curacion_menor: 'Curación Menor',
+    pulso_vital: 'Pulso Vital',
+    bendicion_guardia: 'Bendición de Guardia',
+  };
+  // Subtítulo de debuff especial -- SOLO se usa cuando el propio feed
+  // confirma con un log effect_applied que el efecto se aplicó (ver
+  // playEffectAnnounce()), nunca inferido solo por el nombre del ataque.
+  var DEBUFF_SUB_LABEL = {
+    marca_bruja: 'PRÓXIMO ATAQUE DEBILITADO',
+    herida_profana: 'PRÓXIMA CURACIÓN DEBILITADA',
+  };
 
   function feedItemText(item) {
     var bossDmg = fmtNum(Math.abs(item.boss_hp_delta || 0));
@@ -1031,6 +1320,20 @@
         runPageInit();
       });
     }
+    // Botones de prueba de la cola de movimientos (solo existen en
+    // halloween/batalla.html) -- inyectan un log sintético directo a la
+    // cola visual, ver moveTestItem()/processMoveQueue(). Nunca tocan
+    // loadFeed() ni Supabase.
+    var moveButtons = bar.querySelectorAll('[data-move-test]');
+    moveButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var item = moveTestItem(btn.getAttribute('data-move-test'));
+        if (!item) return;
+        MOVE_QUEUE.push(item);
+        renderLastMove(item);
+        processMoveQueue();
+      });
+    });
   }
 
   // ---------------------------------------------------------------------
