@@ -210,18 +210,34 @@
 
 /* ---------------------------------------------------------------------
    Ajustes SOLO de halloween/batalla.html: más ancho para que el hero
-   domine el espacio horizontal y menos aire antes del contenido. Scoped a
-   body[data-halloween-page="battle"] a propósito -- las otras 4 páginas
-   (Rol/Contratos/Efectos/Crónicas) conservan su max-width, padding y
-   tipografía sin cambios, como antes.
+   domine el espacio horizontal, menos aire antes del contenido y (en
+   escritorio) el encabezado alineado al mismo borde izquierdo que el
+   hero, en vez de centrado -- así se leen como UNA sola composición.
+   Scoped a body[data-halloween-page="battle"] a propósito -- las otras 4
+   páginas (Rol/Contratos/Efectos/Crónicas) conservan su max-width,
+   alineación centrada, padding y tipografía sin cambios, como antes.
 --------------------------------------------------------------------- */
 body[data-halloween-page="battle"] .hw26-page {
-  max-width: 1180px;
-  padding-top: 84px;
+  max-width: 1280px;
+  padding-top: 80px;
 }
-body[data-halloween-page="battle"] .hw26-back-link { margin-bottom: 14px; }
-body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
+body[data-halloween-page="battle"] .hw26-back-link { margin-bottom: 12px; }
+body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
 .hw26-page-content-hero { padding: 0; background: none; border: none; border-radius: 0; }
+
+@media (min-width: 760px) {
+  /* Mobile mantiene todo centrado (como las otras 4 páginas); desde este
+     punto el encabezado se alinea a la izquierda para leerse como parte
+     de la misma composición asimétrica que el hero. */
+  body[data-halloween-page="battle"] .hw26-page-head {
+    text-align: left;
+  }
+  body[data-halloween-page="battle"] .hw26-page-sub {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 560px;
+  }
+}
 
 /* ---------------------------------------------------------------------
    Barra de pruebas (SOLO test mode) — franja discreta arriba del
@@ -299,43 +315,48 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
 /* ---------------------------------------------------------------------
    2) Widget de La Heraldo — ahora vive en halloween/batalla.html
 --------------------------------------------------------------------- */
+/* Segunda pasada: se quita la sensación de "tarjeta" por completo. Antes
+   .hw26-boss/.hw26-boss-frame eran un panel bordeado con fondo sólido; hoy
+   son contenedores TRANSPARENTES (sin borde, sin relleno, sin
+   border-radius de panel) -- la separación del fondo de Halloween la da
+   solo .hw26-boss-atmosphere, un glow ambiental difuso detrás de todo el
+   layout, nunca una silueta rectangular. */
 .hw26-boss {
   position: relative;
-  border-radius: 22px;
-  padding: 2px;
-  background: linear-gradient(160deg, rgba(124, 58, 237, 0.55), rgba(30, 8, 16, 0.2) 40%, rgba(124, 58, 237, 0.25));
-  box-shadow: 0 18px 55px -22px rgba(0, 0, 0, 0.85);
-  transition: background 0.6s ease;
+  padding: 0;
 }
 .hw26-boss-frame {
   position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  background:
-    radial-gradient(120% 90% at 50% -10%, rgba(124, 58, 237, 0.28), transparent 55%),
-    linear-gradient(180deg, var(--hw26-panel-solid), #0a0510 70%);
-  border: 1px solid var(--hw26-violet-line);
-  padding: 22px 20px 24px;
+  padding: 0;
   text-align: center;
 }
-@media (min-width: 760px) {
-  .hw26-boss-frame { padding: 26px 28px 30px; }
-}
-
-/* Fase II — transformación real: glow más agresivo, rojo/violeta intenso */
-.hw26-boss[data-phase="2"] {
-  background: linear-gradient(160deg, rgba(220, 38, 38, 0.7), rgba(124, 58, 237, 0.35) 45%, rgba(220, 38, 38, 0.45));
-  animation: hw26-phase2-pulse 3.2s ease-in-out infinite;
-}
-.hw26-boss[data-phase="2"] .hw26-boss-frame {
+/* Atmósfera: mancha de luz violeta/roja muy difusa detrás del hero,
+   sangrando más allá de los bordes del contenido -- da ambientación sin
+   dibujar un rectángulo. Puramente decorativo (aria-hidden), no roba
+   espacio de layout (position:absolute). */
+.hw26-boss-atmosphere {
+  position: absolute;
+  inset: -16px;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(20px);
+  opacity: 0.9;
   background:
-    radial-gradient(120% 90% at 50% -10%, rgba(220, 38, 38, 0.35), transparent 55%),
-    linear-gradient(180deg, #170617, #0a0510 70%);
-  border-color: rgba(220, 38, 38, 0.45);
+    radial-gradient(46% 60% at 24% 38%, rgba(124, 58, 237, 0.30), transparent 72%),
+    radial-gradient(42% 55% at 88% 55%, rgba(124, 58, 237, 0.22), transparent 72%);
+  transition: background 0.6s ease;
 }
-@keyframes hw26-phase2-pulse {
-  0%, 100% { box-shadow: 0 18px 55px -22px rgba(220, 38, 38, 0.35); }
-  50% { box-shadow: 0 22px 65px -18px rgba(220, 38, 38, 0.65); }
+@media (min-width: 760px) {
+  .hw26-boss-atmosphere { inset: -50px -20px -60px; }
+}
+.hw26-boss-layout { position: relative; z-index: 1; }
+
+/* Fase II — transformación real: glow ambiental rojo/violeta intenso, sin
+   pulsar una caja (eso reintroducía la silueta de "card"). */
+.hw26-boss[data-phase="2"] .hw26-boss-atmosphere {
+  background:
+    radial-gradient(48% 62% at 24% 38%, rgba(220, 38, 38, 0.32), transparent 72%),
+    radial-gradient(44% 58% at 88% 55%, rgba(220, 38, 38, 0.24), transparent 72%);
 }
 
 /* Panel "boss battle" de dos columnas. Mobile-first: column-reverse hace
@@ -377,7 +398,7 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
   border: 1px solid rgba(148, 92, 255, 0.5);
   color: #e6d9ff;
   white-space: nowrap;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .hw26-boss[data-phase="2"] .hw26-boss-badge {
   background: linear-gradient(135deg, #5c0f14, #2a0508);
@@ -385,51 +406,41 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
   color: #ffd8d8;
 }
 
-/* Imagen grande de La Heraldo -- foco visual principal del widget. Nada de
-   avatar circular: panel rectangular con marco/glow temático, la imagen
-   ocupa todo el panel (object-fit: cover) para priorizar rostro/torso
-   según el recorte de cada archivo. */
+/* Imagen grande de La Heraldo -- debe sentirse parte del escenario, no una
+   foto metida en una card. Sin marco/borde grueso: apenas un hairline casi
+   invisible (evita un canto duro en monitores con banding) y el "límite"
+   real lo da un degradado que la funde con el fondo, no una línea. */
 .hw26-boss-art {
   position: relative;
-  min-height: 320px;
-  border-radius: 18px;
+  min-height: 300px;
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(148, 92, 255, 0.35);
-  box-shadow: 0 0 50px -10px rgba(124, 58, 237, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   background: #0a0510;
-  transition: border-color 0.6s ease, box-shadow 0.6s ease;
 }
 @media (min-width: 760px) {
-  .hw26-boss-art { min-height: 460px; }
+  .hw26-boss-art { min-height: 440px; border-radius: 0; border: none; }
 }
 @media (min-width: 1020px) {
-  .hw26-boss-art { min-height: 540px; }
+  .hw26-boss-art { min-height: 560px; }
 }
-.hw26-boss[data-phase="2"] .hw26-boss-art {
-  border-color: rgba(220, 38, 38, 0.5);
-  box-shadow: 0 0 60px -8px rgba(220, 38, 38, 0.7);
-}
-/* Marco elegante: esquinas acentuadas en vez de un borde grueso uniforme
-   -- se siente más "cinematográfico" y menos "tarjeta genérica". */
-.hw26-boss-art::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  z-index: 4;
-  pointer-events: none;
-  border: 1px solid rgba(230, 217, 255, 0.16);
-  border-radius: 12px;
-}
-/* Viñeta suave para que la imagen se funda con el panel en vez de cortar
-   en seco -- "máscara suave", sin ocultar la imagen. */
+/* Se funde con la escena: abajo siempre (para que no corte en seco contra
+   lo que sigue debajo) y, en escritorio, también por la izquierda (donde
+   se junta con la columna de texto) -- así Morvanna se integra en vez de
+   quedar "enmarcada". La derecha/arriba quedan tal cual llega la imagen. */
 .hw26-boss-art::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(10, 5, 16, 0) 55%, rgba(10, 5, 16, 0.6) 100%),
-    linear-gradient(0deg, rgba(10, 5, 16, 0) 88%, rgba(10, 5, 16, 0.35) 100%);
+  background: linear-gradient(0deg, rgba(6, 4, 10, 0.75) 0%, transparent 22%);
+}
+@media (min-width: 760px) {
+  .hw26-boss-art::after {
+    background:
+      linear-gradient(0deg, rgba(6, 4, 10, 0.55) 0%, transparent 20%),
+      linear-gradient(90deg, rgba(6, 4, 10, 0.75) 0%, transparent 20%);
+  }
 }
 .hw26-boss-img {
   width: 100%;
@@ -472,14 +483,16 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
   75% { opacity: 1; }
   100% { opacity: 0; }
 }
-/* Glow más dramático en todo el widget mientras dura la transición. */
-.hw26-boss.hw26-phase-transitioning .hw26-boss-frame {
+/* Glow más dramático mientras dura la transición -- sobre la atmósfera
+   difusa (opacidad/blur), nunca sobre una caja con box-shadow, para no
+   reintroducir una silueta rectangular durante el flash. */
+.hw26-boss.hw26-phase-transitioning .hw26-boss-atmosphere {
   animation: hw26-transition-glow 1.8s ease;
 }
 @keyframes hw26-transition-glow {
-  0% { box-shadow: none; }
-  20% { box-shadow: 0 0 60px -6px rgba(220, 38, 38, 0.85); }
-  100% { box-shadow: none; }
+  0% { opacity: 0.9; filter: blur(20px) brightness(1); }
+  20% { opacity: 1; filter: blur(26px) brightness(1.9); }
+  100% { opacity: 0.9; filter: blur(20px) brightness(1); }
 }
 
 /* La Heraldo ya aparece como título de página ("BATALLA CONTRA LA
@@ -494,13 +507,13 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
   text-transform: uppercase;
   color: #fff;
   text-shadow: 0 0 18px rgba(124, 58, 237, 0.65);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 .hw26-boss[data-phase="2"] .hw26-boss-phase {
   text-shadow: 0 0 22px rgba(220, 38, 38, 0.75);
 }
 
-.hw26-bar-block { margin-bottom: 12px; text-align: left; }
+.hw26-bar-block { margin-bottom: 10px; text-align: left; }
 .hw26-bar-label {
   display: flex;
   justify-content: space-between;
@@ -551,7 +564,7 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
 }
 
 .hw26-boss-status {
-  margin-top: 16px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -584,7 +597,7 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
    información (texto a la izquierda), pero se auto-centra (text-align)
    sin depender de la alineación del contenedor padre. */
 .hw26-boss-cataclysm {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   padding: 14px 12px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(220, 38, 38, 0.22), rgba(249, 115, 22, 0.1));
@@ -631,90 +644,13 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
   text-align: left;
 }
 
-/* Pequeña sección de efectos activos, opcional, debajo del widget en
-   batalla.html (pedido explícito: no convertir la página en un dashboard
-   grande -- por eso va compacta y se oculta sola si no hay efectos). */
-/* Franja de apoyo debajo del hero -- 4 bloques temáticos con CTA a las
-   páginas hermanas (Rol/Contratos/Efectos/Crónicas). Grid simple, nunca
-   tabla: mismo lenguaje visual de tarjeta que el resto del sistema, no un
-   dashboard. En mobile 1 columna, en tablet 2, en escritorio ancho 4. */
-.hw26-battle-support { margin-top: 24px; }
-.hw26-support-eyebrow {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #b98cf5;
-  margin-bottom: 10px;
-}
-.hw26-support-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-@media (min-width: 560px) {
-  .hw26-support-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 1020px) {
-  .hw26-support-grid { grid-template-columns: repeat(4, 1fr); }
-}
-.hw26-support-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  padding: 16px 16px 14px;
-  border-radius: 14px;
-  background:
-    radial-gradient(140% 100% at 0% 0%, rgba(124, 58, 237, 0.12), transparent 60%),
-    rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  text-decoration: none;
-  color: var(--hw26-text);
-  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
-}
-a.hw26-support-card:hover {
-  border-color: rgba(148, 92, 255, 0.5);
-  background:
-    radial-gradient(140% 100% at 0% 0%, rgba(124, 58, 237, 0.2), transparent 60%),
-    rgba(255, 255, 255, 0.045);
-  transform: translateY(-2px);
-}
-.hw26-support-icon {
-  font-size: 1.3rem;
-  filter: drop-shadow(0 0 10px rgba(148, 92, 255, 0.45));
-  margin-bottom: 2px;
-}
-.hw26-support-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #fff;
-}
-.hw26-support-text {
-  font-size: 0.78rem;
-  color: var(--hw26-text-dim);
-  line-height: 1.4;
-}
-.hw26-support-text-muted { color: var(--hw26-text-faint); }
-.hw26-support-cta {
-  margin-top: 8px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #c9a8ff;
-  text-decoration: none;
-}
-.hw26-support-card-live { cursor: default; }
-.hw26-support-live { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-/* Tarjetas de efecto reutilizadas (effectCardHtml) dentro de un tile
-   angosto: se compactan un poco para no desbordar la franja. */
-.hw26-support-live .hw26-effect-card { padding: 10px; margin-bottom: 0; }
-.hw26-support-live .hw26-effect-icon-circle { width: 36px; height: 36px; }
-.hw26-support-live .hw26-effect-icon { font-size: 1rem; }
+/* La franja de 4 tarjetas (Rol/Contratos/Efectos/Crónicas) que vivía aquí
+   se quitó a pedido explícito: esas páginas ya son accesibles desde sus
+   propios pins, y repetirlas debajo del hero hacía que Batalla se sintiera
+   como un dashboard. hw26BattleEffects / hw26SupportEffectsBody ya no
+   existen en el HTML; renderBattleEffects() en el JS sigue existiendo
+   mismo, no se tocó, pero ahora no encuentra su contenedor y no hace nada
+   -- no había necesidad de tocar polling/lógica de datos para quitar esto. */
 
 /* ---------------------------------------------------------------------
    3) Rol (halloween/rol.html)
