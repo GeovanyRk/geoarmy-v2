@@ -334,25 +334,22 @@
   color: #ffd8d8;
 }
 
-.hw26-boss-name {
+/* La Heraldo ya aparece como título de página ("BATALLA CONTRA LA
+   HERALDO"), así que dentro del widget no se repite su nombre: esta línea
+   es ahora el elemento principal ("FASE I — FORMA SELLADA") y lleva el
+   peso visual que antes tenía .hw26-boss-name. */
+.hw26-boss-phase {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #fff;
   text-shadow: 0 0 18px rgba(124, 58, 237, 0.65);
-  margin-bottom: 2px;
-}
-.hw26-boss[data-phase="2"] .hw26-boss-name {
-  text-shadow: 0 0 22px rgba(220, 38, 38, 0.75);
-}
-.hw26-boss-phase {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--hw26-text-dim);
   margin-bottom: 18px;
+}
+.hw26-boss[data-phase="2"] .hw26-boss-phase {
+  text-shadow: 0 0 22px rgba(220, 38, 38, 0.75);
 }
 
 .hw26-bar-block { margin-bottom: 12px; text-align: left; }
@@ -510,6 +507,7 @@
   .hw26-role-grid { grid-template-columns: repeat(3, 1fr); }
 }
 .hw26-role-card {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -522,13 +520,44 @@
   cursor: pointer;
   font-family: inherit;
   color: var(--hw26-text);
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
 }
 .hw26-role-card:hover { border-color: rgba(148, 92, 255, 0.55); background: rgba(124, 58, 237, 0.08); transform: translateY(-2px); }
 .hw26-role-card.is-selected { border-color: var(--hw26-violet); background: rgba(124, 58, 237, 0.16); }
 .hw26-role-icon { font-size: 1.4rem; }
-.hw26-role-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 2px; }
+.hw26-role-body { display: block; }
+.hw26-role-name { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 2px; }
 .hw26-role-desc { font-size: 0.8rem; color: var(--hw26-text-dim); }
+
+/* Vista "preview" de roles antes del 1 de octubre: tarjetas visibles,
+   atenuadas y no clickeables, con badge de candado -- nunca una caja
+   vacía sola. */
+.hw26-role-card.is-locked {
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.55;
+  filter: grayscale(0.35);
+}
+.hw26-role-card.is-locked:hover { transform: none; border-color: rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); }
+.hw26-role-lock-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd9b0;
+  background: rgba(18, 10, 28, 0.92);
+  border: 1px solid rgba(249, 115, 22, 0.45);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 .hw26-role-warning {
   margin: 14px 0;
   padding: 10px 12px;
@@ -537,6 +566,12 @@
   border: 1px solid rgba(249, 115, 22, 0.35);
   color: #ffd9b0;
   font-size: 0.78rem;
+}
+.hw26-role-warning-locked {
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 .hw26-role-confirm {
   width: 100%;
@@ -620,25 +655,56 @@
 --------------------------------------------------------------------- */
 .hw26-effect-card {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 14px;
+  margin-bottom: 10px;
+  background:
+    radial-gradient(140% 100% at 0% 0%, rgba(124, 58, 237, 0.1), transparent 60%),
+    rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
-.hw26-effect-icon { font-size: 1.3rem; }
-.hw26-effect-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; }
-.hw26-effect-mult { color: var(--hw26-gold); font-weight: 700; }
-.hw26-effect-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin-top: 2px; }
-.hw26-effect-scope { font-size: 0.7rem; color: var(--hw26-text-faint); margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
-.hw26-effect-uses { font-size: 0.7rem; color: var(--hw26-gold); margin-top: 4px; }
-.hw26-empty-state {
-  text-align: center;
-  padding: 26px 10px;
-  color: var(--hw26-text-dim);
-  font-size: 0.85rem;
+.hw26-effect-card:hover { border-color: rgba(148, 92, 255, 0.4); transform: translateY(-1px); }
+.hw26-effect-icon-circle {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(124, 58, 237, 0.14);
+  border: 1px solid var(--hw26-violet-line);
+  box-shadow: 0 0 16px -4px rgba(124, 58, 237, 0.55);
+}
+.hw26-effect-icon { font-size: 1.25rem; line-height: 1; }
+.hw26-effect-body { flex: 1 1 auto; min-width: 0; }
+.hw26-effect-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hw26-effect-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; letter-spacing: .02em; }
+.hw26-effect-mult-chip {
+  flex: 0 0 auto;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #1a0e00;
+  background: linear-gradient(135deg, var(--hw26-gold), #f3d375);
+  padding: 2px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.hw26-effect-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin-top: 3px; }
+.hw26-effect-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.hw26-effect-scope { font-size: 0.68rem; color: var(--hw26-text-faint); text-transform: uppercase; letter-spacing: .05em; }
+.hw26-effect-uses-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--hw26-gold);
+  background: rgba(212, 175, 55, 0.14);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
 /* ---------------------------------------------------------------------
