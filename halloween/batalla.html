@@ -74,40 +74,51 @@
               <div class="hw26-cataclysm-sub">PREPAREN LAS DEFENSAS.</div>
             </div>
 
-            <div class="hw26-boss-art">
-              <div class="hw26-boss-badge" id="hw26PhaseBadge">FASE I</div>
-              <!-- Imagen de La Heraldo por fase: intenta primero
-                   assets/halloween/heraldo-fase1.webp / heraldo-fase2.webp
-                   (si ya existen en el repo) y cae automáticamente al
-                   placeholder del planeta si no existen o fallan al cargar
-                   -- ver updateBossImg() en js/halloween-2026.js. No rompe
-                   nada si las imágenes todavía no están subidas. -->
-              <img src="../world-02-halloween-v2.png"
-                   data-fallback="../world-02-halloween-v2.png"
-                   alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
-            </div>
+            <!-- Panel "boss battle" de dos columnas: en escritorio, texto +
+                 barras a la izquierda e imagen grande de La Heraldo a la
+                 derecha (fila con flexbox); en mobile se invierte solo con
+                 CSS (column-reverse) -- mismo HTML, imagen primero. -->
+            <div class="hw26-boss-layout">
+              <div class="hw26-boss-info">
+                <div class="hw26-boss-badge" id="hw26PhaseBadge">FASE I</div>
+                <div class="hw26-boss-phase" id="hw26PhaseText">FASE I — FORMA SELLADA</div>
 
-            <div class="hw26-boss-phase" id="hw26PhaseText">FASE I — FORMA SELLADA</div>
+                <div class="hw26-bar-block">
+                  <div class="hw26-bar-label">
+                    <span>HP DE LA HERALDO</span>
+                    <span id="hw26BossHpText">2,000,000 / 2,000,000 HP</span>
+                  </div>
+                  <div class="hw26-bar hw26-bar-boss"><div class="hw26-bar-fill" id="hw26BossHpFill" style="width:100%"></div></div>
+                </div>
 
-            <div class="hw26-bar-block">
-              <div class="hw26-bar-label">
-                <span>HP de La Heraldo</span>
-                <span id="hw26BossHpText">2,000,000 / 2,000,000</span>
+                <div class="hw26-bar-block">
+                  <div class="hw26-bar-label">
+                    <span>RESISTENCIA GEO ARMY</span>
+                    <span id="hw26GeoHpText">100,000 / 100,000 HP</span>
+                  </div>
+                  <div class="hw26-bar hw26-bar-geo"><div class="hw26-bar-fill" id="hw26GeoHpFill" style="width:100%"></div></div>
+                </div>
+
+                <div class="hw26-boss-status">
+                  <span class="hw26-status-badge" id="hw26StatusBadge">CARGANDO…</span>
+                  <span class="hw26-status-detail" id="hw26StatusDetail"></span>
+                </div>
               </div>
-              <div class="hw26-bar hw26-bar-boss"><div class="hw26-bar-fill" id="hw26BossHpFill" style="width:100%"></div></div>
-            </div>
 
-            <div class="hw26-bar-block">
-              <div class="hw26-bar-label">
-                <span>Resistencia Geo Army</span>
-                <span id="hw26GeoHpText">100,000 / 100,000</span>
+              <div class="hw26-boss-art">
+                <!-- Imagen grande de La Heraldo por fase: intenta primero
+                     assets/halloween/heraldo-fase1.webp / heraldo-fase2.webp
+                     y cae automáticamente al placeholder del planeta si
+                     faltan o fallan al cargar -- ver updateBossImg() en
+                     js/halloween-2026.js. No rompe nada si faltan. -->
+                <img src="../world-02-halloween-v2.png"
+                     data-fallback="../world-02-halloween-v2.png"
+                     alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
+                <!-- Overlay de transición de fase (1 → 2 en la misma
+                     sesión): flash + texto "EL SELLO SE HA ROTO", puramente
+                     visual, ver triggerPhaseTransition() en el JS. -->
+                <div class="hw26-boss-flash" id="hw26PhaseFlash" hidden>EL SELLO SE HA ROTO</div>
               </div>
-              <div class="hw26-bar hw26-bar-geo"><div class="hw26-bar-fill" id="hw26GeoHpFill" style="width:100%"></div></div>
-            </div>
-
-            <div class="hw26-boss-status">
-              <span class="hw26-status-badge" id="hw26StatusBadge">CARGANDO…</span>
-              <span class="hw26-status-detail" id="hw26StatusDetail"></span>
             </div>
           </div>
         </div>
