@@ -448,7 +448,30 @@
   // ---------------------------------------------------------------------
   // 5) PÁGINA "battle" (halloween/batalla.html) — el widget de La Heraldo
   // ---------------------------------------------------------------------
-  var prevBossHp = null, prevGeoHp = null;
+  var prevBossHp = null, prevGeoHp = null, prevBossPhase = null;
+
+  // Transición de fase 1 -> 2 en la misma sesión: flash violeta/rojo +
+  // texto temporal "EL SELLO SE HA ROTO" sobre la imagen grande, y un
+  // glow más intenso en el marco. Puramente visual/CSS -- no recarga la
+  // página ni cambia ningún dato, solo reacciona a que boss_phase pasó de
+  // 1 a 2 entre dos polls. Duración total ~1.8s.
+  function triggerPhaseTransition() {
+    var boss = $('hw26Boss');
+    var flashEl = $('hw26PhaseFlash');
+    if (boss) {
+      boss.classList.remove('hw26-phase-transitioning');
+      void boss.offsetWidth; // reflow, por si se dispara dos veces seguidas
+      boss.classList.add('hw26-phase-transitioning');
+      setTimeout(function () { boss.classList.remove('hw26-phase-transitioning'); }, 1800);
+    }
+    if (flashEl) {
+      flashEl.hidden = false;
+      flashEl.classList.remove('is-active');
+      void flashEl.offsetWidth;
+      flashEl.classList.add('is-active');
+      setTimeout(function () { flashEl.hidden = true; flashEl.classList.remove('is-active'); }, 1800);
+    }
+  }
 
   // Imagen de La Heraldo por fase: intenta assets/halloween/heraldo-faseN.webp
   // y si no existe (404 / onerror) cae al placeholder del planeta que ya
@@ -482,20 +505,31 @@
     var boss = $('hw26Boss');
     if (!boss) return;
 
-    boss.setAttribute('data-phase', String(state.boss_phase || 1));
+    // La fase se lee tal cual de boss_phase (nunca se calcula por HP). Un
+    // evento todavía "scheduled" trae boss_phase 1 desde el backend, así
+    // que esto ya muestra Fase I sin necesitar un caso especial aquí.
+    var phase = state.boss_phase === 2 ? 2 : 1;
+
+    boss.setAttribute('data-phase', String(phase));
     boss.setAttribute('data-eventstatus', state.status || 'scheduled');
     boss.setAttribute('data-outcome', state.outcome || 'none');
 
     var badge = $('hw26PhaseBadge');
     var phaseText = $('hw26PhaseText');
-    if (state.boss_phase === 2) {
+    if (phase === 2) {
       if (badge) badge.textContent = 'FASE II';
       if (phaseText) phaseText.textContent = 'FASE II — FORMA DEMONÍACA';
     } else {
       if (badge) badge.textContent = 'FASE I';
       if (phaseText) phaseText.textContent = 'FASE I — FORMA SELLADA';
     }
-    updateBossImg(state.boss_phase === 2 ? 2 : 1);
+    updateBossImg(phase);
+
+    // Transición 1 -> 2 detectada entre dos polls en la misma sesión.
+    if (prevBossPhase != null && prevBossPhase === 1 && phase === 2) {
+      triggerPhaseTransition();
+    }
+    prevBossPhase = phase;
 
     // Barras — nunca se recalculan, solo se representan boss_hp/boss_max_hp
     // y geoarmy_hp/geoarmy_max_hp tal como vienen de Supabase.
@@ -509,8 +543,8 @@
 
     var bossText = $('hw26BossHpText');
     var geoText = $('hw26GeoHpText');
-    if (bossText) bossText.textContent = fmtNum(state.boss_hp) + ' / ' + fmtNum(state.boss_max_hp) + ' HP (' + Math.round(bossPct) + '%)';
-    if (geoText) geoText.textContent = fmtNum(state.geoarmy_hp) + ' / ' + fmtNum(state.geoarmy_max_hp) + ' HP (' + Math.round(geoPct) + '%)';
+    if (bossText) bossText.textContent = fmtNum(state.boss_hp) + ' / ' + fmtNum(state.boss_max_hp) + ' HP';
+    if (geoText) geoText.textContent = fmtNum(state.geoarmy_hp) + ' / ' + fmtNum(state.geoarmy_max_hp) + ' HP';
 
     // Flash de impacto/curación al detectar cambio respecto al poll anterior
     if (prevBossHp != null && bossFill) {
