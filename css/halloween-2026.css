@@ -1,0 +1,589 @@
+/* =====================================================================
+   HALLOWEEN 2026 — "La Heraldo" — sistema de batalla comunitaria
+   =====================================================================
+   Archivo NUEVO y aislado. No modifica css/style.css ni css/v3-theme.css.
+   Solo se carga desde index-halloween-test.html mientras se prueba.
+
+   Estilo pedido: oscuro, serio, cinematográfico, macabro. Nada infantil,
+   sin calabazas caricaturescas, sin exceso de emojis. Coherente con la
+   paleta ya usada en Mundo 02 (violeta oscuro / negro / rojo / naranja
+   de fuego en detalles).
+   ===================================================================== */
+
+#hw26Root {
+  --hw26-black: #06040a;
+  --hw26-panel: rgba(14, 8, 22, 0.82);
+  --hw26-panel-solid: #120a1c;
+  --hw26-violet: #7c3aed;
+  --hw26-violet-soft: rgba(124, 58, 237, 0.45);
+  --hw26-violet-line: rgba(148, 92, 255, 0.28);
+  --hw26-red: #dc2626;
+  --hw26-red-soft: rgba(220, 38, 38, 0.5);
+  --hw26-orange: #f97316;
+  --hw26-gold: #d4af37;
+  --hw26-text: #f4eefc;
+  --hw26-text-dim: rgba(244, 238, 252, 0.62);
+  --hw26-text-faint: rgba(244, 238, 252, 0.4);
+  --hw26-radius: 18px;
+
+  position: relative;
+  z-index: 3;
+  max-width: 760px;
+  margin: 4px auto 22px;
+  padding: 0 6px;
+  font-family: 'Inter', sans-serif;
+  color: var(--hw26-text);
+}
+
+#hw26Root * { box-sizing: border-box; }
+
+#hw26Root .hw26-hidden { display: none !important; }
+
+/* ---------------------------------------------------------------------
+   Barra de pruebas (SOLO test mode) — franja discreta arriba de todo
+--------------------------------------------------------------------- */
+.hw26-devbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px dashed rgba(249, 115, 22, 0.55);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  color: #ffd9b0;
+}
+.hw26-devbar-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--hw26-orange);
+  color: #1a0e00;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+}
+.hw26-devbar select,
+.hw26-devbar label {
+  font-family: inherit;
+  font-size: 0.78rem;
+  color: #ffe6c8;
+}
+.hw26-devbar select {
+  background: #1c1108;
+  border: 1px solid rgba(249, 115, 22, 0.5);
+  color: #ffe6c8;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+.hw26-devbar label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+
+/* ---------------------------------------------------------------------
+   4 pines — se sienten como marcadores del mundo, no botones SaaS
+--------------------------------------------------------------------- */
+.hw26-pins {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.hw26-pin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  background:
+    radial-gradient(120% 140% at 15% 0%, rgba(124, 58, 237, 0.22), transparent 60%),
+    var(--hw26-panel);
+  border: 1px solid var(--hw26-violet-line);
+  border-radius: var(--hw26-radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  font-family: inherit;
+}
+.hw26-pin:hover,
+.hw26-pin:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(148, 92, 255, 0.6);
+  box-shadow: 0 10px 28px -12px rgba(124, 58, 237, 0.55);
+  outline: none;
+}
+.hw26-pin::after {
+  /* pequeño "stem" de pin, como los marcadores del planeta principal */
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: -6px;
+  width: 2px;
+  height: 8px;
+  background: linear-gradient(to bottom, var(--hw26-violet-soft), transparent);
+}
+.hw26-pin-icon {
+  font-size: 1.35rem;
+  filter: drop-shadow(0 0 6px rgba(148, 92, 255, 0.6));
+}
+.hw26-pin-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--hw26-text);
+}
+.hw26-pin-sub {
+  font-size: 0.74rem;
+  color: var(--hw26-text-dim);
+  line-height: 1.3;
+}
+.hw26-pin[data-hw-urgent="true"] {
+  border-color: rgba(220, 38, 38, 0.55);
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.25) inset;
+}
+.hw26-pin[data-hw-urgent="true"] .hw26-pin-sub { color: #ff9d9d; }
+.hw26-pin[disabled] { cursor: default; opacity: 0.72; }
+
+@media (min-width: 640px) {
+  .hw26-pins { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ---------------------------------------------------------------------
+   Widget de La Heraldo — elemento visual dominante
+--------------------------------------------------------------------- */
+.hw26-boss {
+  position: relative;
+  border-radius: 22px;
+  padding: 2px;
+  background: linear-gradient(160deg, rgba(124, 58, 237, 0.55), rgba(30, 8, 16, 0.2) 40%, rgba(124, 58, 237, 0.25));
+  box-shadow: 0 18px 55px -22px rgba(0, 0, 0, 0.85);
+  transition: background 0.6s ease;
+}
+.hw26-boss-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(124, 58, 237, 0.28), transparent 55%),
+    linear-gradient(180deg, var(--hw26-panel-solid), #0a0510 70%);
+  border: 1px solid var(--hw26-violet-line);
+  padding: 22px 20px 24px;
+  text-align: center;
+}
+
+/* Fase II — transformación real: glow más agresivo, rojo/violeta intenso */
+.hw26-boss[data-phase="2"] {
+  background: linear-gradient(160deg, rgba(220, 38, 38, 0.7), rgba(124, 58, 237, 0.35) 45%, rgba(220, 38, 38, 0.45));
+  animation: hw26-phase2-pulse 3.2s ease-in-out infinite;
+}
+.hw26-boss[data-phase="2"] .hw26-boss-frame {
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(220, 38, 38, 0.35), transparent 55%),
+    linear-gradient(180deg, #170617, #0a0510 70%);
+  border-color: rgba(220, 38, 38, 0.45);
+}
+@keyframes hw26-phase2-pulse {
+  0%, 100% { box-shadow: 0 18px 55px -22px rgba(220, 38, 38, 0.35); }
+  50% { box-shadow: 0 22px 65px -18px rgba(220, 38, 38, 0.65); }
+}
+
+.hw26-boss-art {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--hw26-violet-soft);
+  box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.08), 0 0 40px -6px rgba(124, 58, 237, 0.55);
+  background: #0a0510;
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+.hw26-boss[data-phase="2"] .hw26-boss-art {
+  border-color: rgba(220, 38, 38, 0.65);
+  box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.1), 0 0 46px -4px rgba(220, 38, 38, 0.75);
+}
+.hw26-boss-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Contenedor/clase lista para una imagen distinta de La Heraldo demoníaca
+     más adelante (.hw26-boss-img-demonic). Si solo hay imagen normal, se
+     usa como fallback -- ver js/halloween-2026.js. */
+  filter: saturate(1.05) contrast(1.05);
+}
+.hw26-boss[data-phase="2"] .hw26-boss-img {
+  filter: saturate(1.25) contrast(1.15) brightness(0.9) hue-rotate(-8deg);
+}
+.hw26-boss-badge {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #3b1466, #1a0b2e);
+  border: 1px solid rgba(148, 92, 255, 0.5);
+  color: #e6d9ff;
+  white-space: nowrap;
+}
+.hw26-boss[data-phase="2"] .hw26-boss-badge {
+  background: linear-gradient(135deg, #5c0f14, #2a0508);
+  border-color: rgba(220, 38, 38, 0.6);
+  color: #ffd8d8;
+}
+
+.hw26-boss-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(124, 58, 237, 0.65);
+  margin-bottom: 2px;
+}
+.hw26-boss[data-phase="2"] .hw26-boss-name {
+  text-shadow: 0 0 22px rgba(220, 38, 38, 0.75);
+}
+.hw26-boss-phase {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hw26-text-dim);
+  margin-bottom: 18px;
+}
+
+.hw26-bar-block { margin-bottom: 12px; text-align: left; }
+.hw26-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hw26-text-dim);
+  margin-bottom: 5px;
+}
+.hw26-bar-label span:last-child {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--hw26-text);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.hw26-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.hw26-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.7s cubic-bezier(.22,.68,0,1.01);
+}
+.hw26-bar-boss .hw26-bar-fill {
+  background: linear-gradient(90deg, #7c1d1d, var(--hw26-red), #ff6b4a);
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.55);
+}
+.hw26-bar-geo .hw26-bar-fill {
+  background: linear-gradient(90deg, #5b21b6, var(--hw26-violet), var(--hw26-gold));
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.5);
+}
+/* Flash de impacto (daño) / curación — breve, no exagerado */
+.hw26-bar-fill.hw26-flash-hit { animation: hw26-flash-hit 0.55s ease; }
+.hw26-bar-fill.hw26-flash-heal { animation: hw26-flash-heal 0.55s ease; }
+@keyframes hw26-flash-hit {
+  0% { filter: brightness(2.4) saturate(1.4); }
+  100% { filter: brightness(1); }
+}
+@keyframes hw26-flash-heal {
+  0% { filter: brightness(2.2) hue-rotate(40deg); }
+  100% { filter: brightness(1); }
+}
+
+.hw26-boss-status {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.hw26-status-badge {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.18);
+  border: 1px solid rgba(148, 92, 255, 0.4);
+  color: #e6d9ff;
+}
+.hw26-status-detail {
+  font-size: 0.78rem;
+  color: var(--hw26-text-dim);
+}
+/* Estados finales */
+.hw26-boss[data-outcome="geoarmy_victory"] .hw26-status-badge {
+  background: rgba(70, 224, 168, 0.18); border-color: rgba(70, 224, 168, 0.5); color: #b6ffe4;
+}
+.hw26-boss[data-outcome="herald_victory"] .hw26-status-badge {
+  background: rgba(220, 38, 38, 0.22); border-color: rgba(220, 38, 38, 0.55); color: #ffd0d0;
+}
+
+/* Cataclismo — modo emergencia temporal */
+.hw26-boss-cataclysm {
+  margin: 0 0 16px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.22), rgba(249, 115, 22, 0.1));
+  border: 1px solid rgba(220, 38, 38, 0.55);
+  animation: hw26-cataclysm-pulse 1.4s ease-in-out infinite;
+}
+@keyframes hw26-cataclysm-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+}
+.hw26-cataclysm-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #ffb4b4;
+  margin-bottom: 6px;
+}
+.hw26-cataclysm-timer {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(220, 38, 38, 0.85);
+  line-height: 1;
+}
+.hw26-cataclysm-sub {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffcccc;
+}
+
+.hw26-error {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #ffd0d0;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+/* ---------------------------------------------------------------------
+   Modales de los pines
+--------------------------------------------------------------------- */
+.hw26-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4, 2, 8, 0.78);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.hw26-modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 84vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #150a22, #0a0512);
+  border: 1px solid var(--hw26-violet-line);
+  border-radius: 20px;
+  padding: 26px 22px 22px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
+  color: var(--hw26-text);
+}
+.hw26-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.hw26-modal-close:hover { background: rgba(255, 255, 255, 0.12); }
+
+.hw26-modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+  padding-right: 24px;
+}
+.hw26-modal-sub {
+  font-size: 0.82rem;
+  color: var(--hw26-text-dim);
+  margin-bottom: 18px;
+}
+
+/* Rol */
+.hw26-role-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--hw26-text);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.hw26-role-card:hover { border-color: rgba(148, 92, 255, 0.55); background: rgba(124, 58, 237, 0.08); }
+.hw26-role-card.is-selected { border-color: var(--hw26-violet); background: rgba(124, 58, 237, 0.16); }
+.hw26-role-icon { font-size: 1.4rem; }
+.hw26-role-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 2px; }
+.hw26-role-desc { font-size: 0.8rem; color: var(--hw26-text-dim); }
+.hw26-role-warning {
+  margin: 14px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: #ffd9b0;
+  font-size: 0.78rem;
+}
+.hw26-role-confirm {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #8b3ff0, #6d28d9);
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.hw26-role-confirm:disabled { opacity: 0.5; cursor: default; }
+.hw26-role-current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(124, 58, 237, 0.14);
+  border: 1px solid rgba(148, 92, 255, 0.4);
+}
+.hw26-role-current .hw26-role-icon { font-size: 1.8rem; }
+.hw26-locked-box {
+  text-align: center;
+  padding: 20px 10px;
+}
+.hw26-locked-box .hw26-lock-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.hw26-locked-box b { display: block; font-family: 'Orbitron', sans-serif; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+/* Contratos */
+.hw26-mission-group-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hw26-orange);
+  margin: 16px 0 8px;
+}
+.hw26-mission-group-title:first-child { margin-top: 0; }
+.hw26-mission-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.hw26-mission-card[data-status="active"] {
+  border-color: rgba(212, 175, 55, 0.55);
+  background: rgba(212, 175, 55, 0.08);
+  box-shadow: 0 0 18px -8px rgba(212, 175, 55, 0.5);
+}
+.hw26-mission-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.hw26-mission-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.88rem; }
+.hw26-mission-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin: 4px 0 8px; }
+.hw26-mission-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; }
+.hw26-mission-dmg { color: var(--hw26-red); font-weight: 700; }
+.hw26-mission-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.hw26-mission-badge.upcoming { background: rgba(255,255,255,.08); color: var(--hw26-text-dim); }
+.hw26-mission-badge.active { background: rgba(212, 175, 55, 0.2); color: var(--hw26-gold); }
+.hw26-mission-badge.ended { background: rgba(255,255,255,.05); color: var(--hw26-text-faint); }
+
+/* Efectos */
+.hw26-effect-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.hw26-effect-icon { font-size: 1.3rem; }
+.hw26-effect-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; }
+.hw26-effect-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin-top: 2px; }
+.hw26-effect-uses { font-size: 0.7rem; color: var(--hw26-gold); margin-top: 4px; }
+.hw26-empty-state {
+  text-align: center;
+  padding: 26px 10px;
+  color: var(--hw26-text-dim);
+  font-size: 0.85rem;
+}
+
+/* Crónicas */
+.hw26-feed-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.84rem;
+  color: var(--hw26-text);
+}
+.hw26-feed-item:last-child { border-bottom: none; }
+.hw26-feed-time { display: block; font-size: 0.68rem; color: var(--hw26-text-faint); margin-top: 2px; }
+.hw26-feed-item[data-type="victory"],
+.hw26-feed-item[data-type="phase_change"] { color: var(--hw26-gold); font-weight: 600; }
+.hw26-feed-item[data-type="defeat"] { color: #ff8f8f; font-weight: 600; }
+
+/* Scrollbar discreta dentro del modal */
+.hw26-modal::-webkit-scrollbar { width: 8px; }
+.hw26-modal::-webkit-scrollbar-thumb { background: rgba(148, 92, 255, 0.35); border-radius: 999px; }
