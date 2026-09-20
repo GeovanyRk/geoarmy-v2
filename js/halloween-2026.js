@@ -1,9 +1,20 @@
 // =====================================================================
 // HALLOWEEN 2026 — "La Heraldo" — sistema de batalla comunitaria
 // =====================================================================
-// Archivo NUEVO y aislado. Por ahora se carga SOLAMENTE desde
-// index-halloween-test.html (ver ese archivo) -- NO desde index.html de
-// producción.
+// Archivo NUEVO y aislado. Se carga SOLAMENTE desde las páginas dedicadas
+// halloween/batalla.html, rol.html, contratos.html, efectos.html,
+// cronicas.html (todas de prueba por ahora). index-halloween-test.html ya
+// NO lo carga: los 5 pins sobre el planeta son <a href> simples, con el
+// estado bloqueado/desbloqueado resuelto en puro CSS (ver
+// css/halloween-2026.css, sección "Pins sobre el planeta").
+//
+// CAMBIO DE DIRECCIÓN (v2): se retiró el dashboard de 4 tarjetas + modal
+// genérico. Ahora este archivo actúa como un pequeño "router": lee
+// document.body.dataset.halloweenPage ("battle" | "role" | "missions" |
+// "effects" | "feed") y solo inicializa/pollea lo que esa página
+// necesita. La lógica de cada sección (antes los "openXModal") se
+// conserva casi intacta, solo que ahora escribe directamente en un
+// contenedor de la página en vez de abrir un modal.
 //
 // Reglas de seguridad que este archivo respeta siempre:
 //  - NO usa service_role, solo el cliente anon ya existente
@@ -52,18 +63,41 @@
     var box = $('hw26GlobalError');
     if (box) box.hidden = true;
   }
+  function emptyStateHtml(msg) { return '<div class="hw26-empty-state">' + esc(msg) + '</div>'; }
+  function genericErrorHtml(msg) { return '<div class="hw26-empty-state">' + esc(msg) + '</div>'; }
+
+  function safeLsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function safeLsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
 
   // ---------------------------------------------------------------------
-  // 1) MODO DE PRUEBAS (mock) — SOLO afecta esta página de test.
+  // 0) Router — qué página es esta y si está en modo de pruebas.
+  //    <body data-halloween-page="battle|role|missions|effects|feed"
+  //          data-testmode="true">
+  // ---------------------------------------------------------------------
+  var PAGE = document.body.getAttribute('data-halloween-page') || '';
+  var HALLOWEEN_TEST_MODE = document.body.getAttribute('data-testmode') === 'true';
+
+  // ---------------------------------------------------------------------
+  // 1) MODO DE PRUEBAS (mock) — SOLO afecta estas páginas de test.
   //    Se activa con el <select> del panel "TEST MODE" (#hw26DevScenario)
   //    o con ?hw_scenario=... en la URL. "off" = usa las RPCs reales.
+  //    El escenario elegido también se guarda en localStorage (SOLO en
+  //    test mode, nunca escribe nada en Supabase) para que, al navegar de
+  //    una página Halloween a otra, se conserve el mismo escenario sin
+  //    tener que repetir el parámetro en cada link -- pura conveniencia
+  //    visual de pruebas, ver sección 15 del pedido original.
   // ---------------------------------------------------------------------
-  var urlParams = new URLSearchParams(window.location.search);
-  var rootEl = $('hw26Root');
-  var HALLOWEEN_TEST_MODE = !!(rootEl && rootEl.getAttribute('data-testmode') === 'true');
+  var LS_SCENARIO_KEY = 'hw26_test_scenario';
+  var LS_ROLE_KEY = 'hw26_test_role';
 
-  var currentScenario = HALLOWEEN_TEST_MODE ? (urlParams.get('hw_scenario') || 'off') : 'off';
-  var mockHasRole = urlParams.get('hw_role') === '1';
+  var urlParams = new URLSearchParams(window.location.search);
+  var currentScenario = 'off';
+  var mockHasRole = false;
+  if (HALLOWEEN_TEST_MODE) {
+    currentScenario = urlParams.get('hw_scenario') || safeLsGet(LS_SCENARIO_KEY) || 'off';
+    var roleParam = urlParams.get('hw_role');
+    mockHasRole = roleParam != null ? roleParam === '1' : safeLsGet(LS_ROLE_KEY) === '1';
+  }
 
   var NOW_TEST_BASE = Date.now();
 
@@ -223,11 +257,12 @@
   var sbClient = null;
   var lastState = null;
   var lastParticipation = null;
+  var participationStatus = 'unknown'; // 'ok' | 'no-session' | 'error'
   var lastEffects = [];
   var lastFeed = [];
   var lastMissions = [];
   var cataclysmTimerId = null;
-  var pollIds = { state: null, effects: null, feed: null, missions: null };
+  var pollIds = { main: null };
 
   function clearAllIntervals() {
     Object.keys(pollIds).forEach(function (k) {
@@ -238,7 +273,9 @@
   window.addEventListener('beforeunload', clearAllIntervals);
 
   // ---------------------------------------------------------------------
-  // 4) Carga de datos (cada módulo con su propio try/catch y fallback)
+  // 4) Carga de datos — cada función SOLO obtiene y guarda datos (no
+  //    renderiza nada): así cada página dedicada decide qué cargar y qué
+  //    hacer con el resultado, sin pedir datos que no va a mostrar.
   // ---------------------------------------------------------------------
   function loadState() {
     // halloween_2026_get_public_state() no recibe parámetros (ver spec).
@@ -249,40 +286,41 @@
         if (!row) throw new Error('sin datos');
         lastState = row;
         clearGlobalError();
-        renderBoss(row);
-        renderPinsHeader();
       })
       .catch(function (e) {
         console.warn('[halloween-2026] fallo halloween_2026_get_public_state', e);
+        lastState = null;
         showGlobalError('No se pudo cargar el estado de la batalla.');
       });
   }
 
   function loadParticipation() {
-    // Solo tiene sentido con sesión real (en mock, sbClient puede no
-    // existir todavía si test mode arrancó sin login -- igual usamos el
-    // mock si currentScenario !== 'off').
-    if (!HALLOWEEN_TEST_MODE || currentScenario === 'off') {
-      if (!sbClient) return Promise.resolve();
-      return sbClient.auth.getSession().then(function (sessionRes) {
-        var session = sessionRes.data && sessionRes.data.session;
-        if (!session) { lastParticipation = null; renderRoleStatus(); return; }
-        return callRpc(sbClient, 'halloween_2026_get_my_participation')
-          .then(function (res) {
-            if (res.error) throw res.error;
-            lastParticipation = Array.isArray(res.data) ? res.data[0] : res.data;
-            renderRoleStatus();
-          })
-          .catch(function (e) {
-            console.warn('[halloween-2026] fallo halloween_2026_get_my_participation', e);
-            lastParticipation = null;
-            renderRoleStatus(true);
-          });
+    var isMock = HALLOWEEN_TEST_MODE && currentScenario !== 'off';
+    if (isMock) {
+      return callRpc(sbClient, 'halloween_2026_get_my_participation').then(function (res) {
+        lastParticipation = res.data;
+        participationStatus = 'ok';
       });
     }
-    return callRpc(sbClient, 'halloween_2026_get_my_participation').then(function (res) {
-      lastParticipation = res.data;
-      renderRoleStatus();
+    if (!sbClient) { lastParticipation = null; participationStatus = 'no-session'; return Promise.resolve(); }
+    return sbClient.auth.getSession().then(function (sessionRes) {
+      var session = sessionRes.data && sessionRes.data.session;
+      if (!session) { lastParticipation = null; participationStatus = 'no-session'; return; }
+      return callRpc(sbClient, 'halloween_2026_get_my_participation')
+        .then(function (res) {
+          if (res.error) throw res.error;
+          lastParticipation = Array.isArray(res.data) ? res.data[0] : res.data;
+          participationStatus = 'ok';
+        })
+        .catch(function (e) {
+          console.warn('[halloween-2026] fallo halloween_2026_get_my_participation', e);
+          lastParticipation = null;
+          participationStatus = 'error';
+        });
+    }).catch(function (e) {
+      console.warn('[halloween-2026] fallo al obtener sesión', e);
+      lastParticipation = null;
+      participationStatus = 'error';
     });
   }
 
@@ -292,7 +330,6 @@
       .then(function (res) {
         if (res.error) throw res.error;
         lastEffects = res.data || [];
-        renderEffectsPinSub();
       })
       .catch(function (e) {
         console.warn('[halloween-2026] fallo halloween_2026_get_public_effects', e);
@@ -306,7 +343,6 @@
       .then(function (res) {
         if (res.error) throw res.error;
         lastFeed = res.data || [];
-        renderCronicasPinSub();
       })
       .catch(function (e) {
         console.warn('[halloween-2026] fallo halloween_2026_get_public_feed', e);
@@ -320,7 +356,6 @@
       .then(function (res) {
         if (res.error) throw res.error;
         lastMissions = res.data || [];
-        renderContratosPinSub();
       })
       .catch(function (e) {
         console.warn('[halloween-2026] fallo halloween_2026_get_public_missions', e);
@@ -329,7 +364,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // 5) Render — widget principal de La Heraldo
+  // 5) PÁGINA "battle" (halloween/batalla.html) — el widget de La Heraldo
   // ---------------------------------------------------------------------
   var prevBossHp = null, prevGeoHp = null;
 
@@ -445,81 +480,38 @@
     cataclysmTimerId = setInterval(tick, 1000);
   }
 
-  // ---------------------------------------------------------------------
-  // 6) Render — subtítulos de los 4 pines
-  // ---------------------------------------------------------------------
-  function renderPinsHeader() {
-    var pinRol = $('hw26PinRol');
-    if (!lastState || !pinRol) return;
-    if (lastState.status === 'scheduled') {
-      $('hw26PinRolSub').textContent = 'Bloqueado hasta el 1 Oct';
-    }
+  // Pequeña sección "efectos activos" opcional dentro de batalla.html.
+  function effectCardHtml(fx) {
+    var meta = EFFECT_META[fx.effect_key] || { icon: '✨', name: fx.effect_key, desc: '' };
+    var mult = (fx.multiplier != null) ? ('×' + fx.multiplier) : '';
+    var usesLine = (fx.remaining_uses != null) ? ('Usos restantes: ' + esc(fx.remaining_uses)) : '';
+    var scopeLine = effectScopeLabel(fx.scope);
+    return '<div class="hw26-effect-card">' +
+      '<span class="hw26-effect-icon">' + meta.icon + '</span>' +
+      '<div>' +
+        '<div class="hw26-effect-name">' + esc(meta.name) + (mult ? ' <span class="hw26-effect-mult">' + esc(mult) + '</span>' : '') + '</div>' +
+        '<div class="hw26-effect-desc">' + esc(meta.desc) + '</div>' +
+        (scopeLine ? '<div class="hw26-effect-scope">' + esc(scopeLine) + '</div>' : '') +
+        (usesLine ? '<div class="hw26-effect-uses">' + usesLine + '</div>' : '') +
+      '</div>' +
+    '</div>';
   }
 
-  function renderRoleStatus(errored) {
-    var sub = $('hw26PinRolSub');
-    if (!sub) return;
-    if (errored) { sub.textContent = 'No disponible'; return; }
-    if (!lastState) { sub.textContent = '—'; return; }
-    if (lastState.status === 'scheduled') { sub.textContent = 'Bloqueado hasta el 1 Oct'; return; }
-    if (!lastParticipation) { sub.textContent = 'Inicia sesión'; return; }
-    if (lastParticipation.has_role) {
-      sub.textContent = roleLabel(lastParticipation.role);
-    } else if (lastParticipation.can_choose_role) {
-      sub.textContent = 'Elige tu rol';
-      $('hw26PinRol').setAttribute('data-hw-urgent', 'true');
-    } else {
-      sub.textContent = 'Sin rol';
-    }
+  function renderBattleEffects() {
+    var box = $('hw26BattleEffects');
+    if (!box) return;
+    if (lastEffects == null || !lastEffects.length) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    box.innerHTML = '<div class="hw26-battle-effects-title">Efectos activos</div>' + lastEffects.map(effectCardHtml).join('');
   }
 
-  function renderContratosPinSub() {
-    var sub = $('hw26PinContratosSub');
-    if (!sub) return;
-    if (lastMissions == null) { sub.textContent = 'No disponible'; return; }
-    var activos = lastMissions.filter(function (m) { return m.availability === 'active'; }).length;
-    sub.textContent = activos > 0 ? (activos + ' activo' + (activos === 1 ? '' : 's')) : 'Sin contratos activos';
-  }
-
-  function renderEffectsPinSub() {
-    var sub = $('hw26PinEfectosSub');
-    if (!sub) return;
-    if (lastEffects == null) { sub.textContent = 'No disponible'; return; }
-    sub.textContent = lastEffects.length > 0 ? (lastEffects.length + ' activo' + (lastEffects.length === 1 ? '' : 's')) : 'Ninguno activo';
-  }
-
-  function renderCronicasPinSub() {
-    var sub = $('hw26PinCronicasSub');
-    if (!sub) return;
-    if (lastFeed == null) { sub.textContent = 'No disponible'; return; }
-    sub.textContent = lastFeed.length > 0 ? 'Últimos eventos' : 'Sin eventos todavía';
+  function initBattlePage() {
+    loadState().then(function () { if (lastState) renderBoss(lastState); });
+    loadEffects().then(renderBattleEffects);
   }
 
   // ---------------------------------------------------------------------
-  // 7) Modal genérico
-  // ---------------------------------------------------------------------
-  function openModal(html) {
-    var overlay = $('hw26ModalOverlay');
-    var body = $('hw26ModalBody');
-    if (!overlay || !body) return;
-    body.innerHTML = html;
-    overlay.hidden = false;
-  }
-  function closeModal() {
-    var overlay = $('hw26ModalOverlay');
-    if (overlay) overlay.hidden = true;
-  }
-
-  function wireModalChrome() {
-    var overlay = $('hw26ModalOverlay');
-    var closeBtn = $('hw26ModalClose');
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
-  }
-
-  // ---------------------------------------------------------------------
-  // 8) PIN 1 — ROL
+  // 6) PÁGINA "role" (halloween/rol.html)
   // ---------------------------------------------------------------------
   var ROLE_META = {
     attacker: { icon: '⚔', name: 'ATACANTE', desc: 'Golpea a La Heraldo y participa en la ofensiva.' },
@@ -531,137 +523,132 @@
     return m ? (m.icon + ' ' + m.name) : (role || '—');
   }
 
-  function openRolModal() {
-    if (!lastState) { openModal(genericErrorHtml('No se pudo cargar el estado de la batalla.')); return; }
+  function renderRolePage() {
+    var box = $('hw26RoleContent');
+    if (!box) return;
+
+    if (!lastState) { box.innerHTML = genericErrorHtml('No se pudo cargar el estado de la batalla.'); return; }
 
     if (lastState.status === 'scheduled') {
-      openModal(
-        '<h3 class="hw26-modal-title">⚔ Rol</h3>' +
-        '<div class="hw26-locked-box">' +
+      box.innerHTML =
+        '<div class="hw26-locked-box hw26-locked-box-big">' +
           '<div class="hw26-lock-icon">🔒</div>' +
           '<b>ELECCIÓN BLOQUEADA</b>' +
-          '<div class="hw26-modal-sub" style="margin:0;">Disponible: 1 OCT · 7:00 PM ET</div>' +
-        '</div>'
-      );
+          '<div class="hw26-page-sub" style="margin:0;">Disponible: 1 OCT · 7:00 PM ET</div>' +
+        '</div>';
       return;
     }
 
-    var isMock = HALLOWEEN_TEST_MODE && currentScenario !== 'off';
-    if (!isMock && !sbClient) { openModal(genericErrorHtml('No se pudo conectar con el sistema de cuentas.')); return; }
-
-    var checkSession = isMock
-      ? Promise.resolve({ data: { session: { user: { id: 'mock' } } } })
-      : sbClient.auth.getSession();
-
-    checkSession.then(function (sessionRes) {
-      var session = sessionRes.data && sessionRes.data.session;
-      if (!session) {
-        openModal(
-          '<h3 class="hw26-modal-title">⚔ Rol</h3>' +
-          '<div class="hw26-locked-box">' +
-            '<div class="hw26-lock-icon">👤</div>' +
-            '<b>Necesitas iniciar sesión</b>' +
-            '<div class="hw26-modal-sub" style="margin:8px 0 14px;">Inicia sesión con Twitch para elegir tu rol en la batalla.</div>' +
-            '<button type="button" class="hw26-role-confirm" id="hw26LoginFromModal">Iniciar sesión</button>' +
-          '</div>'
-        );
-        var btn = $('hw26LoginFromModal');
-        if (btn) btn.addEventListener('click', function () {
-          closeModal();
-          if (window.GeoArmyAccount && window.GeoArmyAccount.openLogin) window.GeoArmyAccount.openLogin();
-        });
-        return;
-      }
-
-      if (lastParticipation && lastParticipation.has_role) {
-        var meta = ROLE_META[lastParticipation.role] || { icon: '⚔', name: lastParticipation.role, desc: '' };
-        openModal(
-          '<h3 class="hw26-modal-title">⚔ Rol</h3>' +
-          '<div class="hw26-role-current">' +
-            '<span class="hw26-role-icon">' + meta.icon + '</span>' +
-            '<div><div class="hw26-role-name">' + esc(meta.name) + '</div>' +
-            '<div class="hw26-role-desc">Tu rol es permanente durante Halloween 2026.</div></div>' +
-          '</div>'
-        );
-        return;
-      }
-
-      if (!lastParticipation || !lastParticipation.can_choose_role) {
-        openModal(genericErrorHtml('La elección de rol no está disponible en este momento.'));
-        return;
-      }
-
-      var selected = null;
-      var html =
-        '<h3 class="hw26-modal-title">⚔ Elige tu rol</h3>' +
-        '<div class="hw26-modal-sub">Cada participante elige un rol una sola vez para todo octubre.</div>' +
-        Object.keys(ROLE_META).map(function (key) {
-          var m = ROLE_META[key];
-          return '<button type="button" class="hw26-role-card" data-role="' + key + '">' +
-            '<span class="hw26-role-icon">' + m.icon + '</span>' +
-            '<span><span class="hw26-role-name" style="display:block;">' + m.name + '</span>' +
-            '<span class="hw26-role-desc">' + esc(m.desc) + '</span></span>' +
-          '</button>';
-        }).join('') +
-        '<div class="hw26-role-warning">Tu elección será permanente durante Halloween 2026.</div>' +
-        '<button type="button" class="hw26-role-confirm" id="hw26ConfirmRole" disabled>Confirmar rol</button>';
-      openModal(html);
-
-      var cards = document.querySelectorAll('.hw26-role-card');
-      var confirmBtn = $('hw26ConfirmRole');
-      cards.forEach(function (card) {
-        card.addEventListener('click', function () {
-          selected = card.getAttribute('data-role');
-          cards.forEach(function (c) { c.classList.toggle('is-selected', c === card); });
-          if (confirmBtn) confirmBtn.disabled = false;
-        });
+    if (participationStatus === 'no-session') {
+      box.innerHTML =
+        '<div class="hw26-locked-box hw26-locked-box-big">' +
+          '<div class="hw26-lock-icon">👤</div>' +
+          '<b>Necesitas iniciar sesión</b>' +
+          '<div class="hw26-page-sub" style="margin:8px 0 14px;">Inicia sesión con Twitch para elegir tu rol en la batalla.</div>' +
+          '<button type="button" class="hw26-role-confirm" id="hw26LoginFromPage">Iniciar sesión</button>' +
+        '</div>';
+      var loginBtn = $('hw26LoginFromPage');
+      if (loginBtn) loginBtn.addEventListener('click', function () {
+        if (window.GeoArmyAccount && window.GeoArmyAccount.openLogin) window.GeoArmyAccount.openLogin();
       });
-      if (confirmBtn) confirmBtn.addEventListener('click', function () {
-        if (!selected) return;
-        confirmBtn.disabled = true;
-        confirmBtn.textContent = 'Guardando…';
+      return;
+    }
 
-        var confirmCall = (HALLOWEEN_TEST_MODE && currentScenario !== 'off')
-          ? Promise.resolve({ data: { ok: true }, error: null }) // mock: NO escribe nada real
-          : sbClient.rpc('halloween_2026_choose_role', { p_event_key: EVENT_KEY, p_role: selected });
+    if (participationStatus === 'error') {
+      box.innerHTML = genericErrorHtml('No se pudo verificar tu participación. Intenta de nuevo más tarde.');
+      return;
+    }
 
-        confirmCall.then(function (res) {
-          if (res.error) throw res.error;
-          // No optimistic update permanente: se vuelve a consultar
-          // participación real (o mock) antes de reflejar el cambio.
-          if (HALLOWEEN_TEST_MODE && currentScenario !== 'off') mockHasRole = true;
-          return loadParticipation();
-        }).then(function () {
-          closeModal();
-        }).catch(function (e) {
-          console.warn('[halloween-2026] fallo halloween_2026_choose_role', e);
-          confirmBtn.disabled = false;
-          confirmBtn.textContent = 'Confirmar rol';
-          openModal(genericErrorHtml('No se pudo guardar tu rol. Intenta de nuevo.'));
-        });
+    if (lastParticipation && lastParticipation.has_role) {
+      var meta = ROLE_META[lastParticipation.role] || { icon: '⚔', name: lastParticipation.role, desc: '' };
+      box.innerHTML =
+        '<div class="hw26-role-current hw26-role-current-big">' +
+          '<span class="hw26-role-icon">' + meta.icon + '</span>' +
+          '<div><div class="hw26-role-name">' + esc(meta.name) + '</div>' +
+          '<div class="hw26-role-desc">' + esc(meta.desc) + '</div>' +
+          '<div class="hw26-role-desc" style="margin-top:6px;">Tu rol es permanente durante Halloween 2026.</div></div>' +
+        '</div>';
+      return;
+    }
+
+    if (!lastParticipation || !lastParticipation.can_choose_role) {
+      box.innerHTML = genericErrorHtml('La elección de rol no está disponible en este momento.');
+      return;
+    }
+
+    var selected = null;
+    var html =
+      '<div class="hw26-page-sub" style="margin:0 0 16px;">Cada participante elige un rol una sola vez para todo octubre.</div>' +
+      '<div class="hw26-role-grid">' +
+      Object.keys(ROLE_META).map(function (key) {
+        var m = ROLE_META[key];
+        return '<button type="button" class="hw26-role-card" data-role="' + key + '">' +
+          '<span class="hw26-role-icon">' + m.icon + '</span>' +
+          '<span><span class="hw26-role-name" style="display:block;">' + m.name + '</span>' +
+          '<span class="hw26-role-desc">' + esc(m.desc) + '</span></span>' +
+        '</button>';
+      }).join('') +
+      '</div>' +
+      '<div class="hw26-role-warning">Tu elección será permanente durante Halloween 2026.</div>' +
+      '<button type="button" class="hw26-role-confirm" id="hw26ConfirmRole" disabled>Confirmar rol</button>';
+    box.innerHTML = html;
+
+    var cards = box.querySelectorAll('.hw26-role-card');
+    var confirmBtn = $('hw26ConfirmRole');
+    cards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        selected = card.getAttribute('data-role');
+        cards.forEach(function (c) { c.classList.toggle('is-selected', c === card); });
+        if (confirmBtn) confirmBtn.disabled = false;
       });
-    }).catch(function (e) {
-      console.warn('[halloween-2026] fallo al verificar sesión para Rol', e);
-      openModal(genericErrorHtml('No se pudo verificar tu sesión.'));
+    });
+    if (confirmBtn) confirmBtn.addEventListener('click', function () {
+      if (!selected) return;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Guardando…';
+
+      var isMock = HALLOWEEN_TEST_MODE && currentScenario !== 'off';
+      var confirmCall = isMock
+        ? Promise.resolve({ data: { ok: true }, error: null }) // mock: NO escribe nada real
+        : sbClient.rpc('halloween_2026_choose_role', { p_event_key: EVENT_KEY, p_role: selected });
+
+      confirmCall.then(function (res) {
+        if (res.error) throw res.error;
+        // No optimistic update permanente: se vuelve a consultar
+        // participación real (o mock) antes de reflejar el cambio.
+        if (isMock) { mockHasRole = true; safeLsSet(LS_ROLE_KEY, '1'); }
+        return loadParticipation();
+      }).then(function () {
+        renderRolePage();
+      }).catch(function (e) {
+        console.warn('[halloween-2026] fallo halloween_2026_choose_role', e);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirmar rol';
+        box.insertAdjacentHTML('beforeend', genericErrorHtml('No se pudo guardar tu rol. Intenta de nuevo.'));
+      });
     });
   }
 
+  function initRolePage() {
+    Promise.all([loadState(), loadParticipation()]).then(renderRolePage);
+  }
+
   // ---------------------------------------------------------------------
-  // 9) PIN 2 — CONTRATOS
+  // 7) PÁGINA "missions" (halloween/contratos.html)
   // ---------------------------------------------------------------------
   var MISSION_CATEGORY_LABEL = { fortnite: 'FORTNITE', overwatch: 'OVERWATCH', stream: 'STREAM' };
   var MISSION_STATUS_LABEL = { upcoming: 'PRÓXIMO', active: 'ACTIVO', ended: 'TERMINADO' };
 
-  function openContratosModal() {
-    if (lastMissions == null) { openModal(genericErrorHtml('Contratos temporalmente no disponibles.')); return; }
-    if (!lastMissions.length) {
-      openModal('<h3 class="hw26-modal-title">📜 Contratos</h3>' + emptyStateHtml('Todavía no hay contratos publicados.'));
-      return;
-    }
+  function renderMissionsPage() {
+    var box = $('hw26MissionsContent');
+    if (!box) return;
+    if (lastMissions == null) { box.innerHTML = genericErrorHtml('Contratos temporalmente no disponibles.'); return; }
+    if (!lastMissions.length) { box.innerHTML = emptyStateHtml('Todavía no hay contratos publicados.'); return; }
+
     var byCat = { fortnite: [], overwatch: [], stream: [] };
     lastMissions.forEach(function (m) { (byCat[m.category] || (byCat[m.category] = [])).push(m); });
 
-    var html = '<h3 class="hw26-modal-title">📜 Contratos</h3>';
+    var html = '';
     ['fortnite', 'overwatch', 'stream'].forEach(function (cat) {
       var list = byCat[cat];
       if (!list || !list.length) return;
@@ -682,45 +669,43 @@
           '</div>';
       });
     });
-    openModal(html);
+    box.innerHTML = html || emptyStateHtml('Todavía no hay contratos publicados.');
+  }
+
+  function initMissionsPage() {
+    loadMissions().then(renderMissionsPage);
   }
 
   // ---------------------------------------------------------------------
-  // 10) PIN 3 — EFECTOS
+  // 8) PÁGINA "effects" (halloween/efectos.html)
   // ---------------------------------------------------------------------
   var EFFECT_META = {
-    escudo_arcano: { icon: '🛡', name: 'ESCUDO ARCANO', desc: 'Próximo ataque de La Heraldo ×0.5' },
-    vulnerabilidad: { icon: '🔮', name: 'VULNERABILIDAD', desc: 'Ataques de Geo Army ×2', showUses: true },
-    ruptura_arcana: { icon: '📜', name: 'RUPTURA ARCANA', desc: 'Próximo Contrato ×2' },
-    marca_bruja: { icon: '🩸', name: 'MARCA DE LA BRUJA', desc: 'Próximo ataque de Geo Army ×0.5' },
-    herida_profana: { icon: '💀', name: 'HERIDA PROFANA', desc: 'Próxima curación ×0.5' },
+    escudo_arcano: { icon: '🛡', name: 'ESCUDO ARCANO', desc: 'Reduce el daño del próximo ataque de La Heraldo.' },
+    vulnerabilidad: { icon: '🔮', name: 'VULNERABILIDAD', desc: 'Multiplica el daño de los ataques de Geo Army.' },
+    ruptura_arcana: { icon: '📜', name: 'RUPTURA ARCANA', desc: 'Multiplica el daño del próximo Contrato completado.' },
+    marca_bruja: { icon: '🩸', name: 'MARCA DE LA BRUJA', desc: 'Reduce el daño del próximo ataque de Geo Army.' },
+    herida_profana: { icon: '💀', name: 'HERIDA PROFANA', desc: 'Reduce la próxima curación de Geo Army.' },
   };
+  function effectScopeLabel(scope) {
+    if (scope === 'geoarmy') return 'Afecta a Geo Army';
+    if (scope === 'boss') return 'Afecta a La Heraldo';
+    return '';
+  }
 
-  function openEfectosModal() {
-    if (lastEffects == null) { openModal(genericErrorHtml('Efectos temporalmente no disponibles.')); return; }
-    var html = '<h3 class="hw26-modal-title">🔮 Efectos</h3>';
-    if (!lastEffects.length) {
-      html += emptyStateHtml('NINGÚN EFECTO ACTIVO');
-      openModal(html);
-      return;
-    }
-    lastEffects.forEach(function (fx) {
-      var meta = EFFECT_META[fx.effect_key] || { icon: '✨', name: fx.effect_key, desc: '' };
-      html +=
-        '<div class="hw26-effect-card">' +
-          '<span class="hw26-effect-icon">' + meta.icon + '</span>' +
-          '<div>' +
-            '<div class="hw26-effect-name">' + esc(meta.name) + '</div>' +
-            '<div class="hw26-effect-desc">' + esc(meta.desc) + '</div>' +
-            (meta.showUses && fx.remaining_uses != null ? '<div class="hw26-effect-uses">Usos restantes: ' + esc(fx.remaining_uses) + '</div>' : '') +
-          '</div>' +
-        '</div>';
-    });
-    openModal(html);
+  function renderEffectsPage() {
+    var box = $('hw26EffectsContent');
+    if (!box) return;
+    if (lastEffects == null) { box.innerHTML = genericErrorHtml('Efectos temporalmente no disponibles.'); return; }
+    if (!lastEffects.length) { box.innerHTML = emptyStateHtml('NINGÚN EFECTO ACTIVO'); return; }
+    box.innerHTML = lastEffects.map(effectCardHtml).join('');
+  }
+
+  function initEffectsPage() {
+    loadEffects().then(renderEffectsPage);
   }
 
   // ---------------------------------------------------------------------
-  // 11) PIN 4 — CRÓNICAS
+  // 9) PÁGINA "feed" (halloween/cronicas.html)
   // ---------------------------------------------------------------------
   function feedItemText(item) {
     var dmg = fmtNum(Math.abs(item.boss_hp_delta || 0));
@@ -759,15 +744,13 @@
     }
   }
 
-  function openCronicasModal() {
-    if (lastFeed == null) { openModal(genericErrorHtml('Crónicas temporalmente no disponibles.')); return; }
-    var html = '<h3 class="hw26-modal-title">📖 Crónicas</h3>';
-    if (!lastFeed.length) {
-      html += emptyStateHtml('Todavía no hay crónicas que contar.');
-      openModal(html);
-      return;
-    }
+  function renderFeedPage() {
+    var box = $('hw26FeedContent');
+    if (!box) return;
+    if (lastFeed == null) { box.innerHTML = genericErrorHtml('Crónicas temporalmente no disponibles.'); return; }
+    if (!lastFeed.length) { box.innerHTML = emptyStateHtml('Todavía no hay crónicas que contar.'); return; }
     var sorted = lastFeed.slice().sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+    var html = '';
     sorted.forEach(function (item) {
       var time = '';
       try { time = new Date(item.created_at).toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) {}
@@ -777,18 +760,29 @@
           '<span class="hw26-feed-time">' + esc(time) + '</span>' +
         '</div>';
     });
-    openModal(html);
+    box.innerHTML = html;
+  }
+
+  function initFeedPage() {
+    loadFeed().then(renderFeedPage);
   }
 
   // ---------------------------------------------------------------------
-  // Helpers de modal compartidos
+  // 10) Panel de pruebas (dev bar) — SOLO test mode, en cada página
   // ---------------------------------------------------------------------
-  function emptyStateHtml(msg) { return '<div class="hw26-empty-state">' + esc(msg) + '</div>'; }
-  function genericErrorHtml(msg) { return '<div class="hw26-empty-state">' + esc(msg) + '</div>'; }
+  var PAGE_INIT = {
+    battle: initBattlePage,
+    role: initRolePage,
+    missions: initMissionsPage,
+    effects: initEffectsPage,
+    feed: initFeedPage,
+  };
 
-  // ---------------------------------------------------------------------
-  // 12) Panel de pruebas (dev bar) — SOLO test mode
-  // ---------------------------------------------------------------------
+  function runPageInit() {
+    var fn = PAGE_INIT[PAGE];
+    if (fn) fn();
+  }
+
   function wireDevBar() {
     if (!HALLOWEEN_TEST_MODE) return;
     var bar = $('hw26DevBar');
@@ -800,70 +794,58 @@
       select.value = currentScenario;
       select.addEventListener('change', function () {
         currentScenario = select.value;
+        safeLsSet(LS_SCENARIO_KEY, currentScenario);
         var url = new URL(window.location.href);
         if (currentScenario === 'off') url.searchParams.delete('hw_scenario');
         else url.searchParams.set('hw_scenario', currentScenario);
         history.replaceState(null, '', url);
-        refreshAll();
+        runPageInit();
       });
     }
     if (roleCheck) {
       roleCheck.checked = mockHasRole;
       roleCheck.addEventListener('change', function () {
         mockHasRole = roleCheck.checked;
+        safeLsSet(LS_ROLE_KEY, mockHasRole ? '1' : '0');
         var url = new URL(window.location.href);
         if (mockHasRole) url.searchParams.set('hw_role', '1'); else url.searchParams.delete('hw_role');
         history.replaceState(null, '', url);
-        refreshAll();
+        runPageInit();
       });
     }
   }
 
-  function refreshAll() {
-    loadState();
-    loadParticipation();
-    loadEffects();
-    loadFeed();
-    loadMissions();
-  }
-
   // ---------------------------------------------------------------------
-  // 13) Arranque
+  // 11) Polling — solo el de la página actual, nada más
+  //     (p.ej. cronicas.html NUNCA arranca un poll de misiones/efectos).
   // ---------------------------------------------------------------------
-  function wirePins() {
-    var pinRol = $('hw26PinRol');
-    var pinContratos = $('hw26PinContratos');
-    var pinEfectos = $('hw26PinEfectos');
-    var pinCronicas = $('hw26PinCronicas');
-    if (pinRol) pinRol.addEventListener('click', openRolModal);
-    if (pinContratos) pinContratos.addEventListener('click', openContratosModal);
-    if (pinEfectos) pinEfectos.addEventListener('click', openEfectosModal);
-    if (pinCronicas) pinCronicas.addEventListener('click', openCronicasModal);
-  }
+  var POLL_INTERVAL_MS = { battle: 5000, role: 20000, missions: 45000, effects: 9000, feed: 8000 };
 
   function startPolling() {
     clearAllIntervals();
-    pollIds.state = setInterval(loadState, 5000);
-    pollIds.effects = setInterval(loadEffects, 9000);
-    pollIds.feed = setInterval(loadFeed, 6000);
-    pollIds.missions = setInterval(loadMissions, 45000);
+    var ms = POLL_INTERVAL_MS[PAGE];
+    if (!ms) return;
+    pollIds.main = setInterval(runPageInit, ms);
   }
 
+  // ---------------------------------------------------------------------
+  // 12) Arranque
+  // ---------------------------------------------------------------------
   var didInitialLoad = false;
 
   function init() {
-    wireModalChrome();
-    wirePins();
     wireDevBar();
 
     function afterClient(client) {
       sbClient = client;
       if (client && client.auth && client.auth.onAuthStateChange) {
-        client.auth.onAuthStateChange(function () { loadParticipation(); });
+        client.auth.onAuthStateChange(function () {
+          if (PAGE === 'role') { loadParticipation().then(renderRolePage); }
+        });
       }
       if (didInitialLoad) return; // ya se arrancó con mock; solo llegamos aquí a enchufar el cliente real
       didInitialLoad = true;
-      refreshAll();
+      runPageInit();
       startPolling();
     }
 
