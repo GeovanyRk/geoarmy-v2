@@ -772,6 +772,14 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em;
   color: var(--hw26-text-dim); text-transform: uppercase; white-space: normal; text-align: center;
 }
+/* Contrato completado (mission_damage) -- mismo golpe visual que un
+   ataque de jugador sobre Morvanna, pero con acento ámbar propio para
+   distinguirlo de un golpe directo de Geo Army. */
+.hw26-move-pop-mission {
+  border-color: rgba(249, 199, 90, 0.45) !important;
+}
+.hw26-move-pop-mission .hw26-move-name { color: #ffd88a; }
+.hw26-move-pop-mission .hw26-move-value { color: #ffb648; }
 
 /* Flash breve blanco/violeta sobre Morvanna al recibir un golpe de Geo
    Army -- capa aparte de .hw26-boss-flash (reservado a la transición de
