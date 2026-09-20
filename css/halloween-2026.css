@@ -390,6 +390,36 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   opacity: 1;
 }
 
+/* Cataclismo — mientras pending_attack_key === 'cataclismo' (ver
+   updateBossImg/renderBoss en el JS), la imagen cambia a
+   assets/halloween/cataclismo.webp y el glow ambiental se intensifica más
+   allá de Fase II normal, como alerta temporal. Puro presentación: el
+   navegador nunca decide cuándo empieza/termina, solo refleja
+   pending_attack_key ya cargado -- al desaparecer, el siguiente poll
+   vuelve sola a heraldo-fase2.webp y a este mismo bloque de estilos
+   dejando de aplicar (sin recargar la página). Declarado después de
+   [data-phase="2"]/[data-outcome] para ganar el empate de especificidad
+   mientras Cataclismo está activo. */
+.hw26-boss[data-cataclysm="1"] .hw26-boss-atmosphere {
+  background:
+    radial-gradient(56% 70% at 24% 38%, rgba(220, 38, 38, 0.58), transparent 76%),
+    radial-gradient(50% 64% at 88% 55%, rgba(124, 58, 237, 0.38), transparent 76%);
+  animation: hw26-cataclysm-atmosphere-pulse 1.5s ease-in-out infinite;
+  opacity: 1;
+}
+@keyframes hw26-cataclysm-atmosphere-pulse {
+  0%, 100% { opacity: 0.86; }
+  50% { opacity: 1; }
+}
+/* La imagen de Cataclismo es una escena panorámica (no un retrato como las
+   de fase): se reencuadra un poco más abajo para mantener visible el
+   núcleo de energía/garras en vez del cielo. Mismo object-fit:cover de
+   siempre, mismos degradados de fusión con el fondo (.hw26-boss-art::after
+   no depende de qué imagen haya dentro). */
+.hw26-boss[data-cataclysm="1"] .hw26-boss-img {
+  object-position: center 55%;
+}
+
 /* Panel "boss battle" de dos columnas. Mobile-first: column-reverse hace
    que .hw26-boss-art (imagen, segunda en el HTML) aparezca PRIMERO
    visualmente y .hw26-boss-info (texto/barras) después -- sin duplicar
