@@ -63,8 +63,30 @@
     var box = $('hw26GlobalError');
     if (box) box.hidden = true;
   }
-  function emptyStateHtml(msg) { return '<div class="hw26-empty-state">' + esc(msg) + '</div>'; }
-  function genericErrorHtml(msg) { return '<div class="hw26-empty-state">' + esc(msg) + '</div>'; }
+  // Empty state "trabajado": icono grande sutil + título + texto
+  // secundario de ambientación (en vez de una caja gigante con una sola
+  // línea). genericErrorHtml conserva su firma de un solo mensaje pero
+  // usa la misma estructura visual con un icono de advertencia.
+  function emptyStateHtml(icon, title, sub) {
+    return '<div class="hw26-empty-state">' +
+      '<div class="hw26-empty-icon">' + icon + '</div>' +
+      '<div class="hw26-empty-title">' + esc(title) + '</div>' +
+      (sub ? '<div class="hw26-empty-sub">' + esc(sub) + '</div>' : '') +
+    '</div>';
+  }
+  function genericErrorHtml(msg) {
+    return '<div class="hw26-empty-state hw26-empty-state-error">' +
+      '<div class="hw26-empty-icon">⚠</div>' +
+      '<div class="hw26-empty-title">ALGO SALIÓ MAL</div>' +
+      '<div class="hw26-empty-sub">' + esc(msg) + '</div>' +
+    '</div>';
+  }
+  // "ESCUDO ARCANO" -> "Escudo Arcano" — solo para el texto narrativo de
+  // Crónicas, que se lee mejor en minúsculas/mayúscula inicial que en el
+  // mayúsculas-fijas de las tarjetas de Efectos.
+  function titleCaseEs(s) {
+    return String(s || '').toLowerCase().replace(/(^|\s)([a-záéíóúñ])/g, function (m, sp, c) { return sp + c.toUpperCase(); });
+  }
 
   function safeLsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
   function safeLsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
@@ -179,6 +201,20 @@
     ];
   }
 
+  // Escenario MOCK "effects_active" -- puramente visual, para revisar de
+  // un vistazo las tarjetas de los 5 efectos posibles juntas. NUNCA
+  // escribe en Supabase.
+  function mockEffectsFull() {
+    var now = Date.now();
+    return [
+      { effect_key: 'escudo_arcano', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: 1, expires_at: null, created_at: new Date(now - 30000).toISOString() },
+      { effect_key: 'vulnerabilidad', scope: 'boss', applies_to: null, multiplier: 2, remaining_uses: 2, expires_at: null, created_at: new Date(now - 60000).toISOString() },
+      { effect_key: 'ruptura_arcana', scope: 'boss', applies_to: null, multiplier: 2, remaining_uses: 1, expires_at: null, created_at: new Date(now - 90000).toISOString() },
+      { effect_key: 'marca_bruja', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: 1, expires_at: null, created_at: new Date(now - 120000).toISOString() },
+      { effect_key: 'herida_profana', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: 1, expires_at: null, created_at: new Date(now - 150000).toISOString() },
+    ];
+  }
+
   function mockFeed(scenario) {
     var now = Date.now();
     var items = [
@@ -204,6 +240,26 @@
     return items;
   }
 
+  // Escenario MOCK "feed_active" -- las 6 entradas de ejemplo pedidas,
+  // pensadas para revisar la jerarquía visual de la crónica (hora, texto,
+  // daño destacado, eventos de boss más agresivos). Las horas son de HOY
+  // a las 20:41–20:50 para que se lean igual que el ejemplo sin depender
+  // de cuándo se pruebe. Puramente visual: nunca escribe en Supabase.
+  function mockFeedActive() {
+    var d = new Date();
+    function atTime(h, m) {
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m, 0, 0).toISOString();
+    }
+    return [
+      { log_id: 106, entry_type: 'phase_change', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 999000, geoarmy_hp_after: 15000, phase_after: 2, created_at: atTime(20, 50) },
+      { log_id: 105, entry_type: 'boss_attack', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'cataclismo', effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: -6000, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 21000, phase_after: 1, created_at: atTime(20, 46) },
+      { log_id: 104, entry_type: 'boss_attack_announced', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'cataclismo', effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 27000, phase_after: 1, created_at: atTime(20, 45) },
+      { log_id: 103, entry_type: 'effect_applied', actor_name: 'Geo Army', actor_role: null, action_key: null, boss_attack_key: null, effect_key: 'escudo_arcano', boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 27000, phase_after: 1, created_at: atTime(20, 43) },
+      { log_id: 102, entry_type: 'boss_attack', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'fuego_infernal', effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: -9000, multiplier_applied: 1, boss_hp_after: 1403000, geoarmy_hp_after: 27000, phase_after: 1, created_at: atTime(20, 42) },
+      { log_id: 101, entry_type: 'player_attack', actor_name: 'Geovannyrk', actor_role: 'attacker', action_key: 'golpe_del_abismo', boss_attack_key: null, effect_key: null, boss_hp_delta: -3000, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1403000, geoarmy_hp_after: 36000, phase_after: 1, created_at: atTime(20, 41) },
+    ];
+  }
+
   function mockMissions(scenario) {
     var upcomingOnly = scenario === 'scheduled';
     return [
@@ -212,6 +268,24 @@
       { mission_id: 3, mission_key: 'stream_raid', category: 'stream', title: 'Trae un raid de 5+', description: 'Hazle raid al canal con 5 o más espectadores durante octubre.', mission_day: '2026-10-10', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 4000, verification_mode: 'manual', sort_order: 3 },
       { mission_id: 4, mission_key: 'fn_batalla_final', category: 'fortnite', title: 'Batalla final: asalto', description: 'Contrato especial del 31 de octubre contra La Heraldo.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 20000, verification_mode: 'clip', sort_order: 4 },
     ];
+  }
+
+  // Escenarios MOCK exclusivos para revisar el diseño de Contratos con
+  // contenido real de ejemplo (contratos_empty / contratos_upcoming /
+  // contratos_active). Puramente visuales: NUNCA escriben en Supabase, y
+  // cuando exista la RPC/tabla real de contratos se usará exclusivamente
+  // halloween_2026_get_public_missions() sin pasar por aquí.
+  function mockMissionsContratos(scenario) {
+    if (scenario === 'contratos_empty') return [];
+    var base = [
+      { mission_id: 101, mission_key: 'fn_caza_nocturna', category: 'fortnite', title: 'CAZA NOCTURNA', description: 'Elimina 5 enemigos', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 5000, verification_mode: 'clip', sort_order: 1 },
+      { mission_id: 102, mission_key: 'ow_sin_escapatoria', category: 'overwatch', title: 'SIN ESCAPATORIA', description: 'Gana 2 partidas', mission_day: '2026-10-18', opens_at: '2026-10-18T00:00:00-04:00', closes_at: '2026-10-18T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 2 },
+      { mission_id: 103, mission_key: 'stream_ritual_comunidad', category: 'stream', title: 'RITUAL DE LA COMUNIDAD', description: 'Meta comunitaria', mission_day: '2026-10-24', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 15000, verification_mode: 'manual', sort_order: 3 },
+    ];
+    if (scenario === 'contratos_upcoming') {
+      return base.map(function (m) { return Object.assign({}, m, { availability: 'upcoming' }); });
+    }
+    return base; // contratos_active: mezcla activo/próximo, tal como el ejemplo pedido
   }
 
   // ---------------------------------------------------------------------
@@ -244,9 +318,17 @@
     switch (name) {
       case 'halloween_2026_get_public_state': return mockState(currentScenario);
       case 'halloween_2026_get_my_participation': return mockParticipation(currentScenario);
-      case 'halloween_2026_get_public_effects': return mockEffects(currentScenario);
-      case 'halloween_2026_get_public_feed': return mockFeed(currentScenario);
-      case 'halloween_2026_get_public_missions': return mockMissions(currentScenario);
+      case 'halloween_2026_get_public_effects':
+        if (currentScenario === 'effects_active') return mockEffectsFull();
+        return mockEffects(currentScenario);
+      case 'halloween_2026_get_public_feed':
+        if (currentScenario === 'feed_active') return mockFeedActive();
+        return mockFeed(currentScenario);
+      case 'halloween_2026_get_public_missions':
+        if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' || currentScenario === 'contratos_active') {
+          return mockMissionsContratos(currentScenario);
+        }
+        return mockMissions(currentScenario);
       default: return null;
     }
   }
@@ -368,6 +450,34 @@
   // ---------------------------------------------------------------------
   var prevBossHp = null, prevGeoHp = null;
 
+  // Imagen de La Heraldo por fase: intenta assets/halloween/heraldo-faseN.webp
+  // y si no existe (404 / onerror) cae al placeholder del planeta que ya
+  // trae la etiqueta <img data-fallback="..."> en el HTML. HERO_IMG_MISSING
+  // recuerda qué fases ya fallaron para no reintentar la misma URL rota en
+  // cada poll (evita spam de requests fallidos).
+  var HERO_IMG_MISSING = {};
+  function updateBossImg(phase) {
+    var img = $('hw26BossImg');
+    if (!img) return;
+    var fallback = img.getAttribute('data-fallback') || img.src;
+    var wanted = '../assets/halloween/heraldo-fase' + (phase === 2 ? 2 : 1) + '.webp';
+
+    if (HERO_IMG_MISSING[wanted]) {
+      if (img.getAttribute('src') !== fallback) img.src = fallback;
+      return;
+    }
+    if (img.getAttribute('data-hero-src') === wanted) return; // ya es esta
+
+    img.onerror = function () {
+      HERO_IMG_MISSING[wanted] = true;
+      img.onerror = null;
+      img.removeAttribute('data-hero-src');
+      img.src = fallback;
+    };
+    img.setAttribute('data-hero-src', wanted);
+    img.src = wanted;
+  }
+
   function renderBoss(state) {
     var boss = $('hw26Boss');
     if (!boss) return;
@@ -385,6 +495,7 @@
       if (badge) badge.textContent = 'FASE I';
       if (phaseText) phaseText.textContent = 'FASE I — FORMA SELLADA';
     }
+    updateBossImg(state.boss_phase === 2 ? 2 : 1);
 
     // Barras — nunca se recalculan, solo se representan boss_hp/boss_max_hp
     // y geoarmy_hp/geoarmy_max_hp tal como vienen de Supabase.
@@ -480,19 +591,26 @@
     cataclysmTimerId = setInterval(tick, 1000);
   }
 
-  // Pequeña sección "efectos activos" opcional dentro de batalla.html.
+  // Tarjeta de efecto compartida entre la mini-sección de batalla.html y
+  // la página completa de efectos.html. "Trabajada": icono en círculo,
+  // nombre, descripción corta, chip de multiplicador y píldora de usos.
   function effectCardHtml(fx) {
     var meta = EFFECT_META[fx.effect_key] || { icon: '✨', name: fx.effect_key, desc: '' };
     var mult = (fx.multiplier != null) ? ('×' + fx.multiplier) : '';
-    var usesLine = (fx.remaining_uses != null) ? ('Usos restantes: ' + esc(fx.remaining_uses)) : '';
+    var usesLabel = (fx.remaining_uses != null) ? (fx.remaining_uses + (fx.remaining_uses === 1 ? ' uso' : ' usos')) : '';
     var scopeLine = effectScopeLabel(fx.scope);
     return '<div class="hw26-effect-card">' +
-      '<span class="hw26-effect-icon">' + meta.icon + '</span>' +
-      '<div>' +
-        '<div class="hw26-effect-name">' + esc(meta.name) + (mult ? ' <span class="hw26-effect-mult">' + esc(mult) + '</span>' : '') + '</div>' +
+      '<span class="hw26-effect-icon-circle"><span class="hw26-effect-icon">' + meta.icon + '</span></span>' +
+      '<div class="hw26-effect-body">' +
+        '<div class="hw26-effect-top">' +
+          '<span class="hw26-effect-name">' + esc(meta.name) + '</span>' +
+          (mult ? '<span class="hw26-effect-mult-chip">' + esc(mult) + '</span>' : '') +
+        '</div>' +
         '<div class="hw26-effect-desc">' + esc(meta.desc) + '</div>' +
-        (scopeLine ? '<div class="hw26-effect-scope">' + esc(scopeLine) + '</div>' : '') +
-        (usesLine ? '<div class="hw26-effect-uses">' + usesLine + '</div>' : '') +
+        '<div class="hw26-effect-meta-row">' +
+          (scopeLine ? '<span class="hw26-effect-scope">' + esc(scopeLine) + '</span>' : '') +
+          (usesLabel ? '<span class="hw26-effect-uses-pill">' + esc(usesLabel) + '</span>' : '') +
+        '</div>' +
       '</div>' +
     '</div>';
   }
@@ -523,19 +641,43 @@
     return m ? (m.icon + ' ' + m.name) : (role || '—');
   }
 
+  // Tarjeta de rol compartida entre la vista bloqueada (preview, antes del
+  // 1 de octubre) y la vista activa (seleccionable). opts.locked agrega el
+  // badge "BLOQUEADO", desactiva el botón (disabled/aria-disabled) y deja
+  // que el CSS la atenúe -- pero SIEMPRE se muestran las 3 tarjetas, nunca
+  // una caja vacía con solo un candado.
+  function roleCardHtml(key, meta, opts) {
+    opts = opts || {};
+    var cls = 'hw26-role-card' + (opts.locked ? ' is-locked' : '') + (opts.selected ? ' is-selected' : '');
+    var attrs = 'type="button" class="' + cls + '" data-role="' + key + '"';
+    if (opts.locked) attrs += ' disabled aria-disabled="true"';
+    return '<button ' + attrs + '>' +
+      (opts.locked ? '<span class="hw26-role-lock-badge">🔒 BLOQUEADO</span>' : '') +
+      '<span class="hw26-role-icon">' + meta.icon + '</span>' +
+      '<span class="hw26-role-body"><span class="hw26-role-name">' + esc(meta.name) + '</span>' +
+      '<span class="hw26-role-desc">' + esc(meta.desc) + '</span></span>' +
+    '</button>';
+  }
+
   function renderRolePage() {
     var box = $('hw26RoleContent');
     if (!box) return;
 
     if (!lastState) { box.innerHTML = genericErrorHtml('No se pudo cargar el estado de la batalla.'); return; }
 
+    // Aunque el evento todavía esté "scheduled", se muestran las 3
+    // tarjetas de rol (atenuadas, no clickeables, con badge "BLOQUEADO")
+    // para que el usuario pueda conocerlas antes de que empiece la
+    // batalla -- nunca una caja vacía con solo un candado.
     if (lastState.status === 'scheduled') {
       box.innerHTML =
-        '<div class="hw26-locked-box hw26-locked-box-big">' +
-          '<div class="hw26-lock-icon">🔒</div>' +
-          '<b>ELECCIÓN BLOQUEADA</b>' +
-          '<div class="hw26-page-sub" style="margin:0;">Disponible: 1 OCT · 7:00 PM ET</div>' +
-        '</div>';
+        '<div class="hw26-page-sub" style="margin:0 0 16px;">Conoce los roles disponibles antes de que comience la batalla.</div>' +
+        '<div class="hw26-role-grid">' +
+        Object.keys(ROLE_META).map(function (key) {
+          return roleCardHtml(key, ROLE_META[key], { locked: true });
+        }).join('') +
+        '</div>' +
+        '<div class="hw26-role-warning hw26-role-warning-locked">🔒 Disponible 1 OCT · 7:00 PM ET</div>';
       return;
     }
 
@@ -581,12 +723,7 @@
       '<div class="hw26-page-sub" style="margin:0 0 16px;">Cada participante elige un rol una sola vez para todo octubre.</div>' +
       '<div class="hw26-role-grid">' +
       Object.keys(ROLE_META).map(function (key) {
-        var m = ROLE_META[key];
-        return '<button type="button" class="hw26-role-card" data-role="' + key + '">' +
-          '<span class="hw26-role-icon">' + m.icon + '</span>' +
-          '<span><span class="hw26-role-name" style="display:block;">' + m.name + '</span>' +
-          '<span class="hw26-role-desc">' + esc(m.desc) + '</span></span>' +
-        '</button>';
+        return roleCardHtml(key, ROLE_META[key], {});
       }).join('') +
       '</div>' +
       '<div class="hw26-role-warning">Tu elección será permanente durante Halloween 2026.</div>' +
@@ -643,7 +780,7 @@
     var box = $('hw26MissionsContent');
     if (!box) return;
     if (lastMissions == null) { box.innerHTML = genericErrorHtml('Contratos temporalmente no disponibles.'); return; }
-    if (!lastMissions.length) { box.innerHTML = emptyStateHtml('Todavía no hay contratos publicados.'); return; }
+    if (!lastMissions.length) { box.innerHTML = emptyStateHtml('📜', 'SIN CONTRATOS ACTIVOS', 'Todavía no hay contratos publicados.'); return; }
 
     var byCat = { fortnite: [], overwatch: [], stream: [] };
     lastMissions.forEach(function (m) { (byCat[m.category] || (byCat[m.category] = [])).push(m); });
@@ -669,7 +806,7 @@
           '</div>';
       });
     });
-    box.innerHTML = html || emptyStateHtml('Todavía no hay contratos publicados.');
+    box.innerHTML = html || emptyStateHtml('📜', 'SIN CONTRATOS ACTIVOS', 'Todavía no hay contratos publicados.');
   }
 
   function initMissionsPage() {
@@ -696,7 +833,7 @@
     var box = $('hw26EffectsContent');
     if (!box) return;
     if (lastEffects == null) { box.innerHTML = genericErrorHtml('Efectos temporalmente no disponibles.'); return; }
-    if (!lastEffects.length) { box.innerHTML = emptyStateHtml('NINGÚN EFECTO ACTIVO'); return; }
+    if (!lastEffects.length) { box.innerHTML = emptyStateHtml('🔮', 'NINGÚN EFECTO ACTIVO', 'El campo de batalla está estable… por ahora.'); return; }
     box.innerHTML = lastEffects.map(effectCardHtml).join('');
   }
 
@@ -707,32 +844,47 @@
   // ---------------------------------------------------------------------
   // 9) PÁGINA "feed" (halloween/cronicas.html)
   // ---------------------------------------------------------------------
+  // Etiquetas narrativas para Crónicas -- solo texto de presentación, no
+  // cambian ni calculan nada del combate.
+  var ACTION_KEY_LABEL = { golpe_del_abismo: 'Golpe del Abismo' };
+  var BOSS_ATTACK_LABEL = { fuego_infernal: 'Fuego Infernal', cataclismo: 'Cataclismo' };
+
   function feedItemText(item) {
-    var dmg = fmtNum(Math.abs(item.boss_hp_delta || 0));
-    var heal = fmtNum(Math.abs(item.geoarmy_hp_delta || 0));
+    var bossDmg = fmtNum(Math.abs(item.boss_hp_delta || 0));
+    var geoDmg = fmtNum(Math.abs(item.geoarmy_hp_delta || 0));
     switch (item.entry_type) {
       case 'role_selected':
         return esc(item.actor_name || 'Alguien') + ' se unió a la batalla.';
       case 'player_attack':
-        return esc(item.actor_name || 'Un guerrero') + ' atacó a La Heraldo — ' + dmg + ' de daño.';
+        var actionLabel = ACTION_KEY_LABEL[item.action_key] || 'un ataque';
+        return esc(item.actor_name || 'Un guerrero') + ' usó ' + esc(actionLabel) +
+          ' — <span class="hw26-feed-dmg">' + bossDmg + ' daño</span>.';
       case 'heal':
-        return 'Geo Army recuperó ' + heal + ' HP.';
+        return 'Geo Army recuperó <span class="hw26-feed-heal">' + geoDmg + ' HP</span>.';
       case 'shield':
         return 'Geo Army activó un escudo.';
       case 'mission_damage':
-        return 'Un Contrato golpeó a La Heraldo por ' + dmg + '.';
+        return 'Un Contrato golpeó a La Heraldo por <span class="hw26-feed-dmg">' + bossDmg + '</span>.';
       case 'effect_applied':
+        if (item.effect_key && EFFECT_META[item.effect_key]) {
+          return 'Geo Army activó <b>' + esc(titleCaseEs(EFFECT_META[item.effect_key].name)) + '</b>.';
+        }
         return 'Un nuevo efecto se activó sobre el campo de batalla.';
       case 'effect_consumed':
         return 'Un efecto activo se consumió.';
       case 'boss_attack_announced':
-        return 'LA HERALDO PREPARA CATACLISMO.';
+        var announceLabel = BOSS_ATTACK_LABEL[item.boss_attack_key] ? BOSS_ATTACK_LABEL[item.boss_attack_key].toUpperCase() : 'UN ATAQUE';
+        return 'LA HERALDO PREPARA ' + announceLabel + '.';
       case 'boss_attack':
-        return 'La Heraldo atacó — ' + heal + ' de daño a Geo Army.';
+        if (item.boss_attack_key === 'cataclismo') {
+          return 'Cataclismo impactó — <span class="hw26-feed-dmg hw26-feed-dmg-boss">' + geoDmg + ' daño</span>.';
+        }
+        var bossLabel = BOSS_ATTACK_LABEL[item.boss_attack_key] || 'un ataque';
+        return 'La Heraldo respondió con ' + esc(bossLabel) + ' — <span class="hw26-feed-dmg hw26-feed-dmg-boss">' + geoDmg + ' daño</span>.';
       case 'boss_heal':
-        return 'La Heraldo recuperó ' + dmg + ' HP.';
+        return 'La Heraldo recuperó <span class="hw26-feed-heal">' + bossDmg + ' HP</span>.';
       case 'phase_change':
-        return 'EL SELLO SE ROMPIÓ. LA HERALDO HA CAMBIADO.';
+        return 'EL SELLO SE ROMPIÓ. FASE ' + (item.phase_after === 2 ? 'II' : esc(item.phase_after || '')) + '.';
       case 'victory':
         return 'LA HERALDO HA CAÍDO.';
       case 'defeat':
@@ -744,22 +896,28 @@
     }
   }
 
+  // Eventos "de boss" -- se destacan con más fuerza visual (borde/fondo
+  // más intensos vía CSS [data-type], ver sección 6 de halloween-2026.css).
+  var BOSS_EVENT_TYPES = { boss_attack: 1, boss_attack_announced: 1, phase_change: 1, defeat: 1 };
+
   function renderFeedPage() {
     var box = $('hw26FeedContent');
     if (!box) return;
     if (lastFeed == null) { box.innerHTML = genericErrorHtml('Crónicas temporalmente no disponibles.'); return; }
-    if (!lastFeed.length) { box.innerHTML = emptyStateHtml('Todavía no hay crónicas que contar.'); return; }
+    if (!lastFeed.length) { box.innerHTML = emptyStateHtml('📖', 'AÚN NO HAY CRÓNICAS', 'La historia de esta batalla todavía no se ha escrito.'); return; }
     var sorted = lastFeed.slice().sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
-    var html = '';
+    var html = '<div class="hw26-feed-list">';
     sorted.forEach(function (item) {
       var time = '';
-      try { time = new Date(item.created_at).toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+      try { time = new Date(item.created_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+      var isBoss = !!BOSS_EVENT_TYPES[item.entry_type];
       html +=
-        '<div class="hw26-feed-item" data-type="' + esc(item.entry_type) + '">' +
-          feedItemText(item) +
+        '<div class="hw26-feed-item' + (isBoss ? ' is-boss-event' : '') + '" data-type="' + esc(item.entry_type) + '">' +
           '<span class="hw26-feed-time">' + esc(time) + '</span>' +
+          '<span class="hw26-feed-text">' + feedItemText(item) + '</span>' +
         '</div>';
     });
+    html += '</div>';
     box.innerHTML = html;
   }
 
