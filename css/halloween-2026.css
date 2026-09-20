@@ -10,7 +10,15 @@
    de fuego en detalles).
    ===================================================================== */
 
-#hw26Root {
+/* Variables a nivel :root (no dentro de #hw26Root): el modal genérico
+   (#hw26ModalOverlay/.hw26-modal y todo su contenido -- rol, contratos,
+   efectos, crónicas) vive FUERA de #hw26Root en el HTML, así que si estas
+   variables quedaran ahí adentro el modal no las heredaría y su texto
+   caería en el color por defecto del navegador (invisible sobre fondo
+   oscuro). Con :root quedan disponibles en todo el documento sin tocar
+   ninguna variable existente del sitio (nombres con prefijo hw26-, sin
+   colisión posible). */
+:root {
   --hw26-black: #06040a;
   --hw26-panel: rgba(14, 8, 22, 0.82);
   --hw26-panel-solid: #120a1c;
@@ -25,7 +33,9 @@
   --hw26-text-dim: rgba(244, 238, 252, 0.62);
   --hw26-text-faint: rgba(244, 238, 252, 0.4);
   --hw26-radius: 18px;
+}
 
+#hw26Root {
   position: relative;
   z-index: 3;
   max-width: 760px;
@@ -38,6 +48,11 @@
 #hw26Root * { box-sizing: border-box; }
 
 #hw26Root .hw26-hidden { display: none !important; }
+
+/* El modal vive fuera de #hw26Root -- se le da su propio box-sizing y color
+   base por la misma razón explicada arriba junto a las variables :root. */
+.hw26-modal-overlay, .hw26-modal-overlay * { box-sizing: border-box; }
+.hw26-modal-overlay { color: var(--hw26-text); font-family: 'Inter', sans-serif; }
 
 /* ---------------------------------------------------------------------
    Barra de pruebas (SOLO test mode) — franja discreta arriba de todo
