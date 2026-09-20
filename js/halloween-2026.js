@@ -241,7 +241,8 @@
   // 4) Carga de datos (cada módulo con su propio try/catch y fallback)
   // ---------------------------------------------------------------------
   function loadState() {
-    return callRpc(sbClient, 'halloween_2026_get_public_state', { p_event_key: EVENT_KEY })
+    // halloween_2026_get_public_state() no recibe parámetros (ver spec).
+    return callRpc(sbClient, 'halloween_2026_get_public_state')
       .then(function (res) {
         if (res.error) throw res.error;
         var row = Array.isArray(res.data) ? res.data[0] : res.data;
@@ -286,7 +287,8 @@
   }
 
   function loadEffects() {
-    return callRpc(sbClient, 'halloween_2026_get_public_effects', { p_event_key: EVENT_KEY })
+    // halloween_2026_get_public_effects() no recibe parámetros (ver spec).
+    return callRpc(sbClient, 'halloween_2026_get_public_effects')
       .then(function (res) {
         if (res.error) throw res.error;
         lastEffects = res.data || [];
@@ -299,7 +301,8 @@
   }
 
   function loadFeed() {
-    return callRpc(sbClient, 'halloween_2026_get_public_feed', { p_event_key: EVENT_KEY, p_limit: 30 })
+    // halloween_2026_get_public_feed(p_limit) -- solo ese parámetro (ver spec).
+    return callRpc(sbClient, 'halloween_2026_get_public_feed', { p_limit: 30 })
       .then(function (res) {
         if (res.error) throw res.error;
         lastFeed = res.data || [];
@@ -312,7 +315,8 @@
   }
 
   function loadMissions() {
-    return callRpc(sbClient, 'halloween_2026_get_public_missions', { p_event_key: EVENT_KEY })
+    // halloween_2026_get_public_missions() no recibe parámetros (ver spec).
+    return callRpc(sbClient, 'halloween_2026_get_public_missions')
       .then(function (res) {
         if (res.error) throw res.error;
         lastMissions = res.data || [];
