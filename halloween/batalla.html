@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>La Heraldo — Halloween 2026 · GeoArmy (prueba)</title>
+  <meta name="description" content="Halloween 2026 — La Heraldo. HP de La Heraldo y resistencia de Geo Army en tiempo real. Página de prueba."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"/>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) — mismo cliente de siempre -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="../css/v3-theme.css"/>
+  <!-- ===== HALLOWEEN 2026 — página de prueba, no producción ===== -->
+  <link rel="stylesheet" href="../css/halloween-2026.css"/>
+</head>
+<!-- data-halloween-page="battle": le dice a js/halloween-2026.js (el router
+     compartido) que esta página solo necesita halloween_2026_get_public_state()
+     y, opcionalmente, halloween_2026_get_public_effects() -- no carga ni
+     pollea participación, misiones ni feed. data-testmode="true" activa la
+     barra de pruebas (mock visual, nunca escribe en Supabase). -->
+<body data-halloween-page="battle" data-testmode="true">
+
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="../nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="../nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="../nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="../nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="../index.html" class="v3-logo nav-logo">
+          <span class="v3-logo-mark"><img src="../logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="hw26-page">
+      <a href="../index-halloween-test.html#wlHalloween" class="hw26-back-link">← VOLVER A HALLOWEEN</a>
+
+      <div class="hw26-devbar" id="hw26DevBar" hidden>
+        <span class="hw26-devbar-label">Test mode</span>
+        <select id="hw26DevScenario" aria-label="Escenario de prueba">
+          <option value="off">RPC real (Supabase)</option>
+          <option value="scheduled">Mock: scheduled</option>
+          <option value="active_p1">Mock: active — fase 1</option>
+          <option value="active_p2">Mock: active — fase 2</option>
+          <option value="cataclismo">Mock: cataclismo pendiente</option>
+          <option value="geoarmy_victory">Mock: victoria Geo Army</option>
+          <option value="herald_victory">Mock: victoria La Heraldo</option>
+        </select>
+        <label><input type="checkbox" id="hw26DevRole"/> Simular usuario con rol</label>
+      </div>
+
+      <div class="hw26-page-head">
+        <div class="hw26-page-icon">🐺</div>
+        <div class="hw26-page-eyebrow">Halloween 2026 · Mundo 02</div>
+        <div class="hw26-page-title">LA HERALDO</div>
+        <div class="hw26-page-sub">El sello de La Heraldo y la resistencia de Geo Army, en tiempo real.</div>
+      </div>
+
+      <div class="hw26-page-content">
+        <div class="hw26-boss" id="hw26Boss" data-phase="1" data-eventstatus="scheduled" data-outcome="none">
+          <div class="hw26-boss-frame">
+            <div class="hw26-boss-cataclysm" id="hw26Cataclysm" hidden>
+              <div class="hw26-cataclysm-title">⚠ LA HERALDO PREPARA CATACLISMO</div>
+              <div class="hw26-cataclysm-timer" id="hw26CataclysmTimer">00:00</div>
+              <div class="hw26-cataclysm-sub">PREPAREN LAS DEFENSAS.</div>
+            </div>
+
+            <div class="hw26-boss-art">
+              <div class="hw26-boss-badge" id="hw26PhaseBadge">FASE I</div>
+              <!-- Fallback: por ahora usa la misma imagen del planeta. Clase
+                   .hw26-boss-img-demonic queda lista para más adelante,
+                   cuando exista una ilustración distinta de La Heraldo
+                   en su forma demoníaca (Fase II). -->
+              <img src="../world-02-halloween-v2.png" alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
+            </div>
+
+            <div class="hw26-boss-name">LA HERALDO</div>
+            <div class="hw26-boss-phase" id="hw26PhaseText">FASE I — FORMA SELLADA</div>
+
+            <div class="hw26-bar-block">
+              <div class="hw26-bar-label">
+                <span>HP de La Heraldo</span>
+                <span id="hw26BossHpText">2,000,000 / 2,000,000</span>
+              </div>
+              <div class="hw26-bar hw26-bar-boss"><div class="hw26-bar-fill" id="hw26BossHpFill" style="width:100%"></div></div>
+            </div>
+
+            <div class="hw26-bar-block">
+              <div class="hw26-bar-label">
+                <span>Resistencia Geo Army</span>
+                <span id="hw26GeoHpText">100,000 / 100,000</span>
+              </div>
+              <div class="hw26-bar hw26-bar-geo"><div class="hw26-bar-fill" id="hw26GeoHpFill" style="width:100%"></div></div>
+            </div>
+
+            <div class="hw26-boss-status">
+              <span class="hw26-status-badge" id="hw26StatusBadge">CARGANDO…</span>
+              <span class="hw26-status-detail" id="hw26StatusDetail"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección compacta y opcional de efectos activos -- se oculta sola
+             si no hay ninguno. Nada de tarjetas extra ni segundo dashboard. -->
+        <div class="hw26-battle-effects" id="hw26BattleEffects" hidden></div>
+      </div>
+
+      <div class="hw26-error" id="hw26GlobalError" hidden></div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="../logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="../js/premium.js"></script>
+  <script src="../js/geoarmy-config.js"></script>
+  <script src="../js/geoarmy-ranks.js"></script>
+  <script src="../js/geoarmy-account.js"></script>
+  <!-- ===== HALLOWEEN 2026: router compartido — SOLO páginas de prueba.
+       Se carga DESPUÉS de geoarmy-account.js porque reutiliza
+       window.GeoArmyAccount.client (mismo cliente/sesión de Supabase de
+       siempre, no crea uno nuevo). ===== -->
+  <script src="../js/halloween-2026.js"></script>
+</body>
+</html>

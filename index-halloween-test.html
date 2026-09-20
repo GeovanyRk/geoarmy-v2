@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GeoArmy — Comunidad de Geovannyrk</title>
+  <meta name="description" content="Cuartel general de la comunidad GeoArmy. Streams de Fortnite y Overwatch con Geovannyrk en Twitch."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <!-- Tema V3 (espacial/holográfico) — antes vivía inline aquí, ahora es un archivo
+       compartido para poder reusarlo en mi-geoarmy.html y páginas nuevas -->
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <!-- ===== HALLOWEEN 2026 — SOLO en esta página de pruebas (index-halloween-test.html).
+       NO se agrega todavía a index.html de producción. Ver css/halloween-2026.js
+       y js/halloween-2026.js. ===== -->
+  <link rel="stylesheet" href="css/halloween-2026.css"/>
+  <script>
+  !function(b,e,t,r){
+    b[t]=b[t]||function(...args){(b[t].q=b[t].q||[]).push(args)};
+    b[t].l=+new Date;
+    var s=e.createElement('script'); s.async=1; s.crossOrigin='anonymous';
+    s.src='https://betterstack.net/b.js?t='+r;
+    (e.head||e.getElementsByTagName('head')[0]).appendChild(s);
+  }(window,document,'betterstack','7K7evcpjhiCjpoR65gxKSPhW');
+  betterstack('init', { environment: 'production' });
+</script>
+</head>
+<body>
+
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+
+  <!-- Tema V3: ver css/v3-theme.css (antes este bloque estaba embebido aquí) -->
+
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <!-- NAV -->
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="#inicio" class="v3-logo nav-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Nav real oculto: mantiene vivo el sistema de paneles / tabs de móvil, no se ve en pantalla -->
+    <div class="nav-links" aria-hidden="true">
+      <a href="#inicio">Geo Army</a>
+      <a href="comunidad.html">Comunidad</a>
+      <a href="tienda.html">Tienda</a>
+      <a href="ganadores.html">Ganadores</a>
+      <a href="puntos.html">Puntos</a>
+      <a href="#alcancia-proximamente" aria-disabled="true">Alcancía (Próximamente)</a>
+    </div>
+
+    <!-- Tabs de navegación para móvil -->
+    <div class="panel-tabs" id="panelTabs" aria-label="Secciones"></div>
+
+    <!-- HERO / GEO ARMY (inicio) -->
+    <section class="hero v3-hero-stage panel" id="inicio" style="border-bottom:none;padding:26px 1.5rem 10px;">
+      <h1 class="v3-h1-sr">Geo Army</h1>
+
+      <div class="v3-world-header">
+        <span class="v3-now-line"></span>
+        <span class="v3-world-star">✦</span> Elige tu mundo <span class="v3-world-star">✦</span>
+        <span class="v3-now-line"></span>
+      </div>
+
+      <!-- En desktop ancho (>1300px) los 3 mundos van fijos, lado a lado (ver
+           CSS: "order" los reordena 02/activo/03 aunque el DOM empiece en el
+           activo). Por debajo de 1300px esto mismo se vuelve una tira
+           deslizable (scroll-snap) que arranca en el mundo activo porque es
+           el primero en el DOM — sin JS de por medio, para que no se rompa. -->
+      <div class="v3-orbit-wrap" id="v3WorldRow">
+        <div class="v3-world-slide v3-world-slide-main">
+        <div class="v3-globe-col">
+        <div class="v3-globe-wrap" data-reveal>
+        <picture>
+          <source srcset="geo-army-globe.webp" type="image/webp">
+          <img src="geo-army-globe.jpg" alt="Geo Army" width="900" height="1200" loading="eager"/>
+        </picture>
+
+        <!-- Nav en forma de marcadores sobre el planeta -->
+        <!-- Posiciones ajustadas por COMPOSICIÓN, no por simetría matemática:
+             cada --mx/--my se eligió muestreando el brillo real de
+             geo-army-globe.jpg debajo de cada pin (script de verificación)
+             para caer sobre zonas oscuras del planeta, con buen espacio
+             entre pins y respecto al logo. Ya no son un octágono perfecto. -->
+        <div class="v3-planet-nav" id="v3PlanetNav">
+          <a href="ganadores.html" style="--mx:33.9%; --my:26.7%;">
+            <span class="v3-marker-label">Ganadores</span>
+            <span class="v3-marker-icon">👑</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+          <a href="ranking.html" style="--mx:65.6%; --my:32.8%;">
+            <span class="v3-marker-label">Ranking</span>
+            <span class="v3-marker-icon">🏆</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+          <a href="puntos.html" style="--mx:70.6%; --my:66.6%;">
+            <span class="v3-marker-label">Puntos</span>
+            <span class="v3-marker-icon">⭐</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+          <!-- Alcancía: función pospuesta para más adelante. El pin se
+               conserva visible, en su misma posición/icono, pero queda
+               bloqueado (aria-disabled + preventDefault en el script de más
+               abajo, sin popup/alert) y muestra "Próximamente" bajo el
+               nombre. No se toca alcancia.html ni su backend, solo deja de
+               ser accesible desde la navegación. -->
+          <a href="#alcancia-proximamente" style="--mx:34.5%; --my:76.7%;" aria-disabled="true">
+            <span class="v3-marker-label v3-marker-label-soon">
+              <span class="v3-marker-soon-name">Alcancía</span>
+              <span class="v3-marker-soon-tag">Próximamente</span>
+            </span>
+            <span class="v3-marker-icon v3-marker-icon-soon">🐷</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+          <!-- Tienda también rozaba el borde superior de la misma franja de
+               texto "GEO ARMY" (letras G/E) en 41%. Subido a 37% para
+               despejarla. -->
+          <a href="tienda.html" style="--mx:46.4%; --my:42.6%;">
+            <span class="v3-marker-label">Tienda</span>
+            <span class="v3-marker-icon">🛒</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+          <!-- Misiones: página en producción, la RPC my_missions_status()
+               ya está activa -- el pin navega a misiones.html. -->
+          <a href="misiones.html" style="--mx:27.5%; --my:37.3%;">
+            <span class="v3-marker-label">Misiones</span>
+            <span class="v3-marker-icon">🎯</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+          <!-- Comunidad: ahora es su propia página (comunidad.html), ya no un
+               panel interno -- posición del pin elegida por brillo real de la
+               imagen (zona de tierra, sin overlap con el texto "GEO ARMY" ni
+               con los demás pins). No se tocó la posición al hacer la
+               separación. -->
+          <a href="comunidad.html" style="--mx:75.0%; --my:45.5%;">
+            <span class="v3-marker-label v3-marker-label-community"><span>¿Eres nuevo?</span><strong>Entra acá</strong></span>
+            <span class="v3-marker-icon">💬</span>
+            <span class="v3-marker-stem"></span>
+            <span class="v3-marker-ring"></span>
+          </a>
+        </div>
+        </div>
+
+        <div class="v3-world-active">
+          <div class="v3-world-active-eyebrow">Mundo 01</div>
+          <div class="v3-world-active-name">GEO ARMY</div>
+          <div class="v3-world-active-pill"><span class="dot"></span>Mundo activo</div>
+        </div>
+        </div>
+        </div>
+
+        <!-- Mundo 02: Halloween, bloqueado hasta el 1 de octubre 2026
+             (America/New_York). Overlay/candado/texto/countdown son HTML+CSS
+             reales (no quemados en la imagen) -- ver css/v3-theme.css
+             (clases v3-wl-*) y el script "v3-wl-countdown" al final del
+             body. No se tocó Mundo 01, Mundo 03, pines, fondo ni backend. -->
+        <div class="v3-world-slide v3-world-slide-02">
+
+        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T19:00:00-04:00" id="wlHalloween">
+          <div class="v3-wl-orb">
+            <img src="world-02-halloween-v2.png" alt="Mundo 02 — Halloween" class="v3-world-planet-img v3-wl-img" loading="lazy"/>
+            <span class="v3-wl-tint" aria-hidden="true"></span>
+            <span class="v3-wl-lockbadge" aria-hidden="true">🔒</span>
+
+            <!-- =====================================================================
+                 HALLOWEEN 2026 — 5 pins sobre el planeta (SOLO esta página de pruebas)
+                 Mismo lenguaje visual que .v3-planet-nav/.v3-marker-* de Mundo 01
+                 (círculo + glow + icono + tooltip en hover + posición absoluta en %),
+                 en paleta violeta/roja. Son <a href> simples a páginas dedicadas
+                 (halloween/*.html, también de prueba); no cargan js/halloween-2026.js
+                 aquí porque el índice ya no muestra datos dinámicos de la RPC, solo
+                 navega. El bloqueo/atenuado de los 4 pins secundarios antes del 1 de
+                 octubre es puro CSS: reutiliza la misma clase ".is-unlocked" que el
+                 countdown de abajo ya agrega a #wlHalloween -- ver
+                 css/halloween-2026.css. BATALLA se deja siempre clickeable (para
+                 mostrar el estado "scheduled" de la página), con una insignia
+                 "Programada" que desaparece sola al desbloquear. -->
+            <div class="hw26-planet-pins" id="hw26PlanetPins">
+              <a href="halloween/batalla.html" class="hw26-planet-pin hw26-pin-batalla" style="--mx:50%; --my:16%;">
+                <span class="hw26-pin-badge">Programada</span>
+                <span class="hw26-pin-label">Batalla</span>
+                <span class="hw26-pin-icon">🐺</span>
+              </a>
+              <a href="halloween/rol.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:24%; --my:44%;">
+                <span class="hw26-pin-label">Rol</span>
+                <span class="hw26-pin-icon">⚔<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/contratos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:76%; --my:44%;">
+                <span class="hw26-pin-label">Contratos</span>
+                <span class="hw26-pin-icon">📜<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/efectos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:30%; --my:74%;">
+                <span class="hw26-pin-label">Efectos</span>
+                <span class="hw26-pin-icon">🔮<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/cronicas.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:70%; --my:74%;">
+                <span class="hw26-pin-label">Crónicas</span>
+                <span class="hw26-pin-icon">📖<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+            </div>
+            <!-- ===== fin pins Halloween 2026 ===== -->
+          </div>
+          <div class="v3-wl-eyebrow">Mundo 02</div>
+          <div class="v3-wl-title">Halloween</div>
+          <div class="v3-wl-sub">Se desbloquea el 1 de octubre</div>
+          <div class="v3-wl-countdown" id="wlHalloweenCountdown" aria-live="polite">
+            <span class="v3-wl-seg"><b id="wlD">--</b><i>D</i></span>
+            <span class="v3-wl-colon">:</span>
+            <span class="v3-wl-seg"><b id="wlH">--</b><i>H</i></span>
+            <span class="v3-wl-colon">:</span>
+            <span class="v3-wl-seg"><b id="wlM">--</b><i>M</i></span>
+            <span class="v3-wl-colon">:</span>
+            <span class="v3-wl-seg"><b id="wlS">--</b><i>S</i></span>
+          </div>
+        </div>
+        </div>
+
+        <!-- Mundo 03: bloqueado, próximo evento (decorativo por ahora) -->
+        <div class="v3-world-slide v3-world-slide-03">
+        <div class="v3-world-locked" data-reveal>
+          <img src="world-03.jpg" alt="Mundo 03 — Próximamente" class="v3-world-planet-img" loading="lazy"/>
+        </div>
+        </div>
+      </div>
+
+      <div class="v3-world-hint">‹ Desliza para explorar ›</div>
+    </section>
+
+  </div>
+
+  <!-- SOLICITUDES -->
+  <section class="section panel" id="solicitudes">
+    <style>
+      #solicitudes .sc-wrap{max-width:960px;margin:0 auto;}
+      #solicitudes .sc-stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 22px;}
+      #solicitudes .sc-chip{flex:1;min-width:120px;background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);transition:transform .35s var(--ease),border-color .35s var(--ease);}
+      #solicitudes .sc-chip:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.18);}
+      #solicitudes .sc-chip b{font-family:'Space Grotesk',sans-serif;font-size:2rem;line-height:1;display:block;}
+      #solicitudes .sc-chip span{font-size:.7rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.5);}
+      #solicitudes .sc-chip.gold b{color:#ec4899;}
+      #solicitudes .sc-chip.pend b{color:#ffb13f;}
+      #solicitudes .sc-chip.done b{color:#46e0a8;}
+      #solicitudes .sc-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+      #solicitudes .sc-search{flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:12px;font-size:.95rem;font-family:inherit;}
+      #solicitudes .sc-search::placeholder{color:rgba(255,255,255,.4);}
+      #solicitudes .sc-search:focus{outline:2px solid var(--pink);outline-offset:1px;}
+      #solicitudes .sc-filters{display:flex;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);padding:5px;border-radius:100px;}
+      #solicitudes .sc-filters button{font-family:'Space Grotesk',sans-serif;font-size:.78rem;background:transparent;border:0;color:rgba(255,255,255,.55);padding:8px 14px;border-radius:100px;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease);}
+      #solicitudes .sc-filters button[aria-pressed="true"]{background:linear-gradient(135deg,#f472b6,var(--pink));color:#fff;}
+      #solicitudes .sc-card{background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow);}
+      #solicitudes .sc-row{display:flex;gap:14px;align-items:center;padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.06);transition:background .25s var(--ease);}
+      #solicitudes .sc-row:hover{background:rgba(236,72,153,.05);}
+      #solicitudes .sc-row:last-child{border-bottom:0;}
+      #solicitudes .sc-thumb{width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0;background:rgba(0,0,0,.3);}
+      #solicitudes .sc-info{flex:1;min-width:0;}
+      #solicitudes .sc-item{color:#fff;font-weight:600;font-size:.95rem;}
+      #solicitudes .sc-meta{color:rgba(255,255,255,.55);font-size:.82rem;margin-top:2px;}
+      #solicitudes .sc-badge{display:inline-flex;align-items:center;gap:6px;font-size:.73rem;font-weight:600;padding:5px 11px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
+      #solicitudes .sc-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;}
+      #solicitudes .sc-badge.pend{color:#ffb13f;background:rgba(255,177,63,.13);}
+      #solicitudes .sc-badge.done{color:#46e0a8;background:rgba(70,224,168,.12);}
+      #solicitudes .sc-badge.rej{color:#ef4444;background:rgba(239,68,68,.13);}
+      #solicitudes .sc-empty{padding:44px 20px;text-align:center;color:rgba(255,255,255,.5);}
+      #solicitudes .sc-empty b{display:block;color:#fff;font-family:'Space Grotesk',sans-serif;margin-bottom:6px;font-size:1.05rem;}
+      #solicitudes .sc-foot{margin-top:16px;color:rgba(255,255,255,.4);font-size:.78rem;text-align:right;}
+      @media(max-width:560px){
+        #solicitudes .sc-row{flex-wrap:wrap;}
+        #solicitudes .sc-badge{margin-left:70px;}
+      }
+    </style>
+    <div class="section-inner">
+      <div class="section-header" data-decor="CANJES">
+        <div class="section-tag">Canjes de la Geo Army</div>
+        <h2>Solicitudes de canje</h2>
+        <p>Lo que cada ganador pidió a cambio de su premio de la ruleta, con imagen del item. Se piden con <strong>/reclamar</strong> en Discord.</p>
+      </div>
+      <div class="sc-wrap" data-reveal>
+        <div class="sc-stats">
+          <div class="sc-chip gold"><b id="scTotal">0</b><span>Solicitudes</span></div>
+          <div class="sc-chip pend"><b id="scPend">0</b><span>Por entregar</span></div>
+          <div class="sc-chip done"><b id="scDone">0</b><span>Entregadas</span></div>
+        </div>
+        <div class="sc-controls">
+          <input id="scSearch" class="sc-search" type="search" placeholder="Buscar por usuario o item…" aria-label="Buscar solicitudes">
+          <div class="sc-filters" role="group" aria-label="Filtrar por estado">
+            <button data-f="todos" aria-pressed="true">Todos</button>
+            <button data-f="pendientes" aria-pressed="false">Pendientes</button>
+            <button data-f="entregados" aria-pressed="false">Entregadas</button>
+            <button data-f="rechazados" aria-pressed="false">Rechazadas</button>
+          </div>
+        </div>
+        <div class="sc-card" id="scCard"></div>
+        <div class="sc-foot" id="scUpdated">Cargando…</div>
+      </div>
+    </div>
+    <script>
+    (function(){
+      var DATA = [], filtro = 'todos';
+      function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+      function render(){
+        var q = document.getElementById('scSearch').value.trim().toLowerCase();
+        var rows = DATA.slice().sort(function(a,b){return b.id-a.id;});
+        if(filtro==='pendientes') rows = rows.filter(function(s){return !s.entregado && !s.rechazado;});
+        if(filtro==='entregados') rows = rows.filter(function(s){return s.entregado;});
+        if(filtro==='rechazados') rows = rows.filter(function(s){return s.rechazado;});
+        if(q) rows = rows.filter(function(s){return (s.nombreFortnite+' '+s.item+' '+(s.ganadorPremio||'')).toLowerCase().indexOf(q)>-1;});
+        var card = document.getElementById('scCard');
+        if(!rows.length){
+          card.innerHTML = '<div class="sc-empty"><b>Sin resultados</b>Aún no hay solicitudes que coincidan.</div>';
+        } else {
+          card.innerHTML = rows.map(function(s){
+            var badge = s.entregado
+              ? '<span class="sc-badge done">Entregado</span>'
+              : (s.rechazado ? '<span class="sc-badge rej">Rechazado</span>' : '<span class="sc-badge pend">Pendiente</span>');
+            return '<div class="sc-row">'+
+              '<img class="sc-thumb" src="'+esc(s.imagenUrl||'')+'" alt="" onerror="this.style.visibility=\'hidden\'"/>'+
+              '<div class="sc-info">'+
+                '<div class="sc-item">'+esc(s.item)+'</div>'+
+                '<div class="sc-meta">'+esc(s.nombreFortnite)+' · ganó '+esc(s.ganadorPremio||'')+'</div>'+
+              '</div>'+
+              badge+
+            '</div>';
+          }).join('');
+        }
+        document.getElementById('scTotal').textContent = DATA.length;
+        document.getElementById('scPend').textContent  = DATA.filter(function(s){return !s.entregado && !s.rechazado;}).length;
+        document.getElementById('scDone').textContent  = DATA.filter(function(s){return s.entregado;}).length;
+      }
+      function load(){
+        fetch('solicitudes.json?t='+Date.now(),{cache:'no-store'})
+          .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+          .then(function(j){
+            DATA = j.solicitudes || [];
+            document.getElementById('scUpdated').textContent =
+              'Actualizado ' + new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+            render();
+          })
+          .catch(function(){
+            DATA = [];
+            document.getElementById('scUpdated').textContent = 'Aún no hay solicitudes.json (todavía no se ha usado /reclamar).';
+            render();
+          });
+      }
+      document.getElementById('scSearch').addEventListener('input', render);
+      var btns = document.querySelectorAll('#solicitudes .sc-filters button');
+      btns.forEach(function(b){
+        b.addEventListener('click', function(){
+          btns.forEach(function(x){x.setAttribute('aria-pressed','false');});
+          b.setAttribute('aria-pressed','true');
+          filtro = b.getAttribute('data-f'); render();
+         });
+      });
+      })();
+    </script>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <script src="js/geoarmy-ranks.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <!-- js/halloween-2026.js YA NO se carga aquí: el índice solo muestra los
+       5 pins (enlaces simples) sobre el planeta, sin datos dinámicos de la
+       RPC. Ese script ahora vive en cada página dedicada halloween/*.html
+       (ver css/halloween-2026.css y js/halloween-2026.js para el detalle). -->
+  <script>
+  // ===== V3: countdown real de Mundo 02 (Halloween) hasta el 1 de octubre,
+  // calculado en el navegador contra la fecha ISO en data-unlock-iso (ya
+  // trae el offset -04:00 de America/New_York, así que Date.now() -- que es
+  // UTC -- se compara correctamente sin importar la zona horaria del
+  // visitante). Envuelto en try/catch, no toca nada más de la página.
+  // NOTA (solo en esta copia TEST): data-unlock-iso se cambió arriba de
+  // 2026-10-01T00:00:00-04:00 a 2026-10-01T19:00:00-04:00 para que el
+  // desbloqueo del planeta coincida con el inicio real de la batalla
+  // (7:00 PM ET). El script en sí no se tocó. index.html de producción
+  // SIGUE con la hora original (00:00) hasta que se autorice el cambio. =====
+  (function () {
+    try {
+      var wrap = document.getElementById('wlHalloween');
+      if (!wrap) return;
+      var unlockAt = new Date(wrap.getAttribute('data-unlock-iso')).getTime();
+      if (isNaN(unlockAt)) return;
+
+      var box = document.getElementById('wlHalloweenCountdown');
+      var dEl = document.getElementById('wlD');
+      var hEl = document.getElementById('wlH');
+      var mEl = document.getElementById('wlM');
+      var sEl = document.getElementById('wlS');
+
+      function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+      var timer = null;
+      function tick() {
+        var diff = unlockAt - Date.now();
+        if (diff <= 0) {
+          if (box) box.innerHTML = '<span class="v3-wl-available">¡Disponible!</span>';
+          // Preparado: agregar esta clase es lo único que hace falta para
+          // que el CSS (ver .v3-wl-halloween.is-unlocked en v3-theme.css)
+          // quite visualmente el tinte oscuro y el candado.
+          wrap.classList.add('is-unlocked');
+          if (timer) clearInterval(timer);
+          return;
+        }
+        var s = Math.floor(diff / 1000);
+        var d = Math.floor(s / 86400); s -= d * 86400;
+        var h = Math.floor(s / 3600); s -= h * 3600;
+        var m = Math.floor(s / 60); s -= m * 60;
+        if (dEl) dEl.textContent = pad(d);
+        if (hEl) hEl.textContent = pad(h);
+        if (mEl) mEl.textContent = pad(m);
+        if (sEl) sEl.textContent = pad(s);
+      }
+      tick();
+      timer = setInterval(tick, 1000);
+    } catch (e) { console.warn('[v3-wl-countdown]', e); }
+  })();
+  </script>
+  <script>
+  // =====================================================================
+  // HALLOWEEN 2026 — OVERRIDE VISUAL DE TEST: ?hw_unlock=1
+  // SOLO existe en index-halloween-test.html (esta copia). NO se agrega a
+  // index.html de producción.
+  //
+  // Qué hace: si la URL trae ?hw_unlock=1, agrega la MISMA clase
+  // "is-unlocked" que el countdown real de arriba agrega solo cuando la
+  // fecha real (data-unlock-iso) ya pasó. Esa clase ya controla, sin tocar
+  // nada más:
+  //   - ocultar el tinte oscuro y el candado del planeta (regla existente
+  //     en css/v3-theme.css: .v3-wl-halloween.is-unlocked .v3-wl-tint /
+  //     .v3-wl-lockbadge)
+  //   - quitar la atenuación/bloqueo (opacity, pointer-events:none) de los
+  //     4 pins secundarios y ocultar su candadito (reglas nuevas en
+  //     css/halloween-2026.css: .v3-wl-halloween:not(.is-unlocked)
+  //     .hw26-pin-locked / .is-unlocked ... .hw26-pin-lock)
+  //   - ocultar la insignia "Programada" del pin de Batalla
+  // Es decir: los 5 pins quedan clickeables sin escribir ni una sola línea
+  // de CSS nueva, reutilizando exactamente las reglas que ya existían para
+  // el desbloqueo real.
+  //
+  // Además reemplaza el texto del countdown visual (D:H:M:S) por un aviso
+  // "MODO PRUEBA" para que sea imposible confundirlo con un desbloqueo real
+  // -- el timer real de arriba sigue corriendo internamente (sobre nodos ya
+  // desconectados del DOM tras este reemplazo), sin efecto visible y sin
+  // volver a pisar este aviso.
+  //
+  // Lo que este bloque NUNCA hace:
+  //   - no llama ninguna RPC de Supabase (ni de lectura ni de escritura)
+  //   - no toca data-unlock-iso ni la fecha real (1 OCT · 7:00 PM ET)
+  //   - no cambia el status del evento en el backend, que sigue
+  //     "scheduled" hasta que la fecha real llegue
+  // Sin el parámetro (o con cualquier otro valor), esta página se comporta
+  // exactamente igual que antes: planeta bloqueado, countdown real, pins
+  // secundarios atenuados/bloqueados hasta el 1 de octubre.
+  // =====================================================================
+  // Detecta hw_unlock=1 tanto en la query normal (?hw_unlock=1) como, por
+  // si se pega la URL con el orden invertido (#wlHalloween?hw_unlock=1 en
+  // vez de ?hw_unlock=1#wlHalloween -- un error de copiado muy fácil de
+  // cometer), dentro del hash también. Nunca lee nada más de la URL.
+  function hw26DetectUnlockParam() {
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      if (qs.get('hw_unlock') === '1') return true;
+      var hash = window.location.hash || '';
+      var qIdx = hash.indexOf('?');
+      if (qIdx !== -1) {
+        var hashParams = new URLSearchParams(hash.slice(qIdx + 1));
+        if (hashParams.get('hw_unlock') === '1') return true;
+      }
+      if (/(?:^|[?&#])hw_unlock=1(?:&|$)/.test(hash)) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  (function () {
+    try {
+      var unlocked = hw26DetectUnlockParam();
+      // Log siempre visible en consola (F12) para poder confirmar de un
+      // vistazo si la página detectó el parámetro, sin adivinar.
+      console.log('[hw26-test-unlock] hw_unlock=1 detectado:', unlocked, '— URL:', window.location.href);
+      if (!unlocked) return; // sin el parámetro, cero cambios
+
+      var wrap = document.getElementById('wlHalloween');
+      if (!wrap) return;
+      wrap.classList.add('is-unlocked');
+
+      var countdownBox = document.getElementById('wlHalloweenCountdown');
+      if (countdownBox) {
+        countdownBox.innerHTML = '<span class="v3-wl-available">¡Disponible! (MODO PRUEBA)</span>';
+      }
+    } catch (e) { console.warn('[hw26-test-unlock]', e); }
+  })();
+  </script>
+  <script>
+  // ===== V3: conecta los marcadores del planeta con el sistema de paneles =====
+  // (el nav real .nav-links está oculto y sigue funcionando para móvil/JS;
+  // este bloque solo replica "activar panel" para los marcadores visibles)
+  (function () {
+    try {
+      var links = document.querySelectorAll('#v3PlanetNav a[href^="#"]');
+      links.forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          var id = a.getAttribute('href').slice(1);
+          var target = document.getElementById(id);
+          if (!target || !target.classList.contains('panel')) return;
+          e.preventDefault();
+          document.querySelectorAll('.panel').forEach(function (p) {
+            p.classList.toggle('is-active', p === target);
+          });
+          history.replaceState(null, '', '#' + id);
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    } catch (e) { console.warn('[v3-planet-nav]', e); }
+  })();
+  </script>
+  <script>
+  // ===== V3: Alcancía pospuesta -- pin/enlace visible pero no navegable =====
+  // Cubre el pin del planeta Y el link oculto de .nav-links (y su clon en la
+  // tira de tabs de móvil, que hereda aria-disabled al clonarse). Sin popup,
+  // sin alert: simplemente no navega. No toca alcancia.html ni su backend.
+  (function () {
+    try {
+      var soonLinks = document.querySelectorAll('a[aria-disabled="true"]');
+      soonLinks.forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); });
+        a.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
+        });
+      });
+    } catch (e) { console.warn('[v3-soon-links]', e); }
+  })();
+  </script>
+</body>
+</html>
