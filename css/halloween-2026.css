@@ -2,7 +2,21 @@
    HALLOWEEN 2026 — "La Heraldo" — sistema de batalla comunitaria
    =====================================================================
    Archivo NUEVO y aislado. No modifica css/style.css ni css/v3-theme.css.
-   Solo se carga desde index-halloween-test.html mientras se prueba.
+   Se carga desde:
+     - index-halloween-test.html (SOLO los 5 pins sobre el planeta)
+     - halloween/batalla.html, rol.html, contratos.html, efectos.html,
+       cronicas.html (páginas dedicadas, todas de prueba por ahora)
+
+   CAMBIO DE DIRECCIÓN (v2): se retiró el dashboard de 4 tarjetas + widget
+   gigante dentro del index, y el sistema de modal genérico. Ahora:
+     - el índice solo muestra 5 pins circulares sobre el planeta (mismo
+       lenguaje visual que .v3-planet-nav / .v3-marker-* de Mundo 01);
+     - cada pin lleva a su propia página en halloween/*.html;
+     - el widget de La Heraldo (antes en el index) ahora vive en
+       batalla.html; los antiguos "modales" de Rol/Contratos/Efectos/
+       Crónicas ahora son el contenido directo de cada página.
+   El widget/bars/cataclismo/tarjetas de rol-contratos-efectos-crónicas se
+   conservan tal cual (mismas clases), solo cambia dónde viven en el DOM.
 
    Estilo pedido: oscuro, serio, cinematográfico, macabro. Nada infantil,
    sin calabazas caricaturescas, sin exceso de emojis. Coherente con la
@@ -10,14 +24,10 @@
    de fuego en detalles).
    ===================================================================== */
 
-/* Variables a nivel :root (no dentro de #hw26Root): el modal genérico
-   (#hw26ModalOverlay/.hw26-modal y todo su contenido -- rol, contratos,
-   efectos, crónicas) vive FUERA de #hw26Root en el HTML, así que si estas
-   variables quedaran ahí adentro el modal no las heredaría y su texto
-   caería en el color por defecto del navegador (invisible sobre fondo
-   oscuro). Con :root quedan disponibles en todo el documento sin tocar
-   ninguna variable existente del sitio (nombres con prefijo hw26-, sin
-   colisión posible). */
+/* Variables a nivel :root: tanto el índice (pins) como las páginas
+   dedicadas (halloween/*.html) las usan, y viven en distintos puntos del
+   DOM, así que quedan disponibles globalmente sin colisionar con ninguna
+   variable existente del sitio (prefijo hw26-, único). */
 :root {
   --hw26-black: #06040a;
   --hw26-panel: rgba(14, 8, 22, 0.82);
@@ -35,29 +45,167 @@
   --hw26-radius: 18px;
 }
 
-#hw26Root {
+/* ---------------------------------------------------------------------
+   0) Pins sobre el planeta (SOLO index-halloween-test.html)
+   ---------------------------------------------------------------------
+   Viven dentro de .v3-wl-orb (mismo contenedor que la imagen del planeta
+   de Mundo 02), igual que .v3-planet-nav vive dentro de .v3-globe-wrap en
+   Mundo 01. Mismo lenguaje visual (círculo + glow + icono + tooltip en
+   hover + posición absoluta por porcentaje), en la paleta violeta/roja de
+   Halloween en vez del azul de Mundo 01. No se tocó .v3-planet-nav ni
+   ninguna clase v3-marker-* -- estas son clases nuevas, sin colisión. */
+.hw26-planet-pins { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.hw26-planet-pin {
+  position: absolute; left: var(--mx); top: var(--my);
+  display: flex; flex-direction: column; align-items: center;
+  transform: translate(-50%, -100%);
+  pointer-events: auto; text-decoration: none; cursor: pointer;
+  transition: opacity .4s ease, filter .4s ease;
+}
+.hw26-pin-icon {
   position: relative;
-  z-index: 3;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 19px;
+  background: rgba(18, 10, 28, .9); border: 1px solid var(--hw26-violet-line);
+  box-shadow: 0 0 18px rgba(124, 58, 237, .5), inset 0 0 0 1px rgba(0, 0, 0, .25);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.hw26-pin-batalla .hw26-pin-icon {
+  border-color: rgba(220, 38, 38, .55);
+  box-shadow: 0 0 20px rgba(220, 38, 38, .55), inset 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.hw26-pin-label {
+  order: -1; margin-bottom: 6px;
+  font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: .05em; white-space: nowrap;
+  color: var(--hw26-text); background: rgba(18, 10, 28, .92); border: 1px solid var(--hw26-violet-line);
+  padding: 3px 9px; border-radius: 6px;
+  opacity: 0; transform: translateY(4px); transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.hw26-planet-pin:hover .hw26-pin-label,
+.hw26-planet-pin:focus-visible .hw26-pin-label { opacity: 1; transform: translateY(0); }
+.hw26-planet-pin:hover .hw26-pin-icon,
+.hw26-planet-pin:focus-visible .hw26-pin-icon { transform: scale(1.15); box-shadow: 0 0 24px rgba(148, 92, 255, .8); }
+.hw26-pin-batalla:hover .hw26-pin-icon,
+.hw26-pin-batalla:focus-visible .hw26-pin-icon { box-shadow: 0 0 26px rgba(220, 38, 38, .75); }
+
+/* Candadito superpuesto en los 4 pins secundarios mientras están bloqueados */
+.hw26-pin-lock {
+  position: absolute; right: -3px; bottom: -3px; width: 17px; height: 17px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 9px; line-height: 1; background: rgba(8, 4, 14, .92); border: 1px solid rgba(148, 92, 255, .5);
+}
+/* Insignia "Programada" bajo el pin de Batalla mientras el evento no
+   arrancó -- deja claro que se puede abrir la página, pero que el combate
+   todavía no comenzó. */
+.hw26-pin-badge {
+  order: -2; margin-bottom: 3px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 8px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: #ffcf8a;
+  background: rgba(18, 10, 28, .85); border: 1px solid rgba(249, 115, 22, .4);
+  padding: 2px 7px; border-radius: 999px; white-space: nowrap;
+}
+
+/* Estado bloqueado (antes del desbloqueo del 1 de octubre): reutiliza la
+   MISMA clase .is-unlocked que ya agrega el countdown existente sobre
+   .v3-wl-halloween -- ningún JS nuevo controla esto, es puro CSS. Batalla
+   (sin .hw26-pin-locked) queda siempre clickeable. */
+.v3-wl-halloween:not(.is-unlocked) .hw26-pin-locked {
+  opacity: .38; filter: grayscale(.55) brightness(.8);
+  pointer-events: none; cursor: not-allowed;
+}
+.v3-wl-halloween.is-unlocked .hw26-pin-locked .hw26-pin-lock { display: none; }
+.v3-wl-halloween.is-unlocked .hw26-pin-batalla .hw26-pin-badge { display: none; }
+
+@media (max-width: 560px) {
+  .hw26-pin-icon { width: 36px; height: 36px; font-size: 15px; }
+  .hw26-pin-label { font-size: 9px; }
+}
+
+/* ---------------------------------------------------------------------
+   1) Páginas dedicadas (halloween/*.html) — chrome genérico compartido
+--------------------------------------------------------------------- */
+.hw26-page {
+  position: relative;
+  z-index: 2;
   max-width: 760px;
-  margin: 4px auto 22px;
-  padding: 0 6px;
+  margin: 0 auto 60px;
+  padding: 100px 1.25rem 20px;
   font-family: 'Inter', sans-serif;
   color: var(--hw26-text);
 }
+.hw26-page * { box-sizing: border-box; }
 
-#hw26Root * { box-sizing: border-box; }
+.hw26-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--hw26-text-dim);
+  text-decoration: none;
+  margin-bottom: 22px;
+  padding: 7px 13px 7px 10px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .03);
+  transition: border-color .2s ease, color .2s ease, background .2s ease;
+}
+.hw26-back-link:hover {
+  color: var(--hw26-text);
+  border-color: var(--hw26-violet-line);
+  background: rgba(124, 58, 237, .1);
+}
 
-#hw26Root .hw26-hidden { display: none !important; }
+.hw26-page-head {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.hw26-page-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 14px rgba(148, 92, 255, .6));
+  margin-bottom: 6px;
+}
+.hw26-page-eyebrow {
+  font-family: 'Orbitron', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #b98cf5;
+  margin-bottom: 4px;
+}
+.hw26-page-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(124, 58, 237, .5);
+}
+.hw26-page-sub {
+  margin-top: 6px;
+  font-size: .85rem;
+  color: var(--hw26-text-dim);
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-/* El modal vive fuera de #hw26Root -- se le da su propio box-sizing y color
-   base por la misma razón explicada arriba junto a las variables :root. */
-.hw26-modal-overlay, .hw26-modal-overlay * { box-sizing: border-box; }
-.hw26-modal-overlay { color: var(--hw26-text); font-family: 'Inter', sans-serif; }
+.hw26-page-content {
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(124, 58, 237, .16), transparent 55%),
+    linear-gradient(180deg, var(--hw26-panel-solid), #0a0510 85%);
+  border: 1px solid var(--hw26-violet-line);
+  border-radius: var(--hw26-radius);
+  padding: 20px 18px 22px;
+}
 
 /* ---------------------------------------------------------------------
-   Barra de pruebas (SOLO test mode) — franja discreta arriba de todo
+   Barra de pruebas (SOLO test mode) — franja discreta arriba del
+   contenido de cada página dedicada
 --------------------------------------------------------------------- */
-.hw26-devbar[hidden] { display: none; } /* mismo bugfix que .hw26-modal-overlay -- ver nota ahí */
+.hw26-devbar[hidden] { display: none; } /* ver nota histórica del bug de especificidad más abajo */
 .hw26-devbar {
   display: flex;
   flex-wrap: wrap;
@@ -67,7 +215,7 @@
   border: 1px dashed rgba(249, 115, 22, 0.55);
   border-radius: 12px;
   padding: 8px 12px;
-  margin: 0 0 14px;
+  margin: 0 0 16px;
   font-size: 0.78rem;
   color: #ffd9b0;
 }
@@ -98,80 +246,7 @@
 .hw26-devbar label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
 
 /* ---------------------------------------------------------------------
-   4 pines — se sienten como marcadores del mundo, no botones SaaS
---------------------------------------------------------------------- */
-.hw26-pins {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.hw26-pin {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  text-align: left;
-  background:
-    radial-gradient(120% 140% at 15% 0%, rgba(124, 58, 237, 0.22), transparent 60%),
-    var(--hw26-panel);
-  border: 1px solid var(--hw26-violet-line);
-  border-radius: var(--hw26-radius);
-  padding: 14px 16px;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-  font-family: inherit;
-}
-.hw26-pin:hover,
-.hw26-pin:focus-visible {
-  transform: translateY(-2px);
-  border-color: rgba(148, 92, 255, 0.6);
-  box-shadow: 0 10px 28px -12px rgba(124, 58, 237, 0.55);
-  outline: none;
-}
-.hw26-pin::after {
-  /* pequeño "stem" de pin, como los marcadores del planeta principal */
-  content: "";
-  position: absolute;
-  left: 18px;
-  bottom: -6px;
-  width: 2px;
-  height: 8px;
-  background: linear-gradient(to bottom, var(--hw26-violet-soft), transparent);
-}
-.hw26-pin-icon {
-  font-size: 1.35rem;
-  filter: drop-shadow(0 0 6px rgba(148, 92, 255, 0.6));
-}
-.hw26-pin-label {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  font-size: 0.92rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--hw26-text);
-}
-.hw26-pin-sub {
-  font-size: 0.74rem;
-  color: var(--hw26-text-dim);
-  line-height: 1.3;
-}
-.hw26-pin[data-hw-urgent="true"] {
-  border-color: rgba(220, 38, 38, 0.55);
-  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.25) inset;
-}
-.hw26-pin[data-hw-urgent="true"] .hw26-pin-sub { color: #ff9d9d; }
-.hw26-pin[disabled] { cursor: default; opacity: 0.72; }
-
-@media (min-width: 640px) {
-  .hw26-pins { grid-template-columns: repeat(4, 1fr); }
-}
-
-/* ---------------------------------------------------------------------
-   Widget de La Heraldo — elemento visual dominante
+   2) Widget de La Heraldo — ahora vive en halloween/batalla.html
 --------------------------------------------------------------------- */
 .hw26-boss {
   position: relative;
@@ -408,71 +483,32 @@
   text-align: left;
 }
 
-/* ---------------------------------------------------------------------
-   Modales de los pines
---------------------------------------------------------------------- */
-.hw26-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(4, 2, 8, 0.78);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-/* BUGFIX: sin esta línea, [hidden] (regla del navegador, display:none)
-   empata en especificidad con la clase de arriba y pierde -- el overlay
-   se queda "display:flex" para siempre aunque overlay.hidden=true se
-   ponga por JS (closeModal()), tanto al cargar la página como al pulsar
-   la X. Esta regla, con mayor especificidad (clase + atributo), es la
-   que de verdad lo oculta. */
-.hw26-modal-overlay[hidden] { display: none; }
-.hw26-modal {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  max-height: 84vh;
-  overflow-y: auto;
-  background: linear-gradient(180deg, #150a22, #0a0512);
-  border: 1px solid var(--hw26-violet-line);
-  border-radius: 20px;
-  padding: 26px 22px 22px;
-  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8);
-  color: var(--hw26-text);
-}
-.hw26-modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.9rem;
-  line-height: 1;
-}
-.hw26-modal-close:hover { background: rgba(255, 255, 255, 0.12); }
-
-.hw26-modal-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1rem;
-  letter-spacing: 0.08em;
+/* Pequeña sección de efectos activos, opcional, debajo del widget en
+   batalla.html (pedido explícito: no convertir la página en un dashboard
+   grande -- por eso va compacta y se oculta sola si no hay efectos). */
+.hw26-battle-effects { margin-top: 18px; }
+.hw26-battle-effects-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin: 0 0 4px;
-  padding-right: 24px;
-}
-.hw26-modal-sub {
-  font-size: 0.82rem;
   color: var(--hw26-text-dim);
-  margin-bottom: 18px;
+  margin: 0 0 8px;
+  text-align: center;
 }
 
-/* Rol */
+/* ---------------------------------------------------------------------
+   3) Rol (halloween/rol.html)
+--------------------------------------------------------------------- */
+.hw26-role-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+@media (min-width: 640px) {
+  .hw26-role-grid { grid-template-columns: repeat(3, 1fr); }
+}
 .hw26-role-card {
   display: flex;
   align-items: flex-start;
@@ -483,13 +519,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   padding: 14px;
-  margin-bottom: 10px;
   cursor: pointer;
   font-family: inherit;
   color: var(--hw26-text);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
-.hw26-role-card:hover { border-color: rgba(148, 92, 255, 0.55); background: rgba(124, 58, 237, 0.08); }
+.hw26-role-card:hover { border-color: rgba(148, 92, 255, 0.55); background: rgba(124, 58, 237, 0.08); transform: translateY(-2px); }
 .hw26-role-card.is-selected { border-color: var(--hw26-violet); background: rgba(124, 58, 237, 0.16); }
 .hw26-role-icon { font-size: 1.4rem; }
 .hw26-role-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.92rem; margin-bottom: 2px; }
@@ -526,14 +561,22 @@
   border: 1px solid rgba(148, 92, 255, 0.4);
 }
 .hw26-role-current .hw26-role-icon { font-size: 1.8rem; }
+.hw26-role-current-big { padding: 26px 20px; }
+.hw26-role-current-big .hw26-role-icon { font-size: 2.6rem; }
+.hw26-role-current-big .hw26-role-name { font-size: 1.15rem; }
 .hw26-locked-box {
   text-align: center;
   padding: 20px 10px;
 }
 .hw26-locked-box .hw26-lock-icon { font-size: 1.8rem; margin-bottom: 8px; }
 .hw26-locked-box b { display: block; font-family: 'Orbitron', sans-serif; letter-spacing: 0.08em; margin-bottom: 6px; }
+.hw26-locked-box-big { padding: 40px 16px; }
+.hw26-locked-box-big .hw26-lock-icon { font-size: 2.6rem; }
+.hw26-locked-box-big b { font-size: 1.05rem; }
 
-/* Contratos */
+/* ---------------------------------------------------------------------
+   4) Contratos (halloween/contratos.html)
+--------------------------------------------------------------------- */
 .hw26-mission-group-title {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.72rem;
@@ -572,7 +615,9 @@
 .hw26-mission-badge.active { background: rgba(212, 175, 55, 0.2); color: var(--hw26-gold); }
 .hw26-mission-badge.ended { background: rgba(255,255,255,.05); color: var(--hw26-text-faint); }
 
-/* Efectos */
+/* ---------------------------------------------------------------------
+   5) Efectos (halloween/efectos.html)
+--------------------------------------------------------------------- */
 .hw26-effect-card {
   display: flex;
   gap: 12px;
@@ -585,7 +630,9 @@
 }
 .hw26-effect-icon { font-size: 1.3rem; }
 .hw26-effect-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; }
+.hw26-effect-mult { color: var(--hw26-gold); font-weight: 700; }
 .hw26-effect-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin-top: 2px; }
+.hw26-effect-scope { font-size: 0.7rem; color: var(--hw26-text-faint); margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
 .hw26-effect-uses { font-size: 0.7rem; color: var(--hw26-gold); margin-top: 4px; }
 .hw26-empty-state {
   text-align: center;
@@ -594,7 +641,9 @@
   font-size: 0.85rem;
 }
 
-/* Crónicas */
+/* ---------------------------------------------------------------------
+   6) Crónicas (halloween/cronicas.html)
+--------------------------------------------------------------------- */
 .hw26-feed-item {
   padding: 10px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
@@ -606,7 +655,3 @@
 .hw26-feed-item[data-type="victory"],
 .hw26-feed-item[data-type="phase_change"] { color: var(--hw26-gold); font-weight: 600; }
 .hw26-feed-item[data-type="defeat"] { color: #ff8f8f; font-weight: 600; }
-
-/* Scrollbar discreta dentro del modal */
-.hw26-modal::-webkit-scrollbar { width: 8px; }
-.hw26-modal::-webkit-scrollbar-thumb { background: rgba(148, 92, 255, 0.35); border-radius: 999px; }
