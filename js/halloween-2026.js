@@ -305,6 +305,22 @@
       ];
     }
 
+    if (scenario === 'contratos_stream') {
+      // Los 5 contratos de STREAM propuestos como base real de Halloween
+      // 2026 -- SOLO presentación/mock, ninguna validación de Twitch,
+      // canje o conteo de usuarios corre aquí. Repartidos en 4 martes/
+      // jueves/sábado de octubre (fechas no definitivas) con 1 ended, 2
+      // active, 2 upcoming -- dos de ellos comparten día (24 oct) para
+      // también revisar el grid de 2 columnas dentro de esta categoría.
+      return [
+        { mission_id: 401, mission_key: 'stream_ritual_almas', category: 'stream', title: 'Ritual de las Almas', description: '20 miembros de Geo Army deben responder al llamado y activar el ritual durante el stream.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 402, mission_key: 'stream_mantengan_sello', category: 'stream', title: 'Mantengan el Sello', description: 'La comunidad debe permanecer unida y acumular 20 horas de presencia combinada durante el contrato.', mission_day: '2026-10-13', opens_at: '2026-10-13T00:00:00-04:00', closes_at: '2026-10-13T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 403, mission_key: 'stream_llamado_guardia', category: 'stream', title: 'Llamado de la Guardia', description: '25 miembros únicos de Geo Army deben responder en el chat durante la ventana del contrato.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 7500, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 404, mission_key: 'stream_ofrenda_heraldo', category: 'stream', title: 'Ofrenda a la Heraldo', description: 'La comunidad debe completar 30 ofrendas durante el stream para debilitar el poder de Morvanna.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 405, mission_key: 'stream_juicio_oraculo', category: 'stream', title: 'El Juicio del Oráculo', description: '25 miembros de Geo Army deben participar en el juicio del Oráculo durante el stream.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 6000, verification_mode: 'manual', sort_order: 2 },
+      ];
+    }
+
     var base = [
       { mission_id: 101, mission_key: 'fn_caceria_abismo', category: 'fortnite', title: 'CACERÍA DEL ABISMO', description: 'Elimina 5 enemigos usando tu code de Geo Army en la tienda de Fortnite y compártelo en el chat.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 1 },
       { mission_id: 102, mission_key: 'ow_sin_escapatoria', category: 'overwatch', title: 'SIN ESCAPATORIA', description: 'Gana 2 partidas', mission_day: '2026-10-18', opens_at: '2026-10-18T00:00:00-04:00', closes_at: '2026-10-18T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 2 },
@@ -355,7 +371,7 @@
       case 'halloween_2026_get_public_missions':
         if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' ||
             currentScenario === 'contratos_active' || currentScenario === 'contratos_mixed' ||
-            currentScenario === 'contrato_final') {
+            currentScenario === 'contrato_final' || currentScenario === 'contratos_stream') {
           return mockMissionsContratos(currentScenario);
         }
         return mockMissions(currentScenario);
