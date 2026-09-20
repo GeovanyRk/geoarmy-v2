@@ -688,6 +688,166 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   .hw26-boss[data-eventstatus="finished"] .hw26-status-detail { font-size: 0.92rem; }
 }
 
+/* ---------------------------------------------------------------------
+   Cola de movimientos en vivo — puro presentación (ver "Cola visual de
+   movimientos" en js/halloween-2026.js). Todo vive en capas absolutas
+   que nunca empujan el layout ni las barras: la posición/tamaño del hero
+   no cambia mientras juega un movimiento.
+--------------------------------------------------------------------- */
+#hw26GeoBarBlock { position: relative; }
+
+.hw26-move-zone {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+}
+/* Zona Geo Army: overlay corto sobre la barra de resistencia (nombre +
+   valor en una píldora oscura, no tapa el resto de la columna). */
+.hw26-move-zone-geo {
+  inset: -3px -4px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.hw26-move-zone-geo .hw26-move-pop {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+  background: rgba(6, 4, 10, 0.78);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  padding: 4px 9px;
+  border-radius: 8px;
+}
+/* Zona Morvanna: overlay en el tercio inferior de la imagen -- deja el
+   rostro/torso visible, nunca tapa toda la ilustración (pedido explícito
+   de mobile, aplicado también en desktop por consistencia). */
+.hw26-move-zone-boss {
+  inset: auto 12px 10% 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.hw26-move-zone-boss .hw26-move-pop {
+  flex-direction: column;
+  align-items: center;
+  background: rgba(6, 4, 10, 0.6);
+  border: 1px solid rgba(148, 92, 255, 0.35);
+  padding: 6px 16px;
+  border-radius: 10px;
+}
+.hw26-move-pop {
+  text-align: center;
+  animation: hw26-move-pop 1.5s ease forwards;
+}
+@keyframes hw26-move-pop {
+  0% { opacity: 0; transform: translateY(6px); }
+  12% { opacity: 1; transform: translateY(0); }
+  78% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+.hw26-move-name {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.hw26-move-value {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+.hw26-move-zone-boss .hw26-move-name { color: #e6d9ff; margin-bottom: 2px; }
+.hw26-move-zone-boss .hw26-move-value { color: #ff8a8a; font-size: 1.05rem; }
+.hw26-move-zone-geo .hw26-move-name { color: #ffd0d0; }
+.hw26-move-zone-geo .hw26-move-value { color: #ff8a8a; }
+.hw26-move-pop-heal .hw26-move-value { color: #b6ffe4; }
+.hw26-move-pop-buff {
+  border-color: rgba(249, 199, 90, 0.4) !important;
+  max-width: 220px;
+}
+.hw26-move-pop-buff .hw26-move-name { color: #ffe6b0; white-space: normal; text-align: center; }
+.hw26-move-pop-buff .hw26-move-value {
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--hw26-text-dim); text-transform: uppercase; white-space: normal; text-align: center;
+}
+
+/* Flash breve blanco/violeta sobre Morvanna al recibir un golpe de Geo
+   Army -- capa aparte de .hw26-boss-flash (reservado a la transición de
+   fase, con su propio texto y timing). */
+.hw26-boss-hit-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(60% 60% at 50% 45%, rgba(230, 217, 255, 0.5), transparent 70%);
+  opacity: 0;
+}
+.hw26-boss-hit-flash.is-active { animation: hw26-hit-flash 0.5s ease; }
+@keyframes hw26-hit-flash {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Micro shake local -- SOLO del elemento golpeado (la imagen o el bloque
+   de resistencia), nunca de .hw26-page ni del body. */
+.hw26-shake-local { animation: hw26-shake-local 0.5s ease; }
+@keyframes hw26-shake-local {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+/* Último movimiento -- línea discreta, no una tarjeta nueva. */
+.hw26-last-move {
+  margin-top: 14px;
+  font-size: 0.76rem;
+  color: var(--hw26-text-dim);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 759px) {
+  .hw26-move-name { font-size: 0.7rem; }
+  .hw26-move-value { font-size: 0.78rem; }
+  .hw26-move-zone-boss .hw26-move-value { font-size: 0.92rem; }
+  .hw26-move-zone-boss { inset: auto 8px 8% 8px; }
+  /* Seguridad extra contra overflow en pantallas angostas: nombres largos
+     (sobre todo los de buff/debuff) pueden envolver en vez de desbordar. */
+  .hw26-move-zone-geo .hw26-move-pop,
+  .hw26-move-zone-boss .hw26-move-pop {
+    max-width: calc(100vw - 64px);
+  }
+  .hw26-move-zone-geo .hw26-move-name,
+  .hw26-move-zone-geo .hw26-move-value {
+    white-space: normal;
+  }
+}
+
+/* Botones de prueba de movimientos (SOLO test mode, dentro del devbar
+   existente de batalla.html) -- inyectan un log sintético directo a la
+   cola, sin tocar loadFeed()/Supabase. */
+.hw26-devbar-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+.hw26-devbar-moves button {
+  font-family: inherit;
+  font-size: 0.6rem;
+  background: #1c1108;
+  border: 1px solid rgba(249, 115, 22, 0.5);
+  color: #ffe6c8;
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+.hw26-devbar-moves button:hover { background: #2a1a0c; }
+
 /* Cataclismo — modo emergencia temporal. Vive dentro de la columna de
    información (texto a la izquierda), pero se auto-centra (text-align)
    sin depender de la alineación del contenedor padre. */
