@@ -61,7 +61,7 @@
       <div class="hw26-page-head">
         <div class="hw26-page-icon">🐺</div>
         <div class="hw26-page-eyebrow">Halloween 2026 · Mundo 02</div>
-        <div class="hw26-page-title">LA HERALDO</div>
+        <div class="hw26-page-title">BATALLA CONTRA LA HERALDO</div>
         <div class="hw26-page-sub">El sello de La Heraldo y la resistencia de Geo Army, en tiempo real.</div>
       </div>
 
@@ -76,14 +76,17 @@
 
             <div class="hw26-boss-art">
               <div class="hw26-boss-badge" id="hw26PhaseBadge">FASE I</div>
-              <!-- Fallback: por ahora usa la misma imagen del planeta. Clase
-                   .hw26-boss-img-demonic queda lista para más adelante,
-                   cuando exista una ilustración distinta de La Heraldo
-                   en su forma demoníaca (Fase II). -->
-              <img src="../world-02-halloween-v2.png" alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
+              <!-- Imagen de La Heraldo por fase: intenta primero
+                   assets/halloween/heraldo-fase1.webp / heraldo-fase2.webp
+                   (si ya existen en el repo) y cae automáticamente al
+                   placeholder del planeta si no existen o fallan al cargar
+                   -- ver updateBossImg() en js/halloween-2026.js. No rompe
+                   nada si las imágenes todavía no están subidas. -->
+              <img src="../world-02-halloween-v2.png"
+                   data-fallback="../world-02-halloween-v2.png"
+                   alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
             </div>
 
-            <div class="hw26-boss-name">LA HERALDO</div>
             <div class="hw26-boss-phase" id="hw26PhaseText">FASE I — FORMA SELLADA</div>
 
             <div class="hw26-bar-block">
