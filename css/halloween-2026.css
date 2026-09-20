@@ -209,6 +209,21 @@
 }
 
 /* ---------------------------------------------------------------------
+   Ajustes SOLO de halloween/batalla.html: más ancho para que el hero
+   domine el espacio horizontal y menos aire antes del contenido. Scoped a
+   body[data-halloween-page="battle"] a propósito -- las otras 4 páginas
+   (Rol/Contratos/Efectos/Crónicas) conservan su max-width, padding y
+   tipografía sin cambios, como antes.
+--------------------------------------------------------------------- */
+body[data-halloween-page="battle"] .hw26-page {
+  max-width: 1180px;
+  padding-top: 84px;
+}
+body[data-halloween-page="battle"] .hw26-back-link { margin-bottom: 14px; }
+body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 16px; }
+.hw26-page-content-hero { padding: 0; background: none; border: none; border-radius: 0; }
+
+/* ---------------------------------------------------------------------
    Barra de pruebas (SOLO test mode) — franja discreta arriba del
    contenido de cada página dedicada
 --------------------------------------------------------------------- */
@@ -303,6 +318,9 @@
   padding: 22px 20px 24px;
   text-align: center;
 }
+@media (min-width: 760px) {
+  .hw26-boss-frame { padding: 26px 28px 30px; }
+}
 
 /* Fase II — transformación real: glow más agresivo, rojo/violeta intenso */
 .hw26-boss[data-phase="2"] {
@@ -335,10 +353,15 @@
   .hw26-boss-layout {
     flex-direction: row;
     align-items: stretch;
-    gap: 28px;
+    gap: 32px;
   }
-  .hw26-boss-info { flex: 1 1 46%; display: flex; flex-direction: column; justify-content: center; }
-  .hw26-boss-art { flex: 1 1 54%; }
+  .hw26-boss-info { flex: 1 1 42%; display: flex; flex-direction: column; justify-content: center; }
+  .hw26-boss-art { flex: 1 1 58%; }
+}
+@media (min-width: 1020px) {
+  .hw26-boss-layout { gap: 40px; }
+  .hw26-boss-info { flex-basis: 40%; }
+  .hw26-boss-art { flex-basis: 60%; }
 }
 
 .hw26-boss-badge {
@@ -368,20 +391,34 @@
    según el recorte de cada archivo. */
 .hw26-boss-art {
   position: relative;
-  min-height: 260px;
+  min-height: 320px;
   border-radius: 18px;
   overflow: hidden;
-  border: 2px solid var(--hw26-violet-soft);
-  box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.08), 0 0 44px -8px rgba(124, 58, 237, 0.55);
+  border: 1px solid rgba(148, 92, 255, 0.35);
+  box-shadow: 0 0 50px -10px rgba(124, 58, 237, 0.55);
   background: #0a0510;
   transition: border-color 0.6s ease, box-shadow 0.6s ease;
 }
 @media (min-width: 760px) {
-  .hw26-boss-art { min-height: 380px; }
+  .hw26-boss-art { min-height: 460px; }
+}
+@media (min-width: 1020px) {
+  .hw26-boss-art { min-height: 540px; }
 }
 .hw26-boss[data-phase="2"] .hw26-boss-art {
-  border-color: rgba(220, 38, 38, 0.65);
-  box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.1), 0 0 52px -6px rgba(220, 38, 38, 0.75);
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 0 60px -8px rgba(220, 38, 38, 0.7);
+}
+/* Marco elegante: esquinas acentuadas en vez de un borde grueso uniforme
+   -- se siente más "cinematográfico" y menos "tarjeta genérica". */
+.hw26-boss-art::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  z-index: 4;
+  pointer-events: none;
+  border: 1px solid rgba(230, 217, 255, 0.16);
+  border-radius: 12px;
 }
 /* Viñeta suave para que la imagen se funda con el panel en vez de cortar
    en seco -- "máscara suave", sin ocultar la imagen. */
@@ -390,7 +427,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(10, 5, 16, 0) 60%, rgba(10, 5, 16, 0.55) 100%);
+  background:
+    linear-gradient(180deg, rgba(10, 5, 16, 0) 55%, rgba(10, 5, 16, 0.6) 100%),
+    linear-gradient(0deg, rgba(10, 5, 16, 0) 88%, rgba(10, 5, 16, 0.35) 100%);
 }
 .hw26-boss-img {
   width: 100%;
@@ -541,13 +580,16 @@
   background: rgba(220, 38, 38, 0.22); border-color: rgba(220, 38, 38, 0.55); color: #ffd0d0;
 }
 
-/* Cataclismo — modo emergencia temporal */
+/* Cataclismo — modo emergencia temporal. Vive dentro de la columna de
+   información (texto a la izquierda), pero se auto-centra (text-align)
+   sin depender de la alineación del contenedor padre. */
 .hw26-boss-cataclysm {
-  margin: 0 0 16px;
+  margin: 16px 0 0;
   padding: 14px 12px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(220, 38, 38, 0.22), rgba(249, 115, 22, 0.1));
   border: 1px solid rgba(220, 38, 38, 0.55);
+  text-align: center;
   animation: hw26-cataclysm-pulse 1.4s ease-in-out infinite;
 }
 @keyframes hw26-cataclysm-pulse {
@@ -592,16 +634,87 @@
 /* Pequeña sección de efectos activos, opcional, debajo del widget en
    batalla.html (pedido explícito: no convertir la página en un dashboard
    grande -- por eso va compacta y se oculta sola si no hay efectos). */
-.hw26-battle-effects { margin-top: 18px; }
-.hw26-battle-effects-title {
+/* Franja de apoyo debajo del hero -- 4 bloques temáticos con CTA a las
+   páginas hermanas (Rol/Contratos/Efectos/Crónicas). Grid simple, nunca
+   tabla: mismo lenguaje visual de tarjeta que el resto del sistema, no un
+   dashboard. En mobile 1 columna, en tablet 2, en escritorio ancho 4. */
+.hw26-battle-support { margin-top: 24px; }
+.hw26-support-eyebrow {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #b98cf5;
+  margin-bottom: 10px;
+}
+.hw26-support-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .hw26-support-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1020px) {
+  .hw26-support-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.hw26-support-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px 16px 14px;
+  border-radius: 14px;
+  background:
+    radial-gradient(140% 100% at 0% 0%, rgba(124, 58, 237, 0.12), transparent 60%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  color: var(--hw26-text);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+a.hw26-support-card:hover {
+  border-color: rgba(148, 92, 255, 0.5);
+  background:
+    radial-gradient(140% 100% at 0% 0%, rgba(124, 58, 237, 0.2), transparent 60%),
+    rgba(255, 255, 255, 0.045);
+  transform: translateY(-2px);
+}
+.hw26-support-icon {
+  font-size: 1.3rem;
+  filter: drop-shadow(0 0 10px rgba(148, 92, 255, 0.45));
+  margin-bottom: 2px;
+}
+.hw26-support-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+}
+.hw26-support-text {
+  font-size: 0.78rem;
+  color: var(--hw26-text-dim);
+  line-height: 1.4;
+}
+.hw26-support-text-muted { color: var(--hw26-text-faint); }
+.hw26-support-cta {
+  margin-top: 8px;
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--hw26-text-dim);
-  margin: 0 0 8px;
-  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #c9a8ff;
+  text-decoration: none;
 }
+.hw26-support-card-live { cursor: default; }
+.hw26-support-live { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+/* Tarjetas de efecto reutilizadas (effectCardHtml) dentro de un tile
+   angosto: se compactan un poco para no desbordar la franja. */
+.hw26-support-live .hw26-effect-card { padding: 10px; margin-bottom: 0; }
+.hw26-support-live .hw26-effect-icon-circle { width: 36px; height: 36px; }
+.hw26-support-live .hw26-effect-icon { font-size: 1rem; }
 
 /* ---------------------------------------------------------------------
    3) Rol (halloween/rol.html)
