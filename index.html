@@ -493,10 +493,32 @@
   // exactamente igual que antes: planeta bloqueado, countdown real, pins
   // secundarios atenuados/bloqueados hasta el 1 de octubre.
   // =====================================================================
+  // Detecta hw_unlock=1 tanto en la query normal (?hw_unlock=1) como, por
+  // si se pega la URL con el orden invertido (#wlHalloween?hw_unlock=1 en
+  // vez de ?hw_unlock=1#wlHalloween -- un error de copiado muy fácil de
+  // cometer), dentro del hash también. Nunca lee nada más de la URL.
+  function hw26DetectUnlockParam() {
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      if (qs.get('hw_unlock') === '1') return true;
+      var hash = window.location.hash || '';
+      var qIdx = hash.indexOf('?');
+      if (qIdx !== -1) {
+        var hashParams = new URLSearchParams(hash.slice(qIdx + 1));
+        if (hashParams.get('hw_unlock') === '1') return true;
+      }
+      if (/(?:^|[?&#])hw_unlock=1(?:&|$)/.test(hash)) return true;
+    } catch (e) {}
+    return false;
+  }
+
   (function () {
     try {
-      var params = new URLSearchParams(window.location.search);
-      if (params.get('hw_unlock') !== '1') return; // sin el parámetro, cero cambios
+      var unlocked = hw26DetectUnlockParam();
+      // Log siempre visible en consola (F12) para poder confirmar de un
+      // vistazo si la página detectó el parámetro, sin adivinar.
+      console.log('[hw26-test-unlock] hw_unlock=1 detectado:', unlocked, '— URL:', window.location.href);
+      if (!unlocked) return; // sin el parámetro, cero cambios
 
       var wrap = document.getElementById('wlHalloween');
       if (!wrap) return;
