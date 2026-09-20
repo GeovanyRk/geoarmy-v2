@@ -186,103 +186,49 @@
              body. No se tocó Mundo 01, Mundo 03, pines, fondo ni backend. -->
         <div class="v3-world-slide v3-world-slide-02">
 
-        <!-- =====================================================================
-             HALLOWEEN 2026 — sistema de batalla "La Heraldo"
-             SOLO en esta página de pruebas. Todo el contenido dinámico de este
-             bloque lo genera js/halloween-2026.js a partir de las RPCs públicas
-             de Supabase -- no se calcula combate/HP/daño aquí. Va ARRIBA del
-             planeta a propósito (el planeta/candado/countdown de abajo no se
-             tocan salvo la fecha del countdown, ver nota más abajo). -->
-        <div class="hw26-devbar" id="hw26DevBar" hidden>
-          <span class="hw26-devbar-label">Test mode</span>
-          <select id="hw26DevScenario" aria-label="Escenario de prueba">
-            <option value="off">RPC real (Supabase)</option>
-            <option value="scheduled">Mock: scheduled</option>
-            <option value="active_p1">Mock: active — fase 1</option>
-            <option value="active_p2">Mock: active — fase 2</option>
-            <option value="cataclismo">Mock: cataclismo pendiente</option>
-            <option value="geoarmy_victory">Mock: victoria Geo Army</option>
-            <option value="herald_victory">Mock: victoria La Heraldo</option>
-          </select>
-          <label><input type="checkbox" id="hw26DevRole"/> Simular usuario con rol</label>
-        </div>
-
-        <div class="hw26-root" id="hw26Root" data-testmode="true">
-          <div class="hw26-pins" id="hw26Pins">
-            <button type="button" class="hw26-pin hw26-pin-rol" id="hw26PinRol" data-hw-pin="rol">
-              <span class="hw26-pin-icon">⚔</span>
-              <span class="hw26-pin-label">Rol</span>
-              <span class="hw26-pin-sub" id="hw26PinRolSub">Cargando…</span>
-            </button>
-            <button type="button" class="hw26-pin hw26-pin-contratos" id="hw26PinContratos" data-hw-pin="contratos">
-              <span class="hw26-pin-icon">📜</span>
-              <span class="hw26-pin-label">Contratos</span>
-              <span class="hw26-pin-sub" id="hw26PinContratosSub">Cargando…</span>
-            </button>
-            <button type="button" class="hw26-pin hw26-pin-efectos" id="hw26PinEfectos" data-hw-pin="efectos">
-              <span class="hw26-pin-icon">🔮</span>
-              <span class="hw26-pin-label">Efectos</span>
-              <span class="hw26-pin-sub" id="hw26PinEfectosSub">Cargando…</span>
-            </button>
-            <button type="button" class="hw26-pin hw26-pin-cronicas" id="hw26PinCronicas" data-hw-pin="cronicas">
-              <span class="hw26-pin-icon">📖</span>
-              <span class="hw26-pin-label">Crónicas</span>
-              <span class="hw26-pin-sub" id="hw26PinCronicasSub">Cargando…</span>
-            </button>
-          </div>
-
-          <div class="hw26-boss" id="hw26Boss" data-phase="1" data-eventstatus="scheduled" data-outcome="none">
-            <div class="hw26-boss-frame">
-              <div class="hw26-boss-cataclysm" id="hw26Cataclysm" hidden>
-                <div class="hw26-cataclysm-title">⚠ LA HERALDO PREPARA CATACLISMO</div>
-                <div class="hw26-cataclysm-timer" id="hw26CataclysmTimer">00:00</div>
-                <div class="hw26-cataclysm-sub">PREPAREN LAS DEFENSAS.</div>
-              </div>
-
-              <div class="hw26-boss-art">
-                <div class="hw26-boss-badge" id="hw26PhaseBadge">FASE I</div>
-                <!-- Fallback: por ahora usa la misma imagen del planeta. Clase
-                     .hw26-boss-img-demonic queda lista para más adelante,
-                     cuando exista una ilustración distinta de La Heraldo
-                     en su forma demoníaca (Fase II). -->
-                <img src="world-02-halloween-v2.png" alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
-              </div>
-
-              <div class="hw26-boss-name">LA HERALDO</div>
-              <div class="hw26-boss-phase" id="hw26PhaseText">FASE I — FORMA SELLADA</div>
-
-              <div class="hw26-bar-block">
-                <div class="hw26-bar-label">
-                  <span>HP de La Heraldo</span>
-                  <span id="hw26BossHpText">2,000,000 / 2,000,000</span>
-                </div>
-                <div class="hw26-bar hw26-bar-boss"><div class="hw26-bar-fill" id="hw26BossHpFill" style="width:100%"></div></div>
-              </div>
-
-              <div class="hw26-bar-block">
-                <div class="hw26-bar-label">
-                  <span>Resistencia Geo Army</span>
-                  <span id="hw26GeoHpText">100,000 / 100,000</span>
-                </div>
-                <div class="hw26-bar hw26-bar-geo"><div class="hw26-bar-fill" id="hw26GeoHpFill" style="width:100%"></div></div>
-              </div>
-
-              <div class="hw26-boss-status">
-                <span class="hw26-status-badge" id="hw26StatusBadge">CARGANDO…</span>
-                <span class="hw26-status-detail" id="hw26StatusDetail"></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="hw26-error" id="hw26GlobalError" hidden></div>
-        </div>
-        <!-- ===== fin bloque Halloween 2026 ===== -->
-
         <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T19:00:00-04:00" id="wlHalloween">
           <div class="v3-wl-orb">
             <img src="world-02-halloween-v2.png" alt="Mundo 02 — Halloween" class="v3-world-planet-img v3-wl-img" loading="lazy"/>
             <span class="v3-wl-tint" aria-hidden="true"></span>
             <span class="v3-wl-lockbadge" aria-hidden="true">🔒</span>
+
+            <!-- =====================================================================
+                 HALLOWEEN 2026 — 5 pins sobre el planeta (SOLO esta página de pruebas)
+                 Mismo lenguaje visual que .v3-planet-nav/.v3-marker-* de Mundo 01
+                 (círculo + glow + icono + tooltip en hover + posición absoluta en %),
+                 en paleta violeta/roja. Son <a href> simples a páginas dedicadas
+                 (halloween/*.html, también de prueba); no cargan js/halloween-2026.js
+                 aquí porque el índice ya no muestra datos dinámicos de la RPC, solo
+                 navega. El bloqueo/atenuado de los 4 pins secundarios antes del 1 de
+                 octubre es puro CSS: reutiliza la misma clase ".is-unlocked" que el
+                 countdown de abajo ya agrega a #wlHalloween -- ver
+                 css/halloween-2026.css. BATALLA se deja siempre clickeable (para
+                 mostrar el estado "scheduled" de la página), con una insignia
+                 "Programada" que desaparece sola al desbloquear. -->
+            <div class="hw26-planet-pins" id="hw26PlanetPins">
+              <a href="halloween/batalla.html" class="hw26-planet-pin hw26-pin-batalla" style="--mx:50%; --my:16%;">
+                <span class="hw26-pin-badge">Programada</span>
+                <span class="hw26-pin-label">Batalla</span>
+                <span class="hw26-pin-icon">🐺</span>
+              </a>
+              <a href="halloween/rol.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:24%; --my:44%;">
+                <span class="hw26-pin-label">Rol</span>
+                <span class="hw26-pin-icon">⚔<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/contratos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:76%; --my:44%;">
+                <span class="hw26-pin-label">Contratos</span>
+                <span class="hw26-pin-icon">📜<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/efectos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:30%; --my:74%;">
+                <span class="hw26-pin-label">Efectos</span>
+                <span class="hw26-pin-icon">🔮<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/cronicas.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:70%; --my:74%;">
+                <span class="hw26-pin-label">Crónicas</span>
+                <span class="hw26-pin-icon">📖<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+            </div>
+            <!-- ===== fin pins Halloween 2026 ===== -->
           </div>
           <div class="v3-wl-eyebrow">Mundo 02</div>
           <div class="v3-wl-title">Halloween</div>
@@ -311,15 +257,6 @@
     </section>
 
   </div>
-
-  <!-- Modal genérico de los 4 pines Halloween 2026 -->
-  <div class="hw26-modal-overlay" id="hw26ModalOverlay" hidden>
-    <div class="hw26-modal" id="hw26Modal" role="dialog" aria-modal="true">
-      <button type="button" class="hw26-modal-close" id="hw26ModalClose" aria-label="Cerrar">✕</button>
-      <div class="hw26-modal-body" id="hw26ModalBody"></div>
-    </div>
-  </div>
-
 
   <!-- SOLICITUDES -->
   <section class="section panel" id="solicitudes">
@@ -463,11 +400,10 @@
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
-  <!-- ===== HALLOWEEN 2026: lógica del sistema de batalla — SOLO en esta
-       página de pruebas. Se carga DESPUÉS de geoarmy-account.js porque
-       reutiliza window.GeoArmyAccount.client (mismo cliente/sesión de
-       Supabase de siempre, no crea uno nuevo). ===== -->
-  <script src="js/halloween-2026.js"></script>
+  <!-- js/halloween-2026.js YA NO se carga aquí: el índice solo muestra los
+       5 pins (enlaces simples) sobre el planeta, sin datos dinámicos de la
+       RPC. Ese script ahora vive en cada página dedicada halloween/*.html
+       (ver css/halloween-2026.css y js/halloween-2026.js para el detalle). -->
   <script>
   // ===== V3: countdown real de Mundo 02 (Halloween) hasta el 1 de octubre,
   // calculado en el navegador contra la fecha ISO en data-unlock-iso (ya
