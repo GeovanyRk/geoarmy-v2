@@ -67,6 +67,9 @@
 
       <div class="hw26-page-content hw26-page-content-hero">
         <div class="hw26-boss" id="hw26Boss" data-phase="1" data-eventstatus="scheduled" data-outcome="none">
+          <!-- Atmósfera puramente decorativa: glow difuso detrás del hero,
+               nunca un panel bordeado. Ver .hw26-boss-atmosphere en el CSS. -->
+          <div class="hw26-boss-atmosphere" aria-hidden="true"></div>
           <div class="hw26-boss-frame">
             <!-- Panel "boss battle" de dos columnas: en escritorio, texto +
                  barras a la izquierda e imagen grande de La Heraldo a la
@@ -125,43 +128,6 @@
                 <div class="hw26-boss-flash" id="hw26PhaseFlash" hidden>EL SELLO SE HA ROTO</div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Franja de apoyo debajo del hero: 4 bloques temáticos con CTA a
-             las páginas hermanas. Rol/Contratos/Crónicas son teasers
-             estáticos (sin RPC nueva, sin polling extra); Efectos reutiliza
-             los datos que esta página YA carga (loadEffects(), sin cambios
-             de lógica) para mostrar la lista real. -->
-        <div class="hw26-battle-support">
-          <div class="hw26-support-eyebrow">Apoyo a la batalla</div>
-          <div class="hw26-support-grid">
-            <a href="rol.html" class="hw26-support-card">
-              <span class="hw26-support-icon">⚔</span>
-              <span class="hw26-support-title">ROL</span>
-              <span class="hw26-support-text">Elige tu bando: Atacante, Soporte o Defensor.</span>
-              <span class="hw26-support-cta">Ver rol →</span>
-            </a>
-            <a href="contratos.html" class="hw26-support-card">
-              <span class="hw26-support-icon">📜</span>
-              <span class="hw26-support-title">CONTRATOS</span>
-              <span class="hw26-support-text">Misiones de Fortnite, Overwatch y stream que dañan a La Heraldo.</span>
-              <span class="hw26-support-cta">Ver contratos →</span>
-            </a>
-            <div class="hw26-support-card hw26-support-card-live" id="hw26SupportEffects">
-              <span class="hw26-support-icon">🔮</span>
-              <span class="hw26-support-title">EFECTOS</span>
-              <div class="hw26-support-live" id="hw26SupportEffectsBody">
-                <span class="hw26-support-text">Cargando…</span>
-              </div>
-              <a href="efectos.html" class="hw26-support-cta">Ver todos →</a>
-            </div>
-            <a href="cronicas.html" class="hw26-support-card">
-              <span class="hw26-support-icon">📖</span>
-              <span class="hw26-support-title">CRÓNICAS</span>
-              <span class="hw26-support-text">El registro de todo lo que ha pasado en la batalla.</span>
-              <span class="hw26-support-cta">Ver crónicas →</span>
-            </a>
           </div>
         </div>
       </div>
