@@ -21,6 +21,20 @@
   <!-- Tema V3 (espacial/holográfico) — antes vivía inline aquí, ahora es un archivo
        compartido para poder reusarlo en mi-geoarmy.html y páginas nuevas -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
+  <!-- ===== HALLOWEEN 2026 — SOLO en esta página de pruebas (index-halloween-test.html).
+       NO se agrega todavía a index.html de producción. Ver css/halloween-2026.js
+       y js/halloween-2026.js. ===== -->
+  <link rel="stylesheet" href="css/halloween-2026.css"/>
+  <script>
+  !function(b,e,t,r){
+    b[t]=b[t]||function(...args){(b[t].q=b[t].q||[]).push(args)};
+    b[t].l=+new Date;
+    var s=e.createElement('script'); s.async=1; s.crossOrigin='anonymous';
+    s.src='https://betterstack.net/b.js?t='+r;
+    (e.head||e.getElementsByTagName('head')[0]).appendChild(s);
+  }(window,document,'betterstack','7K7evcpjhiCjpoR65gxKSPhW');
+  betterstack('init', { environment: 'production' });
+</script>
 </head>
 <body>
 
@@ -54,10 +68,9 @@
       <a href="#inicio">Geo Army</a>
       <a href="comunidad.html">Comunidad</a>
       <a href="tienda.html">Tienda</a>
-      <a href="fortnite.html">Fortnite</a>
       <a href="ganadores.html">Ganadores</a>
       <a href="puntos.html">Puntos</a>
-      <a href="alcancia.html" aria-disabled="true">Alcancía (Próximamente)</a>
+      <a href="#alcancia-proximamente" aria-disabled="true">Alcancía (Próximamente)</a>
     </div>
 
     <!-- Tabs de navegación para móvil -->
@@ -106,18 +119,6 @@
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <!-- Fortnite: el planeta tiene el texto "GEO ARMY" grabado con
-               glow en una franja horizontal ~43%-54% de alto (no se veía en
-               el análisis de brillo por pin porque se mezclaba con nubes/
-               continentes claros). En 80%/56% el badge todavía rozaba la
-               "Y" de ARMY. Bajado a 60% para quedar debajo de esa franja
-               con margen, sobre una zona oscura confirmada (~66 de brillo). -->
-          <a href="fortnite.html" style="--mx:56.1%; --my:63.3%;">
-            <span class="v3-marker-label">Fortnite</span>
-            <span class="v3-marker-icon v3-marker-fn">F</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
-          </a>
           <a href="puntos.html" style="--mx:70.6%; --my:66.6%;">
             <span class="v3-marker-label">Puntos</span>
             <span class="v3-marker-icon">⭐</span>
@@ -130,7 +131,7 @@
                abajo, sin popup/alert) y muestra "Próximamente" bajo el
                nombre. No se toca alcancia.html ni su backend, solo deja de
                ser accesible desde la navegación. -->
-          <a href="alcancia.html" style="--mx:34.5%; --my:76.7%;" aria-disabled="true">
+          <a href="#alcancia-proximamente" style="--mx:34.5%; --my:76.7%;" aria-disabled="true">
             <span class="v3-marker-label v3-marker-label-soon">
               <span class="v3-marker-soon-name">Alcancía</span>
               <span class="v3-marker-soon-tag">Próximamente</span>
@@ -184,7 +185,100 @@
              (clases v3-wl-*) y el script "v3-wl-countdown" al final del
              body. No se tocó Mundo 01, Mundo 03, pines, fondo ni backend. -->
         <div class="v3-world-slide v3-world-slide-02">
-        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T00:00:00-04:00" id="wlHalloween">
+
+        <!-- =====================================================================
+             HALLOWEEN 2026 — sistema de batalla "La Heraldo"
+             SOLO en esta página de pruebas. Todo el contenido dinámico de este
+             bloque lo genera js/halloween-2026.js a partir de las RPCs públicas
+             de Supabase -- no se calcula combate/HP/daño aquí. Va ARRIBA del
+             planeta a propósito (el planeta/candado/countdown de abajo no se
+             tocan salvo la fecha del countdown, ver nota más abajo). -->
+        <div class="hw26-devbar" id="hw26DevBar" hidden>
+          <span class="hw26-devbar-label">Test mode</span>
+          <select id="hw26DevScenario" aria-label="Escenario de prueba">
+            <option value="off">RPC real (Supabase)</option>
+            <option value="scheduled">Mock: scheduled</option>
+            <option value="active_p1">Mock: active — fase 1</option>
+            <option value="active_p2">Mock: active — fase 2</option>
+            <option value="cataclismo">Mock: cataclismo pendiente</option>
+            <option value="geoarmy_victory">Mock: victoria Geo Army</option>
+            <option value="herald_victory">Mock: victoria La Heraldo</option>
+          </select>
+          <label><input type="checkbox" id="hw26DevRole"/> Simular usuario con rol</label>
+        </div>
+
+        <div class="hw26-root" id="hw26Root" data-testmode="true">
+          <div class="hw26-pins" id="hw26Pins">
+            <button type="button" class="hw26-pin hw26-pin-rol" id="hw26PinRol" data-hw-pin="rol">
+              <span class="hw26-pin-icon">⚔</span>
+              <span class="hw26-pin-label">Rol</span>
+              <span class="hw26-pin-sub" id="hw26PinRolSub">Cargando…</span>
+            </button>
+            <button type="button" class="hw26-pin hw26-pin-contratos" id="hw26PinContratos" data-hw-pin="contratos">
+              <span class="hw26-pin-icon">📜</span>
+              <span class="hw26-pin-label">Contratos</span>
+              <span class="hw26-pin-sub" id="hw26PinContratosSub">Cargando…</span>
+            </button>
+            <button type="button" class="hw26-pin hw26-pin-efectos" id="hw26PinEfectos" data-hw-pin="efectos">
+              <span class="hw26-pin-icon">🔮</span>
+              <span class="hw26-pin-label">Efectos</span>
+              <span class="hw26-pin-sub" id="hw26PinEfectosSub">Cargando…</span>
+            </button>
+            <button type="button" class="hw26-pin hw26-pin-cronicas" id="hw26PinCronicas" data-hw-pin="cronicas">
+              <span class="hw26-pin-icon">📖</span>
+              <span class="hw26-pin-label">Crónicas</span>
+              <span class="hw26-pin-sub" id="hw26PinCronicasSub">Cargando…</span>
+            </button>
+          </div>
+
+          <div class="hw26-boss" id="hw26Boss" data-phase="1" data-eventstatus="scheduled" data-outcome="none">
+            <div class="hw26-boss-frame">
+              <div class="hw26-boss-cataclysm" id="hw26Cataclysm" hidden>
+                <div class="hw26-cataclysm-title">⚠ LA HERALDO PREPARA CATACLISMO</div>
+                <div class="hw26-cataclysm-timer" id="hw26CataclysmTimer">00:00</div>
+                <div class="hw26-cataclysm-sub">PREPAREN LAS DEFENSAS.</div>
+              </div>
+
+              <div class="hw26-boss-art">
+                <div class="hw26-boss-badge" id="hw26PhaseBadge">FASE I</div>
+                <!-- Fallback: por ahora usa la misma imagen del planeta. Clase
+                     .hw26-boss-img-demonic queda lista para más adelante,
+                     cuando exista una ilustración distinta de La Heraldo
+                     en su forma demoníaca (Fase II). -->
+                <img src="world-02-halloween-v2.png" alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
+              </div>
+
+              <div class="hw26-boss-name">LA HERALDO</div>
+              <div class="hw26-boss-phase" id="hw26PhaseText">FASE I — FORMA SELLADA</div>
+
+              <div class="hw26-bar-block">
+                <div class="hw26-bar-label">
+                  <span>HP de La Heraldo</span>
+                  <span id="hw26BossHpText">2,000,000 / 2,000,000</span>
+                </div>
+                <div class="hw26-bar hw26-bar-boss"><div class="hw26-bar-fill" id="hw26BossHpFill" style="width:100%"></div></div>
+              </div>
+
+              <div class="hw26-bar-block">
+                <div class="hw26-bar-label">
+                  <span>Resistencia Geo Army</span>
+                  <span id="hw26GeoHpText">100,000 / 100,000</span>
+                </div>
+                <div class="hw26-bar hw26-bar-geo"><div class="hw26-bar-fill" id="hw26GeoHpFill" style="width:100%"></div></div>
+              </div>
+
+              <div class="hw26-boss-status">
+                <span class="hw26-status-badge" id="hw26StatusBadge">CARGANDO…</span>
+                <span class="hw26-status-detail" id="hw26StatusDetail"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hw26-error" id="hw26GlobalError" hidden></div>
+        </div>
+        <!-- ===== fin bloque Halloween 2026 ===== -->
+
+        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T19:00:00-04:00" id="wlHalloween">
           <div class="v3-wl-orb">
             <img src="world-02-halloween-v2.png" alt="Mundo 02 — Halloween" class="v3-world-planet-img v3-wl-img" loading="lazy"/>
             <span class="v3-wl-tint" aria-hidden="true"></span>
@@ -216,6 +310,14 @@
       <div class="v3-world-hint">‹ Desliza para explorar ›</div>
     </section>
 
+  </div>
+
+  <!-- Modal genérico de los 4 pines Halloween 2026 -->
+  <div class="hw26-modal-overlay" id="hw26ModalOverlay" hidden>
+    <div class="hw26-modal" id="hw26Modal" role="dialog" aria-modal="true">
+      <button type="button" class="hw26-modal-close" id="hw26ModalClose" aria-label="Cerrar">✕</button>
+      <div class="hw26-modal-body" id="hw26ModalBody"></div>
+    </div>
   </div>
 
 
@@ -339,11 +441,9 @@
           btns.forEach(function(x){x.setAttribute('aria-pressed','false');});
           b.setAttribute('aria-pressed','true');
           filtro = b.getAttribute('data-f'); render();
-        });
+         });
       });
-      load();
-      setInterval(load, 30000);
-    })();
+      })();
     </script>
   </section>
 
@@ -363,12 +463,22 @@
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
+  <!-- ===== HALLOWEEN 2026: lógica del sistema de batalla — SOLO en esta
+       página de pruebas. Se carga DESPUÉS de geoarmy-account.js porque
+       reutiliza window.GeoArmyAccount.client (mismo cliente/sesión de
+       Supabase de siempre, no crea uno nuevo). ===== -->
+  <script src="js/halloween-2026.js"></script>
   <script>
   // ===== V3: countdown real de Mundo 02 (Halloween) hasta el 1 de octubre,
   // calculado en el navegador contra la fecha ISO en data-unlock-iso (ya
   // trae el offset -04:00 de America/New_York, así que Date.now() -- que es
   // UTC -- se compara correctamente sin importar la zona horaria del
-  // visitante). Envuelto en try/catch, no toca nada más de la página. =====
+  // visitante). Envuelto en try/catch, no toca nada más de la página.
+  // NOTA (solo en esta copia TEST): data-unlock-iso se cambió arriba de
+  // 2026-10-01T00:00:00-04:00 a 2026-10-01T19:00:00-04:00 para que el
+  // desbloqueo del planeta coincida con el inicio real de la batalla
+  // (7:00 PM ET). El script en sí no se tocó. index.html de producción
+  // SIGUE con la hora original (00:00) hasta que se autorice el cambio. =====
   (function () {
     try {
       var wrap = document.getElementById('wlHalloween');
@@ -450,8 +560,5 @@
     } catch (e) { console.warn('[v3-soon-links]', e); }
   })();
   </script>
-</body>
-</html>
-
 </body>
 </html>
