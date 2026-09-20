@@ -351,12 +351,43 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
 }
 .hw26-boss-layout { position: relative; z-index: 1; }
 
-/* Fase II — transformación real: glow ambiental rojo/violeta intenso, sin
-   pulsar una caja (eso reintroducía la silueta de "card"). */
+/* Fase II — transformación real: glow ambiental rojo mucho más intenso que
+   en Fase I (antes casi igual de fuerte, ahora con más presencia) + una
+   respiración muy sutil (opacity) para dar sensación de tensión constante,
+   sin pulsar una caja (eso reintroducía la silueta de "card") ni mover
+   nada del layout. Durante la transición 1→2, hw26-transition-glow (más
+   abajo, mismo peso de especificidad pero declarado después) toma
+   prioridad sobre esta respiración continua. */
 .hw26-boss[data-phase="2"] .hw26-boss-atmosphere {
   background:
-    radial-gradient(48% 62% at 24% 38%, rgba(220, 38, 38, 0.32), transparent 72%),
-    radial-gradient(44% 58% at 88% 55%, rgba(220, 38, 38, 0.24), transparent 72%);
+    radial-gradient(50% 64% at 24% 38%, rgba(220, 38, 38, 0.44), transparent 74%),
+    radial-gradient(46% 60% at 88% 55%, rgba(220, 38, 38, 0.34), transparent 74%);
+  opacity: 1;
+  animation: hw26-phase2-breathe 3.4s ease-in-out infinite;
+}
+@keyframes hw26-phase2-breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* Desenlace — victoria/derrota: el glow ambiental toma el color del
+   resultado (verde/dorado si gana Geo Army, rojo oscuro y serio si gana
+   La Heraldo) para que el resultado se sienta en toda la escena, no solo
+   en una etiqueta pequeña. Declarado después de [data-phase="2"] para
+   ganar el empate de especificidad una vez termina la batalla. */
+.hw26-boss[data-outcome="geoarmy_victory"] .hw26-boss-atmosphere {
+  background:
+    radial-gradient(50% 64% at 24% 38%, rgba(70, 224, 168, 0.34), transparent 74%),
+    radial-gradient(46% 60% at 88% 55%, rgba(70, 224, 168, 0.24), transparent 74%);
+  animation: none;
+  opacity: 1;
+}
+.hw26-boss[data-outcome="herald_victory"] .hw26-boss-atmosphere {
+  background:
+    radial-gradient(50% 64% at 24% 38%, rgba(120, 10, 10, 0.46), transparent 74%),
+    radial-gradient(46% 60% at 88% 55%, rgba(120, 10, 10, 0.32), transparent 74%);
+  animation: none;
+  opacity: 1;
 }
 
 /* Panel "boss battle" de dos columnas. Mobile-first: column-reverse hace
@@ -606,6 +637,25 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
 }
 .hw26-boss[data-outcome="herald_victory"] .hw26-status-badge {
   background: rgba(220, 38, 38, 0.22); border-color: rgba(220, 38, 38, 0.55); color: #ffd0d0;
+}
+/* Batalla terminada — el resultado debe dominar la composición sin
+   convertirse en una tarjeta nueva: se agranda y se le da glow al mismo
+   badge/detalle que ya existen, y las barras de HP (ya congeladas, sin
+   sentido de "en vivo") se atenúan para que el resultado sea lo primero
+   que se lee. Nada de esto mueve Morvanna ni agrega marcos nuevos. */
+.hw26-boss[data-eventstatus="finished"] .hw26-status-badge {
+  font-size: 0.92rem;
+  padding: 8px 16px;
+  text-shadow: 0 0 16px currentColor;
+}
+.hw26-boss[data-eventstatus="finished"] .hw26-status-detail {
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+}
+.hw26-boss[data-eventstatus="finished"] .hw26-bar-block { opacity: 0.5; }
+@media (min-width: 760px) {
+  .hw26-boss[data-eventstatus="finished"] .hw26-status-badge { font-size: 1.15rem; padding: 9px 20px; }
+  .hw26-boss[data-eventstatus="finished"] .hw26-status-detail { font-size: 0.92rem; }
 }
 
 /* Cataclismo — modo emergencia temporal. Vive dentro de la columna de
