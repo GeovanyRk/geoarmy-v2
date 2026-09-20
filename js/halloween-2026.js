@@ -478,12 +478,19 @@
   // trae la etiqueta <img data-fallback="..."> en el HTML. HERO_IMG_MISSING
   // recuerda qué fases ya fallaron para no reintentar la misma URL rota en
   // cada poll (evita spam de requests fallidos).
+  // cataclysmActive (booleano, leído de pending_attack_key === 'cataclismo'
+  // en renderBoss) cambia la imagen a assets/halloween/cataclismo.webp
+  // mientras dure; al desaparecer pending_attack_key vuelve sola a la
+  // imagen de la fase actual en el siguiente poll -- puramente visual, el
+  // backend sigue siendo el único que resuelve Cataclismo.
   var HERO_IMG_MISSING = {};
-  function updateBossImg(phase) {
+  function updateBossImg(phase, cataclysmActive) {
     var img = $('hw26BossImg');
     if (!img) return;
     var fallback = img.getAttribute('data-fallback') || img.src;
-    var wanted = '../assets/halloween/heraldo-fase' + (phase === 2 ? 2 : 1) + '.webp';
+    var wanted = cataclysmActive
+      ? '../assets/halloween/cataclismo.webp'
+      : '../assets/halloween/heraldo-fase' + (phase === 2 ? 2 : 1) + '.webp';
 
     if (HERO_IMG_MISSING[wanted]) {
       if (img.getAttribute('src') !== fallback) img.src = fallback;
@@ -499,6 +506,7 @@
     };
     img.setAttribute('data-hero-src', wanted);
     img.src = wanted;
+    img.alt = cataclysmActive ? 'La Heraldo prepara Cataclismo' : 'La Heraldo';
   }
 
   function renderBoss(state) {
@@ -510,9 +518,17 @@
     // que esto ya muestra Fase I sin necesitar un caso especial aquí.
     var phase = state.boss_phase === 2 ? 2 : 1;
 
+    // Cataclismo activo = presentación especial temporal (imagen +
+    // ambiente), leído del mismo campo que ya usa renderCataclysm() para
+    // el bloque de alerta y el countdown. Nunca decide si Cataclismo
+    // "ocurrió" ni cuándo termina -- solo refleja lo que ya viene del
+    // backend/mock en pending_attack_key.
+    var isCataclysm = state.pending_attack_key === 'cataclismo';
+
     boss.setAttribute('data-phase', String(phase));
     boss.setAttribute('data-eventstatus', state.status || 'scheduled');
     boss.setAttribute('data-outcome', state.outcome || 'none');
+    boss.setAttribute('data-cataclysm', isCataclysm ? '1' : '0');
 
     var badge = $('hw26PhaseBadge');
     var phaseText = $('hw26PhaseText');
@@ -523,7 +539,7 @@
       if (badge) badge.textContent = 'FASE I';
       if (phaseText) phaseText.textContent = 'FASE I — FORMA SELLADA';
     }
-    updateBossImg(phase);
+    updateBossImg(phase, isCataclysm);
 
     // Transición 1 -> 2 detectada entre dos polls en la misma sesión.
     if (prevBossPhase != null && prevBossPhase === 1 && phase === 2) {
