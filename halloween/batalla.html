@@ -15,10 +15,14 @@
   <link rel="stylesheet" href="../css/halloween-2026.css"/>
 </head>
 <!-- data-halloween-page="battle": le dice a js/halloween-2026.js (el router
-     compartido) que esta página solo necesita halloween_2026_get_public_state()
-     y, opcionalmente, halloween_2026_get_public_effects() -- no carga ni
-     pollea participación, misiones ni feed. data-testmode="true" activa la
-     barra de pruebas (mock visual, nunca escribe en Supabase). -->
+     compartido) que esta página necesita halloween_2026_get_public_state(),
+     halloween_2026_get_public_effects() y, desde la cola de movimientos en
+     vivo, también halloween_2026_get_public_feed(30) -- mismo RPC/campos
+     que ya usa Crónicas, en el mismo ciclo de poll de 5s (sin setInterval
+     nuevo). No carga ni pollea participación ni misiones. El frontend
+     nunca calcula daño/curación: solo representa los deltas que ya vienen
+     en cada log. data-testmode="true" activa la barra de pruebas (mock
+     visual, nunca escribe en Supabase). -->
 <body data-halloween-page="battle" data-testmode="true">
 
   <div class="v3-page">
@@ -56,10 +60,23 @@
           <option value="herald_victory">Mock: victoria La Heraldo</option>
         </select>
         <label><input type="checkbox" id="hw26DevRole"/> Simular usuario con rol</label>
+        <!-- Botones de prueba de la cola de movimientos: inyectan UN log
+             sintético (id único por click) directo a la cola visual, sin
+             tocar loadFeed()/Supabase -- puramente para probar que cada
+             tipo de movimiento se ve bien y que la cola no se superpone.
+             Ver MOVE_TEST_ITEMS / wireDevBar() en el JS. -->
+        <div class="hw26-devbar-moves">
+          <span class="hw26-devbar-label" style="margin:0;">Movimiento</span>
+          <button type="button" data-move-test="geo_hit">Geo Army ataca</button>
+          <button type="button" data-move-test="boss_hit">Morvanna ataca</button>
+          <button type="button" data-move-test="heal">Curación</button>
+          <button type="button" data-move-test="buff">Buff</button>
+          <button type="button" data-move-test="debuff">Debuff</button>
+          <button type="button" data-move-test="drain">Drenaje</button>
+        </div>
       </div>
 
       <div class="hw26-page-head">
-        <div class="hw26-page-icon">🐺</div>
         <div class="hw26-page-eyebrow">Halloween 2026 · Mundo 02</div>
         <div class="hw26-page-title">BATALLA CONTRA LA HERALDO</div>
         <div class="hw26-page-sub">El sello de La Heraldo y la resistencia de Geo Army, en tiempo real.</div>
@@ -88,12 +105,17 @@
                   <div class="hw26-bar hw26-bar-boss"><div class="hw26-bar-fill" id="hw26BossHpFill" style="width:100%"></div></div>
                 </div>
 
-                <div class="hw26-bar-block">
+                <div class="hw26-bar-block" id="hw26GeoBarBlock">
                   <div class="hw26-bar-label">
                     <span>RESISTENCIA GEO ARMY</span>
                     <span id="hw26GeoHpText">100,000 / 100,000 HP</span>
                   </div>
                   <div class="hw26-bar hw26-bar-geo"><div class="hw26-bar-fill" id="hw26GeoHpFill" style="width:100%"></div></div>
+                  <!-- Movimiento del lado Geo Army: ataques de La Heraldo,
+                       curaciones y anuncios de buff/debuff -- ver
+                       playGeoHit()/playHeal()/playEffectAnnounce() en el
+                       JS. Overlay transitorio, nunca empuja el layout. -->
+                  <div class="hw26-move-zone hw26-move-zone-geo" id="hw26MoveGeo" aria-hidden="true"></div>
                 </div>
 
                 <div class="hw26-boss-status">
@@ -122,6 +144,15 @@
                 <img src="../world-02-halloween-v2.png"
                      data-fallback="../world-02-halloween-v2.png"
                      alt="La Heraldo" class="hw26-boss-img" id="hw26BossImg"/>
+                <!-- Flash breve blanco/violeta cuando Geo Army golpea a
+                     Morvanna -- distinto del flash de transición de fase
+                     de abajo (ese tiene su propio texto/timing fijo). Ver
+                     playBossHit() en el JS. -->
+                <div class="hw26-boss-hit-flash" id="hw26BossHitFlash" aria-hidden="true"></div>
+                <!-- Movimiento del lado Morvanna: nombre del ataque de Geo
+                     Army + daño, y el paso "energía llegando" de los
+                     drenajes -- ver playBossHit()/playDrain() en el JS. -->
+                <div class="hw26-move-zone hw26-move-zone-boss" id="hw26MoveBoss" aria-hidden="true"></div>
                 <!-- Overlay de transición de fase (1 → 2 en la misma
                      sesión): flash + texto "EL SELLO SE HA ROTO", puramente
                      visual, ver triggerPhaseTransition() en el JS. -->
@@ -130,6 +161,12 @@
             </div>
           </div>
         </div>
+
+        <!-- Último movimiento: línea discreta (no una tarjeta), para quien
+             entra tarde o se perdió la animación -- ver renderLastMove()
+             en el JS. Muestra el último log animable confirmado por
+             backend, nunca un feed completo. -->
+        <div class="hw26-last-move" id="hw26LastMove" hidden></div>
       </div>
 
       <div class="hw26-error" id="hw26GlobalError" hidden></div>
