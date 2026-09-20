@@ -649,12 +649,22 @@
     '</div>';
   }
 
+  // Alimenta la tarjeta "EFECTOS" de la franja de apoyo debajo del hero,
+  // con los mismos datos que ya carga initBattlePage() -- sin RPC nueva ni
+  // polling adicional. A diferencia de las otras 3 tarjetas (teasers
+  // estáticos), esta sí muestra estado real.
   function renderBattleEffects() {
-    var box = $('hw26BattleEffects');
+    var box = $('hw26SupportEffectsBody');
     if (!box) return;
-    if (lastEffects == null || !lastEffects.length) { box.hidden = true; box.innerHTML = ''; return; }
-    box.hidden = false;
-    box.innerHTML = '<div class="hw26-battle-effects-title">Efectos activos</div>' + lastEffects.map(effectCardHtml).join('');
+    if (lastEffects == null) {
+      box.innerHTML = '<span class="hw26-support-text">Efectos no disponibles ahora.</span>';
+      return;
+    }
+    if (!lastEffects.length) {
+      box.innerHTML = '<span class="hw26-support-text hw26-support-text-muted">Ningún efecto activo ahora mismo.</span>';
+      return;
+    }
+    box.innerHTML = lastEffects.slice(0, 3).map(effectCardHtml).join('');
   }
 
   function initBattlePage() {
