@@ -198,6 +198,18 @@
   margin-left: auto;
   margin-right: auto;
 }
+/* Línea secundaria discreta bajo .hw26-page-sub (p.ej. "Nuevos contratos:
+   martes · jueves · sábado" en Contratos) -- genérica, cualquier página
+   dedicada puede usarla. */
+.hw26-page-note {
+  margin-top: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--hw26-text-faint);
+}
 
 .hw26-page-content {
   background:
@@ -1032,44 +1044,135 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
 
 /* ---------------------------------------------------------------------
    4) Contratos (halloween/contratos.html)
+   ---------------------------------------------------------------------
+   Página de misiones gótica/cinematográfica: agrupada por día real
+   (mission_day), cada contrato es una tarjeta con una identidad de
+   categoría MUY sutil (franja superior + color del rótulo, nunca un
+   repintado completo de la card) y un tratamiento de estado marcado
+   (ACTIVE domina, UPCOMING apagado, ENDED atenuado). Sin dashboard
+   genérico: nada de iconos de check, barras de progreso ni botones de
+   acción -- la verificación es server-side, esta página es solo lectura.
 --------------------------------------------------------------------- */
-.hw26-mission-group-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--hw26-orange);
-  margin: 16px 0 8px;
-}
-.hw26-mission-group-title:first-child { margin-top: 0; }
-.hw26-mission-card {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.03);
-}
-.hw26-mission-card[data-status="active"] {
-  border-color: rgba(212, 175, 55, 0.55);
-  background: rgba(212, 175, 55, 0.08);
-  box-shadow: 0 0 18px -8px rgba(212, 175, 55, 0.5);
-}
-.hw26-mission-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
-.hw26-mission-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.88rem; }
-.hw26-mission-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin: 4px 0 8px; }
-.hw26-mission-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; }
-.hw26-mission-dmg { color: var(--hw26-red); font-weight: 700; }
-.hw26-mission-badge {
-  font-size: 0.64rem;
+/* Colores de categoría -- identidad sutil, no repintan la tarjeta entera:
+   Fortnite = violeta/azul, Overwatch = ámbar/naranja oscuro,
+   Stream/Community = rojo/violeta. Una sola variable por card
+   (--hw26-cat-color) que solo tiñe la franja superior y el rótulo. */
+.hw26-mission-card[data-category="fortnite"] { --hw26-cat-color: #8f7bff; }
+.hw26-mission-card[data-category="overwatch"] { --hw26-cat-color: #e0993d; }
+.hw26-mission-card[data-category="stream"] { --hw26-cat-color: #d6456f; }
+
+.hw26-mission-day-group { margin-bottom: 24px; }
+.hw26-mission-day-group:last-child { margin-bottom: 0; }
+.hw26-mission-day-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b98cf5;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(148, 92, 255, 0.18);
+}
+.hw26-mission-day-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.hw26-mission-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--hw26-cat-color, rgba(255, 255, 255, 0.18));
+  border-radius: 14px;
+  padding: 14px 16px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.hw26-mission-cat {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--hw26-cat-color, var(--hw26-text-faint));
+  margin-bottom: 5px;
+}
+.hw26-mission-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 6px 8px; }
+.hw26-mission-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.9rem; }
+.hw26-mission-desc { font-size: 0.78rem; color: var(--hw26-text-dim); margin: 4px 0 10px; }
+.hw26-mission-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 10px; font-size: 0.7rem; }
+.hw26-mission-dmg { color: var(--hw26-red); font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+.hw26-mission-window { color: var(--hw26-text-faint); letter-spacing: 0.03em; white-space: nowrap; }
+.hw26-mission-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   padding: 3px 9px;
   border-radius: 999px;
   white-space: nowrap;
 }
-.hw26-mission-badge.upcoming { background: rgba(255,255,255,.08); color: var(--hw26-text-dim); }
-.hw26-mission-badge.active { background: rgba(212, 175, 55, 0.2); color: var(--hw26-gold); }
-.hw26-mission-badge.ended { background: rgba(255,255,255,.05); color: var(--hw26-text-faint); }
+
+/* ACTIVE -- el estado con más presencia: glow dorado, fondo levemente
+   realzado, badge sólido. La franja/rótulo de categoría se mantiene
+   (identidad general única, el estado es lo que domina). */
+.hw26-mission-card[data-status="active"] {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(212, 175, 55, 0.14), transparent 60%),
+    rgba(255, 255, 255, 0.045);
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 22px -9px rgba(212, 175, 55, 0.55);
+}
+.hw26-mission-badge.active {
+  background: linear-gradient(135deg, var(--hw26-gold), #f3d375);
+  color: #1a0e00;
+}
+
+/* UPCOMING -- más apagado, sin glow. */
+.hw26-mission-card[data-status="upcoming"] { opacity: 0.8; }
+.hw26-mission-badge.upcoming { background: rgba(255, 255, 255, 0.07); color: var(--hw26-text-dim); }
+
+/* ENDED -- atenuado pero sigue legible como registro de octubre. */
+.hw26-mission-card[data-status="ended"] { opacity: 0.52; filter: grayscale(0.3); }
+.hw26-mission-badge.ended { background: rgba(255, 255, 255, 0.04); color: var(--hw26-text-faint); }
+
+/* CONTRATO FINAL (is_final_battle) -- mismo mecanismo, presentación
+   mucho más intensa: ocupa el ancho completo del grid del día, glow
+   rojo/violeta combinado y un rótulo propio. Nunca cambia mecánicas,
+   solo la vitrina. */
+.hw26-mission-card-final {
+  grid-column: 1 / -1;
+  padding-top: 34px;
+  border-color: rgba(220, 38, 38, 0.55);
+  background:
+    radial-gradient(140% 160% at 50% 0%, rgba(220, 38, 38, 0.18), transparent 60%),
+    radial-gradient(120% 120% at 100% 100%, rgba(124, 58, 237, 0.18), transparent 55%),
+    rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 34px -10px rgba(220, 38, 38, 0.55), 0 0 50px -18px rgba(124, 58, 237, 0.5);
+}
+.hw26-mission-final-tag {
+  position: absolute;
+  top: 10px;
+  left: 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: #ffe8e8;
+  background: linear-gradient(135deg, var(--hw26-red), var(--hw26-violet));
+  padding: 3px 11px;
+  border-radius: 999px;
+  box-shadow: 0 0 16px -2px rgba(220, 38, 38, 0.7);
+}
+.hw26-mission-card-final .hw26-mission-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.02rem;
+  text-shadow: 0 0 16px rgba(220, 38, 38, 0.5);
+}
+.hw26-mission-card-final .hw26-mission-dmg { color: #ff8a8a; }
+
+@media (max-width: 759px) {
+  .hw26-mission-day-grid { grid-template-columns: 1fr; }
+}
 
 /* ---------------------------------------------------------------------
    5) Efectos (halloween/efectos.html)
@@ -1159,6 +1262,7 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   max-width: 340px;
   margin: 0 auto;
 }
+.hw26-empty-sub + .hw26-empty-sub { margin-top: 4px; }
 .hw26-empty-state-error .hw26-empty-icon { filter: none; color: #ffb4b4; opacity: 0.85; }
 .hw26-empty-state-error .hw26-empty-title { color: #ffd0d0; }
 
