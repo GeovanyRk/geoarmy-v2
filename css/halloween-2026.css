@@ -57,6 +57,7 @@
 /* ---------------------------------------------------------------------
    Barra de pruebas (SOLO test mode) — franja discreta arriba de todo
 --------------------------------------------------------------------- */
+.hw26-devbar[hidden] { display: none; } /* mismo bugfix que .hw26-modal-overlay -- ver nota ahí */
 .hw26-devbar {
   display: flex;
   flex-wrap: wrap;
@@ -421,6 +422,13 @@
   justify-content: center;
   padding: 20px;
 }
+/* BUGFIX: sin esta línea, [hidden] (regla del navegador, display:none)
+   empata en especificidad con la clase de arriba y pierde -- el overlay
+   se queda "display:flex" para siempre aunque overlay.hidden=true se
+   ponga por JS (closeModal()), tanto al cargar la página como al pulsar
+   la X. Esta regla, con mayor especificidad (clase + atributo), es la
+   que de verdad lo oculta. */
+.hw26-modal-overlay[hidden] { display: none; }
 .hw26-modal {
   position: relative;
   width: 100%;
