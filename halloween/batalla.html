@@ -65,15 +65,9 @@
         <div class="hw26-page-sub">El sello de La Heraldo y la resistencia de Geo Army, en tiempo real.</div>
       </div>
 
-      <div class="hw26-page-content">
+      <div class="hw26-page-content hw26-page-content-hero">
         <div class="hw26-boss" id="hw26Boss" data-phase="1" data-eventstatus="scheduled" data-outcome="none">
           <div class="hw26-boss-frame">
-            <div class="hw26-boss-cataclysm" id="hw26Cataclysm" hidden>
-              <div class="hw26-cataclysm-title">⚠ LA HERALDO PREPARA CATACLISMO</div>
-              <div class="hw26-cataclysm-timer" id="hw26CataclysmTimer">00:00</div>
-              <div class="hw26-cataclysm-sub">PREPAREN LAS DEFENSAS.</div>
-            </div>
-
             <!-- Panel "boss battle" de dos columnas: en escritorio, texto +
                  barras a la izquierda e imagen grande de La Heraldo a la
                  derecha (fila con flexbox); en mobile se invierte solo con
@@ -103,6 +97,17 @@
                   <span class="hw26-status-badge" id="hw26StatusBadge">CARGANDO…</span>
                   <span class="hw26-status-detail" id="hw26StatusDetail"></span>
                 </div>
+
+                <!-- Cataclismo / pending attack: vive en la columna de
+                     información (como pide el nuevo layout), autocontenido
+                     así que se ve bien lo mismo aquí que si algún día se
+                     reposiciona. Oculto por defecto, JS lo muestra/oculta
+                     según pending_attack_key. -->
+                <div class="hw26-boss-cataclysm" id="hw26Cataclysm" hidden>
+                  <div class="hw26-cataclysm-title">⚠ LA HERALDO PREPARA CATACLISMO</div>
+                  <div class="hw26-cataclysm-timer" id="hw26CataclysmTimer">00:00</div>
+                  <div class="hw26-cataclysm-sub">PREPAREN LAS DEFENSAS.</div>
+                </div>
               </div>
 
               <div class="hw26-boss-art">
@@ -123,9 +128,42 @@
           </div>
         </div>
 
-        <!-- Sección compacta y opcional de efectos activos -- se oculta sola
-             si no hay ninguno. Nada de tarjetas extra ni segundo dashboard. -->
-        <div class="hw26-battle-effects" id="hw26BattleEffects" hidden></div>
+        <!-- Franja de apoyo debajo del hero: 4 bloques temáticos con CTA a
+             las páginas hermanas. Rol/Contratos/Crónicas son teasers
+             estáticos (sin RPC nueva, sin polling extra); Efectos reutiliza
+             los datos que esta página YA carga (loadEffects(), sin cambios
+             de lógica) para mostrar la lista real. -->
+        <div class="hw26-battle-support">
+          <div class="hw26-support-eyebrow">Apoyo a la batalla</div>
+          <div class="hw26-support-grid">
+            <a href="rol.html" class="hw26-support-card">
+              <span class="hw26-support-icon">⚔</span>
+              <span class="hw26-support-title">ROL</span>
+              <span class="hw26-support-text">Elige tu bando: Atacante, Soporte o Defensor.</span>
+              <span class="hw26-support-cta">Ver rol →</span>
+            </a>
+            <a href="contratos.html" class="hw26-support-card">
+              <span class="hw26-support-icon">📜</span>
+              <span class="hw26-support-title">CONTRATOS</span>
+              <span class="hw26-support-text">Misiones de Fortnite, Overwatch y stream que dañan a La Heraldo.</span>
+              <span class="hw26-support-cta">Ver contratos →</span>
+            </a>
+            <div class="hw26-support-card hw26-support-card-live" id="hw26SupportEffects">
+              <span class="hw26-support-icon">🔮</span>
+              <span class="hw26-support-title">EFECTOS</span>
+              <div class="hw26-support-live" id="hw26SupportEffectsBody">
+                <span class="hw26-support-text">Cargando…</span>
+              </div>
+              <a href="efectos.html" class="hw26-support-cta">Ver todos →</a>
+            </div>
+            <a href="cronicas.html" class="hw26-support-card">
+              <span class="hw26-support-icon">📖</span>
+              <span class="hw26-support-title">CRÓNICAS</span>
+              <span class="hw26-support-text">El registro de todo lo que ha pasado en la batalla.</span>
+              <span class="hw26-support-cta">Ver crónicas →</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       <div class="hw26-error" id="hw26GlobalError" hidden></div>
