@@ -457,6 +457,59 @@
   })();
   </script>
   <script>
+  // =====================================================================
+  // HALLOWEEN 2026 — OVERRIDE VISUAL DE TEST: ?hw_unlock=1
+  // SOLO existe en index-halloween-test.html (esta copia). NO se agrega a
+  // index.html de producción.
+  //
+  // Qué hace: si la URL trae ?hw_unlock=1, agrega la MISMA clase
+  // "is-unlocked" que el countdown real de arriba agrega solo cuando la
+  // fecha real (data-unlock-iso) ya pasó. Esa clase ya controla, sin tocar
+  // nada más:
+  //   - ocultar el tinte oscuro y el candado del planeta (regla existente
+  //     en css/v3-theme.css: .v3-wl-halloween.is-unlocked .v3-wl-tint /
+  //     .v3-wl-lockbadge)
+  //   - quitar la atenuación/bloqueo (opacity, pointer-events:none) de los
+  //     4 pins secundarios y ocultar su candadito (reglas nuevas en
+  //     css/halloween-2026.css: .v3-wl-halloween:not(.is-unlocked)
+  //     .hw26-pin-locked / .is-unlocked ... .hw26-pin-lock)
+  //   - ocultar la insignia "Programada" del pin de Batalla
+  // Es decir: los 5 pins quedan clickeables sin escribir ni una sola línea
+  // de CSS nueva, reutilizando exactamente las reglas que ya existían para
+  // el desbloqueo real.
+  //
+  // Además reemplaza el texto del countdown visual (D:H:M:S) por un aviso
+  // "MODO PRUEBA" para que sea imposible confundirlo con un desbloqueo real
+  // -- el timer real de arriba sigue corriendo internamente (sobre nodos ya
+  // desconectados del DOM tras este reemplazo), sin efecto visible y sin
+  // volver a pisar este aviso.
+  //
+  // Lo que este bloque NUNCA hace:
+  //   - no llama ninguna RPC de Supabase (ni de lectura ni de escritura)
+  //   - no toca data-unlock-iso ni la fecha real (1 OCT · 7:00 PM ET)
+  //   - no cambia el status del evento en el backend, que sigue
+  //     "scheduled" hasta que la fecha real llegue
+  // Sin el parámetro (o con cualquier otro valor), esta página se comporta
+  // exactamente igual que antes: planeta bloqueado, countdown real, pins
+  // secundarios atenuados/bloqueados hasta el 1 de octubre.
+  // =====================================================================
+  (function () {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('hw_unlock') !== '1') return; // sin el parámetro, cero cambios
+
+      var wrap = document.getElementById('wlHalloween');
+      if (!wrap) return;
+      wrap.classList.add('is-unlocked');
+
+      var countdownBox = document.getElementById('wlHalloweenCountdown');
+      if (countdownBox) {
+        countdownBox.innerHTML = '<span class="v3-wl-available">¡Disponible! (MODO PRUEBA)</span>';
+      }
+    } catch (e) { console.warn('[hw26-test-unlock]', e); }
+  })();
+  </script>
+  <script>
   // ===== V3: conecta los marcadores del planeta con el sistema de paneles =====
   // (el nav real .nav-links está oculto y sigue funcionando para móvil/JS;
   // este bloque solo replica "activar panel" para los marcadores visibles)
