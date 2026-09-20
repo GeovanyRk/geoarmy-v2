@@ -67,11 +67,16 @@
   // secundario de ambientación (en vez de una caja gigante con una sola
   // línea). genericErrorHtml conserva su firma de un solo mensaje pero
   // usa la misma estructura visual con un icono de advertencia.
+  // sub acepta un string (una sola línea, comportamiento de siempre) o un
+  // array de strings (varias líneas de ambientación, cada una escapada por
+  // separado) -- Contratos usa 2 líneas en su estado vacío; el resto de
+  // páginas sigue pasando un string y no cambia nada.
   function emptyStateHtml(icon, title, sub) {
+    var subLines = Array.isArray(sub) ? sub : (sub ? [sub] : []);
     return '<div class="hw26-empty-state">' +
       '<div class="hw26-empty-icon">' + icon + '</div>' +
       '<div class="hw26-empty-title">' + esc(title) + '</div>' +
-      (sub ? '<div class="hw26-empty-sub">' + esc(sub) + '</div>' : '') +
+      subLines.map(function (line) { return '<div class="hw26-empty-sub">' + esc(line) + '</div>'; }).join('') +
     '</div>';
   }
   function genericErrorHtml(msg) {
@@ -271,14 +276,37 @@
   }
 
   // Escenarios MOCK exclusivos para revisar el diseño de Contratos con
-  // contenido real de ejemplo (contratos_empty / contratos_upcoming /
-  // contratos_active). Puramente visuales: NUNCA escriben en Supabase, y
-  // cuando exista la RPC/tabla real de contratos se usará exclusivamente
-  // halloween_2026_get_public_missions() sin pasar por aquí.
+  // contenido de ejemplo (contratos_empty / contratos_upcoming /
+  // contratos_active / contratos_mixed / contrato_final). Puramente
+  // visuales: NUNCA escriben en Supabase. La fuente real es exclusivamente
+  // halloween_2026_get_public_missions() -- estos mocks nunca se usan si
+  // ese escenario no está seleccionado, y con "RPC real (Supabase)" jamás
+  // se generan contratos falsos (lastMissions vacío = estado vacío real).
   function mockMissionsContratos(scenario) {
     if (scenario === 'contratos_empty') return [];
+
+    if (scenario === 'contratos_mixed') {
+      // Un ended, un active, un upcoming, categorías distintas, repartidos
+      // en 2 días distintos -- para revisar agrupado por día/fecha Y el
+      // layout de 2 columnas en escritorio cuando un día tiene varios.
+      return [
+        { mission_id: 201, mission_key: 'stream_ecos_pasado', category: 'stream', title: 'ECOS DEL PASADO', description: 'Contrato ya cerrado -- queda como registro de octubre.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 4000, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 202, mission_key: 'fn_caceria_abismo', category: 'fortnite', title: 'CACERÍA DEL ABISMO', description: 'Elimina 5 enemigos usando tu code de Geo Army en la tienda de Fortnite y compártelo en el chat.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 2 },
+        { mission_id: 203, mission_key: 'ow_guardia_hielo', category: 'overwatch', title: 'GUARDIA DE HIELO', description: 'Gana 3 partidas en modo competitivo durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 1 },
+        { mission_id: 204, mission_key: 'stream_llamado_comunidad', category: 'stream', title: 'LLAMADO DE LA COMUNIDAD', description: 'Meta comunitaria de suscripciones durante la semana.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 2 },
+      ];
+    }
+
+    if (scenario === 'contrato_final') {
+      // Solo el contrato final, activo, para revisar su tratamiento
+      // especial (is_final_battle) sin mezclarlo con otros contratos.
+      return [
+        { mission_id: 301, mission_key: 'fn_asalto_final', category: 'fortnite', title: 'ASALTO FINAL A LA HERALDO', description: 'El último contrato de Halloween 2026 -- se abre solo el 31 de octubre.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: true, boss_damage: 50000, verification_mode: 'clip', sort_order: 1 },
+      ];
+    }
+
     var base = [
-      { mission_id: 101, mission_key: 'fn_caza_nocturna', category: 'fortnite', title: 'CAZA NOCTURNA', description: 'Elimina 5 enemigos', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 5000, verification_mode: 'clip', sort_order: 1 },
+      { mission_id: 101, mission_key: 'fn_caceria_abismo', category: 'fortnite', title: 'CACERÍA DEL ABISMO', description: 'Elimina 5 enemigos usando tu code de Geo Army en la tienda de Fortnite y compártelo en el chat.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 1 },
       { mission_id: 102, mission_key: 'ow_sin_escapatoria', category: 'overwatch', title: 'SIN ESCAPATORIA', description: 'Gana 2 partidas', mission_day: '2026-10-18', opens_at: '2026-10-18T00:00:00-04:00', closes_at: '2026-10-18T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 2 },
       { mission_id: 103, mission_key: 'stream_ritual_comunidad', category: 'stream', title: 'RITUAL DE LA COMUNIDAD', description: 'Meta comunitaria', mission_day: '2026-10-24', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 15000, verification_mode: 'manual', sort_order: 3 },
     ];
@@ -325,7 +353,9 @@
         if (currentScenario === 'feed_active') return mockFeedActive();
         return mockFeed(currentScenario);
       case 'halloween_2026_get_public_missions':
-        if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' || currentScenario === 'contratos_active') {
+        if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' ||
+            currentScenario === 'contratos_active' || currentScenario === 'contratos_mixed' ||
+            currentScenario === 'contrato_final') {
           return mockMissionsContratos(currentScenario);
         }
         return mockMissions(currentScenario);
@@ -1216,40 +1246,135 @@
   // ---------------------------------------------------------------------
   // 7) PÁGINA "missions" (halloween/contratos.html)
   // ---------------------------------------------------------------------
+  // Contrato REAL verificado de halloween_2026_get_public_missions():
+  // mission_id, mission_key, category, title, description, mission_day,
+  // opens_at, closes_at, availability ('upcoming'|'active'|'ended'),
+  // is_final_battle, boss_damage, verification_mode, sort_order.
+  // mission_id/mission_key/verification_mode son detalles técnicos --
+  // NUNCA se muestran al usuario. No hay botones de "Completar"/"Enviar
+  // evidencia"/"Subir"/"Aprobar": la verificación es server-side/oficial,
+  // esta página es SOLO lectura. Cuando el backend confirme un contrato
+  // (mission completion -> mission_damage), Batalla ya sabe representar
+  // ese entry_type en su cola de movimientos -- esta página no necesita
+  // ningún cambio para eso, solo muestra el catálogo de contratos.
   var MISSION_CATEGORY_LABEL = { fortnite: 'FORTNITE', overwatch: 'OVERWATCH', stream: 'STREAM' };
-  var MISSION_STATUS_LABEL = { upcoming: 'PRÓXIMO', active: 'ACTIVO', ended: 'TERMINADO' };
+  var MISSION_STATUS_LABEL = { upcoming: 'PRÓXIMAMENTE', active: 'CONTRATO ACTIVO', ended: 'FINALIZADO' };
+  var MISSION_WEEKDAY_ES = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+  var MISSION_MONTH_ES = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
+  // "2026-10-06" -> "MARTES 6 DE OCTUBRE" -- título del grupo del día.
+  // Mediodía fijo al parsear para no correrse de día por zona horaria
+  // (mission_day es una fecha del calendario, no un instante). Si el
+  // formato no es el esperado, se muestra el valor tal cual (sin inventar).
+  function missionDayLabel(dayStr) {
+    if (!dayStr) return 'FECHA POR CONFIRMAR';
+    var d = new Date(dayStr + 'T12:00:00');
+    if (isNaN(d.getTime())) return esc(dayStr);
+    return MISSION_WEEKDAY_ES[d.getDay()] + ' ' + d.getDate() + ' DE ' + MISSION_MONTH_ES[d.getMonth()];
+  }
+
+  // Fecha+hora corta legible a partir de un timestamp real
+  // (opens_at/closes_at) -- nunca inventa una hora si el dato no llega.
+  function missionShortDateTime(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    var datePart = '', timePart = '';
+    try { datePart = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }); } catch (e) {}
+    try { timePart = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+    return (datePart + (timePart ? ' · ' + timePart : '')).toUpperCase();
+  }
+
+  // Ventana mostrada según el estado real: upcoming -> cuándo abre
+  // (opens_at), active -> hasta cuándo sigue abierto (closes_at), ended ->
+  // cuándo cerró (closes_at). Nunca calcula ni inventa una fecha que no
+  // venga del backend.
+  function missionWindowText(m) {
+    if (m.availability === 'upcoming') {
+      var opens = missionShortDateTime(m.opens_at);
+      return opens ? ('ABRE ' + opens) : 'PRÓXIMAMENTE';
+    }
+    if (m.availability === 'ended') {
+      var closed = missionShortDateTime(m.closes_at);
+      return closed ? ('CERRÓ ' + closed) : 'FINALIZADO';
+    }
+    var closes = missionShortDateTime(m.closes_at);
+    return closes ? ('HASTA ' + closes) : 'CONTRATO ACTIVO';
+  }
+
+  function missionDamageText(dmg) {
+    return '−' + fmtNum(dmg) + ' HP A LA HERALDO';
+  }
+
+  // Orden pedido: mission_day asc, luego sort_order asc, luego opens_at
+  // asc -- así el agrupado por día queda cronológico incluso si el backend
+  // no devuelve los contratos ya ordenados.
+  function missionSort(a, b) {
+    var da = a.mission_day || '', db = b.mission_day || '';
+    if (da !== db) return da < db ? -1 : 1;
+    var sa = a.sort_order || 0, sb = b.sort_order || 0;
+    if (sa !== sb) return sa - sb;
+    var oa = a.opens_at || '', ob = b.opens_at || '';
+    if (oa !== ob) return oa < ob ? -1 : 1;
+    return 0;
+  }
+
+  function missionCardHtml(m) {
+    var isFinal = m.is_final_battle === true;
+    var catLabel = MISSION_CATEGORY_LABEL[m.category] || String(m.category || '').toUpperCase();
+    var statusLabel = MISSION_STATUS_LABEL[m.availability] || String(m.availability || '').toUpperCase();
+    return '<div class="hw26-mission-card' + (isFinal ? ' hw26-mission-card-final' : '') + '" data-status="' + esc(m.availability) + '" data-category="' + esc(m.category || '') + '">' +
+      (isFinal ? '<div class="hw26-mission-final-tag">⚔ CONTRATO FINAL</div>' : '') +
+      '<div class="hw26-mission-cat">' + esc(catLabel) + '</div>' +
+      '<div class="hw26-mission-top">' +
+        '<div class="hw26-mission-title">' + esc(m.title) + '</div>' +
+        '<span class="hw26-mission-badge ' + esc(m.availability) + '">' + esc(statusLabel) + '</span>' +
+      '</div>' +
+      '<div class="hw26-mission-desc">' + esc(m.description || '') + '</div>' +
+      '<div class="hw26-mission-meta">' +
+        '<span class="hw26-mission-dmg">' + missionDamageText(m.boss_damage) + '</span>' +
+        '<span class="hw26-mission-window">' + esc(missionWindowText(m)) + '</span>' +
+      '</div>' +
+    '</div>';
+  }
 
   function renderMissionsPage() {
     var box = $('hw26MissionsContent');
     if (!box) return;
     if (lastMissions == null) { box.innerHTML = genericErrorHtml('Contratos temporalmente no disponibles.'); return; }
-    if (!lastMissions.length) { box.innerHTML = emptyStateHtml('📜', 'SIN CONTRATOS ACTIVOS', 'Todavía no hay contratos publicados.'); return; }
+    // Estado vacío real (nunca contratos falsos aquí -- si la RPC real
+    // devuelve [], esto es exactamente lo que se muestra).
+    if (!lastMissions.length) {
+      box.innerHTML = emptyStateHtml('📜', 'SIN CONTRATOS DISPONIBLES', [
+        'Morvanna guarda silencio... por ahora.',
+        'Los contratos aparecen martes, jueves y sábados.',
+      ]);
+      return;
+    }
 
-    var byCat = { fortnite: [], overwatch: [], stream: [] };
-    lastMissions.forEach(function (m) { (byCat[m.category] || (byCat[m.category] = [])).push(m); });
-
-    var html = '';
-    ['fortnite', 'overwatch', 'stream'].forEach(function (cat) {
-      var list = byCat[cat];
-      if (!list || !list.length) return;
-      html += '<div class="hw26-mission-group-title">' + (MISSION_CATEGORY_LABEL[cat] || cat.toUpperCase()) + '</div>';
-      list.sort(function (a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
-      list.forEach(function (m) {
-        html +=
-          '<div class="hw26-mission-card" data-status="' + esc(m.availability) + '">' +
-            '<div class="hw26-mission-top">' +
-              '<div class="hw26-mission-title">' + esc(m.title) + '</div>' +
-              '<span class="hw26-mission-badge ' + esc(m.availability) + '">' + (MISSION_STATUS_LABEL[m.availability] || m.availability) + '</span>' +
-            '</div>' +
-            '<div class="hw26-mission-desc">' + esc(m.description || '') + '</div>' +
-            '<div class="hw26-mission-meta">' +
-              '<span class="hw26-mission-dmg">' + fmtNum(m.boss_damage) + ' DAÑO</span>' +
-              '<span>' + esc(m.mission_day || '') + '</span>' +
-            '</div>' +
-          '</div>';
-      });
+    // Agrupado por mission_day, en el mismo orden cronológico del sort
+    // (mission_day -> sort_order -> opens_at) -- ya no se agrupa por
+    // categoría, la categoría ahora se distingue por card (ver CSS
+    // data-category).
+    var sorted = lastMissions.slice().sort(missionSort);
+    var days = [];
+    var byDay = {};
+    sorted.forEach(function (m) {
+      var key = m.mission_day || '';
+      if (!byDay[key]) { byDay[key] = { day: key, items: [] }; days.push(byDay[key]); }
+      byDay[key].items.push(m);
     });
-    box.innerHTML = html || emptyStateHtml('📜', 'SIN CONTRATOS ACTIVOS', 'Todavía no hay contratos publicados.');
+
+    var html = days.map(function (group) {
+      return '<div class="hw26-mission-day-group">' +
+        '<div class="hw26-mission-day-title">' + esc(missionDayLabel(group.day)) + '</div>' +
+        '<div class="hw26-mission-day-grid">' +
+          group.items.map(missionCardHtml).join('') +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    box.innerHTML = html;
   }
 
   function initMissionsPage() {
