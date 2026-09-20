@@ -69,6 +69,13 @@
   background: rgba(18, 10, 28, .9); border: 1px solid var(--hw26-violet-line);
   box-shadow: 0 0 18px rgba(124, 58, 237, .5), inset 0 0 0 1px rgba(0, 0, 0, .25);
   transition: transform .3s ease, box-shadow .3s ease;
+  overflow: hidden; /* recorta la imagen del pin de Batalla en círculo */
+}
+.hw26-pin-icon-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 30%;
+  border-radius: 50%;
+  display: block;
 }
 .hw26-pin-batalla .hw26-pin-icon {
   border-color: rgba(220, 38, 38, .55);
@@ -205,45 +212,74 @@
    Barra de pruebas (SOLO test mode) — franja discreta arriba del
    contenido de cada página dedicada
 --------------------------------------------------------------------- */
+/* Panel de pruebas compacto: en escritorio flota como una pequeña
+   herramienta fija arriba a la derecha (fuera del flujo normal, no
+   protagoniza la página) y en mobile vuelve a ser una franja estática
+   angosta arriba del contenido. Claramente "herramienta de desarrollo"
+   (naranja/discontinua), nunca parte del diseño de Halloween. */
 .hw26-devbar[hidden] { display: none; } /* ver nota histórica del bug de especificidad más abajo */
 .hw26-devbar {
+  position: fixed;
+  top: 78px;
+  right: 14px;
+  z-index: 50;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  background: rgba(249, 115, 22, 0.12);
-  border: 1px dashed rgba(249, 115, 22, 0.55);
-  border-radius: 12px;
-  padding: 8px 12px;
-  margin: 0 0 16px;
-  font-size: 0.78rem;
+  gap: 7px;
+  max-width: 240px;
+  background: rgba(20, 10, 4, 0.94);
+  border: 1px solid rgba(249, 115, 22, 0.5);
+  border-radius: 10px;
+  padding: 6px 9px;
+  font-size: 0.68rem;
   color: #ffd9b0;
+  box-shadow: 0 10px 26px -12px rgba(0, 0, 0, 0.8);
 }
 .hw26-devbar-label {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   background: var(--hw26-orange);
   color: #1a0e00;
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.58rem;
+  flex: 0 0 auto;
 }
 .hw26-devbar select,
 .hw26-devbar label {
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 0.66rem;
   color: #ffe6c8;
 }
 .hw26-devbar select {
   background: #1c1108;
   border: 1px solid rgba(249, 115, 22, 0.5);
   color: #ffe6c8;
-  border-radius: 8px;
-  padding: 4px 8px;
+  border-radius: 6px;
+  padding: 3px 5px;
+  max-width: 100%;
 }
-.hw26-devbar label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.hw26-devbar label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+
+/* Kill-switch de producción: agregar la clase "hw26-devtools-off" al
+   <body> oculta la barra de pruebas por completo, sin tocar markup ni
+   JS -- lista para cuando estas páginas dejen de ser de prueba. */
+.hw26-devtools-off .hw26-devbar { display: none !important; }
+
+@media (max-width: 640px) {
+  .hw26-devbar {
+    position: static;
+    top: auto;
+    right: auto;
+    max-width: none;
+    width: 100%;
+    margin: 0 0 16px;
+    box-shadow: none;
+  }
+}
 
 /* ---------------------------------------------------------------------
    2) Widget de La Heraldo — ahora vive en halloween/batalla.html
@@ -284,54 +320,127 @@
   50% { box-shadow: 0 22px 65px -18px rgba(220, 38, 38, 0.65); }
 }
 
-.hw26-boss-art {
-  position: relative;
-  width: 168px;
-  height: 168px;
-  margin: 0 auto 14px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid var(--hw26-violet-soft);
-  box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.08), 0 0 40px -6px rgba(124, 58, 237, 0.55);
-  background: #0a0510;
-  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+/* Panel "boss battle" de dos columnas. Mobile-first: column-reverse hace
+   que .hw26-boss-art (imagen, segunda en el HTML) aparezca PRIMERO
+   visualmente y .hw26-boss-info (texto/barras) después -- sin duplicar
+   markup. En escritorio se vuelve una fila: info a la izquierda, imagen
+   grande a la derecha. */
+.hw26-boss-layout {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 20px;
+  text-align: left;
 }
-.hw26-boss[data-phase="2"] .hw26-boss-art {
-  border-color: rgba(220, 38, 38, 0.65);
-  box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.1), 0 0 46px -4px rgba(220, 38, 38, 0.75);
+@media (min-width: 760px) {
+  .hw26-boss-layout {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 28px;
+  }
+  .hw26-boss-info { flex: 1 1 46%; display: flex; flex-direction: column; justify-content: center; }
+  .hw26-boss-art { flex: 1 1 54%; }
 }
-.hw26-boss-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Contenedor/clase lista para una imagen distinta de La Heraldo demoníaca
-     más adelante (.hw26-boss-img-demonic). Si solo hay imagen normal, se
-     usa como fallback -- ver js/halloween-2026.js. */
-  filter: saturate(1.05) contrast(1.05);
-}
-.hw26-boss[data-phase="2"] .hw26-boss-img {
-  filter: saturate(1.25) contrast(1.15) brightness(0.9) hue-rotate(-8deg);
-}
+
 .hw26-boss-badge {
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
+  display: inline-block;
+  align-self: flex-start;
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  padding: 4px 10px;
+  letter-spacing: 0.14em;
+  padding: 4px 11px;
   border-radius: 999px;
   background: linear-gradient(135deg, #3b1466, #1a0b2e);
   border: 1px solid rgba(148, 92, 255, 0.5);
   color: #e6d9ff;
   white-space: nowrap;
+  margin-bottom: 8px;
 }
 .hw26-boss[data-phase="2"] .hw26-boss-badge {
   background: linear-gradient(135deg, #5c0f14, #2a0508);
   border-color: rgba(220, 38, 38, 0.6);
   color: #ffd8d8;
+}
+
+/* Imagen grande de La Heraldo -- foco visual principal del widget. Nada de
+   avatar circular: panel rectangular con marco/glow temático, la imagen
+   ocupa todo el panel (object-fit: cover) para priorizar rostro/torso
+   según el recorte de cada archivo. */
+.hw26-boss-art {
+  position: relative;
+  min-height: 260px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid var(--hw26-violet-soft);
+  box-shadow: 0 0 0 6px rgba(124, 58, 237, 0.08), 0 0 44px -8px rgba(124, 58, 237, 0.55);
+  background: #0a0510;
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+@media (min-width: 760px) {
+  .hw26-boss-art { min-height: 380px; }
+}
+.hw26-boss[data-phase="2"] .hw26-boss-art {
+  border-color: rgba(220, 38, 38, 0.65);
+  box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.1), 0 0 52px -6px rgba(220, 38, 38, 0.75);
+}
+/* Viñeta suave para que la imagen se funda con el panel en vez de cortar
+   en seco -- "máscara suave", sin ocultar la imagen. */
+.hw26-boss-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10, 5, 16, 0) 60%, rgba(10, 5, 16, 0.55) 100%);
+}
+.hw26-boss-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%; /* prioriza rostro/torso/manos, no los pies */
+  display: block;
+  filter: saturate(1.05) contrast(1.05);
+  transition: filter 0.6s ease;
+}
+.hw26-boss[data-phase="2"] .hw26-boss-img {
+  filter: saturate(1.25) contrast(1.15) brightness(0.9) hue-rotate(-8deg);
+}
+
+/* Overlay de transición de fase 1 -> 2: flash + texto temporal, ver
+   triggerPhaseTransition() en js/halloween-2026.js. */
+.hw26-boss-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  color: #fff;
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.85), 0 0 34px rgba(220, 38, 38, 0.9);
+  background: radial-gradient(closest-side, rgba(220, 38, 38, 0.55), rgba(124, 58, 237, 0.4) 60%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.hw26-boss-flash.is-active { animation: hw26-phase-flash 1.8s ease forwards; }
+@keyframes hw26-phase-flash {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* Glow más dramático en todo el widget mientras dura la transición. */
+.hw26-boss.hw26-phase-transitioning .hw26-boss-frame {
+  animation: hw26-transition-glow 1.8s ease;
+}
+@keyframes hw26-transition-glow {
+  0% { box-shadow: none; }
+  20% { box-shadow: 0 0 60px -6px rgba(220, 38, 38, 0.85); }
+  100% { box-shadow: none; }
 }
 
 /* La Heraldo ya aparece como título de página ("BATALLA CONTRA LA
@@ -406,7 +515,7 @@
   margin-top: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
 }
 .hw26-status-badge {
@@ -708,16 +817,114 @@
 }
 
 /* ---------------------------------------------------------------------
+   Empty / error states compartidos (Contratos, Efectos, Crónicas) —
+   icono grande sutil + título + texto secundario de ambientación, en vez
+   de una caja gigante con una sola línea.
+--------------------------------------------------------------------- */
+.hw26-empty-state {
+  text-align: center;
+  padding: 40px 16px 36px;
+  color: var(--hw26-text-dim);
+}
+.hw26-empty-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+  margin-bottom: 10px;
+  opacity: 0.5;
+  filter: grayscale(0.2) drop-shadow(0 0 16px rgba(148, 92, 255, 0.35));
+}
+.hw26-empty-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--hw26-text);
+  margin-bottom: 6px;
+}
+.hw26-empty-sub {
+  font-size: 0.8rem;
+  color: var(--hw26-text-faint);
+  max-width: 340px;
+  margin: 0 auto;
+}
+.hw26-empty-state-error .hw26-empty-icon { filter: none; color: #ffb4b4; opacity: 0.85; }
+.hw26-empty-state-error .hw26-empty-title { color: #ffd0d0; }
+
+/* ---------------------------------------------------------------------
    6) Crónicas (halloween/cronicas.html)
 --------------------------------------------------------------------- */
+/* Registro de batalla, no una tabla: jerarquía hora pequeña -> texto del
+   evento -> daño destacado, con los eventos del boss (ataques, anuncios,
+   cambio de fase) marcados con más fuerza visual (borde/fondo/color). */
+.hw26-feed-list { display: flex; flex-direction: column; }
 .hw26-feed-item {
-  padding: 10px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 2px solid transparent;
   font-size: 0.84rem;
   color: var(--hw26-text);
+  transition: background 0.2s ease;
 }
 .hw26-feed-item:last-child { border-bottom: none; }
-.hw26-feed-time { display: block; font-size: 0.68rem; color: var(--hw26-text-faint); margin-top: 2px; }
-.hw26-feed-item[data-type="victory"],
-.hw26-feed-item[data-type="phase_change"] { color: var(--hw26-gold); font-weight: 600; }
-.hw26-feed-item[data-type="defeat"] { color: #ff8f8f; font-weight: 600; }
+.hw26-feed-time {
+  flex: 0 0 auto;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--hw26-text-faint);
+  min-width: 38px;
+}
+.hw26-feed-text { flex: 1 1 auto; line-height: 1.45; }
+.hw26-feed-dmg { color: var(--hw26-red); font-weight: 700; }
+.hw26-feed-dmg-boss { color: #ff8a5c; }
+.hw26-feed-heal { color: #7ee6b8; font-weight: 700; }
+
+/* Eventos "de boss" (ataques, anuncios, cambio de fase, derrota): más
+   agresivos visualmente que una entrada normal de la crónica. */
+.hw26-feed-item.is-boss-event {
+  border-left-color: rgba(220, 38, 38, 0.55);
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent 65%);
+}
+.hw26-feed-item[data-type="phase_change"] {
+  border-left-color: rgba(212, 175, 55, 0.65);
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.14), transparent 65%);
+}
+.hw26-feed-item[data-type="phase_change"] .hw26-feed-text,
+.hw26-feed-item[data-type="victory"] .hw26-feed-text { color: var(--hw26-gold); font-weight: 700; }
+.hw26-feed-item[data-type="defeat"] .hw26-feed-text { color: #ff8f8f; font-weight: 700; }
+.hw26-feed-item[data-type="boss_attack_announced"] .hw26-feed-text {
+  color: #ffb4b4;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------------
+   7) Altura / footer — SOLO en las 5 páginas Halloween
+   ---------------------------------------------------------------------
+   Selector estrictamente scoped a body[data-halloween-page]: estas reglas
+   NO pueden afectar nunca index.html, index-halloween-test.html ni
+   ninguna otra página del sitio, porque ningún otro <body> del sitio usa
+   este atributo. Layout flex + min-height (nada de alturas fijas), para
+   que el footer quede abajo en páginas con poco contenido sin romper
+   mobile.
+--------------------------------------------------------------------- */
+body[data-halloween-page] {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body[data-halloween-page] > .v3-page {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+body[data-halloween-page] > .v3-page > .hw26-page {
+  flex: 1 0 auto;
+  width: 100%;
+}
+body[data-halloween-page] > .footer {
+  flex-shrink: 0;
+}
