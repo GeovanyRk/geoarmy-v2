@@ -268,16 +268,23 @@
   function mockMissions(scenario) {
     var upcomingOnly = scenario === 'scheduled';
     return [
-      { mission_id: 1, mission_key: 'fn_eliminaciones', category: 'fortnite', title: 'Elimina 5 enemigos', description: 'Consigue 5 eliminaciones en una partida de Fortnite y compártelo en el chat.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: upcomingOnly ? 'upcoming' : 'active', is_final_battle: false, boss_damage: 5000, verification_mode: 'clip', sort_order: 1 },
+      { mission_id: 1, mission_key: 'fn_eliminaciones', category: 'fortnite', title: 'Elimina 5 enemigos', description: 'Consigue 5 eliminaciones en una partida de Fortnite durante el contrato.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: upcomingOnly ? 'upcoming' : 'active', is_final_battle: false, boss_damage: 5000, verification_mode: 'clip', sort_order: 1 },
       { mission_id: 2, mission_key: 'ow_victorias', category: 'overwatch', title: 'Gana 3 partidas', description: 'Consigue 3 victorias en Overwatch durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 6000, verification_mode: 'auto', sort_order: 2 },
-      { mission_id: 3, mission_key: 'stream_ritual_almas', category: 'stream', title: 'Ritual de las Almas', description: '20 miembros de Geo Army deben responder al llamado y activar el ritual durante el stream.', mission_day: '2026-10-10', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 3 },
+      // Nota: título/mission_key distintos de 'Ritual de las Almas' a propósito
+      // -- ese nombre ya es el contrato STREAM canónico real (ver
+      // contratos_stream / contratos_octubre_completo). Este mock genérico de
+      // respaldo (solo se usa si se ve Contratos con un escenario de Batalla
+      // como 'scheduled'/'active_p1') nunca debe reutilizar un título real,
+      // para no confundirlo con el calendario oficial de octubre.
+      { mission_id: 3, mission_key: 'stream_guardianes_directo', category: 'stream', title: 'Guardianes del Directo', description: 'La comunidad debe mantener presencia activa durante el stream para fortalecer la resistencia.', mission_day: '2026-10-10', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 3 },
       { mission_id: 4, mission_key: 'fn_batalla_final', category: 'fortnite', title: 'Batalla final: asalto', description: 'Contrato especial del 31 de octubre contra La Heraldo.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 20000, verification_mode: 'clip', sort_order: 4 },
     ];
   }
 
   // Escenarios MOCK exclusivos para revisar el diseño de Contratos con
   // contenido de ejemplo (contratos_empty / contratos_upcoming /
-  // contratos_active / contratos_mixed / contrato_final). Puramente
+  // contratos_active / contratos_mixed / contratos_stream /
+  // contratos_octubre_completo). Puramente
   // visuales: NUNCA escriben en Supabase. La fuente real es exclusivamente
   // halloween_2026_get_public_missions() -- estos mocks nunca se usan si
   // ese escenario no está seleccionado, y con "RPC real (Supabase)" jamás
@@ -290,20 +297,21 @@
       // en 2 días distintos -- para revisar agrupado por día/fecha Y el
       // layout de 2 columnas en escritorio cuando un día tiene varios.
       return [
-        { mission_id: 201, mission_key: 'stream_ecos_pasado', category: 'stream', title: 'ECOS DEL PASADO', description: 'Contrato ya cerrado -- queda como registro de octubre.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 4000, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 202, mission_key: 'fn_caceria_abismo', category: 'fortnite', title: 'CACERÍA DEL ABISMO', description: 'Elimina 5 enemigos usando tu code de Geo Army en la tienda de Fortnite y compártelo en el chat.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 2 },
-        { mission_id: 203, mission_key: 'ow_guardia_hielo', category: 'overwatch', title: 'GUARDIA DE HIELO', description: 'Gana 3 partidas en modo competitivo durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 1 },
-        { mission_id: 204, mission_key: 'stream_llamado_comunidad', category: 'stream', title: 'LLAMADO DE LA COMUNIDAD', description: 'Meta comunitaria de suscripciones durante la semana.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 2 },
+        { mission_id: 201, mission_key: 'stream_voces_umbral', category: 'stream', title: 'Voces del Umbral', description: 'Contrato ya cerrado -- queda como registro de octubre.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 4000, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 202, mission_key: 'fn_avance_bruma', category: 'fortnite', title: 'Avance en la Bruma', description: 'Consigue una victoria en Fortnite usando tu code de Geo Army en la tienda durante el contrato.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 2 },
+        { mission_id: 203, mission_key: 'ow_vigilancia_helada', category: 'overwatch', title: 'Vigilancia Helada', description: 'Gana 3 partidas en modo competitivo durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 1 },
+        { mission_id: 204, mission_key: 'stream_eco_comunidad', category: 'stream', title: 'Eco de la Comunidad', description: 'Meta comunitaria de suscripciones durante la semana.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 2 },
       ];
     }
 
-    if (scenario === 'contrato_final') {
-      // Solo el contrato final, activo, para revisar su tratamiento
-      // especial (is_final_battle) sin mezclarlo con otros contratos.
-      return [
-        { mission_id: 301, mission_key: 'fn_asalto_final', category: 'fortnite', title: 'ASALTO FINAL A LA HERALDO', description: 'El último contrato de Halloween 2026 -- se abre solo el 31 de octubre.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: true, boss_damage: 50000, verification_mode: 'clip', sort_order: 1 },
-      ];
-    }
+    // NOTA: el escenario 'contrato_final' (un solo contrato "ASALTO FINAL A
+    // LA HERALDO", 50000 de daño) se eliminó -- quedó desactualizado frente
+    // a la definición real del 31 de octubre (3 contratos finales: Asalto
+    // al Trono / Quebrar las Cadenas / El Último Sello). Esa fecha ya se
+    // prueba de forma completa y coherente dentro de
+    // 'contratos_octubre_completo', así que mantener ambos solo generaba
+    // contenido viejo duplicado. Ver `mockRpcResult()` y el <select> de
+    // contratos.html, donde también se quitó la opción correspondiente.
 
     if (scenario === 'contratos_stream') {
       // Los 5 contratos de STREAM propuestos como base real de Halloween
@@ -370,8 +378,8 @@
     }
 
     var base = [
-      { mission_id: 101, mission_key: 'fn_caceria_abismo', category: 'fortnite', title: 'CACERÍA DEL ABISMO', description: 'Elimina 5 enemigos usando tu code de Geo Army en la tienda de Fortnite y compártelo en el chat.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 1 },
-      { mission_id: 102, mission_key: 'ow_sin_escapatoria', category: 'overwatch', title: 'SIN ESCAPATORIA', description: 'Gana 2 partidas', mission_day: '2026-10-18', opens_at: '2026-10-18T00:00:00-04:00', closes_at: '2026-10-18T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 2 },
+      { mission_id: 101, mission_key: 'fn_marca_frente', category: 'fortnite', title: 'Marca en el Frente', description: 'Consigue una victoria usando tu code de Geo Army en la tienda de Fortnite durante el contrato.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 1 },
+      { mission_id: 102, mission_key: 'ow_sin_escapatoria', category: 'overwatch', title: 'SIN ESCAPATORIA', description: 'Gana 2 partidas', mission_day: '2026-10-20', opens_at: '2026-10-20T00:00:00-04:00', closes_at: '2026-10-20T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 2 },
       { mission_id: 103, mission_key: 'stream_ritual_comunidad', category: 'stream', title: 'RITUAL DE LA COMUNIDAD', description: 'Meta comunitaria', mission_day: '2026-10-24', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 15000, verification_mode: 'manual', sort_order: 3 },
     ];
     if (scenario === 'contratos_upcoming') {
@@ -419,7 +427,7 @@
       case 'halloween_2026_get_public_missions':
         if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' ||
             currentScenario === 'contratos_active' || currentScenario === 'contratos_mixed' ||
-            currentScenario === 'contrato_final' || currentScenario === 'contratos_stream' ||
+            currentScenario === 'contratos_stream' ||
             currentScenario === 'contratos_octubre_completo') {
           return mockMissionsContratos(currentScenario);
         }
