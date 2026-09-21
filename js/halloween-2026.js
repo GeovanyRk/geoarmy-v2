@@ -270,7 +270,7 @@
     return [
       { mission_id: 1, mission_key: 'fn_eliminaciones', category: 'fortnite', title: 'Elimina 5 enemigos', description: 'Consigue 5 eliminaciones en una partida de Fortnite y compártelo en el chat.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: upcomingOnly ? 'upcoming' : 'active', is_final_battle: false, boss_damage: 5000, verification_mode: 'clip', sort_order: 1 },
       { mission_id: 2, mission_key: 'ow_victorias', category: 'overwatch', title: 'Gana 3 partidas', description: 'Consigue 3 victorias en Overwatch durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 6000, verification_mode: 'auto', sort_order: 2 },
-      { mission_id: 3, mission_key: 'stream_raid', category: 'stream', title: 'Trae un raid de 5+', description: 'Hazle raid al canal con 5 o más espectadores durante octubre.', mission_day: '2026-10-10', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 4000, verification_mode: 'manual', sort_order: 3 },
+      { mission_id: 3, mission_key: 'stream_ritual_almas', category: 'stream', title: 'Ritual de las Almas', description: '20 miembros de Geo Army deben responder al llamado y activar el ritual durante el stream.', mission_day: '2026-10-10', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 3 },
       { mission_id: 4, mission_key: 'fn_batalla_final', category: 'fortnite', title: 'Batalla final: asalto', description: 'Contrato especial del 31 de octubre contra La Heraldo.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 20000, verification_mode: 'clip', sort_order: 4 },
     ];
   }
@@ -318,6 +318,54 @@
         { mission_id: 403, mission_key: 'stream_llamado_guardia', category: 'stream', title: 'Llamado de la Guardia', description: '25 miembros únicos de Geo Army deben responder en el chat durante la ventana del contrato.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 7500, verification_mode: 'manual', sort_order: 1 },
         { mission_id: 404, mission_key: 'stream_ofrenda_heraldo', category: 'stream', title: 'Ofrenda a la Heraldo', description: 'La comunidad debe completar 30 ofrendas durante el stream para debilitar el poder de Morvanna.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 1 },
         { mission_id: 405, mission_key: 'stream_juicio_oraculo', category: 'stream', title: 'El Juicio del Oráculo', description: '25 miembros de Geo Army deben participar en el juicio del Oráculo durante el stream.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 6000, verification_mode: 'manual', sort_order: 2 },
+      ];
+    }
+
+    if (scenario === 'contratos_octubre_completo') {
+      // Calendario mock COMPLETO de octubre 2026 (21 contratos, martes/
+      // jueves/sábado reales del mes) -- SOLO para revisar de un vistazo
+      // el diseño con el mes entero: agrupado por día, las 3 categorías,
+      // títulos/descripciones largos, y los 3 contratos finales del 31.
+      // Estados distribuidos por fecha (no por lógica real, es puro mock
+      // visual): 1-10 oct -> ended, 13-22 oct -> active, 24-31 oct ->
+      // upcoming (los del 31 además llevan is_final_battle:true, que se
+      // suma al badge de estado, no lo reemplaza).
+      return [
+        // --- 1 OCTUBRE (jueves) -- ended ---
+        { mission_id: 501, mission_key: 'fn_primera_brecha', category: 'fortnite', title: 'La Primera Brecha', description: 'El sello ha comenzado a ceder. Abre el primer frente y consigue una victoria para Geo Army.', mission_day: '2026-10-01', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-01T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 1500, verification_mode: 'clip', sort_order: 1 },
+        { mission_id: 502, mission_key: 'stream_ritual_almas_oct', category: 'stream', title: 'Ritual de las Almas', description: 'Morvanna ya puede sentirnos. 20 miembros de Geo Army deben responder al llamado y activar el ritual.', mission_day: '2026-10-01', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-01T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 2 },
+        // --- 3 OCTUBRE (sábado) -- ended ---
+        { mission_id: 503, mission_key: 'ow_guardia_umbral', category: 'overwatch', title: 'Guardia del Umbral', description: 'Una nueva brecha se ha abierto. Defiende el umbral antes de que las fuerzas de Morvanna lo atraviesen.', mission_day: '2026-10-03', opens_at: '2026-10-03T00:00:00-04:00', closes_at: '2026-10-03T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 1500, verification_mode: 'auto', sort_order: 1 },
+        { mission_id: 504, mission_key: 'stream_llamado_guardia_oct', category: 'stream', title: 'Llamado de la Guardia', description: 'La resistencia necesita voces. La Guardia debe responder antes de que el llamado se extinga.', mission_day: '2026-10-03', opens_at: '2026-10-03T00:00:00-04:00', closes_at: '2026-10-03T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 2 },
+        // --- 6 OCTUBRE (martes) -- ended ---
+        { mission_id: 505, mission_key: 'fn_cazadores_sello', category: 'fortnite', title: 'Cazadores del Sello', description: 'Fragmentos de energía de Morvanna han aparecido en el frente. Destrúyelos antes de que regresen a ella.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 1000, verification_mode: 'clip', sort_order: 1 },
+        // --- 8 OCTUBRE (jueves) -- ended ---
+        { mission_id: 506, mission_key: 'stream_mantengan_sello_oct', category: 'stream', title: 'Mantengan el Sello', description: 'El sello comienza a fracturarse. Solo una presencia constante puede mantenerlo estable.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 1 },
+        // --- 10 OCTUBRE (sábado) -- ended ---
+        { mission_id: 507, mission_key: 'ow_rompan_formacion', category: 'overwatch', title: 'Rompan la Formación', description: 'Las fuerzas de Morvanna se han organizado. Rompan su formación antes de que puedan avanzar.', mission_day: '2026-10-10', opens_at: '2026-10-10T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 10000, verification_mode: 'auto', sort_order: 1 },
+        { mission_id: 508, mission_key: 'stream_juicio_oraculo_oct', category: 'stream', title: 'El Juicio del Oráculo', description: 'El Oráculo exige una respuesta. El silencio también será interpretado.', mission_day: '2026-10-10', opens_at: '2026-10-10T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 2 },
+        // --- 13 OCTUBRE (martes) -- active ---
+        { mission_id: 509, mission_key: 'fn_ecos_abismo', category: 'fortnite', title: 'Ecos del Abismo', description: 'Algo está siguiendo a Geo Army entre los mundos. Sobrevive al eco y regresa con vida.', mission_day: '2026-10-13', opens_at: '2026-10-13T00:00:00-04:00', closes_at: '2026-10-13T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 1500, verification_mode: 'clip', sort_order: 1 },
+        // --- 15 OCTUBRE (jueves) -- active ---
+        { mission_id: 510, mission_key: 'stream_ofrenda_heraldo_oct', category: 'stream', title: 'Ofrenda a la Heraldo', description: 'Toda invocación exige un precio. Esta vez, la ofrenda será utilizada contra quien la reclama.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 1 },
+        { mission_id: 511, mission_key: 'ow_ultima_linea', category: 'overwatch', title: 'La Última Línea', description: 'La defensa retrocede. No queda otra línea detrás de ustedes.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 10000, verification_mode: 'auto', sort_order: 2 },
+        // --- 17 OCTUBRE (sábado) -- active ---
+        { mission_id: 512, mission_key: 'fn_caceria_marca', category: 'fortnite', title: 'Cacería de la Marca', description: 'La Marca de la Bruja se extiende por el frente. Persigue su rastro y destruye los focos de corrupción.', mission_day: '2026-10-17', opens_at: '2026-10-17T00:00:00-04:00', closes_at: '2026-10-17T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 12000, verification_mode: 'clip', sort_order: 1 },
+        // --- 20 OCTUBRE (martes) -- active ---
+        { mission_id: 513, mission_key: 'ow_almas_resistencia', category: 'overwatch', title: 'Almas en Resistencia', description: 'Morvanna intenta desgastar a quienes aún permanecen de pie. Demuéstrale que eligió mal a sus víctimas.', mission_day: '2026-10-20', opens_at: '2026-10-20T00:00:00-04:00', closes_at: '2026-10-20T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 1500, verification_mode: 'auto', sort_order: 1 },
+        // --- 22 OCTUBRE (jueves) -- active ---
+        { mission_id: 514, mission_key: 'stream_vigilia_sello', category: 'stream', title: 'Vigilia del Sello', description: 'Nadie debe abandonar su puesto. Esta noche, el sello necesita guardianes.', mission_day: '2026-10-22', opens_at: '2026-10-22T00:00:00-04:00', closes_at: '2026-10-22T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 15000, verification_mode: 'manual', sort_order: 1 },
+        // --- 24 OCTUBRE (sábado) -- upcoming ---
+        { mission_id: 515, mission_key: 'fn_frente_quebrado', category: 'fortnite', title: 'Frente Quebrado', description: 'Uno de los frentes ha colapsado. Solo una ofensiva coordinada puede abrirlo nuevamente.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'clip', sort_order: 1 },
+        { mission_id: 516, mission_key: 'ow_contraofensiva_nocturna', category: 'overwatch', title: 'Contraofensiva Nocturna', description: 'La oscuridad ya no es una advertencia. Es territorio enemigo.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'auto', sort_order: 2 },
+        // --- 27 OCTUBRE (martes) -- upcoming ---
+        { mission_id: 517, mission_key: 'fn_sangre_sello', category: 'fortnite', title: 'La Sangre del Sello', description: 'El sello exige algo más que supervivencia. Solo una victoria marcada por la batalla podrá alimentarlo.', mission_day: '2026-10-27', opens_at: '2026-10-27T00:00:00-04:00', closes_at: '2026-10-27T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 2000, verification_mode: 'clip', sort_order: 1 },
+        // --- 29 OCTUBRE (jueves) -- upcoming ---
+        { mission_id: 518, mission_key: 'stream_ultimo_ritual', category: 'stream', title: 'El Último Ritual', description: 'Ya no habrá otra oportunidad. Todo lo reunido durante octubre debe concentrarse en una sola invocación.', mission_day: '2026-10-29', opens_at: '2026-10-29T00:00:00-04:00', closes_at: '2026-10-29T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 20000, verification_mode: 'manual', sort_order: 1 },
+        // --- 31 OCTUBRE (sábado) -- BATALLA FINAL: upcoming + is_final_battle ---
+        { mission_id: 519, mission_key: 'fn_asalto_trono', category: 'fortnite', title: 'Asalto al Trono', description: 'El camino hacia Morvanna está abierto. No queda nada que conservar. Avancen.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 15000, verification_mode: 'clip', sort_order: 1 },
+        { mission_id: 520, mission_key: 'ow_quebrar_cadenas', category: 'overwatch', title: 'Quebrar las Cadenas', description: 'Las cadenas que protegen a La Heraldo están expuestas. Rómpanlas antes de que vuelva a cerrarlas.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 15000, verification_mode: 'auto', sort_order: 2 },
+        { mission_id: 521, mission_key: 'stream_ultimo_sello', category: 'stream', title: 'El Último Sello', description: 'Todas las voces. Todos los frentes. Una última vez.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 20000, verification_mode: 'manual', sort_order: 3 },
       ];
     }
 
@@ -371,7 +419,8 @@
       case 'halloween_2026_get_public_missions':
         if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' ||
             currentScenario === 'contratos_active' || currentScenario === 'contratos_mixed' ||
-            currentScenario === 'contrato_final' || currentScenario === 'contratos_stream') {
+            currentScenario === 'contrato_final' || currentScenario === 'contratos_stream' ||
+            currentScenario === 'contratos_octubre_completo') {
           return mockMissionsContratos(currentScenario);
         }
         return mockMissions(currentScenario);
