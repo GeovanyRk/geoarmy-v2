@@ -20,4 +20,4 @@ window.GEOARMY_SUPABASE_ANON_KEY = 'sb_publishable_NOs6VaVgUOQiib5r0GJQiQ_ZoWt1_
 // carpeta y eso hacía que el login mandara al usuario a la raíz de
 // producción en vez de quedarse en esta beta. Si mueves esto a otra carpeta
 // o lo promueves a producción, este es el ÚNICO lugar que hay que cambiar.
-window.GEOARMY_SITE_BASE = '/geoarmy-v2/';
+window.GEOARMY_SITE_BASE = '/';

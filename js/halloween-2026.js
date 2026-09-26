@@ -4,7 +4,7 @@
 // Archivo NUEVO y aislado. Se carga SOLAMENTE desde las páginas dedicadas
 // halloween/batalla.html, rol.html, contratos.html, efectos.html,
 // cronicas.html (todas de prueba por ahora). index-halloween-test.html ya
-// NO lo carga: los 5 pins sobre el planeta son <a href> simples, con el
+// NO lo carga: los 3 pins sobre el planeta son <a href> simples, con el
 // estado bloqueado/desbloqueado resuelto en puro CSS (ver
 // css/halloween-2026.css, sección "Pins sobre el planeta").
 //
@@ -143,7 +143,7 @@
       pending_announced_at: null,
       pending_resolves_at: null,
       starts_at: '2026-10-01T19:00:00-04:00',
-      ends_at: '2026-10-31T23:59:59-04:00',
+      ends_at: '2026-11-01T00:00:00-04:00',
       phase2_at: null,
       finished_at: null,
       updated_at: new Date().toISOString(),
@@ -1168,7 +1168,15 @@
 
   function initBattlePage() {
     loadState().then(function () { if (lastState) renderBoss(reconcileMockState(lastState)); });
-    loadEffects().then(renderBattleEffects);
+    // Simplificación de producto (2026-09-26): se quitó la llamada a
+    // loadEffects().then(renderBattleEffects) -- la sección de efectos
+    // dentro de batalla.html ya había sido eliminada antes (el elemento
+    // #hw26SupportEffectsBody que renderBattleEffects() buscaba ya no
+    // existe en el DOM), así que ese fetch a
+    // halloween_2026_get_public_effects() era una llamada a Supabase cada
+    // 5s sin ningún consumidor real. loadEffects()/renderBattleEffects()
+    // NO se tocan: initEffectsPage() (halloween/efectos.html, huérfana
+    // pero no borrada) sigue usándolas tal cual.
     // Mismo ciclo de poll que ya tenía Batalla (5s, ver POLL_INTERVAL_MS
     // más abajo) -- sin setInterval nuevo.
     loadFeed().then(processBattleFeed);
@@ -1551,8 +1559,13 @@
       case 'mission_damage':
         return 'Un Contrato golpeó a La Heraldo por <span class="hw26-feed-dmg">' + bossDmg + '</span>.';
       case 'effect_applied':
-        if (item.effect_key && EFFECT_META[item.effect_key]) {
-          return 'Geo Army activó <b>' + esc(titleCaseEs(EFFECT_META[item.effect_key].name)) + '</b>.';
+        // HOTFIX (2026-09-26): el contrato REAL de halloween_2026_get_public_feed
+        // NO devuelve effect_key (ver nota en la sección 5b más abajo) -- este
+        // caso dependía de un campo que nunca llega, así que 'effect_applied'
+        // caía siempre al genérico. Se identifica igual que en isMovementEntry()/
+        // playBuff(): por item.action_key contra BUFF_ACTION_LABEL.
+        if (item.action_key && BUFF_ACTION_LABEL[item.action_key]) {
+          return 'Geo Army activó <b>' + esc(titleCaseEs(BUFF_ACTION_LABEL[item.action_key])) + '</b>.';
         }
         return 'Un nuevo efecto se activó sobre el campo de batalla.';
       case 'effect_consumed':

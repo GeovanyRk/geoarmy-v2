@@ -56,7 +56,10 @@
       provider: 'twitch',
       // Debe registrarse en Supabase Auth -> URL Configuration -> Redirect
       // URLs EXACTAMENTE con esta barra final (ej. .../geoarmy-v2/auth/callback/).
-      options: { redirectTo: window.location.origin + siteBase() + 'auth/callback/' },
+      options: {
+        redirectTo: window.location.origin + siteBase() + 'auth/callback/',
+        scopes: 'user:read:email'
+      },
     });
   }
  
