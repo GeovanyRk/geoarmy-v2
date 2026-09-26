@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Widget de Stream — Halloween 2026 · GeoArmy</title>
+  <meta name="description" content="Overlay de solo lectura para OBS Browser Source — La Heraldo, Halloween 2026. Muestra el HP de Morvanna y la resistencia de Geo Army en tiempo real, sin login ni navegación."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/halloween-stream-widget.css"/>
+  <!-- ======================================================================
+       WIDGET OFICIAL DE STREAM — Halloween 2026 (OBS Browser Source)
+       ======================================================================
+       Página NUEVA, aislada, SOLO LECTURA. Pensada para pegarse como
+       Browser Source encima del gameplay:
+         - SIN navbar, SIN footer, SIN login visible, SIN página completa.
+         - SIN scroll (html/body con overflow:hidden).
+         - html/body con background transparente (ver
+           css/halloween-stream-widget.css) para que se vea el juego debajo.
+         - Tamaño recomendado en OBS: 700 x 260 px (responsive: se adapta a
+           cualquier otro tamaño de Browser Source).
+
+       Cliente Supabase: se reutiliza EXACTAMENTE el mismo mecanismo que ya
+       usan batalla.html/rol.html/contratos.html/efectos.html/cronicas.html
+       -- supabase-js (CDN) + la misma cadena de scripts de cuentas
+       (premium.js / geoarmy-config.js / geoarmy-ranks.js /
+       geoarmy-account.js) que construye window.GeoArmyAccount.client, y
+       js/halloween-stream-widget.js espera a que ese cliente exista (igual
+       que hace js/halloween-2026.js) -- NUNCA crea un cliente nuevo, NUNCA
+       usa service_role. Esta página no incluye NINGÚN contenedor de cuenta
+       (login/avatar/etc.): si alguno de esos scripts intenta pintar algo en
+       un id que no existe aquí, no debería mostrar nada (mismo patrón
+       defensivo "if (!box) return" usado en todo este proyecto) -- pero
+       como el contenido real de esos 4 archivos no está disponible en este
+       entorno de trabajo, esto es una suposición razonable, no un hecho
+       confirmado; revisar en el sitio real antes de publicar en producción.
+
+       Este widget es de SOLO LECTURA: llama ÚNICAMENTE
+       halloween_2026_get_public_state() y
+       halloween_2026_get_public_feed({ p_limit: 30 }). Nunca escribe nada,
+       nunca consulta tablas halloween_2026_* directamente, nunca calcula
+       daño/HP/resultado -- todo el estado autoritativo viene de Supabase.
+
+       Modo demo: agregar ?demo=active_p1 | active_p2 | cataclismo |
+       geoarmy_victory | herald_victory a la URL muestra datos mock locales
+       puramente visuales, SIN tocar Supabase en absoluto. Sin ?demo, usa
+       las RPC reales. Este modo demo vive SOLO en este archivo y en
+       js/halloween-stream-widget.js -- no toca el modo de pruebas de
+       js/halloween-2026.js (?hw_unlock=1, HALLOWEEN_TEST_MODE, etc.).
+       ====================================================================== -->
+</head>
+<body data-halloween-widget="stream-widget">
+  <div id="hswRoot" class="hsw-root" data-state="loading" data-phase="1" data-cataclysm="0">
+
+    <div id="hswDemoTag" class="hsw-demo-tag" hidden>MODO DEMO</div>
+    <div id="hswReconnect" class="hsw-reconnect" hidden title="Reconectando con Supabase…">⟳</div>
+
+    <!-- SCHEDULED (status === 'scheduled'): versión discreta, antes del
+         inicio real. NO simula HP moviéndose. -->
+    <div id="hswScheduledPanel" class="hsw-panel hsw-panel-scheduled">
+      <div class="hsw-scheduled-title">BATALLA DE HALLOWEEN</div>
+      <div class="hsw-scheduled-sub">1 OCT · 7:00 PM ET</div>
+    </div>
+
+    <!-- FINISHED (status === 'finished'): título de resultado. Las barras
+         con el HP final se muestran en #hswBars, más abajo (compartido con
+         la vista de batalla activa -- "Mantener HP finales visibles"). -->
+    <div id="hswFinishedBanner" class="hsw-panel hsw-panel-finished">
+      <div id="hswFinishedTitle" class="hsw-finished-title"></div>
+      <div id="hswFinishedSub" class="hsw-finished-sub"></div>
+    </div>
+
+    <!-- BARRAS — vista normal de batalla en curso, y también vista final
+         (con outcome ya decidido) reutilizando el mismo bloque. Oculto
+         solo en 'scheduled'/'loading'. Los valores SOLO representan
+         boss_hp/boss_max_hp/geoarmy_hp/geoarmy_max_hp tal como llegan de
+         Supabase -- nunca se calculan aquí. -->
+    <div id="hswBars" class="hsw-bars">
+      <div class="hsw-row hsw-row-boss">
+        <div class="hsw-row-head">
+          <span class="hsw-name">MORVANNA</span>
+          <span id="hswPhaseBadge" class="hsw-phase-badge">FASE I</span>
+        </div>
+        <div class="hsw-bar hsw-bar-boss"><div id="hswBossFill" class="hsw-bar-fill"></div></div>
+        <div id="hswBossText" class="hsw-bar-text">— / — HP</div>
+      </div>
+      <div class="hsw-row hsw-row-geo">
+        <div class="hsw-row-head"><span class="hsw-name">GEO ARMY</span></div>
+        <div class="hsw-bar hsw-bar-geo"><div id="hswGeoFill" class="hsw-bar-fill"></div></div>
+        <div id="hswGeoText" class="hsw-bar-text">— / — HP</div>
+      </div>
+      <!-- Último movimiento relevante (uno solo, nunca una lista/historial) --
+           también usado por Cataclismo (countdown) y por "Contrato
+           completado" (mission_damage), que reutilizan esta misma línea. -->
+      <div id="hswBottomLine" class="hsw-bottom-line" hidden></div>
+    </div>
+
+    <!-- Transición de fase 1 -> 2 detectada en la misma sesión (nunca se
+         calcula por HP, siempre por boss_phase). Overlay transitorio
+         ~2s, puramente visual. -->
+    <div id="hswPhaseFlash" class="hsw-phase-flash" hidden>
+      <div class="hsw-phase-flash-title">EL SELLO SE HA ROTO</div>
+      <div class="hsw-phase-flash-sub">FASE II</div>
+    </div>
+  </div>
+
+  <!-- ===== Cliente Supabase compartido (mismo patrón que el resto de
+       páginas Halloween 2026 -- ver comentario de cabecera). ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../js/premium.js"></script>
+  <script src="../js/geoarmy-config.js"></script>
+  <script src="../js/geoarmy-ranks.js"></script>
+  <script src="../js/geoarmy-account.js"></script>
+  <script src="../js/halloween-stream-widget.js"></script>
+</body>
+</html>
