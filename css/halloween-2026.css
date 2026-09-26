@@ -3,13 +3,13 @@
    =====================================================================
    Archivo NUEVO y aislado. No modifica css/style.css ni css/v3-theme.css.
    Se carga desde:
-     - index-halloween-test.html (SOLO los 5 pins sobre el planeta)
+     - index-halloween-test.html (SOLO los 3 pins sobre el planeta)
      - halloween/batalla.html, rol.html, contratos.html, efectos.html,
        cronicas.html (páginas dedicadas, todas de prueba por ahora)
 
    CAMBIO DE DIRECCIÓN (v2): se retiró el dashboard de 4 tarjetas + widget
    gigante dentro del index, y el sistema de modal genérico. Ahora:
-     - el índice solo muestra 5 pins circulares sobre el planeta (mismo
+     - el índice solo muestra 3 pins circulares sobre el planeta (mismo
        lenguaje visual que .v3-planet-nav / .v3-marker-* de Mundo 01);
      - cada pin lleva a su propia página en halloween/*.html;
      - el widget de La Heraldo (antes en el index) ahora vive en
@@ -95,7 +95,7 @@
 .hw26-pin-batalla:hover .hw26-pin-icon,
 .hw26-pin-batalla:focus-visible .hw26-pin-icon { box-shadow: 0 0 26px rgba(220, 38, 38, .75); }
 
-/* Candadito superpuesto en los 4 pins secundarios mientras están bloqueados */
+/* Candadito superpuesto en los 2 pins secundarios mientras están bloqueados */
 .hw26-pin-lock {
   position: absolute; right: -3px; bottom: -3px; width: 17px; height: 17px;
   border-radius: 50%; display: flex; align-items: center; justify-content: center;

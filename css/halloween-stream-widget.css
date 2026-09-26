@@ -1,0 +1,254 @@
+/* =========================================================================
+   HALLOWEEN 2026 — Widget de stream (OBS Browser Source)
+   =========================================================================
+   Archivo NUEVO y AISLADO. Se carga ÚNICAMENTE desde
+   halloween/stream-widget.html. No modifica ni depende de
+   css/halloween-2026.css (prefijo distinto: hsw- en vez de hw26-, cero
+   colisión de selectores) para que este widget siga funcionando aunque
+   ese archivo cambie. Paleta y lenguaje visual iguales a propósito
+   (negro/violeta/rojo, cinematográfico) para que se vea parte de la misma
+   identidad de Halloween 2026.
+
+   REQUISITO NO NEGOCIABLE (OBS Browser Source): html y body deben ser
+   transparentes y sin scroll -- si algún elemento de acá vuelve a poner un
+   fondo sólido o un overflow visible, el widget deja de servir como
+   overlay. ========================================================== */
+
+:root {
+  --hsw-panel: rgba(10, 6, 16, 0.86);
+  --hsw-violet: #7c3aed;
+  --hsw-violet-soft: rgba(124, 58, 237, 0.55);
+  --hsw-violet-line: rgba(148, 92, 255, 0.38);
+  --hsw-red: #dc2626;
+  --hsw-red-soft: rgba(220, 38, 38, 0.55);
+  --hsw-orange: #f97316;
+  --hsw-gold: #d4af37;
+  --hsw-text: #f4eefc;
+  --hsw-text-dim: rgba(244, 238, 252, 0.7);
+  --hsw-radius: 16px;
+}
+
+* { box-sizing: border-box; }
+
+/* html/body transparentes SIEMPRE -- OBS compone esto encima del
+   gameplay. !important a propósito: es la única regla del archivo que lo
+   necesita, precisamente porque es la más fácil de romper por accidente
+   más adelante (ej. un reset copiado de otra página que traiga
+   background-color). */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  overflow: hidden; /* NO scrollbars, nunca */
+  font-family: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  color: var(--hsw-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: flex;
+  align-items: flex-end; /* el widget se asienta como "lower third" */
+  padding: 12px;
+}
+
+/* ---------------------------------------------------------------------
+   Contenedor raíz -- responsive: llena el ancho del Browser Source
+   (recomendado 700x260) pero se adapta a cualquier otro tamaño, usando
+   clamp() para que el texto no se rompa ni en un source muy angosto.
+   --------------------------------------------------------------------- */
+.hsw-root {
+  position: relative;
+  width: 100%;
+  min-height: 118px;
+  background: var(--hsw-panel);
+  border: 1px solid var(--hsw-violet-line);
+  border-radius: var(--hsw-radius);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 14px 34px rgba(0, 0, 0, 0.55),
+    0 0 42px rgba(124, 58, 237, 0.18);
+  padding: 14px 18px 12px;
+  overflow: hidden;
+}
+/* Fase II: acento más rojo en todo el panel, sin recalcular nada -- solo
+   refleja data-phase, que el JS fija tal cual boss_phase (nunca por HP). */
+.hsw-root[data-phase="2"] {
+  border-color: var(--hsw-red-soft);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 14px 34px rgba(0, 0, 0, 0.55),
+    0 0 48px rgba(220, 38, 38, 0.22);
+}
+/* Cataclismo activo: pulso rojo/violeta sutil en el borde de todo el
+   panel, además del texto del countdown en #hswBottomLine. */
+.hsw-root[data-cataclysm="1"] {
+  animation: hsw-cataclysm-pulse 1.6s ease-in-out infinite;
+}
+@keyframes hsw-cataclysm-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 14px 34px rgba(0,0,0,.55), 0 0 34px rgba(220,38,38,.25); }
+  50% { box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 14px 34px rgba(0,0,0,.55), 0 0 60px rgba(220,38,38,.55); }
+}
+
+.hsw-demo-tag {
+  position: absolute; top: 8px; right: 10px;
+  font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: .08em;
+  color: var(--hsw-gold); background: rgba(0,0,0,.55);
+  border: 1px solid rgba(212, 175, 55, .5); border-radius: 5px;
+  padding: 2px 7px; z-index: 5;
+}
+.hsw-reconnect {
+  position: absolute; top: 8px; left: 10px;
+  font-size: 13px; color: var(--hsw-text-dim); opacity: .8; z-index: 5;
+  animation: hsw-spin 1.1s linear infinite;
+}
+@keyframes hsw-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ---------------------------------------------------------------------
+   Paneles mutuamente excluyentes por estado (data-state en #hswRoot):
+   'loading' | 'scheduled' | 'battle' | 'finished'.
+   --------------------------------------------------------------------- */
+#hswScheduledPanel, #hswFinishedBanner, #hswBars { display: none; }
+.hsw-root[data-state="scheduled"] #hswScheduledPanel { display: flex; }
+.hsw-root[data-state="battle"] #hswBars,
+.hsw-root[data-state="finished"] #hswBars { display: block; }
+.hsw-root[data-state="finished"] #hswFinishedBanner { display: flex; }
+
+.hsw-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; min-height: 90px; text-align: center; gap: 6px;
+}
+.hsw-scheduled-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 800;
+  font-size: clamp(1rem, 4vw, 1.3rem); letter-spacing: .04em;
+  color: var(--hsw-text);
+}
+.hsw-scheduled-sub {
+  font-size: clamp(.72rem, 2.6vw, .85rem); letter-spacing: .06em;
+  color: var(--hsw-text-dim); text-transform: uppercase;
+}
+
+.hsw-finished-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 800;
+  font-size: clamp(1rem, 4vw, 1.25rem); letter-spacing: .03em;
+}
+.hsw-root[data-state="finished"][data-cataclysm="0"] .hsw-finished-title { color: var(--hsw-text); }
+.hsw-finished-sub {
+  font-size: clamp(.7rem, 2.4vw, .82rem); letter-spacing: .05em;
+  color: var(--hsw-text-dim); text-transform: uppercase;
+}
+
+/* ---------------------------------------------------------------------
+   Barras de HP -- mismo lenguaje visual que css/halloween-2026.css
+   (.hw26-bar / .hw26-bar-fill), reimplementado acá de forma aislada.
+   --------------------------------------------------------------------- */
+.hsw-row { margin-bottom: 8px; }
+.hsw-row:last-of-type { margin-bottom: 0; }
+.hsw-row-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 3px;
+}
+.hsw-name {
+  font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: clamp(.7rem, 2.6vw, .82rem); letter-spacing: .08em;
+  color: var(--hsw-text-dim);
+}
+.hsw-phase-badge {
+  font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: clamp(.6rem, 2.2vw, .68rem); letter-spacing: .08em;
+  color: var(--hsw-text); background: rgba(124, 58, 237, .25);
+  border: 1px solid var(--hsw-violet-line); border-radius: 5px;
+  padding: 1px 7px;
+}
+.hsw-root[data-phase="2"] .hsw-phase-badge {
+  background: rgba(220, 38, 38, .28); border-color: var(--hsw-red-soft);
+}
+.hsw-bar {
+  position: relative; height: 11px; border-radius: 999px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .09);
+  overflow: hidden;
+}
+.hsw-bar-fill {
+  height: 100%; width: 0%; border-radius: 999px;
+  transition: width .7s cubic-bezier(.22, .68, 0, 1.01);
+}
+.hsw-bar-boss .hsw-bar-fill {
+  background: linear-gradient(90deg, #7c1d1d, var(--hsw-red), #ff6b4a);
+  box-shadow: 0 0 10px rgba(220, 38, 38, .55);
+}
+.hsw-bar-geo .hsw-bar-fill {
+  background: linear-gradient(90deg, #5b21b6, var(--hsw-violet), var(--hsw-gold));
+  box-shadow: 0 0 10px rgba(124, 58, 237, .5);
+}
+.hsw-bar-fill.hsw-flash-hit { animation: hsw-flash-hit .55s ease; }
+.hsw-bar-fill.hsw-flash-heal { animation: hsw-flash-heal .55s ease; }
+@keyframes hsw-flash-hit { 0% { filter: brightness(2.3) saturate(1.4); } 100% { filter: brightness(1); } }
+@keyframes hsw-flash-heal { 0% { filter: brightness(2.1) hue-rotate(40deg); } 100% { filter: brightness(1); } }
+
+.hsw-bar-text {
+  margin-top: 2px; font-size: clamp(.62rem, 2.2vw, .72rem);
+  font-weight: 600; color: var(--hsw-text-dim); text-align: right;
+}
+
+/* Último movimiento / Cataclismo / Contrato completado -- una sola línea
+   compartida, nunca una lista. */
+.hsw-bottom-line {
+  margin-top: 8px; padding-top: 7px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  font-size: clamp(.68rem, 2.4vw, .8rem);
+  color: var(--hsw-text); text-align: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hsw-bottom-move { color: var(--hsw-text); }
+.hsw-bottom-mission {
+  color: #ffd88a; font-weight: 700; letter-spacing: .02em;
+  animation: hsw-bottom-pop .4s ease;
+}
+.hsw-bottom-cataclysm {
+  color: #ffb0a8; font-family: 'Orbitron', sans-serif; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+@keyframes hsw-bottom-pop {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------------------------------------------------
+   Transición de fase 1 -> 2 -- overlay transitorio a pantalla completa
+   del widget (~2s), con flash violeta/rojo. Puramente visual/CSS.
+   --------------------------------------------------------------------- */
+.hsw-phase-flash {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(124,58,237,.35), rgba(6,4,10,.92) 70%);
+  border-radius: var(--hsw-radius);
+  opacity: 0; z-index: 8; text-align: center;
+}
+.hsw-phase-flash.is-active {
+  animation: hsw-phase-flash 1.8s ease;
+}
+@keyframes hsw-phase-flash {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.hsw-phase-flash-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: clamp(1rem, 4.2vw, 1.4rem); letter-spacing: .04em;
+  color: #fff; text-shadow: 0 0 18px rgba(220, 38, 38, .85);
+}
+.hsw-phase-flash-sub {
+  margin-top: 4px; font-family: 'Orbitron', sans-serif; font-weight: 700;
+  font-size: clamp(.85rem, 3.2vw, 1.05rem); letter-spacing: .1em;
+  color: var(--hsw-gold);
+}
+
+/* Muy angosto (Browser Source configurado más chico de lo recomendado):
+   se apilan verticalmente en vez de arriesgar texto cortado. */
+@media (max-width: 360px) {
+  .hsw-root { padding: 10px 12px 10px; }
+  .hsw-row-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+}
