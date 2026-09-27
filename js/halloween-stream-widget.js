@@ -29,6 +29,40 @@
 //  - Modo demo (?demo=...) NUNCA llama Supabase ni escribe nada -- usa
 //    exclusivamente datos mock locales, y vive solo en este archivo (no
 //    toca HALLOWEEN_TEST_MODE ni ningún otro modo de prueba existente).
+//
+// REDISEÑO VISUAL (2026-09-26): jerarquía tipo "boss bar" de videojuego
+// (retrato + nombre/título + HP numérico, barra de Morvanna gruesa, Geo
+// Army secundaria, capa dedicada de Cataclismo). Referencia visual dada
+// por Geovany (bossbar_ramattra.html) NO estuvo disponible en este
+// entorno de trabajo -- este rediseño se construyó a partir de su
+// descripción escrita detallada, no de ese archivo.
+//
+// Cambios hechos en ESTA pasada, y solo estos:
+//  1) updatePortrait(phase)/updateSubtitle(phase) [NUEVAS] -- el retrato
+//     depende EXCLUSIVAMENTE de boss_phase (nunca de HP), con fallback
+//     oscuro si la imagen no carga. Llamadas agregadas dentro de
+//     applyPhase() (que ya calculaba `phase` de boss_phase, sin tocar esa
+//     cuenta) y en renderScheduled()/renderFinished().
+//  2) renderFinished() ahora también fija data-outcome en #hswRoot --
+//     mismo state.outcome que ya leía para el título/subtítulo de
+//     resultado (sin inventar ni calcular nada nuevo), expuesto como
+//     atributo para que el CSS pueda oscurecer el retrato en victoria de
+//     Geo Army.
+//  3) renderCataclysm(): el cálculo del countdown (pending_resolves_at
+//     vs Date.now(), 1 tick/seg, nunca resuelve el ataque ni toca HP) es
+//     BYTE POR BYTE el mismo de antes -- lo único que cambió es a qué
+//     elemento del DOM escribe el resultado (antes: la línea de "último
+//     movimiento"; ahora: la nueva capa dedicada #hswCataclysmLayer, que
+//     no oculta el retrato ni las barras, como pide el nuevo layout).
+//  4) renderScheduled(state) ahora recibe `state` (antes no lo recibía)
+//     para poder leer boss_phase real en vez de asumir 1 -- el resto de
+//     su comportamiento (data-state='scheduled', detener el timer de
+//     Cataclismo, no simular HP) no cambió.
+// NO se tocó: loadState/loadFeed/callRpc/waitForClient/doPoll/polling,
+// MOVE_SEEN_IDS/MOVE_QUEUE/isMovementEntry/processBattleFeed/dedupe,
+// isCataclysmActive/el cálculo del countdown en sí, applyPhase() en lo
+// que ya hacía (detección de transición 1->2, badge, triggerPhaseFlash),
+// ni el modo demo (DEMO_SCENARIOS/getDemoParam/initDemo).
 // =========================================================================
 (function () {
   'use strict';
@@ -159,12 +193,72 @@
     if (root) root.setAttribute('data-phase', String(phase));
     var badge = $('hswPhaseBadge');
     if (badge) badge.textContent = phase === 2 ? 'FASE II' : 'FASE I';
+    // NUEVO (rediseño visual): retrato + subtítulo, ambos derivados de la
+    // misma `phase` ya calculada arriba -- ninguna cuenta nueva.
+    updatePortrait(phase);
+    updateSubtitle(phase);
     // Transición 1 -> 2 detectada entre dos polls de la misma sesión.
     if (prevBossPhase != null && prevBossPhase === 1 && phase === 2) {
       triggerPhaseFlash();
     }
     prevBossPhase = phase;
     return phase;
+  }
+
+  // -----------------------------------------------------------------
+  // NUEVO (rediseño visual, único agregado de lógica permitido en esta
+  // pasada además del subtítulo): retrato de Morvanna por fase. Depende
+  // EXCLUSIVAMENTE de boss_phase (nunca de HP, nunca calculado). Si la
+  // imagen no existe/falla, fallback oscuro elegante (#hswPortraitFallback,
+  // ya en el HTML) -- NUNCA un ícono roto. Mismo patrón ya usado en
+  // js/halloween-2026.js (updateBossImg/HERO_IMG_MISSING), reimplementado
+  // aquí de forma aislada.
+  // -----------------------------------------------------------------
+  var PORTRAIT_SRC = {
+    1: '../assets/halloween/heraldo-fase1.webp',
+    2: '../assets/halloween/heraldo-fase2.webp',
+  };
+  var PORTRAIT_MISSING = {}; // recuerda qué src ya falló, evita reintentos en cada poll
+
+  function updatePortrait(phase) {
+    var img = $('hswPortrait');
+    var fallback = $('hswPortraitFallback');
+    if (!img || !fallback) return;
+    var wanted = PORTRAIT_SRC[phase === 2 ? 2 : 1];
+
+    if (PORTRAIT_MISSING[wanted]) {
+      img.hidden = true;
+      fallback.hidden = false;
+      return;
+    }
+    if (img.getAttribute('data-portrait-src') === wanted && !img.hidden) return; // ya es esta
+
+    img.onerror = function () {
+      PORTRAIT_MISSING[wanted] = true;
+      img.onerror = null;
+      img.hidden = true;
+      fallback.hidden = false;
+    };
+    img.onload = function () {
+      img.hidden = false;
+      fallback.hidden = true;
+    };
+    img.setAttribute('data-portrait-src', wanted);
+    img.src = wanted;
+    img.alt = 'Morvanna — ' + (phase === 2 ? 'Fase II' : 'Fase I');
+  }
+
+  // NUEVO (rediseño visual): subtítulo bajo el nombre, mismo espíritu que
+  // el badge FASE I/II que ya existía (applyPhase() lo sigue rellenando
+  // sin cambios), pero con el texto pedido explícitamente para el nuevo
+  // layout.
+  var SUBTITLE_BY_PHASE = {
+    1: 'LA HERALDO · FORMA SELLADA',
+    2: 'LA HERALDO · FORMA DEMONÍACA',
+  };
+  function updateSubtitle(phase) {
+    var el = $('hswSubtitle');
+    if (el) el.textContent = SUBTITLE_BY_PHASE[phase === 2 ? 2 : 1];
   }
 
   function triggerPhaseFlash() {
@@ -216,16 +310,35 @@
     box.hidden = false;
   }
 
-  function renderScheduled() {
+  function renderScheduled(state) {
     var root = $('hswRoot');
-    if (root) root.setAttribute('data-state', 'scheduled');
+    if (root) { root.setAttribute('data-state', 'scheduled'); root.setAttribute('data-outcome', 'none'); }
     stopCataclysmTimer();
+    // NUEVO (rediseño visual): SOLO retrato/subtítulo -- deliberadamente
+    // NO se llama a applyPhase() aquí (eso queda intacto para
+    // battle/finished): no hace falta tocar el badge oculto ni la
+    // detección de transición 1->2 mientras el evento no empezó. boss_phase
+    // ya viene en 1 desde el backend mientras 'scheduled' (mismo comentario
+    // que ya existía en js/halloween-2026.js para este caso), así que se
+    // lee el valor real en vez de asumirlo, pero nunca se calcula. El
+    // atenuado del retrato es puro CSS (data-state="scheduled").
+    var phase = (state && state.boss_phase === 2) ? 2 : 1;
+    updatePortrait(phase);
+    var sub = $('hswSubtitle');
+    if (sub) sub.textContent = 'LA HERALDO'; // sin calificador de fase -- el evento no empezó
     // NO simula HP moviéndose: no se toca renderBars aquí a propósito.
   }
 
   function renderFinished(state) {
     var root = $('hswRoot');
-    if (root) { root.setAttribute('data-state', 'finished'); applyPhase(state, root); }
+    if (root) {
+      root.setAttribute('data-state', 'finished');
+      // NUEVO (rediseño visual): mismo state.outcome que ya se lee abajo
+      // para el título/subtítulo -- solo se expone como atributo para que
+      // el CSS pueda oscurecer el retrato en victoria de Geo Army.
+      root.setAttribute('data-outcome', state.outcome || 'none');
+      applyPhase(state, root);
+    }
     renderBars(state); // "Mantener HP finales visibles"
     stopCataclysmTimer();
     var title = $('hswFinishedTitle'), sub = $('hswFinishedSub');
@@ -244,7 +357,7 @@
 
   function renderBattle(state) {
     var root = $('hswRoot');
-    if (root) root.setAttribute('data-state', 'battle');
+    if (root) { root.setAttribute('data-state', 'battle'); root.setAttribute('data-outcome', 'none'); }
     applyPhase(state, root);
     renderBars(state);
     renderCataclysm(state);
@@ -256,7 +369,7 @@
   function applyState(state) {
     if (!state) return; // sin dato bueno -- se conserva lo que ya había en pantalla
     lastState = state;
-    if (state.status === 'scheduled') { renderScheduled(); return; }
+    if (state.status === 'scheduled') { renderScheduled(state); return; }
     if (state.status === 'finished') { renderFinished(state); return; }
     renderBattle(state); // 'active' o cualquier otro valor no final
   }
@@ -280,14 +393,25 @@
 
     if (!active) { stopCataclysmTimer(); return; }
 
+    // NUEVO (rediseño visual): capa dedicada, no oculta retrato/barras.
+    var layer = $('hswCataclysmLayer');
+    if (layer) layer.hidden = false;
+
     var resolvesAt = new Date(state.pending_resolves_at).getTime();
     if (cataclysmTimerId) clearInterval(cataclysmTimerId);
 
+    // El cálculo del countdown es EXACTAMENTE el mismo de siempre --
+    // pending_resolves_at vs Date.now(), 1 tick/seg, nunca resuelve el
+    // ataque ni cambia HP. Lo único que cambió respecto a la versión
+    // anterior es el elemento del DOM al que se escribe el resultado
+    // (antes: la línea de "último movimiento"; ahora: #hswCataclysmTimer,
+    // dentro de la nueva capa dedicada -- ver HTML/CSS).
     function tick() {
       var diff = Math.max(0, resolvesAt - Date.now());
       var totalSec = Math.floor(diff / 1000);
       var m = Math.floor(totalSec / 60), s = totalSec % 60;
-      setBottomLine('⚠ CATACLISMO · ' + pad2(m) + ':' + pad2(s) + ' · PREPAREN LAS DEFENSAS', 'hsw-bottom-cataclysm');
+      var timerEl = $('hswCataclysmTimer');
+      if (timerEl) timerEl.textContent = pad2(m) + ':' + pad2(s);
       // Nunca se hace nada especial al llegar a 00:00 -- se sigue
       // esperando el próximo public_state, tal como pide la spec.
     }
@@ -296,6 +420,8 @@
   }
   function stopCataclysmTimer() {
     if (cataclysmTimerId) { clearInterval(cataclysmTimerId); cataclysmTimerId = null; }
+    var layer = $('hswCataclysmLayer');
+    if (layer) layer.hidden = true;
   }
 
   // -----------------------------------------------------------------
