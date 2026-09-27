@@ -21,13 +21,139 @@
   <script src="js/geoarmy-config.js"></script>
   <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
+
+  <!-- ================================================================
+       Tematica de Halloween — SOLO decoración y colores para esta página.
+       Todo va scopeado bajo ".mg-halloween" (clase agregada únicamente al
+       contenedor .v3-page de ESTA página) para no afectar a v3-theme.css
+       ni a ninguna otra página que use las mismas clases v3-*. No se
+       modifica ningún ID, ninguna estructura, ningún script: solo colores,
+       fondos, bordes/sombras y algunos elementos decorativos nuevos
+       (calabazas, murciélagos, telarañas) con aria-hidden="true" y
+       pointer-events:none para que nunca puedan interferir con clics
+       reales ni con la lógica de la página. -->
+  <style>
+    .mg-halloween{
+      background:
+        radial-gradient(ellipse 70% 45% at 18% 0%, rgba(255,122,26,.16), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 85% 15%, rgba(151,71,255,.16), transparent 60%),
+        linear-gradient(180deg,#0a0612 0%,#120a1f 40%,#1a0f12 100%);
+    }
+    .mg-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
+
+    /* ---- Nav ---- */
+    .mg-halloween .v3-nav{
+      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
+      border-bottom:1px solid rgba(255,122,26,.28);
+      box-shadow:0 2px 22px rgba(255,122,26,.08);
+    }
+    .mg-halloween .v3-wordmark{
+      color:#ffb347;
+      text-shadow:0 0 10px rgba(255,140,0,.55);
+    }
+    .mg-halloween .v3-page-links a{ color:#e7d7ff; }
+    .mg-halloween .v3-page-links a:hover{ color:#ff9d3d; }
+
+    /* ---- Hero ---- */
+    .mg-halloween .v3-tagline{ color:#ff9d3d; letter-spacing:.3em; }
+    .mg-halloween .v3-page-title{
+      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+      text-shadow:0 0 26px rgba(255,140,0,.25);
+    }
+    .mg-halloween .v3-page-sub{ color:#cbb8e6; }
+
+    /* ---- Tarjetas / secciones ---- */
+    .mg-halloween .v3-simple-card,
+    .mg-halloween .v3-now-card,
+    .mg-halloween .v3-xp-card,
+    .mg-halloween .v3-x-card,
+    .mg-halloween .v3-table-wrap,
+    .mg-halloween .v3-table-card{
+      background:linear-gradient(160deg, rgba(38,18,46,.55), rgba(18,10,20,.65));
+      border:1px solid rgba(255,140,0,.22);
+      box-shadow:0 8px 24px rgba(60,10,80,.25), inset 0 0 30px rgba(255,120,20,.03);
+    }
+    .mg-halloween .v3-now-card.v3-c-purple{ border-color:rgba(255,140,0,.32); box-shadow:0 0 22px rgba(255,120,20,.12); }
+    .mg-halloween .v3-now-card.v3-c-gold{ border-color:rgba(255,201,71,.4); box-shadow:0 0 22px rgba(255,201,71,.14); }
+    .mg-halloween .v3-now-card.v3-c-blue{ border-color:rgba(151,255,158,.28); box-shadow:0 0 22px rgba(120,255,140,.1); }
+
+    .mg-halloween .v3-now-big,
+    .mg-halloween .v3-rank-name-big,
+    .mg-halloween .v3-now-winner-name{ color:#ffe3c2; }
+    .mg-halloween .v3-now-head, .mg-halloween .v3-x-title{ color:#ffb347; }
+    .mg-halloween .v3-now-sub, .mg-halloween .v3-x-desc{ color:#c7b3de; }
+
+    .mg-halloween .v3-xp-bar-bg{ background:rgba(255,140,0,.12); }
+    .mg-halloween .v3-xp-bar-fill{ background:linear-gradient(90deg,#ff8a2b,#b784ff); box-shadow:0 0 10px rgba(255,140,0,.5); }
+
+    .mg-halloween .v3-btn-secondary,
+    .mg-halloween .v3-now-btn,
+    .mg-halloween .v3-x-connect-btn{
+      background:linear-gradient(135deg,#ff7a1a,#b043ff);
+      border:none; color:#fff;
+      box-shadow:0 4px 16px rgba(255,110,20,.3);
+    }
+    .mg-halloween .v3-btn-secondary:hover,
+    .mg-halloween .v3-now-btn:hover,
+    .mg-halloween .v3-x-connect-btn:hover{ filter:brightness(1.1); }
+
+    .mg-halloween .ga-modal{
+      background:linear-gradient(160deg,#1c0f22,#120a14);
+      border:1px solid rgba(255,140,0,.3);
+    }
+    .mg-halloween .ga-twitch-btn{
+      background:linear-gradient(135deg,#ff7a1a,#b043ff);
+      border:none;
+    }
+
+    .mg-halloween .footer{ border-top:1px solid rgba(255,140,0,.18); }
+
+    /* ---- Decoraciones flotantes (puramente visuales) ---- */
+    .mg-hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+    .mg-hw-decor span{ position:absolute; opacity:.55; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
+    .mg-hw-decor .mg-hw-bat{ font-size:22px; animation:mgHwFly 16s linear infinite; }
+    .mg-hw-decor .mg-hw-bat2{ font-size:16px; animation:mgHwFly 22s linear infinite reverse; opacity:.4; }
+    .mg-hw-decor .mg-hw-pumpkin{ font-size:26px; opacity:.5; animation:mgHwBob 6s ease-in-out infinite; }
+    .mg-hw-decor .mg-hw-ghost{ font-size:20px; opacity:.35; animation:mgHwBob 8s ease-in-out infinite; }
+    .mg-hw-decor .mg-hw-web{ font-size:34px; opacity:.28; }
+
+    @keyframes mgHwFly{
+      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
+      50%{ transform:translate(55vw,4vh) rotate(6deg); }
+      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
+    }
+    @keyframes mgHwBob{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-10px); }
+    }
+
+    @media (max-width:700px){
+      .mg-hw-decor .mg-hw-pumpkin, .mg-hw-decor .mg-hw-ghost{ font-size:18px; }
+      .mg-hw-decor .mg-hw-web{ font-size:24px; }
+    }
+  </style>
 </head>
 <body>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
-  <div class="v3-page" style="min-height:100vh;">
+  <div class="v3-page mg-halloween" style="min-height:100vh;">
     <div class="v3-stars"></div>
+
+    <!-- Decoración de Halloween: puramente visual, sin IDs, sin lógica,
+         pointer-events:none para nunca bloquear clics reales. -->
+    <div class="mg-hw-decor" aria-hidden="true">
+      <span class="mg-hw-bat" style="top:8%;">🦇</span>
+      <span class="mg-hw-bat2" style="top:22%;">🦇</span>
+      <span class="mg-hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
+      <span class="mg-hw-pumpkin" style="left:3%; top:14%;">🎃</span>
+      <span class="mg-hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
+      <span class="mg-hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
+      <span class="mg-hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
+      <span class="mg-hw-web" style="left:-4px; top:-4px;">🕸️</span>
+      <span class="mg-hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
+    </div>
 
     <!-- NAV -->
     <nav class="v3-nav">
