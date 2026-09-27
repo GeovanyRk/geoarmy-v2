@@ -131,6 +131,56 @@
     }
     .ti-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent); }
 
+    /* ---------- COMPRAR G-COINS (Square Payment Links, acreditación manual) ----------
+       Sección puramente visual/estática: 5 paquetes fijos con botón <a> a un
+       Payment Link público de Square (target=_blank, sin selector de cantidad,
+       sin precio personalizado, sin SDK/API/claves de Square ni JS de pagos).
+       No lee ni escribe tiSaldoValor/saldo, no llama a ningún endpoint de
+       tienda-server, no toca el catálogo ni la lógica de canje. */
+    .ti-comprar { position: relative; z-index: 2; max-width: 1140px; margin: 3.2rem auto 0; padding: 0 1.5rem; }
+    .ti-comprar-sub { text-align: center; color: var(--text2); font-size: .9rem; max-width: 560px; margin: 0 auto 1.8rem; line-height: 1.6; }
+    .ti-comprar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+    .ti-comprar-card {
+      position: relative; isolation: isolate; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+      border: 1px solid rgba(255,210,63,.28);
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+      padding: 1.4rem 1rem 1.2rem;
+      box-shadow: 0 20px 40px -28px rgba(255,210,63,.3);
+      transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+    }
+    .ti-comprar-card:hover { transform: translateY(-4px); }
+    .ti-comprar-coin { width: 36px; height: 36px; filter: drop-shadow(0 0 12px rgba(255,210,63,.5)); }
+    .ti-comprar-cantidad { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; text-align: center; }
+    .ti-comprar-cantidad span { display: block; font-size: .7rem; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+    .ti-comprar-precio { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.4rem; color: #ffd23f; text-shadow: 0 0 14px rgba(255,210,63,.35); }
+    .ti-comprar-btn {
+      position: relative; overflow: hidden; isolation: isolate;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: .01em; font-size: .92rem;
+      border: none; border-radius: var(--radius-sm);
+      width: 100%; padding: 11px 14px; margin-top: 4px; cursor: pointer; color: #fff; text-decoration: none;
+      background: linear-gradient(135deg, var(--accent), #3aa0ff);
+      transition: opacity .2s, transform .35s var(--ease), box-shadow .35s var(--ease);
+      box-shadow: 0 10px 26px -12px rgba(58,160,255,.5);
+    }
+    .ti-comprar-btn::before {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%);
+      transform: translateX(-120%); transition: transform .7s var(--ease);
+    }
+    .ti-comprar-btn:hover { transform: translateY(-2px); }
+    .ti-comprar-btn:hover::before { transform: translateX(120%); }
+    .ti-comprar-avisos { max-width: 640px; margin: 1.6rem auto 0; text-align: center; }
+    .ti-comprar-aviso { color: var(--text2); font-size: .85rem; line-height: 1.6; margin: 0 0 6px; }
+    .ti-comprar-seguro { color: var(--text3); font-size: .78rem; margin: 0; }
+    @media (max-width: 560px) {
+      .ti-comprar-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 400px) {
+      .ti-comprar-grid { grid-template-columns: 1fr; }
+    }
+
     /* ---------- DESTACADOS ---------- */
     .ti-featured { position: relative; z-index: 2; max-width: 1140px; margin: 3.2rem auto 0; padding: 0 1.5rem; }
     .ti-featured-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
@@ -321,9 +371,98 @@
     @media (max-width: 400px) {
       .ti-grid { grid-template-columns: 1fr; }
     }
+
+  </style>
+
+  <!-- ================================================================
+       Tematica de Halloween — SOLO colores/decoración para esta página.
+       Todo scopeado bajo "body.hw-halloween" (clase agregada únicamente
+       al <body> de ESTE archivo) para no tocar css/v3-theme.css ni
+       css/style.css ni ninguna otra página. No cambia ningún ID/clase
+       leído por el script (tiSaldoValor, tiLoginBtn, tiUsuarioTag,
+       tiUsuarioNombre, tiGrid, tiMsg, .ti-filtro-btn+data-cat, --c2-accent
+       dinámico por categoría) -- solo fondo, bordes/sombras genéricos y
+       elementos decorativos nuevos con pointer-events:none. -->
+  <style>
+    body.hw-halloween{
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%);
+      background-color:#0a0612;
+    }
+    body.hw-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
+    body.hw-halloween .v3-nebula{ opacity:.5; filter:hue-rotate(20deg); }
+
+    body.hw-halloween .v3-nav{
+      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
+      border-bottom:1px solid rgba(255,122,26,.28);
+    }
+    body.hw-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
+    body.hw-halloween .v3-join-btn{ background:linear-gradient(135deg,#ff7a1a,#b043ff); border:none; }
+
+    body.hw-halloween .ti-eyebrow{ color:#ff9d3d; }
+    body.hw-halloween .ti-title-new{
+      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    }
+    body.hw-halloween .ti-sub{ color:#cbb8e6; }
+    body.hw-halloween .ti-crest{ color:#ff9d3d; }
+
+    body.hw-halloween .ti-wallet-card,
+    body.hw-halloween .ti-comprar-card,
+    body.hw-halloween .ti-feat-card{
+      background:linear-gradient(160deg, rgba(38,18,46,.55), rgba(18,10,20,.65));
+      border:1px solid rgba(255,140,0,.22);
+      box-shadow:0 8px 24px rgba(60,10,80,.25);
+    }
+    body.hw-halloween .ti-login-btn,
+    body.hw-halloween .ti-comprar-btn{
+      background:linear-gradient(135deg,#ff7a1a,#b043ff); border:none; color:#fff;
+    }
+    body.hw-halloween .ti-filtro-btn.active{
+      background:linear-gradient(135deg,#ff7a1a,#b043ff); border-color:transparent;
+    }
+    body.hw-halloween .ti-feat-price{ color:#ffb347; text-shadow:0 0 12px rgba(255,140,0,.4); }
+    body.hw-halloween .ti-section-title{ color:#ffb347; }
+    body.hw-halloween .ti-line{ background:linear-gradient(90deg,transparent,#ff7a1a,transparent); }
+
+    /* ---- Decoraciones flotantes (puramente visuales) ---- */
+    .hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+    .hw-decor span{ position:absolute; opacity:.5; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
+    .hw-decor .hw-bat{ font-size:22px; animation:hwFly 16s linear infinite; }
+    .hw-decor .hw-bat2{ font-size:16px; animation:hwFly 22s linear infinite reverse; opacity:.4; }
+    .hw-decor .hw-pumpkin{ font-size:26px; opacity:.5; animation:hwBob 6s ease-in-out infinite; }
+    .hw-decor .hw-ghost{ font-size:20px; opacity:.35; animation:hwBob 8s ease-in-out infinite; }
+    .hw-decor .hw-web{ font-size:34px; opacity:.28; }
+
+    @keyframes hwFly{
+      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
+      50%{ transform:translate(55vw,4vh) rotate(6deg); }
+      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
+    }
+    @keyframes hwBob{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-10px); }
+    }
+    @media (max-width:700px){
+      .hw-decor .hw-pumpkin, .hw-decor .hw-ghost{ font-size:18px; }
+      .hw-decor .hw-web{ font-size:24px; }
+    }
   </style>
 </head>
-<body>
+<body class="hw-halloween">
+
+  <div class="hw-decor" aria-hidden="true">
+    <span class="hw-bat" style="top:8%;">🦇</span>
+    <span class="hw-bat2" style="top:22%;">🦇</span>
+    <span class="hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
+    <span class="hw-pumpkin" style="left:3%; top:14%;">🎃</span>
+    <span class="hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
+    <span class="hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
+    <span class="hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
+    <span class="hw-web" style="left:-4px; top:-4px;">🕸️</span>
+    <span class="hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
+  </div>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -394,6 +533,57 @@
   </section>
   </div>
 
+  <!-- COMPRAR G-COINS: compra manual vía Square Payment Links. Sección
+       estática, sin selector de cantidad ni precio personalizado -- 5
+       paquetes fijos, cada botón abre en pestaña nueva el Payment Link
+       público correspondiente. Square procesa el checkout completo; aquí
+       no hay formulario de tarjeta, API, SDK, clave ni token de Square, ni
+       ningún fetch. La acreditación de G-Coins es MANUAL (no instantánea)
+       -- ver aviso debajo de los paquetes. No modifica saldo/tiSaldoValor,
+       no llama a /api/*, no toca el catálogo ni el sistema de canjes. -->
+  <section class="ti-comprar">
+    <div class="ti-section-title"><span class="ti-line"></span>Comprar G-Coins<span class="ti-line"></span></div>
+    <p class="ti-comprar-sub">Compra G-Coins directamente con tarjeta. El pago se procesa fuera de Geo Army, en Square.</p>
+
+    <div class="ti-comprar-grid">
+      <div class="ti-comprar-card">
+        <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
+        <div class="ti-comprar-cantidad">1,800 <span>G-Coins</span></div>
+        <div class="ti-comprar-precio">$5</div>
+        <a class="ti-comprar-btn" href="https://square.link/u/JFqxuMiT" target="_blank" rel="noopener noreferrer">Comprar</a>
+      </div>
+      <div class="ti-comprar-card">
+        <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
+        <div class="ti-comprar-cantidad">3,750 <span>G-Coins</span></div>
+        <div class="ti-comprar-precio">$10</div>
+        <a class="ti-comprar-btn" href="https://square.link/u/0SlHiuHd" target="_blank" rel="noopener noreferrer">Comprar</a>
+      </div>
+      <div class="ti-comprar-card">
+        <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
+        <div class="ti-comprar-cantidad">7,500 <span>G-Coins</span></div>
+        <div class="ti-comprar-precio">$20</div>
+        <a class="ti-comprar-btn" href="https://square.link/u/sASLLECJ" target="_blank" rel="noopener noreferrer">Comprar</a>
+      </div>
+      <div class="ti-comprar-card">
+        <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
+        <div class="ti-comprar-cantidad">18,750 <span>G-Coins</span></div>
+        <div class="ti-comprar-precio">$50</div>
+        <a class="ti-comprar-btn" href="https://square.link/u/Oou5LtP1" target="_blank" rel="noopener noreferrer">Comprar</a>
+      </div>
+      <div class="ti-comprar-card">
+        <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
+        <div class="ti-comprar-cantidad">37,500 <span>G-Coins</span></div>
+        <div class="ti-comprar-precio">$100</div>
+        <a class="ti-comprar-btn" href="https://square.link/u/JBAkg248" target="_blank" rel="noopener noreferrer">Comprar</a>
+      </div>
+    </div>
+
+    <div class="ti-comprar-avisos">
+      <p class="ti-comprar-aviso">⚠️ Ingresa correctamente tu Twitch username durante el pago. Los G-Coins se acreditan después de verificar el pago.</p>
+      <p class="ti-comprar-seguro">🔒 Pago seguro procesado por Square.</p>
+    </div>
+  </section>
+
   <!-- Destacados: vitrina editorial de los productos marcados como populares.
        Se oculta sola (hidden) si el catálogo no trae ninguno -- ver
        renderFeatured() más abajo. No usa botón de canje propio: cada
@@ -406,10 +596,10 @@
 
   <div class="ti-filtros">
     <button class="ti-filtro-btn active" data-cat="todos">Todos</button>
-    <button class="ti-filtro-btn" data-cat="fortnite"><img src="icons/icon-vbucks.svg" alt=""> Fortnite</button>
-    <button class="ti-filtro-btn" data-cat="overwatch"><img src="icons/icon-overwatch.svg" alt=""> Overwatch</button>
-    <button class="ti-filtro-btn" data-cat="clashroyale"><img src="icons/icon-clash-royale.png" alt=""> Clash Royale</button>
-    <button class="ti-filtro-btn" data-cat="brawlstars"><img src="icons/icon-brawl-stars.png" alt=""> Brawl Stars</button>
+    <button class="ti-filtro-btn" data-cat="fortnite"><img src="assets/store/fortnite-battle-pass.webp" alt=""> Fortnite</button>
+    <button class="ti-filtro-btn" data-cat="overwatch"><img src="assets/store/owcoins-500.webp" alt=""> Overwatch</button>
+    <button class="ti-filtro-btn" data-cat="clashroyale"><img src="assets/store/clash-royale-pass.webp" alt=""> Clash Royale</button>
+    <button class="ti-filtro-btn" data-cat="brawlstars"><img src="assets/store/brawl-stars-pass.webp" alt=""> Brawl Stars</button>
     <button class="ti-filtro-btn" data-cat="premio">🎁 Premios</button>
   </div>
 

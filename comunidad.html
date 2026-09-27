@@ -147,13 +147,11 @@
   .hq-bento {
     display: grid; max-width: 1100px; margin: 0 auto; gap: 16px;
     grid-template-columns: 1.4fr 1fr;
-    grid-template-areas: "stream discord" "stream whatsapp" "fortnite winner";
+    grid-template-areas: "stream discord" "stream whatsapp";
   }
   .hq-card-stream   { grid-area: stream; }
   .hq-card-discord  { grid-area: discord; }
   .hq-card-whatsapp { grid-area: whatsapp; }
-  .hq-card-fortnite { grid-area: fortnite; }
-  .hq-card-winner   { grid-area: winner; }
 
   .hq-card {
     --card-ac: #00d4ff;
@@ -199,59 +197,85 @@
   .hq-social-title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 13.5px; color: #eaf2ff; }
   .hq-social-sub { font-size: 12px; color: var(--text2); }
 
-  /* Pavos Fortnite */
-  .hq-card-fortnite { --card-ac: #ffd23f; flex-direction: row; align-items: center; gap: 16px; }
-  .hq-ft-emoji { font-size: 32px; flex-shrink: 0; filter: drop-shadow(0 0 10px rgba(255,210,63,.5)); }
-  .hq-ft-body { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
-  .hq-ft-body b { font-family: 'Orbitron', sans-serif; font-size: 14.5px; color: #eaf2ff; }
-  .hq-ft-body span { font-size: 12.5px; color: var(--text2); }
-  .hq-card-fortnite .hq-card-btn { margin-top: 0; flex-shrink: 0; }
-
-  /* Último ganador */
-  .hq-card-winner { --card-ac: #ec4899; }
-  .hq-winner-row { display: flex; align-items: center; gap: 12px; }
-  .hq-winner-ava {
-    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; font-size: 17px;
-    background: radial-gradient(circle at 35% 30%, #2a1530, #0a0812); border: 1px solid rgba(236,72,153,.4);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .hq-winner-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; color: #ec4899; }
-  .hq-winner-prize { font-size: 12px; color: var(--text2); margin-top: 2px; }
-  .hq-winner-empty { color: var(--text3); font-size: 12.5px; }
 
   @media (max-width: 980px) {
     .hq-bento { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 700px) {
-    .hq-bento { grid-template-columns: 1fr; grid-template-areas: "stream" "discord" "whatsapp" "fortnite" "winner"; }
-    .hq-card-fortnite { flex-direction: column; align-items: flex-start; }
+    .hq-bento { grid-template-columns: 1fr; grid-template-areas: "stream" "discord" "whatsapp"; }
   }
 
-  /* ---------- ÚLTIMOS GANADORES: ticker horizontal compacto ---------- */
-  .hq-recent { max-width: 1100px; margin: 30px auto 0; }
-  .hq-recent-row { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.25) transparent; }
-  .hq-recent-row::-webkit-scrollbar { height: 6px; }
-  .hq-recent-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); border-radius: 100px; }
-  .hq-recent-item {
-    flex: 0 0 auto; min-width: 190px; display: flex; align-items: center; gap: 10px;
-    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
-    padding: 11px 15px; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-  }
-  .hq-recent-rank {
-    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px;
-    display: flex; align-items: center; justify-content: center; background: #1c2740; color: #eaf2ff;
-  }
-  .hq-recent-rank.g1 { background: rgba(255,210,63,.18); color: #ffd23f; }
-  .hq-recent-rank.g2 { background: rgba(215,222,232,.14); color: #d7dee8; }
-  .hq-recent-rank.g3 { background: rgba(224,160,106,.18); color: #e0a06a; }
-  .hq-recent-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12.5px; color: #eaf2ff; white-space: nowrap; }
-  .hq-recent-prize { font-size: 11px; color: var(--text2); white-space: nowrap; }
-  .hq-recent-more { display: inline-block; margin-top: 4px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px; color: #8fc4ff; }
-  .hq-recent-more:hover { color: #c3e2ff; }
-  .hq-recent-empty { color: var(--text3); font-size: 12.5px; padding: 6px 0; }
+
+  </style>
+
+  <!-- ================================================================
+       Tematica de Halloween — SOLO colores/decoración para esta página,
+       scopeada bajo "body.hw-halloween" (clase agregada únicamente al
+       <body> de este archivo) para no tocar v3-theme.css, style.css ni
+       ninguna otra página. No cambia ningún ID, ninguna estructura,
+       ningún script, ni los colores por tarjeta (--card-ac de
+       stream/discord/whatsapp) que son identidad de marca de cada canal. -->
+  <style>
+    body.hw-halloween{
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%);
+      background-color:#0a0612;
+    }
+    body.hw-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
+    body.hw-halloween .v3-nebula{ opacity:.5; filter:hue-rotate(20deg); }
+    body.hw-halloween .v3-nav{
+      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
+      border-bottom:1px solid rgba(255,122,26,.28);
+    }
+    body.hw-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
+    body.hw-halloween .v3-page-links a{ color:#e7d7ff; }
+    body.hw-halloween .v3-page-links a:hover{ color:#ff9d3d; }
+    body.hw-halloween .hq-title{
+      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    }
+    body.hw-halloween .hq-card{
+      background:linear-gradient(160deg, rgba(38,18,46,.55), rgba(18,10,20,.65));
+    }
+    body.hw-halloween .footer{ border-top:1px solid rgba(255,140,0,.18); }
+
+    /* ---- Decoraciones flotantes (puramente visuales) ---- */
+    .hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+    .hw-decor span{ position:absolute; opacity:.5; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
+    .hw-decor .hw-bat{ font-size:22px; animation:hwFly 16s linear infinite; }
+    .hw-decor .hw-bat2{ font-size:16px; animation:hwFly 22s linear infinite reverse; opacity:.4; }
+    .hw-decor .hw-pumpkin{ font-size:26px; opacity:.5; animation:hwBob 6s ease-in-out infinite; }
+    .hw-decor .hw-ghost{ font-size:20px; opacity:.35; animation:hwBob 8s ease-in-out infinite; }
+    .hw-decor .hw-web{ font-size:34px; opacity:.28; }
+    @keyframes hwFly{
+      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
+      50%{ transform:translate(55vw,4vh) rotate(6deg); }
+      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
+    }
+    @keyframes hwBob{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-10px); }
+    }
+    @media (max-width:700px){
+      .hw-decor .hw-pumpkin, .hw-decor .hw-ghost{ font-size:18px; }
+      .hw-decor .hw-web{ font-size:24px; }
+    }
   </style>
 </head>
-<body>
+<body class="hw-halloween">
+
+  <div class="hw-decor" aria-hidden="true">
+    <span class="hw-bat" style="top:8%;">🦇</span>
+    <span class="hw-bat2" style="top:22%;">🦇</span>
+    <span class="hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
+    <span class="hw-pumpkin" style="left:3%; top:14%;">🎃</span>
+    <span class="hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
+    <span class="hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
+    <span class="hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
+    <span class="hw-web" style="left:-4px; top:-4px;">🕸️</span>
+    <span class="hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
+  </div>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -272,7 +296,6 @@
         <div class="v3-page-links">
           <a href="index.html#inicio">Inicio</a>
           <a href="tienda.html">Tienda</a>
-          <a href="fortnite.html">Fortnite</a>
           <a href="puntos.html">Puntos</a>
         </div>
         <div class="v3-auth">
@@ -353,7 +376,7 @@
                 <div class="hq-social-sub">Únete a nuestra comunidad</div>
               </div>
             </div>
-            <a href="#" class="hq-card-btn">Entrar al Discord ›</a>
+            <a href="https://discord.gg/3y4JmWkC7P" target="_blank" rel="noopener noreferrer" class="hq-card-btn">Entrar al Discord ›</a>
           </div>
 
           <div class="hq-card hq-card-whatsapp">
@@ -364,30 +387,11 @@
                 <div class="hq-social-sub">Avisos y sorteos al instante</div>
               </div>
             </div>
-            <a href="#" class="hq-card-btn">Entrar al grupo ›</a>
+            <a href="https://chat.whatsapp.com/Biv2cUNwewL9LtvUirQBL0" target="_blank" rel="noopener noreferrer" class="hq-card-btn">Entrar al grupo ›</a>
           </div>
 
-          <div class="hq-card hq-card-fortnite">
-            <span class="hq-ft-emoji">🎮</span>
-            <div class="hq-ft-body">
-              <b>¿Necesitas pavos?</b>
-              <span>Consigue V-Bucks para Fortnite.</span>
-            </div>
-            <a href="fortnite.html" class="hq-card-btn">Entrar ›</a>
-          </div>
-
-          <div class="hq-card hq-card-winner">
-            <div class="hq-card-head"><span class="hq-ic">🏆</span>Último ganador</div>
-            <div id="v3LastWinner">Cargando…</div>
-            <a href="index.html#ganadores" class="hq-card-btn">Ver todos ›</a>
-          </div>
         </div>
 
-        <div class="hq-recent" data-reveal>
-          <div class="hq-section-title" style="margin-bottom:16px;"><span class="hq-line"></span>Últimos ganadores<span class="hq-line"></span></div>
-          <div class="hq-recent-row" id="v3RecentRow">Cargando…</div>
-          <a href="index.html#ganadores" class="hq-recent-more">Ver Salón de la Fama ›</a>
-        </div>
       </section>
 
     </div>
@@ -434,60 +438,6 @@
       sync();
       new MutationObserver(sync).observe(label, { childList: true, characterData: true, subtree: true });
     } catch (e) { console.warn('[v3-live-text]', e); }
-  })();
-  </script>
-  <script>
-  // ===== V3: "Ahora en Geo Army" — Último ganador + Últimos ganadores, con datos reales de ganadores.json =====
-  // Independiente del script del panel #ganadores (vive en index.html, no en esta página),
-  // envuelto en try/catch, no rompe nada si falla. Mismo fetch/orden que siempre; solo cambia el HTML que pinta.
-  (function () {
-    try {
-      function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-      function diasDesde(f) {
-        var partes = String(f || '').split('/');
-        if (partes.length !== 3) return '';
-        var d = parseInt(partes[0], 10), m = parseInt(partes[1], 10), y = parseInt(partes[2], 10);
-        if (!d || !m || !y) return '';
-        var fecha = new Date(y, m - 1, d);
-        var diff = Math.floor((new Date() - fecha) / 86400000);
-        if (diff <= 0) return 'Hoy';
-        if (diff === 1) return 'Hace 1 día';
-        return 'Hace ' + diff + ' días';
-      }
-      function renderLast(rows) {
-        var el = document.getElementById('v3LastWinner');
-        if (!el) return;
-        if (!rows.length) { el.innerHTML = '<div class="hq-winner-empty">Todavía no hay ganadores registrados.</div>'; return; }
-        var g = rows[0];
-        el.innerHTML =
-          '<div class="hq-winner-row">' +
-            '<div class="hq-winner-ava">🏆</div>' +
-            '<div><div class="hq-winner-name">@' + esc(g.usuario) + '</div>' +
-            '<div class="hq-winner-prize">' + esc(g.premio) + '</div></div>' +
-          '</div>';
-      }
-      function renderRecent(rows) {
-        var el = document.getElementById('v3RecentRow');
-        if (!el) return;
-        if (!rows.length) { el.innerHTML = '<div class="hq-recent-empty">Todavía no hay ganadores registrados.</div>'; return; }
-        var ranks = ['g1', 'g2', 'g3'];
-        el.innerHTML = rows.slice(0, 8).map(function (g, i) {
-          return '<div class="hq-recent-item">' +
-            '<div class="hq-recent-rank ' + (ranks[i] || '') + '">' + (i + 1) + '</div>' +
-            '<div><div class="hq-recent-name">@' + esc(g.usuario) + '</div>' +
-            '<div class="hq-recent-prize">' + esc(g.premio) + ' · ' + diasDesde(g.fecha) + '</div></div>' +
-            '</div>';
-        }).join('');
-      }
-      fetch('ganadores.json?t=' + Date.now(), { cache: 'no-store' })
-        .then(function (r) { if (!r.ok) throw 0; return r.json(); })
-        .then(function (j) {
-          var rows = (j.ganadores || []).slice().sort(function (a, b) { return b.id - a.id; });
-          renderLast(rows);
-          renderRecent(rows);
-        })
-        .catch(function () { renderLast([]); renderRecent([]); });
-    } catch (e) { console.warn('[v3-now]', e); }
   })();
   </script>
 </body>

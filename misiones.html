@@ -196,9 +196,97 @@
       padding: 10px 22px; border-radius: 100px; border: none; cursor: pointer;
     }
 
+    /* Claim manual de STREAM_RETWEET. La autoridad sigue siendo el backend:
+       el botón solo expresa la intención de reclamar la misión. */
+    .ms-claim-wrap { margin-top: 12px; }
+    .ms-claim-btn {
+      width: 100%; min-height: 38px; border-radius: 9px;
+      border: 1px solid rgba(0,212,255,.45);
+      background: linear-gradient(90deg, rgba(0,212,255,.13), rgba(145,71,255,.16));
+      color: #dff7ff; font-family: 'Orbitron', sans-serif; font-weight: 700;
+      font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+      cursor: pointer; transition: border-color .2s ease, background .2s ease, opacity .2s ease;
+    }
+    .ms-claim-btn:hover:not(:disabled) {
+      border-color: rgba(0,212,255,.85);
+      background: linear-gradient(90deg, rgba(0,212,255,.22), rgba(145,71,255,.24));
+    }
+    .ms-claim-btn:disabled { cursor: default; opacity: .5; }
+
+    .ms-claim-notice {
+      max-width: 1040px; margin: 0 auto 18px; padding: 11px 14px;
+      border-radius: 10px; border: 1px solid rgba(255,255,255,.12);
+      background: rgba(8,14,28,.88); color: #c9d5ea; font-size: 12.5px;
+      line-height: 1.45;
+    }
+    .ms-claim-notice[data-kind="success"] {
+      border-color: rgba(61,220,132,.38); color: #bff6d5;
+    }
+    .ms-claim-notice[data-kind="warning"] {
+      border-color: rgba(255,210,63,.35); color: #ffe89a;
+    }
+    .ms-claim-notice[data-kind="error"] {
+      border-color: rgba(255,105,120,.35); color: #ffc2c9;
+    }
+
     @media (max-width: 560px) {
       .ms-group-grid { grid-template-columns: 1fr; }
       .ms-badge { margin-left: 0; }
+    }
+  </style>
+
+  <!-- ================================================================
+       Tematica de Halloween — SOLO colores/decoración para esta página,
+       scopeada bajo ".mg-halloween" (clase agregada únicamente al
+       contenedor .v3-page de este archivo) para no tocar v3-theme.css,
+       style.css ni ninguna otra página. No cambia ningún ID, ninguna
+       estructura, ningún script, ni los colores por estado de misión
+       (--ms-ac: available/progress/done/soon) que son funcionales. -->
+  <style>
+    .mg-halloween{
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%),
+        linear-gradient(180deg,#0a0612 0%,#120a1f 40%,#1a0f12 100%);
+    }
+    .mg-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
+    .mg-halloween .v3-nebula{ opacity:.5; filter:hue-rotate(20deg); }
+    .mg-halloween .v3-nav{
+      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
+      border-bottom:1px solid rgba(255,122,26,.28);
+    }
+    .mg-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
+    .mg-halloween .v3-page-links a{ color:#e7d7ff; }
+    .mg-halloween .v3-page-links a:hover{ color:#ff9d3d; }
+    .mg-halloween .ms-eyebrow{ color:#ff9d3d; }
+    .mg-halloween .ms-title{
+      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    }
+    .mg-halloween .ms-sub{ color:#cbb8e6; }
+    .mg-halloween .v3-xp-bar-bg{ background:rgba(255,140,0,.12); }
+    .mg-halloween .v3-xp-bar-fill{ background:linear-gradient(90deg,#ff8a2b,#b784ff); box-shadow:0 0 10px rgba(255,140,0,.5); }
+
+    /* ---- Decoraciones flotantes (puramente visuales) ---- */
+    .mg-hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+    .mg-hw-decor span{ position:absolute; opacity:.55; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
+    .mg-hw-decor .mg-hw-bat{ font-size:22px; animation:mgHwFly 16s linear infinite; }
+    .mg-hw-decor .mg-hw-bat2{ font-size:16px; animation:mgHwFly 22s linear infinite reverse; opacity:.4; }
+    .mg-hw-decor .mg-hw-pumpkin{ font-size:26px; opacity:.5; animation:mgHwBob 6s ease-in-out infinite; }
+    .mg-hw-decor .mg-hw-ghost{ font-size:20px; opacity:.35; animation:mgHwBob 8s ease-in-out infinite; }
+    .mg-hw-decor .mg-hw-web{ font-size:34px; opacity:.28; }
+    @keyframes mgHwFly{
+      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
+      50%{ transform:translate(55vw,4vh) rotate(6deg); }
+      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
+    }
+    @keyframes mgHwBob{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-10px); }
+    }
+    @media (max-width:700px){
+      .mg-hw-decor .mg-hw-pumpkin, .mg-hw-decor .mg-hw-ghost{ font-size:18px; }
+      .mg-hw-decor .mg-hw-web{ font-size:24px; }
     }
   </style>
 </head>
@@ -206,8 +294,20 @@
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
-  <div class="v3-page" style="min-height:100vh;">
+  <div class="v3-page mg-halloween" style="min-height:100vh;">
     <div class="v3-stars"></div>
+
+    <div class="mg-hw-decor" aria-hidden="true">
+      <span class="mg-hw-bat" style="top:8%;">🦇</span>
+      <span class="mg-hw-bat2" style="top:22%;">🦇</span>
+      <span class="mg-hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
+      <span class="mg-hw-pumpkin" style="left:3%; top:14%;">🎃</span>
+      <span class="mg-hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
+      <span class="mg-hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
+      <span class="mg-hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
+      <span class="mg-hw-web" style="left:-4px; top:-4px;">🕸️</span>
+      <span class="mg-hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
+    </div>
     <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
     <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
     <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
@@ -223,7 +323,6 @@
         <div class="v3-page-links">
           <a href="index.html#inicio">Inicio</a>
           <a href="tienda.html">Tienda</a>
-          <a href="fortnite.html">Fortnite</a>
           <a href="puntos.html">Puntos</a>
         </div>
         <div class="v3-auth">
@@ -287,6 +386,7 @@
          MISSION_GROUP más abajo) y pintar, tarjeta por tarjeta, la fila que
          la RPC ya devuelve resuelta. -->
     <div class="ms-wrap" id="missionsWrap">
+      <div id="msClaimNotice" class="ms-claim-notice" role="status" aria-live="polite" hidden></div>
       <div id="msList" class="ms-grid">
         <div class="ms-state">Cargando…</div>
       </div>
@@ -335,17 +435,23 @@
     var STATUS_LABEL = {
       available: 'Disponible',
       in_progress: 'En progreso',
+      cooldown: 'Disponible pronto',
       completed_today: 'Completada ✓',
       completed_this_week: 'Completada ✓',
       claimed: 'Completada ✓',
+      no_active_instance: 'Esperando stream',
+      mission_inactive: 'Próximamente',
       coming_soon: 'Próximamente'
     };
     var STATUS_STATE = {
       available: 'available',
       in_progress: 'progress',
+      cooldown: 'soon',
       completed_today: 'done',
       completed_this_week: 'done',
       claimed: 'done',
+      no_active_instance: 'soon',
+      mission_inactive: 'soon',
       coming_soon: 'soon'
     };
 
@@ -364,6 +470,9 @@
     var GROUP_LABELS = { daily: 'Diarias', weekly: 'Semanales', special: 'Especiales', twitch: 'Twitch y Comunidad' };
     var GROUP_ICONS = { daily: '☀️', weekly: '🗓️', special: '✨', twitch: '🟣' };
     function groupOf(code) { return MISSION_GROUP[code] || 'special'; }
+
+    var currentMissionRows = [];
+    var streamClaimBusy = false;
 
     function renderLoggedOut(list) {
       list.innerHTML =
@@ -415,6 +524,26 @@
           '</div>';
       }
 
+      var claimHtml = '';
+      if (code === 'STREAM_RETWEET') {
+        if (row.status === 'available') {
+          claimHtml =
+            '<div class="ms-claim-wrap">' +
+              '<button type="button" class="ms-claim-btn" data-action="claim-stream-retweet">Reclamar</button>' +
+            '</div>';
+        } else if (row.status === 'in_progress') {
+          claimHtml =
+            '<div class="ms-claim-wrap">' +
+              '<button type="button" class="ms-claim-btn" disabled>Verificando…</button>' +
+            '</div>';
+        } else if (row.status === 'cooldown') {
+          claimHtml =
+            '<div class="ms-claim-wrap">' +
+              '<button type="button" class="ms-claim-btn" disabled>Disponible pronto</button>' +
+            '</div>';
+        }
+      }
+
       return (
         '<div class="ms-card" data-state="' + state + '">' +
           '<div class="ms-icon">' + icon + '</div>' +
@@ -426,12 +555,14 @@
             '</div>' +
             '<p class="ms-desc">' + esc(row.description) + '</p>' +
             progressHtml +
+            claimHtml +
           '</div>' +
         '</div>'
       );
     }
 
     function renderMissions(list, rows) {
+      currentMissionRows = Array.isArray(rows) ? rows.slice() : [];
       if (!rows || !rows.length) {
         list.innerHTML = '<div class="ms-state">No hay misiones disponibles ahora mismo.</div>';
         return;
@@ -604,6 +735,157 @@
         })
       ]);
     }
+
+    function showClaimNotice(message, kind) {
+      var notice = document.getElementById('msClaimNotice');
+      if (!notice) return;
+      notice.textContent = message;
+      notice.dataset.kind = kind || 'info';
+      notice.hidden = false;
+    }
+
+    function retryText(retryAfter) {
+      if (!retryAfter) return '';
+      var when = new Date(retryAfter).getTime();
+      if (!Number.isFinite(when)) return '';
+      var diff = when - Date.now();
+      if (diff <= 0) return '';
+      var mins = Math.max(1, Math.ceil(diff / 60000));
+      return ' Disponible en ' + mins + ' min.';
+    }
+
+    function currentStreamMission() {
+      for (var i = 0; i < currentMissionRows.length; i++) {
+        if (currentMissionRows[i].mission_code === 'STREAM_RETWEET') return currentMissionRows[i];
+      }
+      return null;
+    }
+
+    async function claimStreamRetweet(button) {
+      if (streamClaimBusy) return;
+
+      var sb = getMissionsClient();
+      if (!sb) {
+        showClaimNotice('No se pudo iniciar la verificación. Inténtalo nuevamente.', 'error');
+        return;
+      }
+
+      streamClaimBusy = true;
+      var originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Verificando…';
+
+      try {
+        var sessionRes = await withTimeout(sb.auth.getSession(), 8000);
+        var session = sessionRes && sessionRes.data && sessionRes.data.session;
+        var accessToken = session && session.access_token;
+
+        if (!accessToken) {
+          showClaimNotice('Tu sesión expiró. Inicia sesión nuevamente.', 'error');
+          return;
+        }
+
+        var baseUrl = String(window.GEOARMY_SUPABASE_URL || '').replace(/\/+$/, '');
+        if (!baseUrl) {
+          showClaimNotice('Ocurrió un error. Inténtalo nuevamente.', 'error');
+          return;
+        }
+
+        // IMPORTANTE: sin body. El backend resuelve usuario, instancia,
+        // tweet, recompensa e idempotencia de forma autoritativa.
+        var response = await withTimeout(fetch(baseUrl + '/functions/v1/claim-stream-retweet', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Accept': 'application/json'
+          }
+        }), 65000);
+
+        var payload = {};
+        try {
+          payload = await response.json();
+        } catch (_) {
+          payload = {};
+        }
+
+        var status = payload && (payload.status || payload.error);
+        if (!status && response.status === 401) status = 'session_expired';
+
+        var streamRow = currentStreamMission();
+        var reward = streamRow && streamRow.xp_reward != null ? Number(streamRow.xp_reward) : null;
+        var retry = retryText(payload && payload.retry_after);
+
+        switch (status) {
+          case 'granted':
+            showClaimNotice(reward != null ? ('🎉 +' + reward + ' XP') : '🎉 Misión completada.', 'success');
+            await loadMissions();
+            break;
+
+          case 'already_claimed':
+            showClaimNotice('Ya reclamaste esta misión.', 'info');
+            await loadMissions();
+            break;
+
+          case 'not_retweeted':
+            showClaimNotice('Todavía no detectamos tu RT.' + retry, 'warning');
+            await loadMissions();
+            break;
+
+          case 'cooldown':
+            showClaimNotice('Disponible pronto.' + retry, 'warning');
+            await loadMissions();
+            break;
+
+          case 'in_progress':
+            showClaimNotice('Tu RT se está verificando. Intenta en un momento.', 'info');
+            await loadMissions();
+            break;
+
+          case 'not_connected':
+          case 'x_not_connected':
+            showClaimNotice('Conecta tu cuenta de X desde Mi Geo Army para reclamar esta misión.', 'warning');
+            break;
+
+          case 'mission_inactive':
+            showClaimNotice('Esta misión no está disponible ahora mismo.', 'info');
+            await loadMissions();
+            break;
+
+          case 'no_active_instance':
+            showClaimNotice('Esperando stream.', 'info');
+            await loadMissions();
+            break;
+
+          case 'session_expired':
+          case 'unauthorized':
+            showClaimNotice('Tu sesión expiró. Inicia sesión nuevamente.', 'error');
+            break;
+
+          case 'verification_failed':
+          case 'internal_error':
+          default:
+            showClaimNotice('Ocurrió un error. Inténtalo nuevamente.', 'error');
+            break;
+        }
+      } catch (e) {
+        console.warn('[misiones] error reclamando STREAM_RETWEET');
+        showClaimNotice('Ocurrió un error. Inténtalo nuevamente.', 'error');
+      } finally {
+        streamClaimBusy = false;
+        if (button && button.isConnected && button.disabled) {
+          button.disabled = false;
+          button.textContent = originalText || 'Reclamar';
+        }
+      }
+    }
+
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+      var button = target.closest('[data-action="claim-stream-retweet"]');
+      if (!button) return;
+      claimStreamRetweet(button);
+    });
 
     async function loadMissions() {
       var list = document.getElementById('msList');

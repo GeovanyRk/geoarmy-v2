@@ -228,8 +228,72 @@
   }
   .rk-missions-btn:hover { transform: translateY(-3px); }
   </style>
+
+  <!-- ================================================================
+       Tematica de Halloween — SOLO colores/decoración para esta página,
+       scopeada bajo "body.hw-halloween" (clase agregada únicamente al
+       <body> de este archivo) para no tocar v3-theme.css, style.css ni
+       ninguna otra página. No cambia ningún ID, ninguna estructura,
+       ningún script, ni los colores oro/plata/bronce del podio (son
+       información real de posición, no decoración). -->
+  <style>
+    body.hw-halloween{
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%);
+      background-color:#0a0612;
+    }
+    body.hw-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
+    body.hw-halloween .v3-nav{
+      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
+      border-bottom:1px solid rgba(255,122,26,.28);
+    }
+    body.hw-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
+    body.hw-halloween .v3-page-links a{ color:#e7d7ff; }
+    body.hw-halloween .v3-page-links a:hover{ color:#ff9d3d; }
+    body.hw-halloween .rk-title{
+      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    }
+    body.hw-halloween .rk-missions-btn{ background:linear-gradient(135deg,#ff7a1a,#b043ff); color:#fff; }
+    body.hw-halloween .footer{ border-top:1px solid rgba(255,140,0,.18); }
+
+    /* ---- Decoraciones flotantes (puramente visuales) ---- */
+    .hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+    .hw-decor span{ position:absolute; opacity:.5; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
+    .hw-decor .hw-bat{ font-size:22px; animation:hwFly 16s linear infinite; }
+    .hw-decor .hw-bat2{ font-size:16px; animation:hwFly 22s linear infinite reverse; opacity:.4; }
+    .hw-decor .hw-pumpkin{ font-size:26px; opacity:.5; animation:hwBob 6s ease-in-out infinite; }
+    .hw-decor .hw-ghost{ font-size:20px; opacity:.35; animation:hwBob 8s ease-in-out infinite; }
+    .hw-decor .hw-web{ font-size:34px; opacity:.28; }
+    @keyframes hwFly{
+      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
+      50%{ transform:translate(55vw,4vh) rotate(6deg); }
+      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
+    }
+    @keyframes hwBob{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-10px); }
+    }
+    @media (max-width:700px){
+      .hw-decor .hw-pumpkin, .hw-decor .hw-ghost{ font-size:18px; }
+      .hw-decor .hw-web{ font-size:24px; }
+    }
+  </style>
 </head>
-<body>
+<body class="hw-halloween">
+
+  <div class="hw-decor" aria-hidden="true">
+    <span class="hw-bat" style="top:8%;">🦇</span>
+    <span class="hw-bat2" style="top:22%;">🦇</span>
+    <span class="hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
+    <span class="hw-pumpkin" style="left:3%; top:14%;">🎃</span>
+    <span class="hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
+    <span class="hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
+    <span class="hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
+    <span class="hw-web" style="left:-4px; top:-4px;">🕸️</span>
+    <span class="hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
+  </div>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -246,7 +310,6 @@
         <div class="v3-page-links">
           <a href="index.html#inicio">Inicio</a>
           <a href="tienda.html">Tienda</a>
-          <a href="fortnite.html">Fortnite</a>
           <a href="puntos.html">Puntos</a>
         </div>
         <div class="v3-auth">

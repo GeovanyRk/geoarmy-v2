@@ -18,17 +18,80 @@
     gtag('js', new Date());
     gtag('config', 'G-VT78CC8X2V');
   </script>
+
+  <!-- ================================================================
+       Tematica de Halloween — SOLO colores/decoración para esta página,
+       scopeada bajo "body.hw-halloween" (clase agregada únicamente al
+       <body> de este archivo) para no tocar v3-theme.css, style.css ni
+       ninguna otra página. No cambia ningún ID, ninguna estructura,
+       ningún script, ni el fetch/canje/ranking/clientRequestId, ni los
+       acentos de color de cada Paquete (PAQUETE_ACENTOS, son
+       diferenciación funcional entre paquetes). -->
+  <style>
+    body.hw-halloween{
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%);
+      background-color:#0a0612;
+    }
+    body.hw-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
+    body.hw-halloween .v3-nebula{ opacity:.5; filter:hue-rotate(20deg); }
+    body.hw-halloween .v3-nav{
+      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
+      border-bottom:1px solid rgba(255,122,26,.28);
+    }
+    body.hw-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
+    body.hw-halloween .pg-title{
+      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    }
+    body.hw-halloween .pg-card{ border-color:rgba(255,140,0,.22); box-shadow:0 8px 24px rgba(60,10,80,.25); }
+    body.hw-halloween .footer{ border-top:1px solid rgba(255,140,0,.18); }
+
+    /* ---- Decoraciones flotantes (puramente visuales) ---- */
+    .hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
+    .hw-decor span{ position:absolute; opacity:.5; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
+    .hw-decor .hw-bat{ font-size:22px; animation:hwFly 16s linear infinite; }
+    .hw-decor .hw-bat2{ font-size:16px; animation:hwFly 22s linear infinite reverse; opacity:.4; }
+    .hw-decor .hw-pumpkin{ font-size:26px; opacity:.5; animation:hwBob 6s ease-in-out infinite; }
+    .hw-decor .hw-ghost{ font-size:20px; opacity:.35; animation:hwBob 8s ease-in-out infinite; }
+    .hw-decor .hw-web{ font-size:34px; opacity:.28; }
+    @keyframes hwFly{
+      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
+      50%{ transform:translate(55vw,4vh) rotate(6deg); }
+      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
+    }
+    @keyframes hwBob{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-10px); }
+    }
+    @media (max-width:700px){
+      .hw-decor .hw-pumpkin, .hw-decor .hw-ghost{ font-size:18px; }
+      .hw-decor .hw-web{ font-size:24px; }
+    }
+  </style>
 </head>
-<body>
+<body class="hw-halloween">
+
+  <div class="hw-decor" aria-hidden="true">
+    <span class="hw-bat" style="top:8%;">🦇</span>
+    <span class="hw-bat2" style="top:22%;">🦇</span>
+    <span class="hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
+    <span class="hw-pumpkin" style="left:3%; top:14%;">🎃</span>
+    <span class="hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
+    <span class="hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
+    <span class="hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
+    <span class="hw-web" style="left:-4px; top:-4px;">🕸️</span>
+    <span class="hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
+  </div>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
-  <!-- Shell visual V2: mismo fondo espacial/nebulosas/nav que index.html.
-       Envuelve solo el nav (banda corta) -- el contenido de #puntos no se
-       movió ni un pixel, sigue exactamente igual, solo cambia lo que hay
-       arriba de él. No se tocó ningún endpoint, fetch, login, ranking,
-       clientRequestId ni lógica de Puntos -> GCOIN. -->
-  <div class="v3-page" style="min-height:220px;">
+  <!-- Shell visual V2: mismo fondo espacial/nebulosas/nav que el resto del
+       sitio. No se tocó ningún endpoint, fetch, login, ranking,
+       clientRequestId ni lógica de Puntos -> GCOIN -- solo se rediseñó lo
+       visual (hero + toda la sección #puntos de aquí abajo). -->
+  <div class="v3-page">
     <div class="v3-stars"></div>
     <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
     <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
@@ -45,97 +108,316 @@
         </div>
       </div>
     </nav>
+
+    <!-- HERO -->
+    <section class="pg-hero">
+      <div class="pg-hero-bg" aria-hidden="true"><div class="pg-hero-grid"></div></div>
+      <div class="pg-hero-inner" data-reveal>
+        <div class="pg-eyebrow">✦ Centro de Puntos ✦</div>
+        <h1 class="pg-title">Puntos Geo Army</h1>
+        <p class="pg-sub">Participa en el stream, acumula puntos y conviértelos en recompensas.</p>
+
+        <!-- Estos números son solo texto informativo -- si cambias
+             PUNTOS_POR_INTERVALO / INTERVALO_PUNTOS_MINUTOS / PUNTOS_COFRE /
+             INTERVALO_COFRE_MINUTOS en twitchPuntos.js, actualiza también
+             estas dos cards a mano (no hay una API pública que exponga esa
+             config, así que no se leen de ahí). -->
+        <div class="pg-earn-cards">
+          <div class="pg-earn-card">
+            <span class="pg-earn-ic">💬</span>
+            <div>
+              <div class="pg-earn-title">Activo en chat</div>
+              <div class="pg-earn-sub">+20 pts cada 5 minutos</div>
+            </div>
+          </div>
+          <div class="pg-earn-card">
+            <span class="pg-earn-ic">🎁</span>
+            <div>
+              <div class="pg-earn-title">Cofre sorpresa</div>
+              <div class="pg-earn-sub">+50 pts cada 15 minutos</div>
+            </div>
+          </div>
+        </div>
+        <p class="pg-earn-note">Solo para suscriptores del canal.</p>
+      </div>
+    </section>
   </div>
 
   <section class="section" id="puntos">
     <style>
-      #puntos .pt-wrap{max-width:940px;margin:0 auto;}
-      #puntos .pt-stats{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 22px;}
-      #puntos .pt-chip{flex:1;min-width:120px;background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px 20px;box-shadow:var(--card-shadow);transition:transform .35s var(--ease),border-color .35s var(--ease);}
-      #puntos .pt-chip:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.18);}
-      #puntos .pt-chip b{font-family:'Space Grotesk',sans-serif;font-size:2rem;line-height:1;display:block;color:#a970ff;}
-      #puntos .pt-chip span{font-size:.7rem;text-transform:uppercase;letter-spacing:.13em;color:rgba(255,255,255,.5);}
-      #puntos .pt-rank-card{background:linear-gradient(180deg, rgba(169,112,255,.09), rgba(169,112,255,.03)), var(--bg2);border:1px solid rgba(169,112,255,.25);border-radius:20px;padding:20px 22px;margin-bottom:20px;box-shadow:var(--card-shadow);}
-      #puntos .pt-rank-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:600;color:#a970ff;margin-bottom:10px;}
-      #puntos .pt-rank-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-      #puntos .pt-rank-row:last-child{border-bottom:0;}
-      #puntos .pt-rank-pos{width:28px;flex-shrink:0;font-size:1.1rem;text-align:center;}
-      #puntos .pt-rank-name{flex:1;font-weight:600;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-      #puntos .pt-rank-total{color:#a970ff;font-family:'Space Grotesk',sans-serif;font-size:.88rem;white-space:nowrap;}
-      #puntos .pt-rank-empty{padding:14px 4px;color:rgba(255,255,255,.5);font-size:.9rem;text-align:center;}
-      #puntos .pt-search{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:12px;font-size:.95rem;font-family:inherit;margin-bottom:14px;}
-      #puntos .pt-search::placeholder{color:rgba(255,255,255,.4);}
-      #puntos .pt-search:focus{outline:2px solid var(--accent-light);outline-offset:1px;}
-      #puntos .pt-card{background:var(--card-bg);border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;box-shadow:var(--card-shadow);}
-      #puntos table{width:100%;border-collapse:collapse;}
-      #puntos thead th{font-family:'Space Grotesk',sans-serif;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;text-align:left;color:rgba(255,255,255,.45);padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
-      #puntos tbody td{padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.05);font-size:.93rem;vertical-align:middle;color:#fff;}
-      #puntos tbody tr:last-child td{border-bottom:0;}
-      #puntos tbody tr:hover{background:rgba(169,112,255,.07);}
-      #puntos .pt-pts{color:#a970ff;font-family:'Space Grotesk',sans-serif;}
-      #puntos .pt-empty{padding:44px 20px;text-align:center;color:rgba(255,255,255,.5);}
-      #puntos .pt-empty b{display:block;color:#fff;font-family:'Space Grotesk',sans-serif;margin-bottom:6px;font-size:1.05rem;}
-      #puntos .pt-foot{margin-top:16px;color:rgba(255,255,255,.4);font-size:.78rem;text-align:right;}
-      #puntos .pt-canje-card{background:linear-gradient(180deg, rgba(255,210,63,.07), rgba(255,210,63,.02)), var(--bg2);border:1px solid rgba(255,210,63,.22);border-radius:20px;padding:22px 24px;margin-top:24px;box-shadow:var(--card-shadow);}
-      #puntos .pt-canje-title{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:#ffd23f;margin-bottom:6px;}
-      #puntos .pt-canje-desc{color:rgba(255,255,255,.6);font-size:.9rem;line-height:1.6;margin-bottom:16px;}
-      #puntos .pt-login-btn{position:relative;overflow:hidden;isolation:isolate;font-family:'Space Grotesk',sans-serif;font-weight:700;border:none;border-radius:var(--radius-sm);padding:12px 24px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),#6c1fe0);transition:transform .35s var(--ease);box-shadow:0 10px 26px -12px rgba(145,71,255,.55);}
-      #puntos .pt-login-btn:hover{transform:translateY(-2px);}
-      #puntos .pt-canje-saldo{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 18px;margin-bottom:16px;}
-      #puntos .pt-canje-saldo-nombre{font-weight:600;color:#fff;font-size:.95rem;}
-      #puntos .pt-canje-saldo-valor{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;color:#a970ff;}
-      #puntos .pt-paquetes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;}
-      #puntos .pt-paquete{background:var(--bg3);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease);}
-      #puntos .pt-paquete:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.2);box-shadow:0 16px 34px -18px rgba(0,0,0,.5);}
-      #puntos .pt-paquete-img{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-      #puntos .pt-paquete-img img{width:52%;height:52%;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,.45));transition:transform .4s var(--ease);}
-      #puntos .pt-paquete:hover .pt-paquete-img img{transform:scale(1.08) rotate(-3deg);}
-      #puntos .pt-paquete-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:5px;flex:1;}
-      #puntos .pt-paquete-tag{font-size:.64rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
-      #puntos .pt-paquete-nombre{font-family:'Space Grotesk',sans-serif;font-size:1.04rem;color:#fff;font-weight:600;margin-bottom:2px;}
-      #puntos .pt-paquete-recibe{display:flex;align-items:center;gap:5px;font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:10px;}
-      #puntos .pt-paquete-recibe img{width:15px;height:15px;}
-      #puntos .pt-paquete-precio{font-family:'Space Grotesk',sans-serif;font-weight:700;color:#fff;font-size:1rem;margin-top:auto;margin-bottom:12px;}
-      #puntos .pt-paquete.pt-r-basico .pt-paquete-img{background:radial-gradient(circle at 50% 38%, rgba(169,112,255,.4), rgba(169,112,255,.04) 70%);}
-      #puntos .pt-paquete.pt-r-basico{border-top:3px solid #a970ff;}
-      #puntos .pt-paquete.pt-r-basico .pt-paquete-tag{color:#a970ff;}
-      #puntos .pt-paquete.pt-r-plus .pt-paquete-img{background:radial-gradient(circle at 50% 38%, rgba(70,224,208,.4), rgba(70,224,208,.04) 70%);}
-      #puntos .pt-paquete.pt-r-plus{border-top:3px solid #46e0d0;}
-      #puntos .pt-paquete.pt-r-plus .pt-paquete-tag{color:#46e0d0;}
-      #puntos .pt-paquete.pt-r-elite .pt-paquete-img{background:radial-gradient(circle at 50% 38%, rgba(255,210,63,.4), rgba(255,210,63,.04) 70%);}
-      #puntos .pt-paquete.pt-r-elite{border-top:3px solid #ffd23f;}
-      #puntos .pt-paquete.pt-r-elite .pt-paquete-tag{color:#ffd23f;}
-      #puntos .pt-canjear-btn{width:100%;font-family:'Space Grotesk',sans-serif;font-weight:700;border:none;padding:12px;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--accent),#6c1fe0);transition:opacity .2s,filter .2s;}
-      #puntos .pt-canjear-btn:hover:not(:disabled){filter:brightness(1.15);}
-      #puntos .pt-canjear-btn:disabled{opacity:.4;cursor:not-allowed;background:var(--bg2);}
-      #puntos .pt-canje-msg{margin-top:14px;font-size:.85rem;color:rgba(255,255,255,.6);text-align:center;}
-      #puntos .pt-oculto{display:none!important;}
-      @media(max-width:620px){
-        #puntos thead{display:none;}
-        #puntos tbody tr{display:block;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);}
-        #puntos tbody td{display:flex;justify-content:space-between;gap:12px;border:0;padding:8px 16px;}
-        #puntos tbody td::before{content:attr(data-label);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);}
-        #puntos tbody td.pt-user-cell::before{content:"";}
+      /* =====================================================================
+         PUNTOS GEO ARMY — rediseño premium v2. Prefijo pg- (no toca
+         css/v3-theme.css ni css/style.css). No cambia ningún ID leído por
+         los scripts de abajo (ptTotal, ptLider, ptSuma, ptRankBody,
+         ptSearch, ptBody, ptUpdated, pcLoginBtn, pcSaldoBox,
+         pcUsuarioNombre, pcSaldoValor, pcPaquetes, pcMsg) -- solo
+         estructura visual + un modal propio en vez de confirm().
+         ===================================================================== */
+
+      /* ---------- HERO ---------- */
+      .pg-hero { position: relative; z-index: 2; padding: 5.5rem 1.5rem 2.2rem; text-align: center; overflow: hidden; isolation: isolate; }
+      .pg-hero::before {
+        content: ""; position: absolute; inset: -20% -10% auto -10%; height: 140%; z-index: -2;
+        background:
+          radial-gradient(34% 42% at 24% 14%, rgba(169,112,255,.16), transparent 65%),
+          radial-gradient(32% 40% at 76% 22%, rgba(255,210,63,.1), transparent 65%);
+        filter: blur(16px);
       }
+      .pg-hero-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+      .pg-hero-grid {
+        position: absolute; inset: -10%;
+        background-image:
+          linear-gradient(rgba(190,160,255,.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(190,160,255,.06) 1px, transparent 1px);
+        background-size: 44px 44px;
+        -webkit-mask-image: radial-gradient(55% 55% at 50% 18%, #000 0%, transparent 78%);
+        mask-image: radial-gradient(55% 55% at 50% 18%, #000 0%, transparent 78%);
+      }
+      .pg-hero-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+      .pg-eyebrow {
+        font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+        color: #c9a3ff; text-shadow: 0 0 16px rgba(169,112,255,.4); margin-bottom: 1rem;
+      }
+      .pg-title {
+        font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: .01em; line-height: 1.04;
+        font-size: clamp(2.1rem, 5.6vw, 3.3rem); margin: 0 0 .8rem;
+        background: linear-gradient(120deg, #eaf4ff 8%, #c9a3ff 50%, #ffd23f 95%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        filter: drop-shadow(0 0 22px rgba(169,112,255,.2));
+        text-transform: uppercase;
+      }
+      .pg-sub { color: var(--text2); font-size: 15.5px; max-width: 460px; margin: 0 auto; line-height: 1.6; }
+
+      .pg-earn-cards { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 1.8rem auto 0; max-width: 520px; }
+      .pg-earn-card {
+        flex: 1 1 220px; display: flex; align-items: center; gap: 12px; text-align: left;
+        background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px; padding: 12px 16px;
+      }
+      .pg-earn-ic { font-size: 1.5rem; flex-shrink: 0; }
+      .pg-earn-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .88rem; color: #fff; }
+      .pg-earn-sub { font-size: .78rem; color: var(--text2); }
+      .pg-earn-note { margin-top: .9rem; font-size: 12px; color: var(--text3); }
+
+      /* ---------- CONTENIDO ---------- */
+      #puntos .pg-wrap { max-width: 940px; margin: 0 auto; }
+
+      /* Estadísticas: 3 cards premium */
+      #puntos .pg-stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 0 0 24px; }
+      #puntos .pg-stat {
+        flex: 1; min-width: 150px; position: relative; isolation: isolate;
+        background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.012));
+        border: 1px solid rgba(255,255,255,.09);
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+        padding: 18px 20px; transition: transform .3s var(--ease), border-color .3s var(--ease);
+      }
+      #puntos .pg-stat:hover { transform: translateY(-3px); border-color: rgba(169,112,255,.35); }
+      #puntos .pg-stat-ic { font-size: 1.1rem; margin-bottom: 6px; opacity: .8; }
+      #puntos .pg-stat b { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; line-height: 1; display: block; color: #c9a3ff; text-shadow: 0 0 16px rgba(169,112,255,.3); }
+      #puntos .pg-stat span { font-size: .68rem; text-transform: uppercase; letter-spacing: .12em; color: var(--text2); }
+
+      /* Top 10 */
+      #puntos .pg-rank-card {
+        position: relative; isolation: isolate;
+        background: linear-gradient(180deg, rgba(169,112,255,.07), rgba(169,112,255,.015)), var(--bg2);
+        border: 1px solid rgba(169,112,255,.22);
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+        padding: 20px 22px 14px; margin-bottom: 22px;
+      }
+      #puntos .pg-rank-title {
+        font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+        color: #c9a3ff; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+      }
+      #puntos .pg-podium { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+      #puntos .pg-podium-row {
+        display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px;
+        background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+      }
+      #puntos .pg-podium-row.is-1 { background: linear-gradient(90deg, rgba(255,210,63,.14), rgba(255,210,63,.02)); border-color: rgba(255,210,63,.4); box-shadow: 0 10px 26px -18px rgba(255,210,63,.6); }
+      #puntos .pg-podium-row.is-2 { background: linear-gradient(90deg, rgba(200,210,230,.1), rgba(200,210,230,.02)); border-color: rgba(200,210,230,.32); }
+      #puntos .pg-podium-row.is-3 { background: linear-gradient(90deg, rgba(217,154,92,.1), rgba(217,154,92,.02)); border-color: rgba(217,154,92,.32); }
+      #puntos .pg-podium-medal { font-size: 1.35rem; width: 30px; text-align: center; flex-shrink: 0; }
+      #puntos .pg-podium-row.is-1 .pg-podium-medal { font-size: 1.65rem; filter: drop-shadow(0 0 8px rgba(255,210,63,.6)); }
+      #puntos .pg-podium-name { flex: 1; font-weight: 700; color: #fff; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #puntos .pg-podium-row.is-1 .pg-podium-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; }
+      #puntos .pg-podium-pts { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .9rem; color: #c9a3ff; white-space: nowrap; }
+      #puntos .pg-podium-row.is-1 .pg-podium-pts { color: #ffd23f; }
+
+      #puntos .pg-list { display: flex; flex-direction: column; }
+      #puntos .pg-list-row { display: flex; align-items: center; gap: 12px; padding: 8px 4px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: .87rem; }
+      #puntos .pg-list-row:last-child { border-bottom: 0; }
+      #puntos .pg-list-pos { width: 22px; flex-shrink: 0; color: var(--text3); text-align: center; }
+      #puntos .pg-list-name { flex: 1; color: #fff; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #puntos .pg-list-pts { color: var(--text2); font-family: 'Space Grotesk', sans-serif; white-space: nowrap; }
+      #puntos .pg-rank-empty { padding: 16px 4px; color: var(--text2); font-size: .9rem; text-align: center; }
+
+      /* Buscador + ranking general */
+      #puntos .pg-search {
+        width: 100%; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); color: #fff;
+        padding: 12px 18px; border-radius: 100px; font-size: .92rem; font-family: inherit; margin-bottom: 14px;
+      }
+      #puntos .pg-search::placeholder { color: rgba(255,255,255,.4); }
+      #puntos .pg-search:focus { outline: 2px solid var(--accent-light); outline-offset: 1px; }
+
+      #puntos .pg-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; overflow: hidden; box-shadow: var(--card-shadow); }
+      #puntos table { width: 100%; border-collapse: collapse; }
+      #puntos thead th { font-family: 'Space Grotesk', sans-serif; font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; text-align: left; color: rgba(255,255,255,.42); padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,.08); }
+      #puntos tbody td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.05); font-size: .9rem; vertical-align: middle; color: #fff; }
+      #puntos tbody tr:last-child td { border-bottom: 0; }
+      #puntos tbody tr:hover { background: rgba(169,112,255,.06); }
+      #puntos .pg-td-user { font-weight: 700; }
+      #puntos .pg-td-saldo { color: #ffd23f; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .98rem; }
+      #puntos .pg-td-sec { color: var(--text3); font-size: .84rem; }
+      #puntos .pg-empty { padding: 40px 20px; text-align: center; color: var(--text2); }
+      #puntos .pg-empty b { display: block; color: #fff; font-family: 'Space Grotesk', sans-serif; margin-bottom: 6px; font-size: 1.02rem; }
+      #puntos .pg-foot { margin-top: 14px; color: var(--text3); font-size: .78rem; text-align: right; }
+
+      @media (max-width: 620px) {
+        #puntos thead { display: none; }
+        #puntos tbody tr { display: block; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+        #puntos tbody td { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 0; padding: 4px 16px; }
+        #puntos tbody td::before { content: attr(data-label); font-size: .66rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.42); }
+        #puntos tbody td.pg-td-user::before { content: ""; }
+        #puntos tbody td.pg-td-user { font-size: 1rem; }
+      }
+
+      /* ---------- TIENDA DE CONVERSIÓN (canje) ---------- */
+      #puntos .pg-canje-card {
+        position: relative; isolation: isolate;
+        background: linear-gradient(180deg, rgba(255,210,63,.06), rgba(255,210,63,.015)), var(--bg2);
+        border: 1px solid rgba(255,210,63,.2);
+        clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        padding: 26px 26px 24px; margin-top: 28px;
+      }
+      #puntos .pg-canje-eyebrow { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #ffd23f; margin-bottom: 6px; }
+      #puntos .pg-canje-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+      #puntos .pg-canje-desc { color: var(--text2); font-size: .92rem; line-height: 1.6; margin-bottom: 6px; max-width: 560px; }
+      #puntos .pg-canje-rate { display: inline-block; font-size: 11.5px; color: var(--text3); background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); padding: 4px 12px; border-radius: 100px; margin-bottom: 18px; }
+
+      #puntos .pg-login-btn {
+        position: relative; overflow: hidden; isolation: isolate;
+        font-family: 'Space Grotesk', sans-serif; font-weight: 700; border: none; border-radius: 100px;
+        padding: 13px 26px; cursor: pointer; color: #fff;
+        background: linear-gradient(135deg, var(--accent), #6c1fe0);
+        transition: transform .35s var(--ease); box-shadow: 0 10px 26px -12px rgba(145,71,255,.55);
+      }
+      #puntos .pg-login-btn:hover { transform: translateY(-2px); }
+
+      #puntos .pg-conectado {
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+        background: rgba(61,220,132,.06); border: 1px solid rgba(61,220,132,.28); border-radius: 16px;
+        padding: 14px 20px; margin-bottom: 18px;
+      }
+      #puntos .pg-conectado-label { font-family: 'Orbitron', sans-serif; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--text2); margin-bottom: 3px; }
+      #puntos .pg-conectado-nombre { font-weight: 700; color: #fff; font-size: .98rem; }
+      #puntos .pg-conectado-saldo { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.35rem; color: #c9a3ff; }
+      #puntos .pg-conectado-saldo span { font-size: .8rem; font-weight: 600; color: var(--text2); margin-left: 4px; }
+
+      #puntos .pg-paquetes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+      #puntos .pg-paquete {
+        --pg-ac: #c9a3ff;
+        position: relative; isolation: isolate; background: var(--bg3);
+        border: 1px solid rgba(255,255,255,.08);
+        clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+        overflow: hidden; display: flex; flex-direction: column;
+        transition: transform .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+      }
+      #puntos .pg-paquete::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--pg-ac); }
+      #puntos .pg-paquete:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--pg-ac) 45%, rgba(255,255,255,.08)); box-shadow: 0 18px 36px -20px color-mix(in srgb, var(--pg-ac) 50%, transparent); }
+      #puntos .pg-paquete.is-featured { border-color: rgba(255,210,63,.4); }
+      #puntos .pg-paquete-badge {
+        position: absolute; top: 12px; right: -6px; z-index: 2;
+        background: linear-gradient(135deg, #ffe89a, #ffd23f); color: #3a2600;
+        font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 9px; letter-spacing: .04em; text-transform: uppercase;
+        padding: 4px 12px 4px 9px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 7px 50%);
+      }
+      #puntos .pg-paquete-coin-wrap { position: relative; padding: 26px 0 8px; display: flex; align-items: center; justify-content: center; }
+      #puntos .pg-paquete-coin-glow { position: absolute; width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--pg-ac) 35%, transparent), transparent 70%); }
+      #puntos .pg-paquete-coin { position: relative; width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,.4)); transition: transform .4s var(--ease); }
+      #puntos .pg-paquete:hover .pg-paquete-coin { transform: scale(1.08) rotate(-4deg); }
+      #puntos .pg-paquete-body { padding: 4px 18px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; text-align: center; }
+      #puntos .pg-paquete-tag { font-family: 'Orbitron', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--pg-ac); }
+      #puntos .pg-paquete-nombre { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
+      #puntos .pg-paquete-costo { font-size: .82rem; color: var(--text2); margin-bottom: 10px; }
+      #puntos .pg-paquete-costo b { color: #fff; font-family: 'Space Grotesk', sans-serif; }
+      #puntos .pg-canjear-btn {
+        width: 100%; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .85rem; letter-spacing: .01em;
+        border: none; padding: 13px; cursor: pointer; color: #fff;
+        background: linear-gradient(135deg, var(--accent), #6c1fe0);
+        transition: opacity .2s, filter .2s;
+      }
+      #puntos .pg-canjear-btn:hover:not(:disabled) { filter: brightness(1.15); }
+      #puntos .pg-canjear-btn:disabled { opacity: .42; cursor: not-allowed; background: var(--bg2); }
+
+      #puntos .pg-msg { margin-top: 16px; font-size: .87rem; text-align: center; padding: 10px 16px; border-radius: 12px; }
+      #puntos .pg-msg:empty { display: none; padding: 0; margin-top: 0; }
+      #puntos .pg-msg.is-error { color: #ff9b9b; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); }
+      #puntos .pg-msg.is-info { color: var(--text2); }
+
+      /* Estado de éxito tras un canje */
+      #puntos .pg-success {
+        text-align: center; padding: 30px 20px 26px;
+        background: linear-gradient(180deg, rgba(61,220,132,.08), transparent);
+        border: 1px solid rgba(61,220,132,.28); border-radius: 16px;
+      }
+      #puntos .pg-success-ic { font-size: 2.4rem; margin-bottom: 10px; filter: drop-shadow(0 0 14px rgba(61,220,132,.5)); }
+      #puntos .pg-success-title { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: .06em; text-transform: uppercase; color: #3ddc84; margin-bottom: 4px; }
+      #puntos .pg-success-amount { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 1.6rem; color: #ffd23f; margin-bottom: 10px; }
+      #puntos .pg-success-desc { color: var(--text2); font-size: .88rem; max-width: 380px; margin: 0 auto 18px; line-height: 1.55; }
+      #puntos .pg-success-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+      #puntos .pg-tienda-btn {
+        display: inline-block; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .85rem;
+        color: #04101f; background: linear-gradient(135deg, #ffe89a, #ffd23f);
+        padding: 11px 24px; border-radius: 100px; text-decoration: none;
+      }
+      #puntos .pg-otro-canje { font-size: .82rem; color: var(--text2); text-decoration: underline; cursor: pointer; background: none; border: none; }
+
+      #puntos .pg-oculto { display: none !important; }
+
+      /* ---------- MODAL DE CONFIRMACIÓN ---------- */
+      .pg-modal-overlay {
+        position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center;
+        background: rgba(6,4,14,.72); backdrop-filter: blur(6px); padding: 1.5rem;
+      }
+      .pg-modal {
+        width: 100%; max-width: 380px; position: relative; isolation: isolate;
+        background: linear-gradient(180deg, rgba(28,20,48,.98), rgba(14,10,26,.98));
+        border: 1px solid rgba(169,112,255,.3);
+        clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+        padding: 28px 26px 24px; box-shadow: 0 40px 80px -30px rgba(0,0,0,.7);
+        text-align: center;
+      }
+      .pg-modal-title { font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: .95rem; letter-spacing: .08em; text-transform: uppercase; color: #c9a3ff; margin-bottom: 18px; }
+      .pg-modal-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); text-align: left; }
+      .pg-modal-row:last-of-type { border-bottom: 0; }
+      .pg-modal-row-label { font-size: .82rem; color: var(--text2); }
+      .pg-modal-row-value { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff; font-size: .95rem; }
+      .pg-modal-row.is-gain .pg-modal-row-value { color: #ffd23f; }
+      .pg-modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+      .pg-modal-cancel, .pg-modal-confirm {
+        flex: 1; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .85rem;
+        border: none; border-radius: 100px; padding: 12px; cursor: pointer;
+      }
+      .pg-modal-cancel { background: rgba(255,255,255,.06); color: var(--text2); border: 1px solid rgba(255,255,255,.12); }
+      .pg-modal-cancel:hover { background: rgba(255,255,255,.1); }
+      .pg-modal-confirm { background: linear-gradient(135deg, var(--accent), #6c1fe0); color: #fff; }
+      .pg-modal-confirm:hover { filter: brightness(1.12); }
     </style>
     <div class="section-inner">
-      <div class="section-header" data-decor="PUNTOS">
-        <div class="section-tag">Puntos Geo Army</div>
-        <h2>Ranking de Puntos</h2>
-        <p>Los suscriptores ganan puntos automáticamente por chatear en el stream, más un cofre sorpresa cada rato. Se canjean por G-coins y el Pase de Batalla.</p>
-      </div>
-      <div class="pt-wrap" data-reveal>
-        <div class="pt-stats">
-          <div class="pt-chip"><b id="ptTotal">0</b><span>Suscriptores con puntos</span></div>
-          <div class="pt-chip"><b id="ptLider">—</b><span>Líder actual</span></div>
-          <div class="pt-chip"><b id="ptSuma">0</b><span>Puntos ganados en total</span></div>
+      <div class="pg-wrap" data-reveal>
+        <div class="pg-stats">
+          <div class="pg-stat"><div class="pg-stat-ic">👥</div><b id="ptTotal">0</b><span>Usuarios</span></div>
+          <div class="pg-stat"><div class="pg-stat-ic">👑</div><b id="ptLider">—</b><span>Líder</span></div>
+          <div class="pg-stat"><div class="pg-stat-ic">🪙</div><b id="ptSuma">0</b><span>Puntos generados</span></div>
         </div>
-        <div class="pt-rank-card">
-          <div class="pt-rank-title">🪙 Top 10</div>
+
+        <div class="pg-rank-card">
+          <div class="pg-rank-title">🏆 Top 10</div>
           <div id="ptRankBody"></div>
         </div>
-        <input id="ptSearch" class="pt-search" type="search" placeholder="Buscar por usuario…" aria-label="Buscar en el ranking de puntos">
-        <div class="pt-card">
+
+        <input id="ptSearch" class="pg-search" type="search" placeholder="Buscar por usuario…" aria-label="Buscar en el ranking de puntos">
+        <div class="pg-card">
           <table>
             <thead>
               <tr><th>#</th><th>Usuario</th><th>Ganado</th><th>Gastado</th><th>Saldo actual</th></tr>
@@ -143,30 +425,67 @@
             <tbody id="ptBody"></tbody>
           </table>
         </div>
-        <div class="pt-foot" id="ptUpdated">Cargando…</div>
+        <div class="pg-foot" id="ptUpdated">Cargando…</div>
 
-        <div class="pt-canje-card">
-          <div class="pt-canje-title">🎁 Canjea tus puntos por G-coins</div>
-          <p class="pt-canje-desc">10 Puntos Geo Army = 1 G-coin. Inicia sesión con Twitch, elige un paquete y tus G-coins se acreditan al instante en la <a href="tienda.html" style="color:#ffd23f;">Tienda de la Geo Army</a>.</p>
+        <div class="pg-canje-card">
+          <div class="pg-canje-eyebrow">Tienda de Conversión</div>
+          <div class="pg-canje-title">Convierte tus Puntos Geo Army en G-Coins</div>
+          <p class="pg-canje-desc">Inicia sesión con Twitch, elige un paquete y tus G-Coins se acreditan al instante en la <a href="tienda.html" style="color:#ffd23f;">Tienda Geo Army</a>.</p>
+          <span class="pg-canje-rate">20 Puntos Geo Army = 1 G-Coin</span>
 
-          <button id="pcLoginBtn" class="pt-login-btn">Iniciar sesión con Twitch</button>
+          <button id="pcLoginBtn" class="pg-login-btn">Iniciar sesión con Twitch</button>
 
-          <div id="pcSaldoBox" class="pt-canje-saldo pt-oculto">
+          <div id="pcSaldoBox" class="pg-conectado pg-oculto">
             <div>
-              <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);">Conectado como</div>
-              <div id="pcUsuarioNombre" class="pt-canje-saldo-nombre"></div>
+              <div class="pg-conectado-label">Conectado como</div>
+              <div id="pcUsuarioNombre" class="pg-conectado-nombre"></div>
             </div>
             <div style="text-align:right;">
-              <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);">Tus Puntos Geo Army</div>
-              <div class="pt-canje-saldo-valor"><span id="pcSaldoValor">0</span> pts</div>
+              <div class="pg-conectado-label">Saldo disponible</div>
+              <div class="pg-conectado-saldo"><span id="pcSaldoValor">0</span><span>pts</span></div>
             </div>
           </div>
 
-          <div id="pcPaquetes" class="pt-paquetes pt-oculto"></div>
-          <p id="pcMsg" class="pt-canje-msg"></p>
+          <div id="pcPaquetes" class="pg-paquetes pg-oculto"></div>
+
+          <!-- Estado de éxito -- oculto hasta un canje exitoso (ver renderExito() en el script) -->
+          <div id="pgSuccessBox" class="pg-success pg-oculto">
+            <div class="pg-success-ic">✓</div>
+            <div class="pg-success-title">Canje completado</div>
+            <div class="pg-success-amount" id="pgSuccessAmount">+0 G-Coins</div>
+            <p class="pg-success-desc">Tus G-Coins ya están disponibles en la Tienda Geo Army.</p>
+            <div class="pg-success-actions">
+              <a href="tienda.html" class="pg-tienda-btn">Ir a la Tienda</a>
+              <button type="button" class="pg-otro-canje" id="pgOtroCanjeBtn">Canjear otro paquete</button>
+            </div>
+          </div>
+
+          <p id="pcMsg" class="pg-msg"></p>
         </div>
       </div>
     </div>
+
+    <!-- Modal de confirmación de canje -- reemplaza el confirm() nativo. No
+         cambia la lógica del canje: solo decide si se llama o no a
+         ejecutarCanje() (ver segundo script de abajo). -->
+    <div id="pgModalOverlay" class="pg-modal-overlay pg-oculto">
+      <div class="pg-modal" role="dialog" aria-modal="true" aria-labelledby="pgModalTitle">
+        <div class="pg-modal-title" id="pgModalTitle">Confirmar canje</div>
+        <div class="pg-modal-row">
+          <span class="pg-modal-row-label">Vas a utilizar</span>
+          <span class="pg-modal-row-value" id="pgModalPuntos">0 pts</span>
+        </div>
+        <div class="pg-modal-row is-gain">
+          <span class="pg-modal-row-label">Recibirás</span>
+          <span class="pg-modal-row-value" id="pgModalGcoins">0 G-Coins</span>
+        </div>
+        <div class="pg-modal-actions">
+          <button type="button" class="pg-modal-cancel" id="pgModalCancelar">Cancelar</button>
+          <button type="button" class="pg-modal-confirm" id="pgModalConfirmar">Confirmar canje</button>
+        </div>
+      </div>
+    </div>
+
     <script>
     (function(){
       var DATA = [];
@@ -174,18 +493,30 @@
       function renderRanking(){
         var box = document.getElementById('ptRankBody');
         if(!DATA.length){
-          box.innerHTML = '<div class="pt-rank-empty">Todavía nadie tiene Puntos Geo Army. ¡Sé el primero chateando en el stream! 🪙</div>';
+          box.innerHTML = '<div class="pg-rank-empty">Todavía nadie tiene Puntos Geo Army. ¡Sé el primero chateando en el stream! 🪙</div>';
           return;
         }
+        var top10 = DATA.slice(0,10);
+        var top3 = top10.slice(0,3);
+        var resto = top10.slice(3);
         var medallas = ['🥇','🥈','🥉'];
-        box.innerHTML = DATA.slice(0,10).map(function(u,i){
-          var medalla = medallas[i] || ((i+1)+'.');
-          return '<div class="pt-rank-row">'+
-            '<span class="pt-rank-pos">'+medalla+'</span>'+
-            '<span class="pt-rank-name">'+esc(u.usuario)+'</span>'+
-            '<span class="pt-rank-total">'+u.saldo.toLocaleString()+' pts</span>'+
+        var html = '<div class="pg-podium">' + top3.map(function(u,i){
+          return '<div class="pg-podium-row is-'+(i+1)+'">'+
+            '<span class="pg-podium-medal">'+medallas[i]+'</span>'+
+            '<span class="pg-podium-name">'+esc(u.usuario)+'</span>'+
+            '<span class="pg-podium-pts">'+u.saldo.toLocaleString()+' pts</span>'+
           '</div>';
-        }).join('');
+        }).join('') + '</div>';
+        if(resto.length){
+          html += '<div class="pg-list">' + resto.map(function(u,i){
+            return '<div class="pg-list-row">'+
+              '<span class="pg-list-pos">'+(i+4)+'</span>'+
+              '<span class="pg-list-name">'+esc(u.usuario)+'</span>'+
+              '<span class="pg-list-pts">'+u.saldo.toLocaleString()+' pts</span>'+
+            '</div>';
+          }).join('') + '</div>';
+        }
+        box.innerHTML = html;
       }
       function render(){
         var q = document.getElementById('ptSearch').value.trim().toLowerCase();
@@ -193,15 +524,15 @@
         if(q) rows = rows.filter(function(u){return (u.usuario||'').toLowerCase().indexOf(q)>-1;});
         var tb = document.getElementById('ptBody');
         if(!rows.length){
-          tb.innerHTML = '<tr><td colspan="4" class="pt-empty"><b>Sin resultados</b>Nadie con ese nombre todavía.</td></tr>';
+          tb.innerHTML = '<tr><td colspan="5" class="pg-empty"><b>Sin resultados</b>Nadie con ese nombre todavía.</td></tr>';
         } else {
           tb.innerHTML = rows.map(function(u,i){
             return '<tr>'+
               '<td data-label="#">'+(i+1)+'</td>'+
-              '<td data-label="Usuario" class="pt-user-cell">'+esc(u.usuario)+'</td>'+
-              '<td data-label="Ganado">'+u.ganado.toLocaleString()+'</td>'+
-              '<td data-label="Gastado">'+u.gastado.toLocaleString()+'</td>'+
-              '<td data-label="Saldo actual" class="pt-pts">'+u.saldo.toLocaleString()+'</td>'+
+              '<td data-label="Usuario" class="pg-td-user">'+esc(u.usuario)+'</td>'+
+              '<td data-label="Ganado" class="pg-td-sec">'+u.ganado.toLocaleString()+'</td>'+
+              '<td data-label="Gastado" class="pg-td-sec">'+u.gastado.toLocaleString()+'</td>'+
+              '<td data-label="Saldo actual" class="pg-td-saldo">'+u.saldo.toLocaleString()+'</td>'+
             '</tr>';
           }).join('');
         }
@@ -246,40 +577,46 @@
       var TWITCH_CLIENT_ID = '3spb0xbi38qc8ng1zwcoz5081lp524';
       var REDIRECT_URI = window.location.origin + window.location.pathname;
 
-      // Debe coincidir con PAQUETES en puntosCanje.js (geoarmy-bot)
+      // Debe coincidir EXACTO con PAQUETES en puntosCanje.js (geoarmy-bot).
+      // Economía: 20 Puntos Geo Army = 1 G-Coin.
       var PAQUETES = [
-        { puntos: 250, gcoins: 25 },
-        { puntos: 500, gcoins: 50 },
-        { puntos: 1000, gcoins: 100 }
+        { puntos: 2000, gcoins: 100 },
+        { puntos: 5000, gcoins: 250 },
+        { puntos: 10000, gcoins: 500 }
       ];
       // ================================
 
       var loginBtn = document.getElementById('pcLoginBtn');
       var saldoBox = document.getElementById('pcSaldoBox');
       var paquetesBox = document.getElementById('pcPaquetes');
+      var successBox = document.getElementById('pgSuccessBox');
+      var successAmount = document.getElementById('pgSuccessAmount');
       var msg = document.getElementById('pcMsg');
 
       var twitchAccessToken = null;
       var usuario = null;
       var saldo = 0;
 
+      function setMsg(texto, tipo){
+        msg.textContent = texto || '';
+        msg.classList.remove('is-error', 'is-info');
+        if(texto) msg.classList.add(tipo === 'error' ? 'is-error' : 'is-info');
+      }
+
       function authHeaders(){ return { Authorization: 'Bearer ' + twitchAccessToken }; }
 
       // ---- operación Puntos -> GCOIN pendiente, persistida en sessionStorage ----
       // El backend solo permite UNA operación pendiente por usuario (por
-      // twitchUserId) -- ver claveOperacionPendiente().
+      // twitchUserId) -- ver claveOperacionPendiente(). Sin cambios de lógica
+      // respecto a la versión anterior, solo se movió cómo se dispara
+      // (antes: confirm() nativo -- ahora: modal propio, ver más abajo).
       function claveOperacionPendiente(twitchUserId){
         return 'geoarmy-puntos-gcoin-pending:' + twitchUserId;
       }
-      // Devuelve null si no hay ninguna operación pendiente guardada, el
-      // objeto { clientRequestId, puntos } si la hay, o lanza si
-      // sessionStorage no se puede leer (el caller debe abortar el canje).
       function leerOperacionPendiente(twitchUserId){
         var raw = sessionStorage.getItem(claveOperacionPendiente(twitchUserId));
         return raw ? JSON.parse(raw) : null;
       }
-      // Lanza si sessionStorage no se puede escribir (el caller debe
-      // abortar el canje antes del fetch).
       function guardarOperacionPendiente(twitchUserId, datos){
         sessionStorage.setItem(claveOperacionPendiente(twitchUserId), JSON.stringify(datos));
       }
@@ -297,32 +634,33 @@
         window.location.href = 'https://id.twitch.tv/oauth2/authorize?' + params;
       }
 
-      // Nombres y "rareza" (color de acento) de cada paquete, estilo tienda de
-      // ítems — en el mismo orden que PAQUETES. Si agregas un paquete nuevo,
-      // agrega también su nombre y rareza aquí (si faltan, usa el último).
-      var PAQUETE_NOMBRES = ['Paquete Inicial', 'Paquete Plus', 'Paquete Elite'];
-      var PAQUETE_RAREZAS = ['pt-r-basico', 'pt-r-plus', 'pt-r-elite'];
+      // Nombres y acento de cada paquete, en el mismo orden que PAQUETES. Si
+      // agregas un paquete nuevo, agrega también su nombre/acento aquí (si
+      // faltan, usa el último).
+      var PAQUETE_NOMBRES = ['Paquete I', 'Paquete II', 'Paquete III'];
+      var PAQUETE_ACENTOS = ['#a970ff', '#46e0d0', '#ffd23f'];
 
       function renderPaquetes(){
         paquetesBox.innerHTML = PAQUETES.map(function(p, i){
           var puede = saldo >= p.puntos;
-          var rareza = PAQUETE_RAREZAS[i] || PAQUETE_RAREZAS[PAQUETE_RAREZAS.length - 1];
+          var acento = PAQUETE_ACENTOS[i] || PAQUETE_ACENTOS[PAQUETE_ACENTOS.length - 1];
           var nombre = PAQUETE_NOMBRES[i] || (p.puntos.toLocaleString() + ' pts');
-          return '<div class="pt-paquete ' + rareza + '">' +
-            '<div class="pt-paquete-img"><img src="gcoin-icon.png" alt="G-coins"></div>' +
-            '<div class="pt-paquete-body">' +
-              '<span class="pt-paquete-tag">Canje Geo Army</span>' +
-              '<span class="pt-paquete-nombre">' + nombre + '</span>' +
-              '<span class="pt-paquete-recibe"><img src="gcoin-icon.png" alt="">Recibes ' + p.gcoins + ' G-coins</span>' +
-              '<span class="pt-paquete-precio">🪙 ' + p.puntos.toLocaleString() + ' pts</span>' +
+          var esUltimo = i === PAQUETES.length - 1;
+          return '<div class="pg-paquete' + (esUltimo ? ' is-featured' : '') + '" style="--pg-ac:' + acento + '">' +
+            (esUltimo ? '<span class="pg-paquete-badge">Mejor recompensa</span>' : '') +
+            '<div class="pg-paquete-coin-wrap"><div class="pg-paquete-coin-glow"></div><img class="pg-paquete-coin" src="gcoin-icon.png" alt="G-coins"></div>' +
+            '<div class="pg-paquete-body">' +
+              '<span class="pg-paquete-tag">' + p.gcoins.toLocaleString() + ' G-Coins</span>' +
+              '<span class="pg-paquete-nombre">' + nombre + '</span>' +
+              '<span class="pg-paquete-costo">Costo: <b>' + p.puntos.toLocaleString() + '</b> pts</span>' +
             '</div>' +
-            '<button class="pt-canjear-btn" data-puntos="' + p.puntos + '" ' + (puede ? '' : 'disabled') + '>' +
-              (puede ? 'Canjear' : 'Puntos insuficientes') +
+            '<button class="pg-canjear-btn" data-puntos="' + p.puntos + '" ' + (puede ? '' : 'disabled') + '>' +
+              (puede ? ('CANJEAR ' + p.gcoins.toLocaleString() + ' G-COINS') : 'PUNTOS INSUFICIENTES') +
             '</button>' +
           '</div>';
         }).join('');
         Array.prototype.forEach.call(paquetesBox.querySelectorAll('button'), function(btn){
-          btn.addEventListener('click', function(){ canjear(parseInt(btn.getAttribute('data-puntos'), 10)); });
+          btn.addEventListener('click', function(){ abrirModalCanje(parseInt(btn.getAttribute('data-puntos'), 10)); });
         });
       }
 
@@ -330,20 +668,54 @@
         return fetch(API_BASE + '/api/puntos/saldo', { headers: authHeaders() })
           .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
           .then(function(res){
-            if(!res.ok){ msg.textContent = res.data.error || 'No se pudo cargar tu saldo.'; return; }
+            if(!res.ok){ setMsg(res.data.error || 'No se pudo cargar tu saldo.', 'error'); return; }
             saldo = res.data.puntos;
             document.getElementById('pcSaldoValor').textContent = saldo.toLocaleString();
-            paquetesBox.classList.remove('pt-oculto');
+            paquetesBox.classList.remove('pg-oculto');
             renderPaquetes();
           })
-          .catch(function(){ msg.textContent = 'Error de conexión con el bot. Intenta de nuevo.'; });
+          .catch(function(){ setMsg('Error de conexión con el bot. Intenta de nuevo.', 'error'); });
       }
 
-      function canjear(puntos){
-        var paquete = PAQUETES.filter(function(p){ return p.puntos === puntos; })[0];
-        if(!paquete) return;
-        if(!confirm('¿Canjear ' + paquete.puntos + ' Puntos Geo Army por ' + paquete.gcoins + ' G-coins?')) return;
+      // ---------- Modal de confirmación (reemplaza confirm()) ----------
+      var paqueteEnModal = null;
+      var modalOverlay = document.getElementById('pgModalOverlay');
 
+      function abrirModalCanje(puntos){
+        var paquete = PAQUETES.filter(function(p){ return p.puntos === puntos; })[0];
+        if(!paquete) return; // nunca debería pasar: el botón solo existe para paquetes reales de PAQUETES
+        paqueteEnModal = paquete;
+        document.getElementById('pgModalPuntos').textContent = paquete.puntos.toLocaleString() + ' Puntos Geo Army';
+        document.getElementById('pgModalGcoins').textContent = paquete.gcoins.toLocaleString() + ' G-Coins';
+        modalOverlay.classList.remove('pg-oculto');
+      }
+      function cerrarModalCanje(){
+        modalOverlay.classList.add('pg-oculto');
+        paqueteEnModal = null;
+      }
+      document.getElementById('pgModalCancelar').addEventListener('click', cerrarModalCanje);
+      modalOverlay.addEventListener('click', function(e){ if(e.target === modalOverlay) cerrarModalCanje(); });
+      document.getElementById('pgModalConfirmar').addEventListener('click', function(){
+        var paquete = paqueteEnModal;
+        cerrarModalCanje();
+        if(paquete) ejecutarCanje(paquete);
+      });
+
+      function renderExito(gcoinsAcreditados){
+        paquetesBox.classList.add('pg-oculto');
+        successAmount.textContent = '+' + gcoinsAcreditados.toLocaleString() + ' G-Coins';
+        successBox.classList.remove('pg-oculto');
+        setMsg('', 'info');
+      }
+      document.getElementById('pgOtroCanjeBtn').addEventListener('click', function(){
+        successBox.classList.add('pg-oculto');
+        paquetesBox.classList.remove('pg-oculto');
+      });
+
+      // Misma lógica exacta que antes tenía canjear(puntos) -- lo único que
+      // cambió es que ya no empieza con "if(!confirm(...)) return;": ahora
+      // solo se llega aquí DESPUÉS de que el usuario confirma en el modal.
+      function ejecutarCanje(paquete){
         var twitchUserId = usuario && usuario.id;
         var clientRequestId;
         try {
@@ -351,7 +723,7 @@
           if(pendiente && pendiente.puntos !== paquete.puntos){
             // Ya hay una operación pendiente de OTRO paquete -- no se crea
             // otro UUID ni se llama al backend hasta que esa se resuelva.
-            msg.textContent = 'Tienes un canje pendiente de otro paquete (' + pendiente.puntos.toLocaleString() + ' pts). Espera a que termine o reinténtalo antes de iniciar uno nuevo.';
+            setMsg('Tienes un canje pendiente de otro paquete (' + pendiente.puntos.toLocaleString() + ' pts). Espera a que termine o reinténtalo antes de iniciar uno nuevo.', 'error');
             return;
           }
           if(pendiente && pendiente.puntos === paquete.puntos){
@@ -366,11 +738,11 @@
           // sessionStorage no se pudo leer o guardar -- se aborta el canje
           // antes del fetch, nunca se llama al backend sin poder persistir
           // el clientRequestId.
-          msg.textContent = 'No se puede iniciar un canje seguro en este navegador. Recarga la página e intenta de nuevo.';
+          setMsg('No se puede iniciar un canje seguro en este navegador. Recarga la página e intenta de nuevo.', 'error');
           return;
         }
 
-        msg.textContent = 'Procesando…';
+        setMsg('Procesando…', 'info');
         fetch(API_BASE + '/api/puntos/canjear-gcoins', {
           method: 'POST',
           headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
@@ -383,21 +755,23 @@
               // proceso, 500/502/503/504, etc.) CONSERVA la operación
               // pendiente -- la prioridad es no perder el UUID de una
               // operación que pueda necesitar recovery. Solo se borra tras
-              // un 200 exitoso, más abajo.
-              msg.textContent = res.data.error || 'No se pudo canjear.';
+              // un 200 exitoso, más abajo. El detalle técnico nunca se
+              // muestra: solo el texto que ya manda el backend en .error.
+              setMsg(res.data.error || 'No se pudo completar el canje.', 'error');
               return;
             }
             borrarOperacionPendiente(twitchUserId);
             saldo = res.data.puntosRestantes;
             document.getElementById('pcSaldoValor').textContent = saldo.toLocaleString();
             renderPaquetes();
-            msg.textContent = '¡Listo! Se acreditaron ' + res.data.gcoinsAcreditados + ' G-coins en tu cuenta. Ve a la Tienda para gastarlos.';
+            renderExito(res.data.gcoinsAcreditados);
           })
-          .catch(function(){
+          .catch(function(e){
             // Error de red: no sabemos si el backend llegó a procesar el
             // canje -- se conserva la operación pendiente para un reintento
-            // seguro.
-            msg.textContent = 'Error de conexión con el bot. Intenta de nuevo.';
+            // seguro. El detalle técnico solo va a consola.
+            console.error('[puntos] Error de conexión al canjear:', e);
+            setMsg('Error de conexión con el bot. Intenta de nuevo.', 'error');
           });
       }
 
@@ -421,11 +795,12 @@
               var u = data.data && data.data[0];
               if(!u) return;
               usuario = { id: u.id, login: u.login, display_name: u.display_name };
-              loginBtn.classList.add('pt-oculto');
-              saldoBox.classList.remove('pt-oculto');
+              loginBtn.classList.add('pg-oculto');
+              saldoBox.classList.remove('pg-oculto');
               document.getElementById('pcUsuarioNombre').textContent = usuario.display_name;
               cargarSaldo();
-            });
+            })
+            .catch(function(e){ console.error('[puntos] Error validando sesión de Twitch:', e); });
         }
       }
 
