@@ -9,13 +9,25 @@
    (negro/violeta/rojo, cinematográfico) para que se vea parte de la misma
    identidad de Halloween 2026.
 
+   REDISEÑO VISUAL (2026-09-26): jerarquía tipo "boss bar" de videojuego
+   (referencia dada por Geovany: bossbar_ramattra.html, NO copiado
+   literalmente -- no estuvo disponible en este entorno de trabajo, este
+   rediseño se construyó a partir de su descripción escrita detallada).
+   Retrato + nombre/título + HP numérico arriba, barra principal gruesa de
+   Morvanna debajo, Geo Army claramente secundaria, último movimiento en
+   una sola línea, capa dedicada de Cataclismo. Cambio PURAMENTE VISUAL:
+   ningún selector de esta hoja lee ni decide nada -- todo el contenido
+   que pinta viene de ids que la lógica en js/halloween-stream-widget.js
+   ya rellenaba (o rellena ahora solo para imagen/subtítulo, ver cabecera
+   de ese archivo).
+
    REQUISITO NO NEGOCIABLE (OBS Browser Source): html y body deben ser
    transparentes y sin scroll -- si algún elemento de acá vuelve a poner un
    fondo sólido o un overflow visible, el widget deja de servir como
    overlay. ========================================================== */
 
 :root {
-  --hsw-panel: rgba(10, 6, 16, 0.86);
+  --hsw-panel: rgba(10, 6, 16, 0.88);
   --hsw-violet: #7c3aed;
   --hsw-violet-soft: rgba(124, 58, 237, 0.55);
   --hsw-violet-line: rgba(148, 92, 255, 0.38);
@@ -50,18 +62,20 @@ html, body {
 body {
   display: flex;
   align-items: flex-end; /* el widget se asienta como "lower third" */
-  padding: 12px;
+  padding: 10px;
 }
 
 /* ---------------------------------------------------------------------
-   Contenedor raíz -- responsive: llena el ancho del Browser Source
-   (recomendado 700x260) pero se adapta a cualquier otro tamaño, usando
-   clamp() para que el texto no se rompa ni en un source muy angosto.
+   Contenedor raíz -- el panel NO ocupa toda la pantalla: es una boss bar
+   compacta que se asienta con su propio ancho/alto, no un canvas gigante.
+   Responsive vía clamp() para que el texto no se rompa en un source más
+   angosto que el recomendado (700px).
    --------------------------------------------------------------------- */
 .hsw-root {
   position: relative;
   width: 100%;
-  min-height: 118px;
+  max-width: 700px;
+  margin: 0 auto;
   background: var(--hsw-panel);
   border: 1px solid var(--hsw-violet-line);
   border-radius: var(--hsw-radius);
@@ -82,7 +96,7 @@ body {
     0 0 48px rgba(220, 38, 38, 0.22);
 }
 /* Cataclismo activo: pulso rojo/violeta sutil en el borde de todo el
-   panel, además del texto del countdown en #hswBottomLine. */
+   panel, además de la capa dedicada (#hswCataclysmLayer, más abajo). */
 .hsw-root[data-cataclysm="1"] {
   animation: hsw-cataclysm-pulse 1.6s ease-in-out infinite;
 }
@@ -96,14 +110,100 @@ body {
   font-family: 'Orbitron', sans-serif; font-size: 9px; letter-spacing: .08em;
   color: var(--hsw-gold); background: rgba(0,0,0,.55);
   border: 1px solid rgba(212, 175, 55, .5); border-radius: 5px;
-  padding: 2px 7px; z-index: 5;
+  padding: 2px 7px; z-index: 6;
 }
 .hsw-reconnect {
   position: absolute; top: 8px; left: 10px;
-  font-size: 13px; color: var(--hsw-text-dim); opacity: .8; z-index: 5;
+  font-size: 13px; color: var(--hsw-text-dim); opacity: .8; z-index: 6;
   animation: hsw-spin 1.1s linear infinite;
 }
 @keyframes hsw-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ---------------------------------------------------------------------
+   HEADER — retrato + nombre/título + HP numérico. Fila superior de la
+   boss bar, visible en 'scheduled'/'battle'/'finished' (oculta en
+   'loading').
+   --------------------------------------------------------------------- */
+#hswHeader { display: none; }
+.hsw-root[data-state="scheduled"] #hswHeader,
+.hsw-root[data-state="battle"] #hswHeader,
+.hsw-root[data-state="finished"] #hswHeader { display: flex; }
+
+.hsw-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.hsw-portrait-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(52px, 11vw, 80px);
+  height: clamp(52px, 11vw, 80px);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--hsw-violet-line);
+  background: #0b0710;
+  box-shadow: 0 0 16px rgba(124, 58, 237, .45), inset 0 0 12px rgba(0,0,0,.6);
+  transition: border-color .4s ease, box-shadow .4s ease;
+}
+.hsw-root[data-phase="2"] .hsw-portrait-wrap {
+  border-color: var(--hsw-red-soft);
+  box-shadow: 0 0 18px rgba(220, 38, 38, .5), inset 0 0 12px rgba(0,0,0,.6);
+}
+.hsw-portrait-img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 25%;
+  display: block;
+}
+.hsw-portrait-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 900;
+  font-size: clamp(20px, 5vw, 30px);
+  color: rgba(148, 92, 255, .55);
+  background: radial-gradient(circle at 50% 40%, rgba(124,58,237,.28), rgba(6,4,10,.96) 75%);
+}
+/* SCHEDULED: retrato de Fase I atenuado (spec: "mantener el retrato de
+   Fase I atenuado", nunca se simula HP ni fase). */
+.hsw-root[data-state="scheduled"] .hsw-portrait-img,
+.hsw-root[data-state="scheduled"] .hsw-portrait-fallback {
+  opacity: .45; filter: grayscale(.35);
+}
+/* FINISHED + victoria de Geo Army: retrato oscurecido. data-outcome lo
+   fija renderFinished() a partir del mismo state.outcome que ya leía
+   (sin inventar ni calcular nada nuevo). */
+.hsw-root[data-state="finished"][data-outcome="geoarmy_victory"] .hsw-portrait-img,
+.hsw-root[data-state="finished"][data-outcome="geoarmy_victory"] .hsw-portrait-fallback {
+  filter: grayscale(.6) brightness(.4);
+}
+
+.hsw-header-mid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.hsw-boss-name {
+  font-family: 'Orbitron', sans-serif; font-weight: 800;
+  font-size: clamp(.95rem, 3.4vw, 1.15rem); letter-spacing: .07em;
+  color: var(--hsw-text);
+}
+.hsw-boss-subtitle {
+  font-size: clamp(.62rem, 2.2vw, .74rem); letter-spacing: .06em;
+  color: var(--hsw-violet-line); text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hsw-root[data-phase="2"] .hsw-boss-subtitle { color: var(--hsw-red-soft); }
+/* #hswPhaseBadge se mantiene en el DOM (applyPhase() sigue escribiéndole
+   "FASE I"/"FASE II" exactamente igual que antes) pero ya no se muestra:
+   el subtítulo cumple ese rol en el nuevo layout. */
+.hsw-phase-badge { display: none; }
+
+.hsw-hp-numeric {
+  flex: 0 0 auto; text-align: right;
+  font-family: 'Orbitron', sans-serif; font-weight: 800;
+  font-size: clamp(1.05rem, 4.2vw, 1.55rem);
+  color: var(--hsw-text);
+  text-shadow: 0 0 14px rgba(220, 38, 38, .35);
+  white-space: nowrap;
+}
+.hsw-root[data-phase="2"] .hsw-hp-numeric { text-shadow: 0 0 16px rgba(220, 38, 38, .6); }
 
 /* ---------------------------------------------------------------------
    Paneles mutuamente excluyentes por estado (data-state en #hswRoot):
@@ -117,70 +217,84 @@ body {
 
 .hsw-panel {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; min-height: 90px; text-align: center; gap: 6px;
+  text-align: center; gap: 4px; padding: 4px 0 8px;
 }
 .hsw-scheduled-title {
   font-family: 'Orbitron', sans-serif; font-weight: 800;
-  font-size: clamp(1rem, 4vw, 1.3rem); letter-spacing: .04em;
+  font-size: clamp(.95rem, 3.6vw, 1.15rem); letter-spacing: .04em;
   color: var(--hsw-text);
 }
 .hsw-scheduled-sub {
-  font-size: clamp(.72rem, 2.6vw, .85rem); letter-spacing: .06em;
+  font-size: clamp(.68rem, 2.4vw, .8rem); letter-spacing: .06em;
   color: var(--hsw-text-dim); text-transform: uppercase;
 }
 
 .hsw-finished-title {
   font-family: 'Orbitron', sans-serif; font-weight: 800;
-  font-size: clamp(1rem, 4vw, 1.25rem); letter-spacing: .03em;
+  font-size: clamp(.95rem, 3.6vw, 1.15rem); letter-spacing: .03em;
+  color: var(--hsw-text);
 }
-.hsw-root[data-state="finished"][data-cataclysm="0"] .hsw-finished-title { color: var(--hsw-text); }
 .hsw-finished-sub {
-  font-size: clamp(.7rem, 2.4vw, .82rem); letter-spacing: .05em;
+  font-size: clamp(.66rem, 2.2vw, .78rem); letter-spacing: .05em;
   color: var(--hsw-text-dim); text-transform: uppercase;
 }
 
 /* ---------------------------------------------------------------------
-   Barras de HP -- mismo lenguaje visual que css/halloween-2026.css
-   (.hw26-bar / .hw26-bar-fill), reimplementado acá de forma aislada.
+   Barra principal de Morvanna -- gruesa (18-22px), lenguaje "boss bar":
+   gradiente rojo oscuro -> rojo vivo, brillo, divisiones sutiles.
    --------------------------------------------------------------------- */
-.hsw-row { margin-bottom: 8px; }
-.hsw-row:last-of-type { margin-bottom: 0; }
+.hsw-bar-boss {
+  position: relative; height: 20px; border-radius: 8px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .1);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.hsw-bar-boss .hsw-bar-fill {
+  height: 100%; width: 0%; border-radius: 7px;
+  background: linear-gradient(90deg, #6e1414, var(--hsw-red), #ff8a5c);
+  box-shadow: 0 0 14px rgba(220, 38, 38, .6), inset 0 1px 0 rgba(255,255,255,.18);
+  transition: width .7s cubic-bezier(.22, .68, 0, 1.01);
+  position: relative;
+}
+/* Divisiones sutiles -- puramente decorativas, franjas verticales tenues
+   sobre el relleno, no dependen de ningún dato. */
+.hsw-bar-boss::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0, transparent calc(10% - 1px),
+    rgba(0, 0, 0, .22) calc(10% - 1px), rgba(0, 0, 0, .22) 10%
+  );
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------
+   Geo Army -- más delgada (12-14px), violeta -> dorado, claramente
+   secundaria frente a la barra de Morvanna.
+   --------------------------------------------------------------------- */
+.hsw-row-geo { margin-top: 2px; }
 .hsw-row-head {
   display: flex; align-items: baseline; justify-content: space-between;
   margin-bottom: 3px;
 }
 .hsw-name {
   font-family: 'Orbitron', sans-serif; font-weight: 700;
-  font-size: clamp(.7rem, 2.6vw, .82rem); letter-spacing: .08em;
+  font-size: clamp(.62rem, 2.2vw, .7rem); letter-spacing: .08em;
   color: var(--hsw-text-dim);
 }
-.hsw-phase-badge {
-  font-family: 'Orbitron', sans-serif; font-weight: 700;
-  font-size: clamp(.6rem, 2.2vw, .68rem); letter-spacing: .08em;
-  color: var(--hsw-text); background: rgba(124, 58, 237, .25);
-  border: 1px solid var(--hsw-violet-line); border-radius: 5px;
-  padding: 1px 7px;
-}
-.hsw-root[data-phase="2"] .hsw-phase-badge {
-  background: rgba(220, 38, 38, .28); border-color: var(--hsw-red-soft);
-}
-.hsw-bar {
-  position: relative; height: 11px; border-radius: 999px;
-  background: rgba(255, 255, 255, .07);
+.hsw-bar-geo {
+  position: relative; height: 13px; border-radius: 999px;
+  background: rgba(255, 255, 255, .06);
   border: 1px solid rgba(255, 255, 255, .09);
   overflow: hidden;
 }
-.hsw-bar-fill {
-  height: 100%; width: 0%; border-radius: 999px;
-  transition: width .7s cubic-bezier(.22, .68, 0, 1.01);
-}
-.hsw-bar-boss .hsw-bar-fill {
-  background: linear-gradient(90deg, #7c1d1d, var(--hsw-red), #ff6b4a);
-  box-shadow: 0 0 10px rgba(220, 38, 38, .55);
-}
 .hsw-bar-geo .hsw-bar-fill {
+  height: 100%; width: 0%; border-radius: 999px;
   background: linear-gradient(90deg, #5b21b6, var(--hsw-violet), var(--hsw-gold));
-  box-shadow: 0 0 10px rgba(124, 58, 237, .5);
+  box-shadow: 0 0 8px rgba(124, 58, 237, .45);
+  transition: width .7s cubic-bezier(.22, .68, 0, 1.01);
 }
 .hsw-bar-fill.hsw-flash-hit { animation: hsw-flash-hit .55s ease; }
 .hsw-bar-fill.hsw-flash-heal { animation: hsw-flash-heal .55s ease; }
@@ -188,14 +302,14 @@ body {
 @keyframes hsw-flash-heal { 0% { filter: brightness(2.1) hue-rotate(40deg); } 100% { filter: brightness(1); } }
 
 .hsw-bar-text {
-  margin-top: 2px; font-size: clamp(.62rem, 2.2vw, .72rem);
+  margin-top: 2px; font-size: clamp(.6rem, 2vw, .68rem);
   font-weight: 600; color: var(--hsw-text-dim); text-align: right;
 }
 
-/* Último movimiento / Cataclismo / Contrato completado -- una sola línea
-   compartida, nunca una lista. */
+/* Último movimiento -- una sola línea, nunca una lista. Ya NO la usa
+   Cataclismo (capa dedicada más abajo). */
 .hsw-bottom-line {
-  margin-top: 8px; padding-top: 7px;
+  margin-top: 9px; padding-top: 7px;
   border-top: 1px solid rgba(255, 255, 255, .08);
   font-size: clamp(.68rem, 2.4vw, .8rem);
   color: var(--hsw-text); text-align: center;
@@ -206,18 +320,45 @@ body {
   color: #ffd88a; font-weight: 700; letter-spacing: .02em;
   animation: hsw-bottom-pop .4s ease;
 }
-.hsw-bottom-cataclysm {
-  color: #ffb0a8; font-family: 'Orbitron', sans-serif; font-weight: 700;
-  letter-spacing: .04em; text-transform: uppercase;
-}
 @keyframes hsw-bottom-pop {
   0% { opacity: 0; transform: translateY(4px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------------------------------------------------------------------
-   Transición de fase 1 -> 2 -- overlay transitorio a pantalla completa
-   del widget (~2s), con flash violeta/rojo. Puramente visual/CSS.
+   Capa dedicada de Cataclismo -- ADICIONAL, nunca oculta retrato/barras
+   (que siguen arriba, sin cambios). Countdown puramente presentacional
+   (mismo cálculo de siempre, ver renderCataclysm() en el JS).
+   --------------------------------------------------------------------- */
+.hsw-cataclysm-layer {
+  margin-top: 10px; padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 38, 38, .55);
+  background: linear-gradient(90deg, rgba(124,58,237,.22), rgba(220,38,38,.22));
+  text-align: center;
+  animation: hsw-cataclysm-layer-pulse 1.3s ease-in-out infinite;
+}
+.hsw-cataclysm-title {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: .06em;
+  color: #ffb0a8; font-size: clamp(.74rem, 2.6vw, .88rem);
+}
+.hsw-cataclysm-timer {
+  font-family: 'Orbitron', sans-serif; font-weight: 800;
+  font-size: clamp(1.1rem, 4vw, 1.4rem); letter-spacing: .05em;
+  color: #fff; text-shadow: 0 0 14px rgba(220, 38, 38, .9);
+}
+.hsw-cataclysm-sub {
+  font-size: clamp(.6rem, 2.1vw, .7rem); letter-spacing: .08em;
+  color: var(--hsw-text-dim); text-transform: uppercase;
+}
+@keyframes hsw-cataclysm-layer-pulse {
+  0%, 100% { box-shadow: inset 0 0 10px rgba(220, 38, 38, .25); }
+  50% { box-shadow: inset 0 0 22px rgba(220, 38, 38, .55); }
+}
+
+/* ---------------------------------------------------------------------
+   Transición de fase 1 -> 2 -- overlay transitorio (~1.8s), con flash
+   violeta/rojo. Puramente visual/CSS, sin cambios de comportamiento.
    --------------------------------------------------------------------- */
 .hsw-phase-flash {
   position: absolute; inset: 0;
@@ -247,8 +388,9 @@ body {
 }
 
 /* Muy angosto (Browser Source configurado más chico de lo recomendado):
-   se apilan verticalmente en vez de arriesgar texto cortado. */
-@media (max-width: 360px) {
+   el header se apila en dos líneas en vez de arriesgar texto cortado. */
+@media (max-width: 380px) {
   .hsw-root { padding: 10px 12px 10px; }
-  .hsw-row-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .hsw-header { flex-wrap: wrap; }
+  .hsw-hp-numeric { flex: 1 1 100%; text-align: left; margin-top: 2px; }
 }
