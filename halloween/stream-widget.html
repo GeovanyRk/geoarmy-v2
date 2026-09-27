@@ -17,8 +17,15 @@
          - SIN scroll (html/body con overflow:hidden).
          - html/body con background transparente (ver
            css/halloween-stream-widget.css) para que se vea el juego debajo.
-         - Tamaño recomendado en OBS: 700 x 260 px (responsive: se adapta a
-           cualquier otro tamaño de Browser Source).
+         - Tamaño recomendado en OBS: 700 x 220-250 px (responsive: se
+           adapta a cualquier otro tamaño de Browser Source).
+
+       REDISEÑO VISUAL (2026-09-26): jerarquía tipo "boss bar" de
+       videojuego (retrato + nombre/título + HP numérico arriba, barra
+       principal gruesa debajo, Geo Army claramente secundaria, último
+       movimiento en una sola línea, capa dedicada de Cataclismo). Cambio
+       PURAMENTE VISUAL -- ver cabecera de js/halloween-stream-widget.js
+       para el detalle exacto de qué se tocó y qué no en esa pasada.
 
        Cliente Supabase: se reutiliza EXACTAMENTE el mismo mecanismo que ya
        usan batalla.html/rol.html/contratos.html/efectos.html/cronicas.html
@@ -50,13 +57,39 @@
        ====================================================================== -->
 </head>
 <body data-halloween-widget="stream-widget">
-  <div id="hswRoot" class="hsw-root" data-state="loading" data-phase="1" data-cataclysm="0">
+  <div id="hswRoot" class="hsw-root" data-state="loading" data-phase="1" data-cataclysm="0" data-outcome="none">
 
     <div id="hswDemoTag" class="hsw-demo-tag" hidden>MODO DEMO</div>
     <div id="hswReconnect" class="hsw-reconnect" hidden title="Reconectando con Supabase…">⟳</div>
 
+    <!-- HEADER — fila superior tipo "boss bar": retrato + nombre/título +
+         HP numérico grande. Visible en 'scheduled'/'battle'/'finished'
+         (oculto solo en 'loading', ver CSS). El retrato depende
+         EXCLUSIVAMENTE de boss_phase (nunca de HP) -- ver
+         updatePortrait()/updateSubtitle() en js/halloween-stream-widget.js,
+         los únicos agregados de lógica permitidos en esta pasada. #hswPhaseBadge
+         se conserva en el DOM (la lógica que lo rellena -- applyPhase() --
+         no se tocó) pero queda oculto vía CSS: el subtítulo ahora cumple
+         ese rol visualmente. -->
+    <div id="hswHeader" class="hsw-header">
+      <div class="hsw-portrait-wrap">
+        <img id="hswPortrait" class="hsw-portrait-img" alt="Morvanna" hidden />
+        <div id="hswPortraitFallback" class="hsw-portrait-fallback" aria-hidden="true">M</div>
+      </div>
+      <div class="hsw-header-mid">
+        <div class="hsw-boss-name">MORVANNA</div>
+        <div id="hswSubtitle" class="hsw-boss-subtitle">LA HERALDO</div>
+        <span id="hswPhaseBadge" class="hsw-phase-badge" hidden>FASE I</span>
+      </div>
+      <!-- Mismo elemento/ID que ya rellenaba renderBars() (fmtNum tal cual
+           boss_hp/boss_max_hp) -- solo se reubicó aquí y se le agrandó la
+           tipografía por CSS; renderBars() en JS no cambió. -->
+      <div id="hswBossText" class="hsw-hp-numeric">— / — HP</div>
+    </div>
+
     <!-- SCHEDULED (status === 'scheduled'): versión discreta, antes del
-         inicio real. NO simula HP moviéndose. -->
+         inicio real, con el retrato de Fase I atenuado (CSS). NO simula
+         HP moviéndose. -->
     <div id="hswScheduledPanel" class="hsw-panel hsw-panel-scheduled">
       <div class="hsw-scheduled-title">BATALLA DE HALLOWEEN</div>
       <div class="hsw-scheduled-sub">1 OCT · 7:00 PM ET</div>
@@ -74,30 +107,36 @@
          (con outcome ya decidido) reutilizando el mismo bloque. Oculto
          solo en 'scheduled'/'loading'. Los valores SOLO representan
          boss_hp/boss_max_hp/geoarmy_hp/geoarmy_max_hp tal como llegan de
-         Supabase -- nunca se calculan aquí. -->
+         Supabase -- nunca se calculan aquí. Barra de Morvanna ahora
+         gruesa (barra principal de la boss bar); Geo Army se mantiene
+         más delgada, claramente secundaria. -->
     <div id="hswBars" class="hsw-bars">
-      <div class="hsw-row hsw-row-boss">
-        <div class="hsw-row-head">
-          <span class="hsw-name">MORVANNA</span>
-          <span id="hswPhaseBadge" class="hsw-phase-badge">FASE I</span>
-        </div>
-        <div class="hsw-bar hsw-bar-boss"><div id="hswBossFill" class="hsw-bar-fill"></div></div>
-        <div id="hswBossText" class="hsw-bar-text">— / — HP</div>
-      </div>
+      <div class="hsw-bar hsw-bar-boss"><div id="hswBossFill" class="hsw-bar-fill"></div></div>
       <div class="hsw-row hsw-row-geo">
         <div class="hsw-row-head"><span class="hsw-name">GEO ARMY</span></div>
         <div class="hsw-bar hsw-bar-geo"><div id="hswGeoFill" class="hsw-bar-fill"></div></div>
         <div id="hswGeoText" class="hsw-bar-text">— / — HP</div>
       </div>
-      <!-- Último movimiento relevante (uno solo, nunca una lista/historial) --
-           también usado por Cataclismo (countdown) y por "Contrato
-           completado" (mission_damage), que reutilizan esta misma línea. -->
+      <!-- Último movimiento relevante (uno solo, nunca una lista/historial).
+           Ya NO la usa Cataclismo (ver capa dedicada más abajo) -- misma
+           lógica de cola/dedupe, solo cambió a qué elemento escribe. -->
       <div id="hswBottomLine" class="hsw-bottom-line" hidden></div>
+    </div>
+
+    <!-- Capa de emergencia de Cataclismo -- NUEVA, ADICIONAL: no oculta el
+         retrato ni las barras (siguen visibles arriba). Countdown = mismo
+         cálculo de siempre (pending_resolves_at vs Date.now(), SOLO
+         presentación, nunca resuelve nada ni toca HP) -- ver
+         renderCataclysm() en js/halloween-stream-widget.js. -->
+    <div id="hswCataclysmLayer" class="hsw-cataclysm-layer" hidden>
+      <div class="hsw-cataclysm-title">⚠ CATACLISMO</div>
+      <div id="hswCataclysmTimer" class="hsw-cataclysm-timer">00:00</div>
+      <div class="hsw-cataclysm-sub">PREPAREN LAS DEFENSAS</div>
     </div>
 
     <!-- Transición de fase 1 -> 2 detectada en la misma sesión (nunca se
          calcula por HP, siempre por boss_phase). Overlay transitorio
-         ~2s, puramente visual. -->
+         ~1.8s, puramente visual. -->
     <div id="hswPhaseFlash" class="hsw-phase-flash" hidden>
       <div class="hsw-phase-flash-title">EL SELLO SE HA ROTO</div>
       <div class="hsw-phase-flash-sub">FASE II</div>
