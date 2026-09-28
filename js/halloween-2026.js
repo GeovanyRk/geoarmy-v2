@@ -2,11 +2,13 @@
 // HALLOWEEN 2026 — "La Heraldo" — sistema de batalla comunitaria
 // =====================================================================
 // Archivo NUEVO y aislado. Se carga SOLAMENTE desde las páginas dedicadas
-// halloween/batalla.html, rol.html, contratos.html, efectos.html,
-// cronicas.html (todas de prueba por ahora). index-halloween-test.html ya
-// NO lo carga: los 3 pins sobre el planeta son <a href> simples, con el
-// estado bloqueado/desbloqueado resuelto en puro CSS (ver
-// css/halloween-2026.css, sección "Pins sobre el planeta").
+// halloween/batalla.html, rol.html, contratos.html (producción), y
+// también desde halloween/efectos.html/cronicas.html (huérfanas, sin
+// enlace público, ver PASADA FINAL TEST -> PRODUCCIÓN más abajo).
+// index.html/index-halloween-test.html NO lo cargan: los 3 pins sobre el
+// planeta son <a href> simples, con el estado bloqueado/desbloqueado
+// resuelto en puro CSS (ver css/halloween-2026.css, sección "Pins sobre
+// el planeta").
 //
 // CAMBIO DE DIRECCIÓN (v2): se retiró el dashboard de 4 tarjetas + modal
 // genérico. Ahora este archivo actúa como un pequeño "router": lee
@@ -16,6 +18,12 @@
 // conserva casi intacta, solo que ahora escribe directamente en un
 // contenedor de la página en vez de abrir un modal.
 //
+// PASADA FINAL TEST -> PRODUCCIÓN (2026-09-26): se retiró por completo el
+// sistema exclusivo de desarrollo (la bandera de modo prueba, el atributo
+// data-testmode, el selector de escenarios, la barra de desarrollo, y
+// todas las funciones de simulación). callRpc() ahora llama SIEMPRE la
+// RPC real -- este archivo ya no simula nada.
+//
 // Reglas de seguridad que este archivo respeta siempre:
 //  - NO usa service_role, solo el cliente anon ya existente
 //    (window.GeoArmyAccount.client, creado en js/geoarmy-account.js).
@@ -24,9 +32,6 @@
 //  - NO calcula combate/daño/HP en el navegador. Solo representa lo que
 //    devuelven las RPCs.
 //  - NO resuelve Cataclismo, NO envía user_id manualmente a choose_role.
-//  - El "modo de pruebas" (mock) es puramente visual: cuando está activo
-//    NUNCA llama RPCs reales ni escribe nada en Supabase -- ver sección
-//    "MOCK" más abajo.
 // =====================================================================
 (function () {
   'use strict';
@@ -93,301 +98,24 @@
     return String(s || '').toLowerCase().replace(/(^|\s)([a-záéíóúñ])/g, function (m, sp, c) { return sp + c.toUpperCase(); });
   }
 
-  function safeLsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
-  function safeLsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
-
   // ---------------------------------------------------------------------
-  // 0) Router — qué página es esta y si está en modo de pruebas.
-  //    <body data-halloween-page="battle|role|missions|effects|feed"
-  //          data-testmode="true">
+  // 0) Router — qué página es esta.
+  //    <body data-halloween-page="battle|role|missions|effects|feed">
   // ---------------------------------------------------------------------
   var PAGE = document.body.getAttribute('data-halloween-page') || '';
-  var HALLOWEEN_TEST_MODE = document.body.getAttribute('data-testmode') === 'true';
 
-  // ---------------------------------------------------------------------
-  // 1) MODO DE PRUEBAS (mock) — SOLO afecta estas páginas de test.
-  //    Se activa con el <select> del panel "TEST MODE" (#hw26DevScenario)
-  //    o con ?hw_scenario=... en la URL. "off" = usa las RPCs reales.
-  //    El escenario elegido también se guarda en localStorage (SOLO en
-  //    test mode, nunca escribe nada en Supabase) para que, al navegar de
-  //    una página Halloween a otra, se conserve el mismo escenario sin
-  //    tener que repetir el parámetro en cada link -- pura conveniencia
-  //    visual de pruebas, ver sección 15 del pedido original.
-  // ---------------------------------------------------------------------
-  var LS_SCENARIO_KEY = 'hw26_test_scenario';
-  var LS_ROLE_KEY = 'hw26_test_role';
-
-  var urlParams = new URLSearchParams(window.location.search);
-  var currentScenario = 'off';
-  var mockHasRole = false;
-  if (HALLOWEEN_TEST_MODE) {
-    currentScenario = urlParams.get('hw_scenario') || safeLsGet(LS_SCENARIO_KEY) || 'off';
-    var roleParam = urlParams.get('hw_role');
-    mockHasRole = roleParam != null ? roleParam === '1' : safeLsGet(LS_ROLE_KEY) === '1';
-  }
-
-  var NOW_TEST_BASE = Date.now();
-
-  function mockState(scenario) {
-    var base = {
-      event_key: EVENT_KEY,
-      status: 'active',
-      outcome: null,
-      boss_hp: 1400000,
-      boss_max_hp: 2000000,
-      boss_phase: 1,
-      phase2_threshold_hp: 1000000,
-      geoarmy_hp: 62000,
-      geoarmy_max_hp: 100000,
-      pending_attack_key: null,
-      pending_announced_at: null,
-      pending_resolves_at: null,
-      starts_at: '2026-10-01T19:00:00-04:00',
-      ends_at: '2026-11-01T00:00:00-04:00',
-      phase2_at: null,
-      finished_at: null,
-      updated_at: new Date().toISOString(),
-    };
-    switch (scenario) {
-      case 'scheduled':
-        return Object.assign({}, base, {
-          status: 'scheduled', boss_hp: 2000000, geoarmy_hp: 100000, boss_phase: 1,
-        });
-      case 'active_p1':
-        return base;
-      case 'active_p2':
-        return Object.assign({}, base, {
-          boss_hp: 640000, boss_phase: 2, geoarmy_hp: 38000,
-        });
-      case 'cataclismo':
-        return Object.assign({}, base, {
-          boss_hp: 610000, boss_phase: 2, geoarmy_hp: 21000,
-          pending_attack_key: 'cataclismo',
-          pending_announced_at: new Date(NOW_TEST_BASE - 4000).toISOString(),
-          pending_resolves_at: new Date(NOW_TEST_BASE + 17000).toISOString(),
-        });
-      case 'geoarmy_victory':
-        return Object.assign({}, base, {
-          status: 'finished', outcome: 'geoarmy_victory', boss_hp: 0, boss_phase: 2,
-          geoarmy_hp: 15400, finished_at: new Date().toISOString(),
-        });
-      case 'herald_victory':
-        return Object.assign({}, base, {
-          status: 'finished', outcome: 'herald_victory', boss_hp: 610000, boss_phase: 2,
-          geoarmy_hp: 0, finished_at: new Date().toISOString(),
-        });
-      default:
-        return base;
-    }
-  }
-
-  function mockParticipation(scenario) {
-    var eventStatus = (scenario === 'scheduled') ? 'scheduled'
-      : (scenario === 'geoarmy_victory' || scenario === 'herald_victory') ? 'finished'
-      : 'active';
-    if (!mockHasRole) {
-      return {
-        participant_id: null, role: null, display_name: 'TesterMock', joined_at: null,
-        has_role: false, can_choose_role: eventStatus === 'active', event_status: eventStatus,
-      };
-    }
-    return {
-      participant_id: 'mock-participant-1', role: 'attacker', display_name: 'TesterMock',
-      joined_at: new Date().toISOString(), has_role: true, can_choose_role: false,
-      event_status: eventStatus,
-    };
-  }
-
-  function mockEffects(scenario) {
-    if (scenario === 'scheduled') return [];
-    return [
-      { effect_key: 'escudo_arcano', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: null, expires_at: new Date(Date.now() + 9 * 60000).toISOString(), created_at: new Date().toISOString() },
-      { effect_key: 'vulnerabilidad', scope: 'boss', applies_to: null, multiplier: 2, remaining_uses: 2, expires_at: null, created_at: new Date().toISOString() },
-    ];
-  }
-
-  // Escenario MOCK "effects_active" -- puramente visual, para revisar de
-  // un vistazo las tarjetas de los 5 efectos posibles juntas. NUNCA
-  // escribe en Supabase.
-  function mockEffectsFull() {
-    var now = Date.now();
-    return [
-      { effect_key: 'escudo_arcano', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: 1, expires_at: null, created_at: new Date(now - 30000).toISOString() },
-      { effect_key: 'vulnerabilidad', scope: 'boss', applies_to: null, multiplier: 2, remaining_uses: 2, expires_at: null, created_at: new Date(now - 60000).toISOString() },
-      { effect_key: 'ruptura_arcana', scope: 'boss', applies_to: null, multiplier: 2, remaining_uses: 1, expires_at: null, created_at: new Date(now - 90000).toISOString() },
-      { effect_key: 'marca_bruja', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: 1, expires_at: null, created_at: new Date(now - 120000).toISOString() },
-      { effect_key: 'herida_profana', scope: 'geoarmy', applies_to: null, multiplier: 0.5, remaining_uses: 1, expires_at: null, created_at: new Date(now - 150000).toISOString() },
-    ];
-  }
-
-  function mockFeed(scenario) {
-    var now = Date.now();
-    var items = [
-      { log_id: 6, entry_type: 'player_attack', actor_name: 'geovannyrk', actor_role: 'attacker', action_key: 'golpe_abismo', boss_attack_key: null, boss_hp_delta: -3000, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 62000, phase_after: 1, created_at: new Date(now - 30000).toISOString() },
-      { log_id: 5, entry_type: 'heal', actor_name: 'MissTwitch', actor_role: 'support', action_key: null, boss_attack_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 5000, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 62000, phase_after: 1, created_at: new Date(now - 90000).toISOString() },
-      { log_id: 4, entry_type: 'shield', actor_name: 'ElDefensor', actor_role: 'defender', action_key: null, boss_attack_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 57000, phase_after: 1, created_at: new Date(now - 150000).toISOString() },
-      { log_id: 3, entry_type: 'mission_damage', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, boss_hp_delta: -5000, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1403000, geoarmy_hp_after: 57000, phase_after: 1, created_at: new Date(now - 240000).toISOString() },
-      { log_id: 2, entry_type: 'boss_attack', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'fuego_infernal', boss_hp_delta: 0, geoarmy_hp_delta: -9000, multiplier_applied: 1, boss_hp_after: 1408000, geoarmy_hp_after: 57000, phase_after: 1, created_at: new Date(now - 300000).toISOString() },
-      { log_id: 1, entry_type: 'event_started', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 2000000, geoarmy_hp_after: 100000, phase_after: 1, created_at: new Date(now - 600000).toISOString() },
-    ];
-    if (scenario === 'active_p2' || scenario === 'cataclismo') {
-      items.unshift({ log_id: 7, entry_type: 'phase_change', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 999000, geoarmy_hp_after: 40000, phase_after: 2, created_at: new Date(now - 5000).toISOString() });
-    }
-    if (scenario === 'cataclismo') {
-      items.unshift({ log_id: 8, entry_type: 'boss_attack_announced', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'cataclismo', boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 610000, geoarmy_hp_after: 21000, phase_after: 2, created_at: new Date(now - 2000).toISOString() });
-    }
-    if (scenario === 'geoarmy_victory') {
-      items.unshift({ log_id: 9, entry_type: 'victory', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 0, geoarmy_hp_after: 15400, phase_after: 2, created_at: new Date(now - 1000).toISOString() });
-    }
-    if (scenario === 'herald_victory') {
-      items.unshift({ log_id: 9, entry_type: 'defeat', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 610000, geoarmy_hp_after: 0, phase_after: 2, created_at: new Date(now - 1000).toISOString() });
-    }
-    return items;
-  }
-
-  // Escenario MOCK "feed_active" -- las 6 entradas de ejemplo pedidas,
-  // pensadas para revisar la jerarquía visual de la crónica (hora, texto,
-  // daño destacado, eventos de boss más agresivos). Las horas son de HOY
-  // a las 20:41–20:50 para que se lean igual que el ejemplo sin depender
-  // de cuándo se pruebe. Puramente visual: nunca escribe en Supabase.
-  function mockFeedActive() {
-    var d = new Date();
-    function atTime(h, m) {
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m, 0, 0).toISOString();
-    }
-    return [
-      { log_id: 106, entry_type: 'phase_change', actor_name: null, actor_role: null, action_key: null, boss_attack_key: null, effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 999000, geoarmy_hp_after: 15000, phase_after: 2, created_at: atTime(20, 50) },
-      { log_id: 105, entry_type: 'boss_attack', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'cataclismo', effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: -6000, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 21000, phase_after: 1, created_at: atTime(20, 46) },
-      { log_id: 104, entry_type: 'boss_attack_announced', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'cataclismo', effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 27000, phase_after: 1, created_at: atTime(20, 45) },
-      { log_id: 103, entry_type: 'effect_applied', actor_name: 'Geo Army', actor_role: null, action_key: null, boss_attack_key: null, effect_key: 'escudo_arcano', boss_hp_delta: 0, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1400000, geoarmy_hp_after: 27000, phase_after: 1, created_at: atTime(20, 43) },
-      { log_id: 102, entry_type: 'boss_attack', actor_name: null, actor_role: null, action_key: null, boss_attack_key: 'fuego_infernal', effect_key: null, boss_hp_delta: 0, geoarmy_hp_delta: -9000, multiplier_applied: 1, boss_hp_after: 1403000, geoarmy_hp_after: 27000, phase_after: 1, created_at: atTime(20, 42) },
-      { log_id: 101, entry_type: 'player_attack', actor_name: 'Geovannyrk', actor_role: 'attacker', action_key: 'golpe_abismo', boss_attack_key: null, effect_key: null, boss_hp_delta: -3000, geoarmy_hp_delta: 0, multiplier_applied: 1, boss_hp_after: 1403000, geoarmy_hp_after: 36000, phase_after: 1, created_at: atTime(20, 41) },
-    ];
-  }
-
-  function mockMissions(scenario) {
-    var upcomingOnly = scenario === 'scheduled';
-    return [
-      { mission_id: 1, mission_key: 'fn_eliminaciones', category: 'fortnite', title: 'Elimina 5 enemigos', description: 'Consigue 5 eliminaciones en una partida de Fortnite durante el contrato.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: upcomingOnly ? 'upcoming' : 'active', is_final_battle: false, boss_damage: 5000, verification_mode: 'clip', sort_order: 1 },
-      { mission_id: 2, mission_key: 'ow_victorias', category: 'overwatch', title: 'Gana 3 partidas', description: 'Consigue 3 victorias en Overwatch durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 6000, verification_mode: 'auto', sort_order: 2 },
-      // Nota: título/mission_key distintos de 'Ritual de las Almas' a propósito
-      // -- ese nombre ya es el contrato STREAM canónico real (ver
-      // contratos_stream / contratos_octubre_completo). Este mock genérico de
-      // respaldo (solo se usa si se ve Contratos con un escenario de Batalla
-      // como 'scheduled'/'active_p1') nunca debe reutilizar un título real,
-      // para no confundirlo con el calendario oficial de octubre.
-      { mission_id: 3, mission_key: 'stream_guardianes_directo', category: 'stream', title: 'Guardianes del Directo', description: 'La comunidad debe mantener presencia activa durante el stream para fortalecer la resistencia.', mission_day: '2026-10-10', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 3 },
-      { mission_id: 4, mission_key: 'fn_batalla_final', category: 'fortnite', title: 'Batalla final: asalto', description: 'Contrato especial del 31 de octubre contra La Heraldo.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 20000, verification_mode: 'clip', sort_order: 4 },
-    ];
-  }
-
-  // Escenarios MOCK exclusivos para revisar el diseño de Contratos con
-  // contenido de ejemplo (contratos_empty / contratos_upcoming /
-  // contratos_active / contratos_mixed / contratos_stream /
-  // contratos_octubre_completo). Puramente
-  // visuales: NUNCA escriben en Supabase. La fuente real es exclusivamente
-  // halloween_2026_get_public_missions() -- estos mocks nunca se usan si
-  // ese escenario no está seleccionado, y con "RPC real (Supabase)" jamás
-  // se generan contratos falsos (lastMissions vacío = estado vacío real).
-  function mockMissionsContratos(scenario) {
-    if (scenario === 'contratos_empty') return [];
-
-    if (scenario === 'contratos_mixed') {
-      // Un ended, un active, un upcoming, categorías distintas, repartidos
-      // en 2 días distintos -- para revisar agrupado por día/fecha Y el
-      // layout de 2 columnas en escritorio cuando un día tiene varios.
-      return [
-        { mission_id: 201, mission_key: 'stream_voces_umbral', category: 'stream', title: 'Voces del Umbral', description: 'Contrato ya cerrado -- queda como registro de octubre.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 4000, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 202, mission_key: 'fn_avance_bruma', category: 'fortnite', title: 'Avance en la Bruma', description: 'Consigue una victoria en Fortnite usando tu code de Geo Army en la tienda durante el contrato.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 2 },
-        { mission_id: 203, mission_key: 'ow_vigilancia_helada', category: 'overwatch', title: 'Vigilancia Helada', description: 'Gana 3 partidas en modo competitivo durante el stream.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 1 },
-        { mission_id: 204, mission_key: 'stream_eco_comunidad', category: 'stream', title: 'Eco de la Comunidad', description: 'Meta comunitaria de suscripciones durante la semana.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 2 },
-      ];
-    }
-
-    // NOTA: el escenario 'contrato_final' (un solo contrato "ASALTO FINAL A
-    // LA HERALDO", 50000 de daño) se eliminó -- quedó desactualizado frente
-    // a la definición real del 31 de octubre (3 contratos finales: Asalto
-    // al Trono / Quebrar las Cadenas / El Último Sello). Esa fecha ya se
-    // prueba de forma completa y coherente dentro de
-    // 'contratos_octubre_completo', así que mantener ambos solo generaba
-    // contenido viejo duplicado. Ver `mockRpcResult()` y el <select> de
-    // contratos.html, donde también se quitó la opción correspondiente.
-
-    if (scenario === 'contratos_stream') {
-      // Los 5 contratos de STREAM propuestos como base real de Halloween
-      // 2026 -- SOLO presentación/mock, ninguna validación de Twitch,
-      // canje o conteo de usuarios corre aquí. Repartidos en 4 martes/
-      // jueves/sábado de octubre (fechas no definitivas) con 1 ended, 2
-      // active, 2 upcoming -- dos de ellos comparten día (24 oct) para
-      // también revisar el grid de 2 columnas dentro de esta categoría.
-      return [
-        { mission_id: 401, mission_key: 'stream_ritual_almas', category: 'stream', title: 'Ritual de las Almas', description: '20 miembros de Geo Army deben responder al llamado y activar el ritual durante el stream.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 402, mission_key: 'stream_mantengan_sello', category: 'stream', title: 'Mantengan el Sello', description: 'La comunidad debe permanecer unida y acumular 20 horas de presencia combinada durante el contrato.', mission_day: '2026-10-13', opens_at: '2026-10-13T00:00:00-04:00', closes_at: '2026-10-13T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 403, mission_key: 'stream_llamado_guardia', category: 'stream', title: 'Llamado de la Guardia', description: '25 miembros únicos de Geo Army deben responder en el chat durante la ventana del contrato.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 7500, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 404, mission_key: 'stream_ofrenda_heraldo', category: 'stream', title: 'Ofrenda a la Heraldo', description: 'La comunidad debe completar 30 ofrendas durante el stream para debilitar el poder de Morvanna.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 405, mission_key: 'stream_juicio_oraculo', category: 'stream', title: 'El Juicio del Oráculo', description: '25 miembros de Geo Army deben participar en el juicio del Oráculo durante el stream.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 6000, verification_mode: 'manual', sort_order: 2 },
-      ];
-    }
-
-    if (scenario === 'contratos_octubre_completo') {
-      // Calendario mock COMPLETO de octubre 2026 (21 contratos, martes/
-      // jueves/sábado reales del mes) -- SOLO para revisar de un vistazo
-      // el diseño con el mes entero: agrupado por día, las 3 categorías,
-      // títulos/descripciones largos, y los 3 contratos finales del 31.
-      // Estados distribuidos por fecha (no por lógica real, es puro mock
-      // visual): 1-10 oct -> ended, 13-22 oct -> active, 24-31 oct ->
-      // upcoming (los del 31 además llevan is_final_battle:true, que se
-      // suma al badge de estado, no lo reemplaza).
-      return [
-        // --- 1 OCTUBRE (jueves) -- ended ---
-        { mission_id: 501, mission_key: 'fn_primera_brecha', category: 'fortnite', title: 'La Primera Brecha', description: 'El sello ha comenzado a ceder. Abre el primer frente y consigue una victoria para Geo Army.', mission_day: '2026-10-01', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-01T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 1500, verification_mode: 'clip', sort_order: 1 },
-        { mission_id: 502, mission_key: 'stream_ritual_almas_oct', category: 'stream', title: 'Ritual de las Almas', description: 'Morvanna ya puede sentirnos. 20 miembros de Geo Army deben responder al llamado y activar el ritual.', mission_day: '2026-10-01', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-01T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 2 },
-        // --- 3 OCTUBRE (sábado) -- ended ---
-        { mission_id: 503, mission_key: 'ow_guardia_umbral', category: 'overwatch', title: 'Guardia del Umbral', description: 'Una nueva brecha se ha abierto. Defiende el umbral antes de que las fuerzas de Morvanna lo atraviesen.', mission_day: '2026-10-03', opens_at: '2026-10-03T00:00:00-04:00', closes_at: '2026-10-03T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 1500, verification_mode: 'auto', sort_order: 1 },
-        { mission_id: 504, mission_key: 'stream_llamado_guardia_oct', category: 'stream', title: 'Llamado de la Guardia', description: 'La resistencia necesita voces. La Guardia debe responder antes de que el llamado se extinga.', mission_day: '2026-10-03', opens_at: '2026-10-03T00:00:00-04:00', closes_at: '2026-10-03T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 10000, verification_mode: 'manual', sort_order: 2 },
-        // --- 6 OCTUBRE (martes) -- ended ---
-        { mission_id: 505, mission_key: 'fn_cazadores_sello', category: 'fortnite', title: 'Cazadores del Sello', description: 'Fragmentos de energía de Morvanna han aparecido en el frente. Destrúyelos antes de que regresen a ella.', mission_day: '2026-10-06', opens_at: '2026-10-06T00:00:00-04:00', closes_at: '2026-10-06T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 1000, verification_mode: 'clip', sort_order: 1 },
-        // --- 8 OCTUBRE (jueves) -- ended ---
-        { mission_id: 506, mission_key: 'stream_mantengan_sello_oct', category: 'stream', title: 'Mantengan el Sello', description: 'El sello comienza a fracturarse. Solo una presencia constante puede mantenerlo estable.', mission_day: '2026-10-08', opens_at: '2026-10-08T00:00:00-04:00', closes_at: '2026-10-08T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 1 },
-        // --- 10 OCTUBRE (sábado) -- ended ---
-        { mission_id: 507, mission_key: 'ow_rompan_formacion', category: 'overwatch', title: 'Rompan la Formación', description: 'Las fuerzas de Morvanna se han organizado. Rompan su formación antes de que puedan avanzar.', mission_day: '2026-10-10', opens_at: '2026-10-10T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 10000, verification_mode: 'auto', sort_order: 1 },
-        { mission_id: 508, mission_key: 'stream_juicio_oraculo_oct', category: 'stream', title: 'El Juicio del Oráculo', description: 'El Oráculo exige una respuesta. El silencio también será interpretado.', mission_day: '2026-10-10', opens_at: '2026-10-10T00:00:00-04:00', closes_at: '2026-10-10T23:59:59-04:00', availability: 'ended', is_final_battle: false, boss_damage: 8000, verification_mode: 'manual', sort_order: 2 },
-        // --- 13 OCTUBRE (martes) -- active ---
-        { mission_id: 509, mission_key: 'fn_ecos_abismo', category: 'fortnite', title: 'Ecos del Abismo', description: 'Algo está siguiendo a Geo Army entre los mundos. Sobrevive al eco y regresa con vida.', mission_day: '2026-10-13', opens_at: '2026-10-13T00:00:00-04:00', closes_at: '2026-10-13T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 1500, verification_mode: 'clip', sort_order: 1 },
-        // --- 15 OCTUBRE (jueves) -- active ---
-        { mission_id: 510, mission_key: 'stream_ofrenda_heraldo_oct', category: 'stream', title: 'Ofrenda a la Heraldo', description: 'Toda invocación exige un precio. Esta vez, la ofrenda será utilizada contra quien la reclama.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 12000, verification_mode: 'manual', sort_order: 1 },
-        { mission_id: 511, mission_key: 'ow_ultima_linea', category: 'overwatch', title: 'La Última Línea', description: 'La defensa retrocede. No queda otra línea detrás de ustedes.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 10000, verification_mode: 'auto', sort_order: 2 },
-        // --- 17 OCTUBRE (sábado) -- active ---
-        { mission_id: 512, mission_key: 'fn_caceria_marca', category: 'fortnite', title: 'Cacería de la Marca', description: 'La Marca de la Bruja se extiende por el frente. Persigue su rastro y destruye los focos de corrupción.', mission_day: '2026-10-17', opens_at: '2026-10-17T00:00:00-04:00', closes_at: '2026-10-17T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 12000, verification_mode: 'clip', sort_order: 1 },
-        // --- 20 OCTUBRE (martes) -- active ---
-        { mission_id: 513, mission_key: 'ow_almas_resistencia', category: 'overwatch', title: 'Almas en Resistencia', description: 'Morvanna intenta desgastar a quienes aún permanecen de pie. Demuéstrale que eligió mal a sus víctimas.', mission_day: '2026-10-20', opens_at: '2026-10-20T00:00:00-04:00', closes_at: '2026-10-20T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 1500, verification_mode: 'auto', sort_order: 1 },
-        // --- 22 OCTUBRE (jueves) -- active ---
-        { mission_id: 514, mission_key: 'stream_vigilia_sello', category: 'stream', title: 'Vigilia del Sello', description: 'Nadie debe abandonar su puesto. Esta noche, el sello necesita guardianes.', mission_day: '2026-10-22', opens_at: '2026-10-22T00:00:00-04:00', closes_at: '2026-10-22T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 15000, verification_mode: 'manual', sort_order: 1 },
-        // --- 24 OCTUBRE (sábado) -- upcoming ---
-        { mission_id: 515, mission_key: 'fn_frente_quebrado', category: 'fortnite', title: 'Frente Quebrado', description: 'Uno de los frentes ha colapsado. Solo una ofensiva coordinada puede abrirlo nuevamente.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'clip', sort_order: 1 },
-        { mission_id: 516, mission_key: 'ow_contraofensiva_nocturna', category: 'overwatch', title: 'Contraofensiva Nocturna', description: 'La oscuridad ya no es una advertencia. Es territorio enemigo.', mission_day: '2026-10-24', opens_at: '2026-10-24T00:00:00-04:00', closes_at: '2026-10-24T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 12000, verification_mode: 'auto', sort_order: 2 },
-        // --- 27 OCTUBRE (martes) -- upcoming ---
-        { mission_id: 517, mission_key: 'fn_sangre_sello', category: 'fortnite', title: 'La Sangre del Sello', description: 'El sello exige algo más que supervivencia. Solo una victoria marcada por la batalla podrá alimentarlo.', mission_day: '2026-10-27', opens_at: '2026-10-27T00:00:00-04:00', closes_at: '2026-10-27T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 2000, verification_mode: 'clip', sort_order: 1 },
-        // --- 29 OCTUBRE (jueves) -- upcoming ---
-        { mission_id: 518, mission_key: 'stream_ultimo_ritual', category: 'stream', title: 'El Último Ritual', description: 'Ya no habrá otra oportunidad. Todo lo reunido durante octubre debe concentrarse en una sola invocación.', mission_day: '2026-10-29', opens_at: '2026-10-29T00:00:00-04:00', closes_at: '2026-10-29T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 20000, verification_mode: 'manual', sort_order: 1 },
-        // --- 31 OCTUBRE (sábado) -- BATALLA FINAL: upcoming + is_final_battle ---
-        { mission_id: 519, mission_key: 'fn_asalto_trono', category: 'fortnite', title: 'Asalto al Trono', description: 'El camino hacia Morvanna está abierto. No queda nada que conservar. Avancen.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 15000, verification_mode: 'clip', sort_order: 1 },
-        { mission_id: 520, mission_key: 'ow_quebrar_cadenas', category: 'overwatch', title: 'Quebrar las Cadenas', description: 'Las cadenas que protegen a La Heraldo están expuestas. Rómpanlas antes de que vuelva a cerrarlas.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 15000, verification_mode: 'auto', sort_order: 2 },
-        { mission_id: 521, mission_key: 'stream_ultimo_sello', category: 'stream', title: 'El Último Sello', description: 'Todas las voces. Todos los frentes. Una última vez.', mission_day: '2026-10-31', opens_at: '2026-10-31T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: true, boss_damage: 20000, verification_mode: 'manual', sort_order: 3 },
-      ];
-    }
-
-    var base = [
-      { mission_id: 101, mission_key: 'fn_marca_frente', category: 'fortnite', title: 'Marca en el Frente', description: 'Consigue una victoria usando tu code de Geo Army en la tienda de Fortnite durante el contrato.', mission_day: '2026-10-15', opens_at: '2026-10-15T00:00:00-04:00', closes_at: '2026-10-15T23:59:59-04:00', availability: 'active', is_final_battle: false, boss_damage: 25000, verification_mode: 'clip', sort_order: 1 },
-      { mission_id: 102, mission_key: 'ow_sin_escapatoria', category: 'overwatch', title: 'SIN ESCAPATORIA', description: 'Gana 2 partidas', mission_day: '2026-10-20', opens_at: '2026-10-20T00:00:00-04:00', closes_at: '2026-10-20T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 8000, verification_mode: 'auto', sort_order: 2 },
-      { mission_id: 103, mission_key: 'stream_ritual_comunidad', category: 'stream', title: 'RITUAL DE LA COMUNIDAD', description: 'Meta comunitaria', mission_day: '2026-10-24', opens_at: '2026-10-01T00:00:00-04:00', closes_at: '2026-10-31T23:59:59-04:00', availability: 'upcoming', is_final_battle: false, boss_damage: 15000, verification_mode: 'manual', sort_order: 3 },
-    ];
-    if (scenario === 'contratos_upcoming') {
-      return base.map(function (m) { return Object.assign({}, m, { availability: 'upcoming' }); });
-    }
-    return base; // contratos_active: mezcla activo/próximo, tal como el ejemplo pedido
-  }
-
+  // PASADA FINAL TEST -> PRODUCCIÓN (2026-09-26): se retiró por completo el
+  // sistema exclusivo de desarrollo (la bandera de modo prueba, el
+  // selector de escenario, la comprobación de rol simulada, las claves de
+  // localStorage de prueba, y todas las funciones de simulación que
+  // vivían aquí -- estado, participación, efectos, feed y misiones
+  // simulados, y el resultado de RPC simulado). callRpc() ahora llama
+  // SIEMPRE la RPC real (ver sección 2). Ningún dato de este archivo se
+  // inventa más:
+  // toda la lógica productiva (loadState, loadParticipation, chooseRole,
+  // loadMissions, loadFeed, processBattleFeed, feedItemText, la cola de
+  // movimientos, transición de fase, Cataclismo, render de Batalla/Rol/
+  // Contratos, polling real) sigue intacta debajo.
   // ---------------------------------------------------------------------
   // 2) Cliente Supabase real: reutiliza window.GeoArmyAccount.client
   //    (creado por js/geoarmy-account.js). Nunca se crea un cliente nuevo.
@@ -403,37 +131,13 @@
     setTimeout(function () { waitForClient(cb, triesLeft - 1); }, 100);
   }
 
-  // Envoltorio único para llamar RPCs: en modo mock nunca toca la red ni
-  // Supabase; en modo real, llama la RPC pública tal cual y nunca consulta
-  // tablas halloween_2026_* directamente.
+  // Envoltorio único para llamar RPCs: SIEMPRE llama la RPC pública real,
+  // nunca consulta tablas halloween_2026_* directamente. (El modo mock que
+  // existía aquí se retiró por completo en la pasada final test ->
+  // producción -- ver comentario de la sección 0.)
   function callRpc(client, name, args) {
-    if (HALLOWEEN_TEST_MODE && currentScenario !== 'off') {
-      return Promise.resolve({ data: mockRpcResult(name), error: null });
-    }
     var p = args ? client.rpc(name, args) : client.rpc(name);
     return Promise.resolve(p);
-  }
-
-  function mockRpcResult(name) {
-    switch (name) {
-      case 'halloween_2026_get_public_state': return mockState(currentScenario);
-      case 'halloween_2026_get_my_participation': return mockParticipation(currentScenario);
-      case 'halloween_2026_get_public_effects':
-        if (currentScenario === 'effects_active') return mockEffectsFull();
-        return mockEffects(currentScenario);
-      case 'halloween_2026_get_public_feed':
-        if (currentScenario === 'feed_active') return mockFeedActive();
-        return mockFeed(currentScenario);
-      case 'halloween_2026_get_public_missions':
-        if (currentScenario === 'contratos_empty' || currentScenario === 'contratos_upcoming' ||
-            currentScenario === 'contratos_active' || currentScenario === 'contratos_mixed' ||
-            currentScenario === 'contratos_stream' ||
-            currentScenario === 'contratos_octubre_completo') {
-          return mockMissionsContratos(currentScenario);
-        }
-        return mockMissions(currentScenario);
-      default: return null;
-    }
   }
 
   // ---------------------------------------------------------------------
@@ -480,13 +184,6 @@
   }
 
   function loadParticipation() {
-    var isMock = HALLOWEEN_TEST_MODE && currentScenario !== 'off';
-    if (isMock) {
-      return callRpc(sbClient, 'halloween_2026_get_my_participation').then(function (res) {
-        lastParticipation = res.data;
-        participationStatus = 'ok';
-      });
-    }
     if (!sbClient) { lastParticipation = null; participationStatus = 'no-session'; return Promise.resolve(); }
     return sbClient.auth.getSession().then(function (sessionRes) {
       var session = sessionRes.data && sessionRes.data.session;
@@ -790,11 +487,10 @@
   // 5b) Cola visual de movimientos (Batalla) — SOLO presentación.
   //
   //     El motor/backend ya está cerrado: este bloque NUNCA calcula daño
-  //     ni curación, NUNCA decide si algo ocurrió. En modo RPC real NUNCA
-  //     toca boss_hp/geoarmy_hp localmente -- eso lo sigue fijando
+  //     ni curación, NUNCA decide si algo ocurrió. NUNCA toca
+  //     boss_hp/geoarmy_hp localmente -- eso lo fija exclusivamente
   //     renderBoss(lastState) con halloween_2026_get_public_state(), en
-  //     cada poll. (En modo TEST MODE mock sí existe un HP local aparte,
-  //     ver "HP mock" más abajo -- nunca se mezcla con el real.)
+  //     cada poll.
   //
   //     Contrato REAL verificado de halloween_2026_get_public_feed(30):
   //     log_id, entry_type, actor_name, actor_role, action_key,
@@ -902,58 +598,11 @@
 
   var MOVE_DURATION_MS = 1500; // dentro del rango pedido de 1.2-1.8s
 
-  // -----------------------------------------------------------------
-  // HP mock — SOLO existe en TEST MODE con un escenario mock activo.
-  // Completamente separado del estado real: en modo "RPC real
-  // (Supabase)" MOCK_HP siempre es null y renderBoss usa el HP
-  // autoritativo de state tal cual, sin pasar por acá.
-  // -----------------------------------------------------------------
-  var MOCK_HP = null; // { scenario, bossHp, bossMaxHp, geoHp, geoMaxHp }
-
-  function isMockActive() {
-    return HALLOWEEN_TEST_MODE && currentScenario !== 'off';
-  }
-
-  // Se llama con el state recién armado (loadState(), que en mock es
-  // mockState(currentScenario) recalculado desde cero en cada poll). En
-  // modo real lo devuelve intacto. En modo mock: si el escenario cambió
-  // (o es la primera vez), (re)inicializa el HP mock desde los valores
-  // base de ESE escenario -- esto es el reset pedido al cambiar de
-  // escenario. Si el escenario sigue siendo el mismo, ignora el HP fresco
-  // del poll y devuelve el HP mock local (para que los golpes de los
-  // botones de prueba no se borren solos cada 5s).
-  function reconcileMockState(state) {
-    if (!isMockActive()) { MOCK_HP = null; return state; }
-    if (!MOCK_HP || MOCK_HP.scenario !== currentScenario) {
-      MOCK_HP = {
-        scenario: currentScenario,
-        bossHp: state.boss_hp, bossMaxHp: state.boss_max_hp,
-        geoHp: state.geoarmy_hp, geoMaxHp: state.geoarmy_max_hp,
-      };
-    }
-    return Object.assign({}, state, {
-      boss_hp: MOCK_HP.bossHp, boss_max_hp: MOCK_HP.bossMaxHp,
-      geoarmy_hp: MOCK_HP.geoHp, geoarmy_max_hp: MOCK_HP.geoMaxHp,
-    });
-  }
-
-  // Aplica un delta al HP mock local (clamp 0..max) y repinta las barras
-  // -- nunca toca lastState ni pasa por acá en modo real.
-  function applyMockDelta(bossDelta, geoDelta) {
-    if (!MOCK_HP) return;
-    if (bossDelta) MOCK_HP.bossHp = clampNum(MOCK_HP.bossHp + bossDelta, 0, MOCK_HP.bossMaxHp);
-    if (geoDelta) MOCK_HP.geoHp = clampNum(MOCK_HP.geoHp + geoDelta, 0, MOCK_HP.geoMaxHp);
-    var bossPct = MOCK_HP.bossMaxHp > 0 ? clampNum((MOCK_HP.bossHp / MOCK_HP.bossMaxHp) * 100, 0, 100) : 0;
-    var geoPct = MOCK_HP.geoMaxHp > 0 ? clampNum((MOCK_HP.geoHp / MOCK_HP.geoMaxHp) * 100, 0, 100) : 0;
-    var bossFill = $('hw26BossHpFill'), geoFill = $('hw26GeoHpFill');
-    // .hw26-bar-fill ya tiene transition:width -- el cambio de ancho es
-    // suave solo con actualizar style.width, sin animación nueva.
-    if (bossFill) bossFill.style.width = bossPct + '%';
-    if (geoFill) geoFill.style.width = geoPct + '%';
-    var bossText = $('hw26BossHpText'), geoText = $('hw26GeoHpText');
-    if (bossText) bossText.textContent = fmtNum(MOCK_HP.bossHp) + ' / ' + fmtNum(MOCK_HP.bossMaxHp) + ' HP';
-    if (geoText) geoText.textContent = fmtNum(MOCK_HP.geoHp) + ' / ' + fmtNum(MOCK_HP.geoMaxHp) + ' HP';
-  }
+  // (El sistema de HP simulado que existía aquí -- variable de HP de
+  // prueba y sus funciones de activación/reconciliación/aplicación de
+  // deltas -- se retiró por completo en la pasada final test -> producción.
+  // El HP mostrado ahora es siempre el autoritativo de lastState, tal como
+  // llega de halloween_2026_get_public_state().)
 
   // Geo Army ataca a Morvanna -- zona derecha (sobre la imagen), flash
   // blanco/violeta breve, micro shake SOLO de la imagen. golpe_abismo es
@@ -964,15 +613,14 @@
     shakeEl($('hw26BossImg'), 500);
     flashHitOverlay();
     if ($('hw26BossHpFill')) flashOnce($('hw26BossHpFill'), 'hw26-flash-hit');
-    if (isMockActive()) applyMockDelta(item.boss_hp_delta, 0);
     setTimeout(done, MOVE_DURATION_MS);
   }
 
   // Morvanna ataca a Geo Army -- zona izquierda (sobre la barra de
   // resistencia), flash rojo local, shake SOLO del bloque de resistencia.
-  // marca_bruja/herida_profana son ataques normales de fase (ver
-  // BOSS_ATTACK_BY_PHASE) -- se animan igual que cualquier otro golpe de
-  // Morvanna, con su daño real. drenaje_alma/drenaje_demoniaco TAMBIÉN
+  // marca_bruja/herida_profana son ataques normales de fase -- se animan
+  // igual que cualquier otro golpe de Morvanna, con su daño real.
+  // drenaje_alma/drenaje_demoniaco TAMBIÉN
   // pasan por aquí igual que cualquier boss_attack -- la curación de
   // Morvanna que generan llega como un log 'boss_heal' aparte (ver
   // playBossHeal()), nunca combinada en este mismo paso. Cataclismo, si
@@ -985,7 +633,6 @@
     spawnMovePop($('hw26MoveGeo'), label, fmtDelta(item.geoarmy_hp_delta) + ' RESISTENCIA', '', MOVE_DURATION_MS);
     shakeEl($('hw26GeoBarBlock'), 500);
     if ($('hw26GeoHpFill')) flashOnce($('hw26GeoHpFill'), 'hw26-flash-hit');
-    if (isMockActive()) applyMockDelta(0, item.geoarmy_hp_delta);
     setTimeout(done, MOVE_DURATION_MS);
   }
 
@@ -998,7 +645,6 @@
     var label = HEAL_ACTION_LABEL[item.action_key] || 'Curación';
     spawnMovePop($('hw26MoveGeo'), label, fmtDelta(item.geoarmy_hp_delta) + ' RESISTENCIA', 'hw26-move-pop-heal', MOVE_DURATION_MS);
     if ($('hw26GeoHpFill')) flashOnce($('hw26GeoHpFill'), 'hw26-flash-heal');
-    if (isMockActive()) applyMockDelta(0, item.geoarmy_hp_delta);
     setTimeout(done, MOVE_DURATION_MS);
   }
 
@@ -1029,7 +675,6 @@
     var label = (item.boss_attack_key && BOSS_ATTACK_LABEL[item.boss_attack_key]) || 'MORVANNA SE CURA';
     spawnMovePop($('hw26MoveBoss'), label, fmtDelta(item.boss_hp_delta) + ' HP MORVANNA', 'hw26-move-pop-heal', MOVE_DURATION_MS);
     if ($('hw26BossHpFill')) flashOnce($('hw26BossHpFill'), 'hw26-flash-heal');
-    if (isMockActive()) applyMockDelta(item.boss_hp_delta, 0);
     setTimeout(done, MOVE_DURATION_MS);
   }
 
@@ -1044,7 +689,6 @@
     shakeEl($('hw26BossImg'), 500);
     flashHitOverlay();
     if ($('hw26BossHpFill')) flashOnce($('hw26BossHpFill'), 'hw26-flash-hit');
-    if (isMockActive()) applyMockDelta(item.boss_hp_delta, 0);
     setTimeout(done, MOVE_DURATION_MS);
   }
 
@@ -1112,62 +756,8 @@
     processMoveQueue();
   }
 
-  // Fase mock actual (del escenario seleccionado, vía el mismo
-  // mockState() que ya arma el resto de la página) -- para que los
-  // botones de prueba de Morvanna solo elijan ataques de la fase
-  // correcta, nunca "Fuego Infernal" en Fase I.
-  var BOSS_ATTACK_BY_PHASE = {
-    1: { normal: 'zarpazo_sombrio', drain: 'drenaje_alma', debuff: 'marca_bruja' },
-    2: { normal: 'fuego_infernal', drain: 'drenaje_demoniaco', debuff: 'herida_profana' },
-  };
-  function currentMockPhase() {
-    var s = mockState(currentScenario);
-    return s.boss_phase === 2 ? 2 : 1;
-  }
-
-  // Botones de TEST MODE: inyectan un log sintético con id único directo
-  // a la cola, sin pasar por loadFeed() ni Supabase -- puramente
-  // presentación, para poder probar cada tipo de movimiento y que la
-  // cola nunca superponga. Ver wireDevBar(). Los de Morvanna (boss_hit/
-  // drain/debuff) usan BOSS_ATTACK_BY_PHASE para respetar la fase actual
-  // del escenario mock.
-  // Devuelve SIEMPRE un array de 1+ logs sintéticos (nunca un objeto
-  // suelto) -- "drain" necesita simular los DOS logs reales e
-  // independientes (boss_attack + boss_heal, cada uno con su propio
-  // log_id/created_at) en vez de un único movimiento combinado, para
-  // probar el mismo camino que usa el feed real.
-  function moveTestItem(kind) {
-    var stamp = Date.now();
-    function id(suffix) { return 'test-' + stamp + '-' + suffix + '-' + Math.floor(Math.random() * 1000); }
-    function at(offsetMs) { return new Date(stamp + (offsetMs || 0)).toISOString(); }
-    var phaseKeys = BOSS_ATTACK_BY_PHASE[currentMockPhase()];
-    switch (kind) {
-      case 'geo_hit':
-        return [{ log_id: id('a'), entry_type: 'player_attack', action_key: 'golpe_abismo', actor_name: 'TesterMock', boss_hp_delta: -3000, created_at: at(0) }];
-      case 'boss_hit':
-        return [{ log_id: id('a'), entry_type: 'boss_attack', boss_attack_key: phaseKeys.normal, geoarmy_hp_delta: -6000, created_at: at(0) }];
-      case 'heal':
-        return [{ log_id: id('a'), entry_type: 'heal', action_key: 'pulso_vital', geoarmy_hp_delta: 5000, created_at: at(0) }];
-      case 'buff':
-        return [{ log_id: id('a'), entry_type: 'shield', action_key: 'escudo_arcano', created_at: at(0) }];
-      case 'debuff':
-        return [{ log_id: id('a'), entry_type: 'boss_attack', boss_attack_key: phaseKeys.debuff, geoarmy_hp_delta: -2000, created_at: at(0) }];
-      case 'drain':
-        // Dos logs reales separados, mismo orden que produciría el motor:
-        // primero el boss_attack que drena a Geo Army, después el
-        // boss_heal que le da esa energía a Morvanna.
-        return [
-          { log_id: id('a'), entry_type: 'boss_attack', boss_attack_key: phaseKeys.drain, geoarmy_hp_delta: -8000, created_at: at(0) },
-          { log_id: id('b'), entry_type: 'boss_heal', boss_attack_key: phaseKeys.drain, boss_hp_delta: 8000, created_at: at(1) },
-        ];
-      case 'mission':
-        return [{ log_id: id('a'), entry_type: 'mission_damage', boss_hp_delta: -5000, created_at: at(0) }];
-      default: return null;
-    }
-  }
-
   function initBattlePage() {
-    loadState().then(function () { if (lastState) renderBoss(reconcileMockState(lastState)); });
+    loadState().then(function () { if (lastState) renderBoss(lastState); });
     // Simplificación de producto (2026-09-26): se quitó la llamada a
     // loadEffects().then(renderBattleEffects) -- la sección de efectos
     // dentro de batalla.html ya había sido eliminada antes (el elemento
@@ -1187,8 +777,8 @@
   // ---------------------------------------------------------------------
   var ROLE_META = {
     attacker: { icon: '⚔', name: 'ATACANTE', desc: 'Golpea a La Heraldo y participa en la ofensiva.' },
-    support: { icon: '✚', name: 'SOPORTE', desc: 'Representa a quienes mantienen con vida a Geo Army.' },
-    defender: { icon: '🛡', name: 'DEFENSOR', desc: 'Representa a quienes protegen la resistencia.' },
+    support: { icon: '✚', name: 'SOPORTE', desc: 'Cura a Geo Army y mantén al ejército con vida.' },
+    defender: { icon: '🛡', name: 'DEFENSOR', desc: 'Protege a Geo Army y reduce el daño de los ataques enemigos.' },
   };
   function roleLabel(role) {
     var m = ROLE_META[role];
@@ -1209,7 +799,8 @@
       (opts.locked ? '<span class="hw26-role-lock-badge">🔒 BLOQUEADO</span>' : '') +
       '<span class="hw26-role-icon">' + meta.icon + '</span>' +
       '<span class="hw26-role-body"><span class="hw26-role-name">' + esc(meta.name) + '</span>' +
-      '<span class="hw26-role-desc">' + esc(meta.desc) + '</span></span>' +
+      '<span class="hw26-role-desc">' + esc(meta.desc) + '</span>' +
+      '<span class="hw26-role-permanent">Tu rol es permanente durante Halloween 2026.</span></span>' +
     '</button>';
   }
 
@@ -1258,11 +849,12 @@
     if (lastParticipation && lastParticipation.has_role) {
       var meta = ROLE_META[lastParticipation.role] || { icon: '⚔', name: lastParticipation.role, desc: '' };
       box.innerHTML =
+        '<div class="hw26-role-state-label">TU ROL</div>' +
         '<div class="hw26-role-current hw26-role-current-big">' +
           '<span class="hw26-role-icon">' + meta.icon + '</span>' +
           '<div><div class="hw26-role-name">' + esc(meta.name) + '</div>' +
           '<div class="hw26-role-desc">' + esc(meta.desc) + '</div>' +
-          '<div class="hw26-role-desc" style="margin-top:6px;">Tu rol es permanente durante Halloween 2026.</div></div>' +
+          '<div class="hw26-role-desc" style="margin-top:6px;">Tu elección ya está registrada y permanecerá activa durante Halloween 2026.</div></div>' +
         '</div>';
       return;
     }
@@ -1274,6 +866,14 @@
 
     var selected = null;
     var html =
+      '<div class="hw26-role-intro">' +
+        '<div class="hw26-role-intro-title">ELIGE TU ROL</div>' +
+        '<div class="hw26-role-intro-text">Tu elección será permanente durante todo Halloween 2026.</div>' +
+        '<div class="hw26-role-intro-warning">' +
+          '<span class="hw26-role-intro-warning-icon">⚠️</span>' +
+          '<span>IMPORTANTE: solo puedes usar las recompensas de Twitch correspondientes a tu rol. Si canjeas una recompensa de otro rol, la acción no contará y el canje será rechazado.</span>' +
+        '</div>' +
+      '</div>' +
       '<div class="hw26-page-sub" style="margin:0 0 16px;">Cada participante elige un rol una sola vez para todo octubre.</div>' +
       '<div class="hw26-role-grid">' +
       Object.keys(ROLE_META).map(function (key) {
@@ -1298,16 +898,11 @@
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Guardando…';
 
-      var isMock = HALLOWEEN_TEST_MODE && currentScenario !== 'off';
-      var confirmCall = isMock
-        ? Promise.resolve({ data: { ok: true }, error: null }) // mock: NO escribe nada real
-        : sbClient.rpc('halloween_2026_choose_role', { p_event_key: EVENT_KEY, p_role: selected });
-
-      confirmCall.then(function (res) {
+      sbClient.rpc('halloween_2026_choose_role', { p_event_key: EVENT_KEY, p_role: selected })
+      .then(function (res) {
         if (res.error) throw res.error;
         // No optimistic update permanente: se vuelve a consultar
-        // participación real (o mock) antes de reflejar el cambio.
-        if (isMock) { mockHasRole = true; safeLsSet(LS_ROLE_KEY, '1'); }
+        // participación real antes de reflejar el cambio.
         return loadParticipation();
       }).then(function () {
         renderRolePage();
@@ -1533,8 +1128,8 @@
   // (confirmado en halloween_2026_action_defs); si llega null o una clave
   // no reconocida, playBuff() cae a un mensaje genérico. marca_bruja y
   // herida_profana ya NO tienen anuncio de debuff aparte: son simplemente
-  // ataques de La Heraldo como cualquier otro (ver BOSS_ATTACK_BY_PHASE),
-  // así que no necesitan entrada aquí.
+  // ataques de La Heraldo como cualquier otro, así que no necesitan
+  // entrada aquí.
   var BUFF_ACTION_LABEL = {
     escudo_arcano: 'ESCUDO ARCANO ACTIVADO',
     pocion_furia: 'POCIÓN DE FURIA',
@@ -1624,7 +1219,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // 10) Panel de pruebas (dev bar) — SOLO test mode, en cada página
+  // 10) Router de inicialización por página
   // ---------------------------------------------------------------------
   var PAGE_INIT = {
     battle: initBattlePage,
@@ -1637,56 +1232,6 @@
   function runPageInit() {
     var fn = PAGE_INIT[PAGE];
     if (fn) fn();
-  }
-
-  function wireDevBar() {
-    if (!HALLOWEEN_TEST_MODE) return;
-    var bar = $('hw26DevBar');
-    var select = $('hw26DevScenario');
-    var roleCheck = $('hw26DevRole');
-    if (!bar) return;
-    bar.hidden = false;
-    if (select) {
-      select.value = currentScenario;
-      select.addEventListener('change', function () {
-        currentScenario = select.value;
-        safeLsSet(LS_SCENARIO_KEY, currentScenario);
-        var url = new URL(window.location.href);
-        if (currentScenario === 'off') url.searchParams.delete('hw_scenario');
-        else url.searchParams.set('hw_scenario', currentScenario);
-        history.replaceState(null, '', url);
-        runPageInit();
-      });
-    }
-    if (roleCheck) {
-      roleCheck.checked = mockHasRole;
-      roleCheck.addEventListener('change', function () {
-        mockHasRole = roleCheck.checked;
-        safeLsSet(LS_ROLE_KEY, mockHasRole ? '1' : '0');
-        var url = new URL(window.location.href);
-        if (mockHasRole) url.searchParams.set('hw_role', '1'); else url.searchParams.delete('hw_role');
-        history.replaceState(null, '', url);
-        runPageInit();
-      });
-    }
-    // Botones de prueba de la cola de movimientos (solo existen en
-    // halloween/batalla.html) -- inyectan log(s) sintético(s) directo a la
-    // cola visual, ver moveTestItem()/processMoveQueue(). moveTestItem()
-    // siempre devuelve un array (drain son dos logs reales separados) --
-    // se encolan todos en orden, mostrando el último como "último
-    // movimiento". Nunca tocan loadFeed() ni Supabase.
-    var moveButtons = bar.querySelectorAll('[data-move-test]');
-    moveButtons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var items = moveTestItem(btn.getAttribute('data-move-test'));
-        if (!items || !items.length) return;
-        items.forEach(function (it) {
-          MOVE_QUEUE.push(it);
-          renderLastMove(it);
-        });
-        processMoveQueue();
-      });
-    });
   }
 
   // ---------------------------------------------------------------------
@@ -1708,8 +1253,6 @@
   var didInitialLoad = false;
 
   function init() {
-    wireDevBar();
-
     function afterClient(client) {
       sbClient = client;
       if (client && client.auth && client.auth.onAuthStateChange) {
@@ -1717,22 +1260,13 @@
           if (PAGE === 'role') { loadParticipation().then(renderRolePage); }
         });
       }
-      if (didInitialLoad) return; // ya se arrancó con mock; solo llegamos aquí a enchufar el cliente real
+      if (didInitialLoad) return;
       didInitialLoad = true;
       runPageInit();
       startPolling();
     }
 
-    if (HALLOWEEN_TEST_MODE && currentScenario !== 'off') {
-      // En mock puro no es obligatorio tener cliente real: arrancamos ya
-      // mismo con datos simulados (sin bloquear en la red) y, en paralelo,
-      // intentamos enchufar el cliente real solo para que "Iniciar sesión"
-      // y la elección de rol real sigan disponibles si el usuario se loguea.
-      afterClient(null);
-      waitForClient(function (client) { sbClient = client; }, 20);
-    } else {
-      waitForClient(afterClient);
-    }
+    waitForClient(afterClient);
   }
 
   if (document.readyState === 'loading') {
