@@ -21,6 +21,14 @@
   <!-- Tema V3 (espacial/holográfico) — antes vivía inline aquí, ahora es un archivo
        compartido para poder reusarlo en mi-geoarmy.html y páginas nuevas -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
+  <!-- ===== HALLOWEEN 2026 — Mundo 02, producción (PASADA FINAL TEST ->
+       PRODUCCIÓN, 2026-09-26). Solo estiliza los 3 pins circulares sobre
+       el planeta (Batalla/Rol/Contratos) -- este archivo NO carga
+       js/halloween-2026.js: los pins son <a href> simples, el
+       bloqueado/desbloqueado se resuelve en puro CSS reutilizando la
+       misma clase "is-unlocked" que ya agrega el countdown real de más
+       abajo. Ver css/halloween-2026.css. ===== -->
+  <link rel="stylesheet" href="css/halloween-2026.css"/>
   <script>
   !function(b,e,t,r){
     b[t]=b[t]||function(...args){(b[t].q=b[t].q||[]).push(args)};
@@ -175,17 +183,86 @@
         </div>
         </div>
 
-        <!-- Mundo 02: Halloween, bloqueado hasta el 1 de octubre 2026
-             (America/New_York). Overlay/candado/texto/countdown son HTML+CSS
-             reales (no quemados en la imagen) -- ver css/v3-theme.css
-             (clases v3-wl-*) y el script "v3-wl-countdown" al final del
-             body. No se tocó Mundo 01, Mundo 03, pines, fondo ni backend. -->
+        <!-- Mundo 02: Halloween, bloqueado hasta el 1 de octubre 2026, 7:00
+             PM ET (America/New_York) -- coincide con el inicio real de la
+             batalla. Overlay/candado/texto/countdown son HTML+CSS reales
+             (no quemados en la imagen) -- ver css/v3-theme.css (clases
+             v3-wl-*) y el script "v3-wl-countdown" al final del body. No
+             se tocó Mundo 01, Mundo 03, pines, fondo ni backend.
+
+             PASADA FINAL TEST -> PRODUCCIÓN (2026-09-26): se promovieron
+             ÚNICAMENTE los 3 pins de Mundo 02 (Batalla/Rol/Contratos)
+             desde index-halloween-test.html, y data-unlock-iso pasó de
+             00:00:00 a 19:00:00 para coincidir con la hora real de inicio
+             de la batalla. Sin pins de Efectos/Crónicas, sin
+             ?hw_unlock=1 ni ninguna otra lógica que fuerce el desbloqueo
+             visual -- el planeta SOLO se desbloquea cuando esta fecha
+             real ya pasó. -->
         <div class="v3-world-slide v3-world-slide-02">
-        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T00:00:00-04:00" id="wlHalloween">
+        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T19:00:00-04:00" id="wlHalloween">
           <div class="v3-wl-orb">
             <img src="world-02-halloween-v2.png" alt="Mundo 02 — Halloween" class="v3-world-planet-img v3-wl-img" loading="lazy"/>
             <span class="v3-wl-tint" aria-hidden="true"></span>
             <span class="v3-wl-lockbadge" aria-hidden="true">🔒</span>
+
+            <!-- 4 pins de producción sobre el planeta -- mismo lenguaje
+                 visual que .v3-planet-nav/.v3-marker-* de Mundo 01 (círculo
+                 + glow + icono + tooltip en hover + posición absoluta en %),
+                 en paleta violeta/roja. <a href> simples a las páginas
+                 dedicadas halloween/*.html -- NO cargan js/halloween-2026.js
+                 aquí, el índice no muestra datos dinámicos de la RPC, solo
+                 navega. El bloqueo/atenuado de Rol/Contratos/Registro de
+                 Puntos antes del 1 de octubre es puro CSS: reutiliza la
+                 misma clase ".is-unlocked" que el countdown de abajo ya
+                 agrega a #wlHalloween -- ver css/halloween-2026.css.
+                 BATALLA se deja siempre clickeable (para mostrar el estado
+                 "scheduled" de la página), con una insignia "Programada"
+                 que desaparece sola al desbloquear.
+
+                 RECOMPOSICIÓN (pedido explícito): antes eran 3 pines --
+                 Batalla arriba/centro, Rol y Contratos a los lados, ambos a
+                 --my:44%, dejando el tercio inferior del planeta vacío.
+                 Ahora Rol se renombra a "Elige tu Rol" (misma página,
+                 halloween/rol.html, mismo ícono ⚔) y baja a --my:56%, junto
+                 con Contratos (mismo --mx, también a --my:56%), para abrir
+                 espacio a un 4to pin nuevo -- Registro de Puntos -- en la
+                 zona inferior-central (--mx:50%; --my:79%), que en la
+                 imagen real (world-02-halloween-v2.png, verificada antes de
+                 elegir estas coordenadas) es roca oscura despejada, sin
+                 tapar el castillo ni el cementerio. Los 3 secundarios
+                 (Rol/Contratos/Registro de Puntos) quedan bloqueados con el
+                 mismo candadito hasta el desbloqueo; Batalla no cambia de
+                 posición ni de comportamiento. Sin pines de Efectos/
+                 Crónicas: ese producto quedó reducido a Batalla/Rol/
+                 Contratos/Registro de Puntos. -->
+            <div class="hw26-planet-pins" id="hw26PlanetPins">
+              <a href="halloween/batalla.html" class="hw26-planet-pin hw26-pin-batalla" style="--mx:50%; --my:16%;">
+                <span class="hw26-pin-badge">Programada</span>
+                <span class="hw26-pin-label">Batalla</span>
+                <span class="hw26-pin-icon"><img src="assets/halloween/pin-batalla.webp" alt="" class="hw26-pin-icon-img"/></span>
+              </a>
+              <a href="halloween/rol.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:22%; --my:56%;">
+                <span class="hw26-pin-label">Elige tu Rol</span>
+                <span class="hw26-pin-icon">⚔<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <a href="halloween/contratos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:78%; --my:56%;">
+                <span class="hw26-pin-label">Contratos</span>
+                <span class="hw26-pin-icon">📜<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+              <!-- NUEVO -- Registro de Puntos. halloween/registro-puntos.html
+                   es un placeholder estático (sin RPC, sin
+                   js/halloween-2026.js): título, "PRÓXIMAMENTE" y una vista
+                   previa marcada como ejemplo, nada de datos reales. Cuando
+                   exista la lógica real de puntos gastados, esa página se
+                   actualiza aparte; este pin no cambia. Bloqueado igual que
+                   Rol/Contratos: mismo candadito, mismo desbloqueo por
+                   .is-unlocked, ninguna lógica de datos nueva acá. -->
+              <a href="halloween/registro-puntos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:50%; --my:79%;">
+                <span class="hw26-pin-label">Registro de Puntos</span>
+                <span class="hw26-pin-icon">📖<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
+              </a>
+            </div>
+            <!-- ===== fin pins Halloween 2026 ===== -->
           </div>
           <div class="v3-wl-eyebrow">Mundo 02</div>
           <div class="v3-wl-title">Halloween</div>
@@ -445,8 +522,5 @@
     } catch (e) { console.warn('[v3-soon-links]', e); }
   })();
   </script>
-</body>
-</html>
-
 </body>
 </html>
