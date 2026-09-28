@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro de Puntos — Halloween 2026 · GeoArmy</title>
+  <meta name="description" content="Halloween 2026 — Registro de puntos gastados en recompensas de rol."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <link rel="stylesheet" href="../css/v3-theme.css"/>
+  <link rel="stylesheet" href="../css/halloween-2026.css"/>
+</head>
+<!-- PLACEHOLDER -- ruta preparada para el pin nuevo del planeta (Mundo 02),
+     pedido explícito: "crea solamente el pin y deja preparada una ruta
+     clara... NO inventes todavía la lógica de datos si no existe".
+     Por eso esta página:
+       - NO carga js/halloween-2026.js (no hay RPC de registro de puntos
+         todavía, y ese archivo no tiene ningún router para esta página --
+         cargarlo sin un data-halloween-page real no haría nada útil).
+       - NO llama a Supabase ni a ninguna tabla/función nueva.
+       - Muestra contenido 100% estático: el mismo chrome (nav/fondo/
+         footer) que el resto de halloween/*.html, un estado "PRÓXIMAMENTE"
+         explicando qué va a mostrar esta página, y una vista previa
+         ilustrativa (con la leyenda "ejemplo", no datos reales) de las
+         columnas pedidas: Fecha, Acción/Recompensa, Puntos gastados, Tipo,
+         Estado. Reusa .hw26-feed-item/.hw26-feed-time/.hw26-feed-text
+         (mismas clases que ya usa Crónicas para su lista cronológica) --
+         ninguna clase CSS nueva.
+       - El botón de cuenta (#geoAccountWidget) sigue funcionando porque
+         geoarmy-account.js se carga igual que en las demás páginas -- eso
+         no depende de halloween-2026.js. -->
+<body data-halloween-page="registro-puntos">
+
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="../nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="../nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="../nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="../nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="../index.html" class="v3-logo nav-logo">
+          <span class="v3-logo-mark"><img src="../logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+          <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="hw26-page">
+      <a href="../index.html#wlHalloween" class="hw26-back-link">← VOLVER A HALLOWEEN</a>
+
+      <div class="hw26-page-head">
+        <div class="hw26-page-icon">📖</div>
+        <div class="hw26-page-eyebrow">Halloween 2026 · Mundo 02</div>
+        <div class="hw26-page-title">REGISTRO DE PUNTOS</div>
+        <div class="hw26-page-sub">Historial de puntos gastados en recompensas de rol durante Halloween 2026.</div>
+        <div class="hw26-page-note">Próximamente</div>
+      </div>
+
+      <div class="hw26-page-content" id="hw26RegistroPuntosContent">
+        <div class="hw26-empty-state">
+          <div class="hw26-empty-icon">📖</div>
+          <div class="hw26-empty-title">PRÓXIMAMENTE</div>
+          <div class="hw26-empty-sub">Acá vas a poder ver cada canje que hiciste con tus puntos: fecha, recompensa, puntos gastados, tipo y estado.</div>
+        </div>
+
+        <div class="hw26-page-note" style="margin:18px 0 4px;">Vista previa (ejemplo ilustrativo — no son datos reales)</div>
+        <div class="hw26-feed-list">
+          <div class="hw26-feed-item">
+            <span class="hw26-feed-time">--/--</span>
+            <span class="hw26-feed-text">🩸 Arañazo Maldito — <b>1000</b> puntos · Atacante · Aceptado</span>
+          </div>
+          <div class="hw26-feed-item">
+            <span class="hw26-feed-time">--/--</span>
+            <span class="hw26-feed-text">🌑 Golpe del Abismo — <b>2500</b> puntos · Atacante · Aceptado</span>
+          </div>
+          <div class="hw26-feed-item">
+            <span class="hw26-feed-time">--/--</span>
+            <span class="hw26-feed-text">💚 Curación Menor — <b>1000</b> puntos · Soporte · Aceptado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hw26-error" id="hw26GlobalError" hidden></div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="../logo.png" alt="GeoArmy" class="footer-logo-img"/>
+        GeoArmy
+      </div>
+      <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      <div class="footer-code">geovanyrk.github.io</div>
+    </div>
+  </footer>
+
+  <script src="../js/premium.js"></script>
+  <script src="../js/geoarmy-config.js"></script>
+  <script src="../js/geoarmy-ranks.js"></script>
+  <script src="../js/geoarmy-account.js"></script>
+</body>
+</html>
