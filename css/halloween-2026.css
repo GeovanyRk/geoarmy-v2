@@ -3,9 +3,11 @@
    =====================================================================
    Archivo NUEVO y aislado. No modifica css/style.css ni css/v3-theme.css.
    Se carga desde:
-     - index-halloween-test.html (SOLO los 3 pins sobre el planeta)
-     - halloween/batalla.html, rol.html, contratos.html, efectos.html,
-       cronicas.html (páginas dedicadas, todas de prueba por ahora)
+     - index.html (SOLO los 3 pins sobre el planeta -- producción; ver
+       PASADA FINAL TEST -> PRODUCCIÓN, 2026-09-26)
+     - halloween/batalla.html, rol.html, contratos.html (producción)
+     - halloween/efectos.html, cronicas.html (huérfanas, sin enlace
+       público, se conservan sin borrar -- ver misma pasada)
 
    CAMBIO DE DIRECCIÓN (v2): se retiró el dashboard de 4 tarjetas + widget
    gigante dentro del index, y el sistema de modal genérico. Ahora:
@@ -46,7 +48,7 @@
 }
 
 /* ---------------------------------------------------------------------
-   0) Pins sobre el planeta (SOLO index-halloween-test.html)
+   0) Pins sobre el planeta (index.html, producción)
    ---------------------------------------------------------------------
    Viven dentro de .v3-wl-orb (mismo contenedor que la imagen del planeta
    de Mundo 02), igual que .v3-planet-nav vive dentro de .v3-globe-wrap en
@@ -255,74 +257,15 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
    Barra de pruebas (SOLO test mode) — franja discreta arriba del
    contenido de cada página dedicada
 --------------------------------------------------------------------- */
-/* Panel de pruebas compacto: en escritorio flota como una pequeña
-   herramienta fija arriba a la derecha (fuera del flujo normal, no
-   protagoniza la página) y en mobile vuelve a ser una franja estática
-   angosta arriba del contenido. Claramente "herramienta de desarrollo"
-   (naranja/discontinua), nunca parte del diseño de Halloween. */
-.hw26-devbar[hidden] { display: none; } /* ver nota histórica del bug de especificidad más abajo */
-.hw26-devbar {
-  position: fixed;
-  top: 78px;
-  right: 14px;
-  z-index: 50;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 7px;
-  max-width: 240px;
-  background: rgba(20, 10, 4, 0.94);
-  border: 1px solid rgba(249, 115, 22, 0.5);
-  border-radius: 10px;
-  padding: 6px 9px;
-  font-size: 0.68rem;
-  color: #ffd9b0;
-  box-shadow: 0 10px 26px -12px rgba(0, 0, 0, 0.8);
-}
-.hw26-devbar-label {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: var(--hw26-orange);
-  color: #1a0e00;
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-size: 0.58rem;
-  flex: 0 0 auto;
-}
-.hw26-devbar select,
-.hw26-devbar label {
-  font-family: inherit;
-  font-size: 0.66rem;
-  color: #ffe6c8;
-}
-.hw26-devbar select {
-  background: #1c1108;
-  border: 1px solid rgba(249, 115, 22, 0.5);
-  color: #ffe6c8;
-  border-radius: 6px;
-  padding: 3px 5px;
-  max-width: 100%;
-}
-.hw26-devbar label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
-
-/* Kill-switch de producción: agregar la clase "hw26-devtools-off" al
-   <body> oculta la barra de pruebas por completo, sin tocar markup ni
-   JS -- lista para cuando estas páginas dejen de ser de prueba. */
-.hw26-devtools-off .hw26-devbar { display: none !important; }
-
-@media (max-width: 640px) {
-  .hw26-devbar {
-    position: static;
-    top: auto;
-    right: auto;
-    max-width: none;
-    width: 100%;
-    margin: 0 0 16px;
-    box-shadow: none;
-  }
-}
+/* PASADA FINAL TEST -> PRODUCCIÓN (2026-09-26): se retiró de aquí el panel
+   de pruebas (.hw26-devbar y variantes) -- el markup que le daba vida
+   (#hw26DevBar/#hw26DevScenario/#hw26DevRole) ya no existe en las páginas
+   de producción (batalla.html/rol.html/contratos.html). Las reglas se
+   quitaron de esta hoja global porque ya no tienen consumidor productivo;
+   efectos.html/cronicas.html (huérfanas, sin enlace público, ver Parte D
+   de la misma pasada) SÍ conservan ese markup en su propio HTML sin
+   tocar -- si algún día se reabren, su devbar seguirá sin estilos hasta
+   que se decida qué hacer con esas 2 páginas. */
 
 /* ---------------------------------------------------------------------
    2) Widget de La Heraldo — ahora vive en halloween/batalla.html
@@ -847,27 +790,6 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   }
 }
 
-/* Botones de prueba de movimientos (SOLO test mode, dentro del devbar
-   existente de batalla.html) -- inyectan un log sintético directo a la
-   cola, sin tocar loadFeed()/Supabase. */
-.hw26-devbar-moves {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  width: 100%;
-}
-.hw26-devbar-moves button {
-  font-family: inherit;
-  font-size: 0.6rem;
-  background: #1c1108;
-  border: 1px solid rgba(249, 115, 22, 0.5);
-  color: #ffe6c8;
-  border-radius: 6px;
-  padding: 3px 6px;
-  cursor: pointer;
-}
-.hw26-devbar-moves button:hover { background: #2a1a0c; }
-
 /* Cataclismo — modo emergencia temporal. Vive dentro de la columna de
    información (texto a la izquierda), pero se auto-centra (text-align)
    sin depender de la alineación del contenedor padre. */
@@ -999,6 +921,77 @@ body[data-halloween-page="battle"] .hw26-page-head { margin-bottom: 20px; }
   border: 1px solid rgba(249, 115, 22, 0.35);
   color: #ffd9b0;
   font-size: 0.78rem;
+}
+/* Línea de recordatorio de permanencia, repetida dentro de cada tarjeta
+   de rol (además del aviso de .hw26-role-warning debajo de la grilla y
+   del bloque .hw26-role-intro arriba) -- pedido explícito: que las tres
+   tarjetas lleven el recordatorio, no solo el aviso general. */
+.hw26-role-permanent {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--hw26-text-faint);
+}
+/* Etiqueta corta de sección ("TU ROL"), mismo lenguaje visual que
+   .hw26-page-eyebrow (Orbitron, versalitas, violeta claro) pero para uso
+   dentro del contenido de la página, no en el header. */
+.hw26-role-state-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b98cf5;
+  margin-bottom: 10px;
+}
+/* Bloque "ELIGE TU ROL": intro + aviso de recompensas de Twitch, arriba
+   de la grilla de 3 tarjetas (Estado 1, sin rol elegido todavía).
+   Fondo oscuro/morado integrado con el resto de la página (mismos
+   tokens --hw26-panel-solid/--hw26-violet-line que .hw26-page-content),
+   nunca el aspecto de un alert() del navegador. */
+.hw26-role-intro {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(124, 58, 237, 0.16), rgba(18, 10, 28, 0.92));
+  border: 1px solid var(--hw26-violet-line);
+}
+.hw26-role-intro-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(124, 58, 237, .5);
+  margin-bottom: 6px;
+}
+.hw26-role-intro-text {
+  font-size: 0.82rem;
+  color: var(--hw26-text-dim);
+  margin-bottom: 10px;
+}
+.hw26-role-intro-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(6, 4, 10, 0.55);
+  border: 1px solid rgba(148, 92, 255, 0.35);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: #e9d9ff;
+}
+.hw26-role-intro-warning-icon {
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+@media (max-width: 480px) {
+  .hw26-role-intro { padding: 12px 13px; }
+  .hw26-role-intro-title { font-size: 0.85rem; }
+  .hw26-role-intro-text { font-size: 0.78rem; }
+  .hw26-role-intro-warning { font-size: 0.72rem; padding: 8px 10px; }
 }
 .hw26-role-warning-locked {
   text-align: center;
