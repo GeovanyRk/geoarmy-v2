@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rol — Halloween 2026 · GeoArmy (prueba)</title>
-  <meta name="description" content="Halloween 2026 — Elige tu rol en la batalla contra La Heraldo. Página de prueba."/>
+  <title>Rol — Halloween 2026 · GeoArmy</title>
+  <meta name="description" content="Halloween 2026 — Elige tu rol en la batalla contra La Heraldo."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css"/>
@@ -16,7 +16,7 @@
      halloween_2026_get_public_state() (para saber si ya se puede elegir) y
      halloween_2026_get_my_participation() (para el rol actual). No pollea
      misiones, efectos ni feed. -->
-<body data-halloween-page="role" data-testmode="true">
+<body data-halloween-page="role">
 
   <div class="v3-page">
     <div class="v3-stars"></div>
@@ -39,21 +39,7 @@
     </nav>
 
     <main class="hw26-page">
-      <a href="../index-halloween-test.html#wlHalloween" class="hw26-back-link">← VOLVER A HALLOWEEN</a>
-
-      <div class="hw26-devbar" id="hw26DevBar" hidden>
-        <span class="hw26-devbar-label">Test mode</span>
-        <select id="hw26DevScenario" aria-label="Escenario de prueba">
-          <option value="off">RPC real (Supabase)</option>
-          <option value="scheduled">Mock: scheduled</option>
-          <option value="active_p1">Mock: active — fase 1</option>
-          <option value="active_p2">Mock: active — fase 2</option>
-          <option value="cataclismo">Mock: cataclismo pendiente</option>
-          <option value="geoarmy_victory">Mock: victoria Geo Army</option>
-          <option value="herald_victory">Mock: victoria La Heraldo</option>
-        </select>
-        <label><input type="checkbox" id="hw26DevRole"/> Simular usuario con rol</label>
-      </div>
+      <a href="../index.html#wlHalloween" class="hw26-back-link">← VOLVER A HALLOWEEN</a>
 
       <div class="hw26-page-head">
         <div class="hw26-page-icon">⚔</div>
