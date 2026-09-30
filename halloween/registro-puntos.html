@@ -12,25 +12,28 @@
   <link rel="stylesheet" href="../css/v3-theme.css"/>
   <link rel="stylesheet" href="../css/halloween-2026.css"/>
 </head>
-<!-- PLACEHOLDER -- ruta preparada para el pin nuevo del planeta (Mundo 02),
-     pedido explícito: "crea solamente el pin y deja preparada una ruta
-     clara... NO inventes todavía la lógica de datos si no existe".
-     Por eso esta página:
-       - NO carga js/halloween-2026.js (no hay RPC de registro de puntos
-         todavía, y ese archivo no tiene ningún router para esta página --
-         cargarlo sin un data-halloween-page real no haría nada útil).
-       - NO llama a Supabase ni a ninguna tabla/función nueva.
-       - Muestra contenido 100% estático: el mismo chrome (nav/fondo/
-         footer) que el resto de halloween/*.html, un estado "PRÓXIMAMENTE"
-         explicando qué va a mostrar esta página, y una vista previa
-         ilustrativa (con la leyenda "ejemplo", no datos reales) de las
-         columnas pedidas: Fecha, Acción/Recompensa, Puntos gastados, Tipo,
-         Estado. Reusa .hw26-feed-item/.hw26-feed-time/.hw26-feed-text
-         (mismas clases que ya usa Crónicas para su lista cronológica) --
-         ninguna clase CSS nueva.
-       - El botón de cuenta (#geoAccountWidget) sigue funcionando porque
-         geoarmy-account.js se carga igual que en las demás páginas -- eso
-         no depende de halloween-2026.js. -->
+<!-- Conectado a datos reales (00d241cf-attachment.txt / 01b4a599-attachment.txt).
+     Ya NO es el placeholder estático -- ver backups/ si hace falta el
+     estado "PRÓXIMAMENTE" original.
+       - NO carga js/halloween-2026.js: esta página no comparte router con
+         batalla/rol/contratos (esos siguen exactamente igual, sin tocar).
+         Tiene su propio script chico al final del body, autocontenido,
+         que reusa el MISMO patrón ya probado en halloween-2026.js:
+         window.GeoArmyAccount.client (nunca crea un cliente nuevo),
+         auth.getSession() antes de llamar la RPC, y una sola RPC pública
+         nueva: halloween_2026_get_my_point_spend_log() -- cero parámetros,
+         la identidad se deriva de auth.uid() del lado del servidor. Nunca
+         se envía user_id ni profile_id desde acá.
+       - NO calcula ni suma nada en el navegador -- el total viene tal cual
+         de la RPC (total_points_spent).
+       - Reusa .hw26-feed-item/.hw26-feed-time/.hw26-feed-text (mismas
+         clases que Crónicas) para cada fila; solo se agregan 3 clases CSS
+         chicas nuevas para el bloque de total (ver css/halloween-2026.css,
+         sección "Registro de Puntos"), reusando las variables de color ya
+         definidas (--hw26-gold/--hw26-text-dim/--hw26-violet-line), sin
+         colores nuevos.
+       - El botón de cuenta (#geoAccountWidget) sigue funcionando igual,
+         geoarmy-account.js no cambia. -->
 <body data-halloween-page="registro-puntos">
 
   <div class="v3-page">
@@ -61,31 +64,10 @@
         <div class="hw26-page-eyebrow">Halloween 2026 · Mundo 02</div>
         <div class="hw26-page-title">REGISTRO DE PUNTOS</div>
         <div class="hw26-page-sub">Historial de puntos gastados en recompensas de rol durante Halloween 2026.</div>
-        <div class="hw26-page-note">Próximamente</div>
       </div>
 
       <div class="hw26-page-content" id="hw26RegistroPuntosContent">
-        <div class="hw26-empty-state">
-          <div class="hw26-empty-icon">📖</div>
-          <div class="hw26-empty-title">PRÓXIMAMENTE</div>
-          <div class="hw26-empty-sub">Acá vas a poder ver cada canje que hiciste con tus puntos: fecha, recompensa, puntos gastados, tipo y estado.</div>
-        </div>
-
-        <div class="hw26-page-note" style="margin:18px 0 4px;">Vista previa (ejemplo ilustrativo — no son datos reales)</div>
-        <div class="hw26-feed-list">
-          <div class="hw26-feed-item">
-            <span class="hw26-feed-time">--/--</span>
-            <span class="hw26-feed-text">🩸 Arañazo Maldito — <b>1000</b> puntos · Atacante · Aceptado</span>
-          </div>
-          <div class="hw26-feed-item">
-            <span class="hw26-feed-time">--/--</span>
-            <span class="hw26-feed-text">🌑 Golpe del Abismo — <b>2500</b> puntos · Atacante · Aceptado</span>
-          </div>
-          <div class="hw26-feed-item">
-            <span class="hw26-feed-time">--/--</span>
-            <span class="hw26-feed-text">💚 Curación Menor — <b>1000</b> puntos · Soporte · Aceptado</span>
-          </div>
-        </div>
+        <div class="hw26-empty-state">Cargando…</div>
       </div>
 
       <div class="hw26-error" id="hw26GlobalError" hidden></div>
@@ -108,5 +90,122 @@
   <script src="../js/geoarmy-config.js"></script>
   <script src="../js/geoarmy-ranks.js"></script>
   <script src="../js/geoarmy-account.js"></script>
+
+  <!-- Script propio de esta página -- autocontenido, no toca js/halloween-2026.js.
+       Mismo patrón de cliente/sesión ya probado ahí (window.GeoArmyAccount.client,
+       auth.getSession() antes de llamar RPCs), aplicado a una sola RPC nueva:
+       halloween_2026_get_my_point_spend_log(). -->
+  <script>
+  (function () {
+    'use strict';
+
+    var ROLE_LABEL = { attacker: 'ATACANTE', support: 'SOPORTE', defender: 'DEFENSOR' }; // mismos labels que ROLE_META en halloween-2026.js
+    var ROLE_ICON  = { attacker: '⚔', support: '✚', defender: '🛡' };
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+      });
+    }
+    function fmtNum(n) {
+      n = Math.max(0, Math.round(Number(n) || 0));
+      return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    function fmtDateTime(iso) {
+      if (!iso) return '';
+      var d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      var datePart = '', timePart = '';
+      try { datePart = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }); } catch (e) {}
+      try { timePart = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+      return (datePart + (timePart ? ' · ' + timePart : '')).toUpperCase();
+    }
+    function $(id) { return document.getElementById(id); }
+
+    function emptyStateHtml(icon, title, sub) {
+      return '<div class="hw26-empty-state">' +
+        '<div class="hw26-empty-icon">' + icon + '</div>' +
+        '<div class="hw26-empty-title">' + esc(title) + '</div>' +
+        '<div class="hw26-empty-sub">' + esc(sub) + '</div>' +
+      '</div>';
+    }
+
+    function renderSpendLog(data) {
+      var box = $('hw26RegistroPuntosContent');
+      if (!box) return;
+      var items = (data && Array.isArray(data.items)) ? data.items : [];
+      var total = data ? data.total_points_spent : 0;
+
+      var html = '<div class="hw26-spend-total">' +
+        '<div class="hw26-spend-total-label">PUNTOS GASTADOS EN HALLOWEEN</div>' +
+        '<div class="hw26-spend-total-value">' + fmtNum(total) + '</div>' +
+      '</div>';
+
+      if (items.length === 0) {
+        html += emptyStateHtml('📖', 'AÚN NO GASTASTE PUNTOS',
+          'Cuando canjees una recompensa de rol con tus puntos del canal de Twitch, tu historial aparecerá aquí.');
+      } else {
+        html += '<div class="hw26-feed-list">' + items.map(function (item) {
+          var role = item.role || '';
+          var icon = ROLE_ICON[role] || '🎯';
+          var roleLabel = ROLE_LABEL[role] || esc(role).toUpperCase();
+          return '<div class="hw26-feed-item">' +
+            '<span class="hw26-feed-time">' + esc(fmtDateTime(item.spent_at)) + '</span>' +
+            '<span class="hw26-feed-text">' + icon + ' ' + esc(item.reward_title) +
+              ' — <b>' + fmtNum(item.points) + '</b> puntos ' +
+              '<span class="hw26-spend-row-role">· ' + esc(roleLabel) + '</span></span>' +
+          '</div>';
+        }).join('') + '</div>';
+      }
+
+      box.innerHTML = html;
+    }
+
+    function renderNoSession() {
+      var box = $('hw26RegistroPuntosContent');
+      if (!box) return;
+      box.innerHTML = emptyStateHtml('🔒', 'INICIÁ SESIÓN',
+        'Iniciá sesión con Twitch para ver tu historial de puntos gastados en Halloween 2026.');
+    }
+
+    function renderError() {
+      var box = $('hw26RegistroPuntosContent');
+      if (!box) return;
+      box.innerHTML = emptyStateHtml('⚠', 'ALGO SALIÓ MAL',
+        'No se pudo cargar tu registro de puntos. Probá recargar la página.');
+    }
+
+    function load(client) {
+      client.auth.getSession().then(function (sessionRes) {
+        var session = sessionRes.data && sessionRes.data.session;
+        if (!session) { renderNoSession(); return; }
+        return Promise.resolve(client.rpc('halloween_2026_get_my_point_spend_log')).then(function (res) {
+          if (res.error) throw res.error;
+          renderSpendLog(res.data);
+        });
+      }).catch(function (e) {
+        console.warn('[registro-puntos] fallo al cargar el registro de puntos', e);
+        renderError();
+      });
+    }
+
+    function waitForClient(triesLeft) {
+      triesLeft = triesLeft == null ? 100 : triesLeft;
+      if (window.GeoArmyAccount && window.GeoArmyAccount.client) { load(window.GeoArmyAccount.client); return; }
+      if (triesLeft <= 0) {
+        console.error('[registro-puntos] No se encontró window.GeoArmyAccount.client.');
+        renderError();
+        return;
+      }
+      setTimeout(function () { waitForClient(triesLeft - 1); }, 100);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () { waitForClient(); });
+    } else {
+      waitForClient();
+    }
+  })();
+  </script>
 </body>
 </html>
