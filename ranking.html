@@ -24,7 +24,7 @@
 
   <style>
   /* =====================================================================
-     RANKING GEO ARMY V2 — "COMPETITIVE SPACE ELITE".
+     RANKING GEO ARMY V2.1 — "COMPETITIVE SPACE ELITE".
      Prefijo rk- para no chocar con nada de v3-theme.css ni de otras páginas
      (solo se reutiliza el "shell" compartido .v3-page/.v3-stars/.v3-nav/
      .v3-page-links/.v3-auth). Todos los números que se ven acá vienen tal
@@ -35,7 +35,7 @@
      borde, ::after = superficie, ambas con clip-path) para que el borde
      siga el corte diagonal. El elemento en sí NO se recorta, así que
      sombras/filter (drop-shadow) siguen la forma biselada y nada de texto
-     o imagen queda cortado.
+     o imagen queda cortado (la insignia del perfil incluso sobresale).
      ===================================================================== */
 
   /* @property: permite animar el color del borde en hover. Si el navegador
@@ -54,8 +54,7 @@
     --rk-violet: #9147FF;
     --rk-text: #F2F6FF;
     --rk-text2: #A4B6D0;
-    --rk-silver: #C9D6EA;
-    --rk-bronze: #D9966A;
+    --rk-w: 1060px;
     --rk-ff-display: 'Orbitron', sans-serif;
     --rk-ff-body: 'Space Grotesk', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --rk-ease: var(--ease, cubic-bezier(.2,.7,.2,1));
@@ -106,7 +105,7 @@
   }
 
   /* ---------- ENCABEZADO ---------- */
-  .rk-hero { position: relative; isolation: isolate; overflow: hidden; padding: 96px 1.5rem 22px; text-align: center; }
+  .rk-hero { position: relative; isolation: isolate; overflow: hidden; padding: 84px 1.5rem 4px; text-align: center; }
   .rk-hero-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
   .rk-hero-grid {
     position: absolute; inset: -10%;
@@ -117,20 +116,20 @@
     -webkit-mask-image: radial-gradient(50% 60% at 50% 30%, #000 0%, transparent 78%);
     mask-image: radial-gradient(50% 60% at 50% 30%, #000 0%, transparent 78%);
   }
-  .rk-eyebrow { font-family: var(--rk-ff-display); font-weight: 700; font-size: 11.5px; letter-spacing: .32em; text-transform: uppercase; color: var(--rk-blue-soft); margin-bottom: 14px; }
+  .rk-eyebrow { font-family: var(--rk-ff-display); font-weight: 700; font-size: 11.5px; letter-spacing: .32em; text-transform: uppercase; color: var(--rk-blue-soft); margin-bottom: 12px; }
   .rk-title {
     font-family: var(--rk-ff-display); font-weight: 900; letter-spacing: .02em; line-height: 1.05;
-    font-size: clamp(2.1rem, 5.6vw, 3.4rem); margin: 0 0 12px;
+    font-size: clamp(2rem, 5.2vw, 3.1rem); margin: 0 0 10px;
     background: linear-gradient(120deg, #F2F6FF 10%, #9FCBFF 55%, #6FB4FF 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 0 22px rgba(58,160,255,.25));
   }
-  .rk-sub { font-size: 16px; color: var(--rk-text2); max-width: 520px; margin: 0 auto; line-height: 1.6; }
-  @media (max-width: 700px) { .rk-hero { padding: 78px 1.2rem 16px; } }
+  .rk-sub { font-size: 16px; color: var(--rk-text2); max-width: 520px; margin: 0 auto; line-height: 1.55; }
+  @media (max-width: 700px) { .rk-hero { padding: 74px 1.2rem 0; } }
 
   /* ---------- TÍTULO DE SECCIÓN (compartido) ---------- */
   .rk-section-title {
-    display: flex; align-items: center; gap: 18px; max-width: 1040px; margin: 0 auto 28px;
+    display: flex; align-items: center; gap: 18px; max-width: var(--rk-w); margin: 0 auto 24px;
     font-family: var(--rk-ff-display); font-weight: 700; font-size: 12.5px; letter-spacing: .24em; line-height: 1.3;
     text-transform: uppercase; color: var(--rk-text);
   }
@@ -147,54 +146,84 @@
   /* Etiquetas pequeñas: tipografía de lectura (no Orbitron) */
   .rk-pf-label { font-family: var(--rk-ff-body); font-weight: 700; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--rk-text2); }
 
-  /* ---------- 1 · PERFIL COMPETITIVO ---------- */
-  .rk-profile-section { position: relative; z-index: 2; padding: 26px 1.5rem 10px; }
-  .rk-profile-shell { max-width: 1040px; margin: 0 auto; }
+  /* =====================================================================
+     1 · PERFIL COMPETITIVO — escenario de rango (izq.), progreso (centro)
+     y módulo de posición dorado acoplado (der.).
+     ===================================================================== */
+  .rk-profile-section { position: relative; z-index: 2; padding: 30px 1.5rem 4px; }
+  .rk-profile-shell { max-width: var(--rk-w); margin: 0 auto; }
   .rk-profile-shell .rk-guest, .rk-profile-shell .rk-pf-error { display: none; }
   .rk-profile-shell[data-state="guest"] .rk-guest { display: grid; }
   .rk-profile-shell[data-state="error"] .rk-pf-error { display: block; }
-  .rk-profile-shell[data-state="loading"] { min-height: 230px; background: linear-gradient(180deg, rgba(20,36,61,.5), rgba(16,28,48,.35)); clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); animation: rkPulse 1.6s ease-in-out infinite; }
+  .rk-profile-shell[data-state="loading"] { min-height: 250px; background: linear-gradient(180deg, rgba(20,36,61,.5), rgba(16,28,48,.35)); clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); animation: rkPulse 1.6s ease-in-out infinite; }
   @keyframes rkPulse { 0%, 100% { opacity: .55; } 50% { opacity: .95; } }
   .rk-pf-error { text-align: center; padding: 34px 20px; color: var(--rk-text2); border: 1px solid rgba(142,197,255,.16); background: rgba(16,28,48,.6); }
 
   .rk-profile {
-    --b: 26px;
-    display: grid; grid-template-columns: minmax(200px, .8fr) minmax(0, 1.75fr) minmax(190px, .75fr);
-    grid-template-areas: "left center right";
+    --b: 30px; margin-top: 40px;
+    display: grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(210px, 250px);
+    grid-template-areas: "left center right"; align-items: stretch;
     filter: drop-shadow(0 22px 34px rgba(58,160,255,.14));
+    --fill:
+      radial-gradient(40% 90% at 14% 50%, rgba(58,160,255,.20), transparent 70%),
+      linear-gradient(118deg, rgba(255,255,255,.06) 0, transparent 22%),
+      repeating-linear-gradient(118deg, rgba(120,190,255,.035) 0 1px, transparent 1px 9px),
+      linear-gradient(180deg, #14243D, #0F1B2F);
   }
-  .rk-profile::before { --ec1: rgba(58,160,255,.7); --ec2: rgba(145,71,255,.3); }
+  .rk-profile::before { --ec1: rgba(58,160,255,.75); --ec2: rgba(145,71,255,.28); }
   /* Rango máximo: acabado dorado en el panel (prestigio) */
   .rk-profile:has(#rkMaxBlock:not([hidden])) { filter: drop-shadow(0 22px 34px rgba(234,196,111,.16)); }
   .rk-profile:has(#rkMaxBlock:not([hidden]))::before { --ec1: rgba(247,226,166,.9); --ec2: rgba(234,196,111,.3); }
 
-  .rk-pf-zone { min-width: 0; padding: 28px; }
+  .rk-pf-zone { min-width: 0; }
+
+  /* Escenario del rango: la insignia sobresale del panel */
   .rk-pf-left {
-    grid-area: left; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center;
-    background: radial-gradient(70% 70% at 50% 42%, rgba(58,160,255,.15), transparent 75%);
+    grid-area: left; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 0 18px 26px;
   }
-  .rk-pf-badge { width: 132px; height: 132px; object-fit: contain; display: block; filter: drop-shadow(0 0 24px rgba(58,160,255,.5)); }
-  .rk-pf-rank { font-family: var(--rk-ff-display); font-weight: 900; font-size: clamp(1.1rem, 2.2vw, 1.5rem); letter-spacing: .04em; text-transform: uppercase; color: var(--rk-text); text-shadow: 0 0 20px rgba(58,160,255,.35); overflow-wrap: anywhere; }
+  .rk-pf-badgewrap {
+    order: 1; position: relative; isolation: isolate; display: grid; place-items: center;
+    width: 208px; height: 208px; margin-top: -48px; border-radius: 50%;
+    border: 1px solid rgba(142,197,255,.16);
+  }
+  .rk-pf-badgewrap::before { /* anillo con marcas, estilo dial */
+    content: ""; position: absolute; inset: 9px; border-radius: 50%; pointer-events: none;
+    background: repeating-conic-gradient(rgba(142,197,255,.55) 0 1deg, transparent 1deg 6deg);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 7px), #000 calc(100% - 3px), transparent calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 7px), #000 calc(100% - 3px), transparent calc(100% - 3px));
+  }
+  .rk-pf-badgewrap::after { /* resplandor radial detrás de la insignia */
+    content: ""; position: absolute; inset: -34px; border-radius: 50%; z-index: -1; pointer-events: none;
+    background: radial-gradient(circle, rgba(58,160,255,.34) 0, rgba(58,160,255,.12) 42%, transparent 68%);
+  }
+  .rk-pf-badgewrap:has(#rkMyBadge[hidden])::before, .rk-pf-badgewrap:has(#rkMyBadge[hidden])::after { display: none; }
+  .rk-pf-badge { width: 164px; height: 164px; object-fit: contain; display: block; filter: drop-shadow(0 8px 14px rgba(0,0,0,.5)); }
+  .rk-pf-left .rk-pf-label { order: 2; margin-top: 4px; }
+  .rk-pf-rank {
+    order: 3; align-self: stretch; padding: 9px 12px; margin-top: -2px;
+    font-family: var(--rk-ff-display); font-weight: 900; font-size: clamp(1.1rem, 2.1vw, 1.5rem); letter-spacing: .06em; text-transform: uppercase; color: var(--rk-text);
+    background: linear-gradient(90deg, transparent, rgba(58,160,255,.22) 25%, rgba(58,160,255,.22) 75%, transparent);
+    border-top: 1px solid rgba(142,197,255,.3); border-bottom: 1px solid rgba(142,197,255,.3);
+    overflow-wrap: anywhere;
+  }
 
-  .rk-pf-center { grid-area: center; display: flex; flex-direction: column; justify-content: center; gap: 6px; border-left: 1px solid rgba(142,197,255,.14); }
-  .rk-pf-xp { font-family: var(--rk-ff-display); font-weight: 900; font-size: clamp(1.7rem, 3.4vw, 2.4rem); line-height: 1.1; letter-spacing: .02em; color: var(--rk-text); }
-  .rk-pf-progress { margin-top: 14px; padding-top: 16px; border-top: 1px solid rgba(142,197,255,.12); }
+  .rk-pf-center { grid-area: center; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 30px 36px; }
+  .rk-pf-xp { font-family: var(--rk-ff-display); font-weight: 900; font-size: clamp(1.9rem, 3.8vw, 2.7rem); line-height: 1.1; letter-spacing: .02em; color: var(--rk-text); }
+  .rk-pf-progress { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(142,197,255,.14); }
 
-  .rk-progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 12px 0 9px; flex-wrap: wrap; }
+  .rk-progress-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 10px 0 9px; flex-wrap: wrap; }
   #rkProgressText { font-family: var(--rk-ff-body); font-weight: 700; font-size: 14.5px; color: var(--rk-text); }
-  #rkProgressPct { font-family: var(--rk-ff-display); font-weight: 900; font-size: 19px; color: var(--rk-blue-soft); text-shadow: 0 0 14px rgba(58,160,255,.5); }
+  #rkProgressPct { font-family: var(--rk-ff-display); font-weight: 900; font-size: 20px; color: var(--rk-blue-soft); }
+  /* Barra segmentada: el relleno es solo el % del backend; los segmentos son una máscara visual */
   .rk-bar-bg {
-    position: relative; height: 12px; background: rgba(120,170,255,.14);
-    clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
-  }
-  .rk-bar-bg::after { /* marcas de segmento cada 10% (puramente decorativas) */
-    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
-    background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(8,14,28,.75) calc(10% - 1px) 10%);
+    position: relative; height: 14px; background: rgba(120,170,255,.16);
+    -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 calc(5% - 3px), transparent calc(5% - 3px) 5%);
+    mask-image: repeating-linear-gradient(90deg, #000 0 calc(5% - 3px), transparent calc(5% - 3px) 5%);
   }
   .rk-bar-fill {
     position: relative; overflow: hidden; height: 100%; width: 0%;
     background: linear-gradient(90deg, #2A7FD4, #3AA0FF 62%, #8EC5FF);
-    box-shadow: 0 0 14px rgba(58,160,255,.6); transition: width .6s var(--rk-ease);
+    transition: width .6s var(--rk-ease);
   }
   .rk-bar-fill::after {
     content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 38%;
@@ -203,31 +232,37 @@
   }
   @keyframes rkBarSweep { from { transform: translateX(-120%); } to { transform: translateX(380%); } }
   .rk-progress-note { margin: 10px 0 0; font-size: 13.5px; color: var(--rk-text2); }
-  .rk-next-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed rgba(142,197,255,.18); flex-wrap: wrap; }
+  .rk-next-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(142,197,255,.2); flex-wrap: wrap; }
   .rk-next-label { font-family: var(--rk-ff-body); font-weight: 700; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--rk-text2); }
-  .rk-next-badge { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(58,160,255,.35)); }
+  .rk-next-badge { width: 40px; height: 40px; object-fit: contain; }
   #rkNextName { font-family: var(--rk-ff-display); font-weight: 700; font-size: 13.5px; color: var(--rk-text); }
   .rk-next-xp { font-size: 13px; font-weight: 700; color: var(--rk-blue-soft); margin-left: auto; }
   .rk-max-block {
-    margin-top: 6px; padding: 12px 16px; text-align: center; font-family: var(--rk-ff-display); font-weight: 700; font-size: 14px; letter-spacing: .06em;
-    color: var(--rk-gold-hi); text-shadow: 0 0 16px rgba(234,196,111,.45);
+    margin-top: 6px; padding: 14px 16px; text-align: center; font-family: var(--rk-ff-display); font-weight: 700; font-size: 14px; letter-spacing: .06em;
+    color: var(--rk-gold-hi);
     border: 1px solid rgba(234,196,111,.4); background: linear-gradient(90deg, rgba(234,196,111,.14), rgba(234,196,111,.03));
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
   }
 
+  /* Módulo de posición: placa dorada acoplada que sobresale del panel */
   .rk-pf-right {
-    grid-area: right; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px;
-    border-left: 1px solid rgba(142,197,255,.14);
-    background: radial-gradient(70% 70% at 50% 55%, rgba(234,196,111,.11), transparent 75%);
+    grid-area: right; --b: 20px; margin: -26px -22px -26px 0; padding: 26px 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px;
+    filter: drop-shadow(0 14px 24px rgba(234,196,111,.2));
+    --fill:
+      radial-gradient(90% 55% at 50% 0%, rgba(234,196,111,.26), transparent 70%),
+      repeating-linear-gradient(0deg, rgba(234,196,111,.05) 0 1px, transparent 1px 7px),
+      linear-gradient(180deg, #17294A, #101C30);
   }
+  .rk-pf-right::before { --ec1: rgba(247,226,166,.95); --ec2: rgba(234,196,111,.25); }
   .rk-pf-pos { display: flex; flex-direction: column; align-items: center; line-height: 1; }
   .rk-pos-num {
-    font-family: var(--rk-ff-display); font-weight: 900; font-size: clamp(2.6rem, 5.2vw, 3.7rem);
+    font-family: var(--rk-ff-display); font-weight: 900; font-size: clamp(2.8rem, 5.4vw, 4rem);
     background: linear-gradient(180deg, #FFF1C4, #EAC46F 58%, #B8923F); -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 0 18px rgba(234,196,111,.3));
   }
   .rk-pos-sub { margin-top: 10px; font-family: var(--rk-ff-body); font-weight: 700; font-size: 12px; letter-spacing: .32em; color: var(--rk-text2); }
   .rk-pf-pos.is-empty { font-size: 15px; font-weight: 500; line-height: 1.4; color: var(--rk-text2); max-width: 14ch; }
+  .rk-pf-ticks { width: 68%; height: 6px; background: repeating-linear-gradient(90deg, rgba(234,196,111,.6) 0 3px, transparent 3px 8px); }
 
   /* Sin sesión: presentación del sistema */
   .rk-guest {
@@ -253,95 +288,171 @@
   .rk-btn:hover { filter: brightness(1.12); transform: translateY(-2px); }
   .rk-btn:focus-visible, .rk-missions-btn:focus-visible { outline: 2px solid var(--rk-gold-hi); outline-offset: 3px; }
 
-  @media (max-width: 860px) {
-    .rk-profile { grid-template-columns: 1fr 1fr; grid-template-areas: "left right" "center center"; }
-    .rk-pf-zone { padding: 22px 18px; }
-    .rk-pf-badge { width: 96px; height: 96px; }
-    .rk-pf-center { border-left: 0; border-top: 1px solid rgba(142,197,255,.14); }
+  @media (max-width: 900px) {
+    .rk-profile { grid-template-columns: 1fr 1fr; grid-template-areas: "left right" "center center"; margin-top: 44px; }
+    .rk-pf-left { padding: 0 10px 18px; }
+    .rk-pf-badgewrap { width: 150px; height: 150px; margin-top: -40px; }
+    .rk-pf-badge { width: 118px; height: 118px; }
+    .rk-pf-right { margin: 0 14px 18px 0; align-self: center; padding: 20px 12px; }
+    .rk-pf-center { padding: 22px 20px 24px; border-top: 1px solid rgba(142,197,255,.14); }
     .rk-guest { grid-template-columns: 1fr; }
     .rk-guest-steps { border-left: 0; border-top: 1px solid rgba(142,197,255,.14); padding: 24px 22px; }
     .rk-guest-main { padding: 28px 22px; }
   }
+  @media (max-width: 420px) {
+    .rk-pf-badgewrap { width: 128px; height: 128px; }
+    .rk-pf-badge { width: 100px; height: 100px; }
+    .rk-pf-rank { font-size: 1rem; letter-spacing: .03em; }
+    .rk-pf-right { margin-right: 10px; }
+  }
 
-  /* ---------- 2 · SALÓN DE CAMPEONES ---------- */
-  .rk-champions-section { position: relative; z-index: 2; padding: 52px 1.5rem 8px; }
+  /* =====================================================================
+     2 · SALÓN DE CAMPEONES — escenarios holográficos con siluetas propias:
+     #1 octogonal y más alto, #2 y #3 con cortes espejados.
+     ===================================================================== */
+  .rk-champions-section { position: relative; z-index: 2; padding: 38px 1.5rem 4px; }
   .rk-champions-section:has(#rkTop3:empty) { display: none; }
   /* Flex (no grid con columnas fijas): sigue bien si falta algún puesto o hay empates */
-  .rk-top3-row { display: flex; align-items: flex-end; justify-content: center; gap: 16px; max-width: 960px; margin: 0 auto; }
-  .rk-top-card { --b: 20px; flex: 1 1 0; min-width: 0; text-align: center; padding: 24px 14px 22px; }
-  .rk-top-card::before { background: var(--edge); }
-  .rk-top-card::after { background: var(--fill); }
-  .rk-top-1 { order: 2; flex-grow: 1.2; padding: 38px 18px 30px; filter: drop-shadow(0 16px 30px rgba(234,196,111,.22));
+  .rk-top3-row { position: relative; display: flex; align-items: flex-end; justify-content: center; gap: 16px; max-width: 980px; margin: 0 auto; padding-bottom: 20px; }
+  .rk-top3-row::before { /* línea de suelo del podio */
+    content: ""; position: absolute; left: 2%; right: 2%; bottom: 12px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(142,197,255,.5), transparent);
+  }
+  .rk-top3-row::after { /* luz de proyector sobre el suelo */
+    content: ""; position: absolute; left: 6%; right: 6%; bottom: 0; height: 26px; pointer-events: none;
+    background: radial-gradient(60% 100% at 50% 0%, rgba(58,160,255,.3), transparent 72%);
+  }
+
+  .rk-top-card {
+    --b1: 30px; --b2: 20px; flex: 1 1 0; min-width: 0; text-align: center; padding: 6px 14px 22px;
+    --shape: polygon(0 0, calc(100% - var(--b1)) 0, 100% var(--b1), 100% 100%, var(--b2) 100%, 0 calc(100% - var(--b2)));
+    --shape-in: polygon(0 0, calc(100% - var(--b1) + .6px) 0, 100% calc(var(--b1) - .6px), 100% 100%, calc(var(--b2) - .6px) 100%, 0 calc(100% - var(--b2) + .6px));
+  }
+  .rk-top-card::before { background: var(--edge); clip-path: var(--shape); }
+  .rk-top-card::after { background: var(--fill); clip-path: var(--shape-in); }
+
+  .rk-top-1 {
+    order: 2; flex-grow: 1.2; padding: 8px 18px 28px; --b1: 34px; --b2: 22px;
+    --shape: polygon(var(--b1) 0, calc(100% - var(--b1)) 0, 100% var(--b1), 100% calc(100% - var(--b2)), calc(100% - var(--b2)) 100%, var(--b2) 100%, 0 calc(100% - var(--b2)), 0 var(--b1));
+    --shape-in: polygon(calc(var(--b1) - .6px) 0, calc(100% - var(--b1) + .6px) 0, 100% calc(var(--b1) - .6px), 100% calc(100% - var(--b2) + .6px), calc(100% - var(--b2) + .6px) 100%, calc(var(--b2) - .6px) 100%, 0 calc(100% - var(--b2) + .6px), 0 calc(var(--b1) - .6px));
+    filter: drop-shadow(0 16px 30px rgba(234,196,111,.22));
     --edge: linear-gradient(155deg, #FFF1C4, #EAC46F 32%, #8D6B2A 62%, #EAC46F);
     --fill:
-      radial-gradient(90% 55% at 50% 0%, rgba(234,196,111,.26), transparent 70%),
+      linear-gradient(180deg, rgba(234,196,111,.20), transparent 38%),
       linear-gradient(112deg, transparent 30%, rgba(255,255,255,.07) 46%, rgba(120,190,255,.07) 54%, transparent 70%),
       repeating-linear-gradient(118deg, rgba(120,190,255,.05) 0 1px, transparent 1px 8px),
       linear-gradient(180deg, #16284A, #101C30 62%, #0C1628);
     --ring: conic-gradient(from 200deg, #FFF1C4, #EAC46F, #8D6B2A, #EAC46F, #FFF1C4);
     --metal: linear-gradient(180deg, #FFF1C4, #EAC46F 58%, #B8923F);
+    --halo: rgba(234,196,111,.30); --tick: rgba(234,196,111,.55); --xp: #EAC46F;
   }
-  .rk-top-2 { order: 1; filter: drop-shadow(0 14px 26px rgba(120,190,255,.2));
+  .rk-top-2 {
+    order: 1; filter: drop-shadow(0 14px 26px rgba(120,190,255,.2));
     --edge: linear-gradient(155deg, #F2F6FF, #9FB2CF 40%, rgba(159,178,207,.28) 70%, #C9D6EA);
     --fill:
-      radial-gradient(90% 55% at 50% 0%, rgba(120,190,255,.22), transparent 70%),
+      linear-gradient(180deg, rgba(120,190,255,.16), transparent 40%),
       repeating-linear-gradient(118deg, rgba(120,190,255,.045) 0 1px, transparent 1px 8px),
       linear-gradient(180deg, #14243D, #101C30 70%);
     --ring: conic-gradient(from 200deg, #F2F6FF, #9FB2CF, #5E7396, #C9D6EA, #F2F6FF);
     --metal: linear-gradient(180deg, #FFFFFF, #C9D6EA 58%, #8497B6);
+    --halo: rgba(120,190,255,.26); --tick: rgba(201,214,234,.5); --xp: #DCE6F5;
   }
-  .rk-top-3 { order: 3; filter: drop-shadow(0 14px 26px rgba(217,150,106,.18));
-    --edge: linear-gradient(155deg, #F6C9A0, #D9966A 40%, rgba(217,150,106,.28) 70%, #C27A4C);
+  .rk-top-3 {
+    order: 3; filter: drop-shadow(0 14px 26px rgba(217,150,106,.18));
+    --shape: polygon(var(--b1) 0, 100% 0, 100% calc(100% - var(--b2)), calc(100% - var(--b2)) 100%, 0 100%, 0 var(--b1));
+    --shape-in: polygon(calc(var(--b1) - .6px) 0, 100% 0, 100% calc(100% - var(--b2) + .6px), calc(100% - var(--b2) + .6px) 100%, 0 100%, 0 calc(var(--b1) - .6px));
+    --edge: linear-gradient(205deg, #F6C9A0, #D9966A 40%, rgba(217,150,106,.28) 70%, #C27A4C);
     --fill:
-      radial-gradient(90% 55% at 50% 0%, rgba(217,150,106,.2), transparent 70%),
-      repeating-linear-gradient(118deg, rgba(217,150,106,.04) 0 1px, transparent 1px 8px),
+      linear-gradient(180deg, rgba(217,150,106,.17), transparent 40%),
+      repeating-linear-gradient(62deg, rgba(217,150,106,.04) 0 1px, transparent 1px 8px),
       linear-gradient(180deg, #17243A, #101C30 70%);
     --ring: conic-gradient(from 200deg, #F6C9A0, #D9966A, #8A4F2B, #D9966A, #F6C9A0);
     --metal: linear-gradient(180deg, #FFE0C4, #D9966A 58%, #9A5C34);
+    --halo: rgba(217,150,106,.24); --tick: rgba(217,150,106,.5); --xp: #E9A878;
   }
-  .rk-top-medal {
-    font-family: var(--rk-ff-display); font-weight: 900; font-size: 1.9rem; line-height: 1; margin-bottom: 14px; letter-spacing: .02em;
-    background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent;
+
+  /* Escenario del avatar: halo + numeral fantasma + dial + etiqueta de puesto */
+  .rk-top-stage { position: relative; isolation: isolate; display: grid; place-items: center; padding: 34px 0 24px; }
+  .rk-top-1 .rk-top-stage { padding: 52px 0 28px; }
+  .rk-top-stage::before { /* halo holográfico */
+    content: ""; position: absolute; left: 50%; top: 50%; width: 190px; height: 190px; transform: translate(-50%, -50%); z-index: -1; pointer-events: none;
+    background: radial-gradient(circle, var(--halo) 0, transparent 66%);
   }
-  .rk-top-1 .rk-top-medal { font-size: 2.8rem; margin-bottom: 18px; }
-  .rk-top-hash { font-size: .55em; opacity: .8; margin-right: 2px; vertical-align: .35em; }
-  .rk-top-avawrap { position: relative; width: 76px; height: 76px; margin: 0 auto 14px; }
-  .rk-top-1 .rk-top-avawrap { width: 96px; height: 96px; margin-bottom: 18px; }
-  .rk-top-avawrap::before {
+  .rk-top-1 .rk-top-stage::before { width: 250px; height: 250px; top: calc(50% + 10px); animation: rkHalo 4.5s ease-in-out infinite; }
+  @keyframes rkHalo { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+  .rk-top-stage::after { /* numeral gigante detrás (capa de profundidad) */
+    content: attr(data-pos); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: -1; pointer-events: none;
+    font-family: var(--rk-ff-display); font-weight: 900; font-size: 130px; line-height: 1;
+    background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent; opacity: .09;
+  }
+  .rk-top-1 .rk-top-stage::after { font-size: 180px; top: calc(50% + 10px); }
+  .rk-top-crown { /* corona geométrica minimalista, solo para el #1 */
+    display: none; position: absolute; top: 12px; left: 50%; width: 40px; height: 26px; transform: translateX(-50%); background: var(--metal);
+    clip-path: polygon(0 100%, 0 28%, 24% 60%, 50% 0, 76% 60%, 100% 28%, 100% 100%);
+  }
+  .rk-top-1 .rk-top-crown { display: block; }
+  .rk-top-avawrap { position: relative; width: 78px; height: 78px; }
+  .rk-top-1 .rk-top-avawrap { width: 104px; height: 104px; }
+  .rk-top-avawrap::before { /* aro metálico */
     content: ""; position: absolute; inset: -5px; border-radius: 50%; background: var(--ring);
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
     mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2.5px));
   }
+  .rk-top-avawrap::after { /* dial exterior con marcas */
+    content: ""; position: absolute; inset: -22px; border-radius: 50%; pointer-events: none;
+    background: repeating-conic-gradient(var(--tick) 0 1.2deg, transparent 1.2deg 7.5deg);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px), #000 calc(100% - 3px), transparent calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px), #000 calc(100% - 3px), transparent calc(100% - 3px));
+  }
+  .rk-top-1 .rk-top-avawrap::after { inset: -28px; }
+  .rk-top-medal { /* etiqueta de puesto biselada, a caballo del avatar */
+    position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); z-index: 2; padding: 3px 14px 3px 12px;
+    font-family: var(--rk-ff-display); font-weight: 900; font-size: 16px; line-height: 1.2; color: #0B1424; background: var(--metal);
+    clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+  }
+  .rk-top-card .rk-flag { right: -10px; bottom: 16px; }
+  .rk-top-1 .rk-top-medal { font-size: 21px; padding: 4px 18px 4px 16px; bottom: 2px; }
+  .rk-top-hash { font-size: .6em; opacity: .75; margin-right: 1px; vertical-align: .25em; }
+
   .rk-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid #0B1424; display: block; }
   .rk-avatar-fallback { display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 35% 30%, #1D3358, #0A1122); font-family: var(--rk-ff-display); font-weight: 700; font-size: 22px; color: #C9D6EC; text-transform: uppercase; }
   .rk-flag { position: absolute; z-index: 1; right: -4px; bottom: -2px; width: 24px; height: 17px; border-radius: 3px; object-fit: cover; box-shadow: 0 0 0 2px #0B1424; }
   .rk-badge-ic { width: 30px; height: 30px; object-fit: contain; margin: 0 auto 4px; display: block; }
-  .rk-top-card .rk-badge-ic { width: 38px; height: 38px; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(142,197,255,.4)); }
-  .rk-top-1 .rk-badge-ic { width: 48px; height: 48px; filter: drop-shadow(0 0 14px rgba(234,196,111,.5)); }
+  .rk-top-card .rk-badge-ic { width: 40px; height: 40px; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
+  .rk-top-1 .rk-badge-ic { width: 52px; height: 52px; }
   .rk-top-name { font-family: var(--rk-ff-body); font-weight: 700; font-size: 15.5px; color: var(--rk-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-top-1 .rk-top-name { font-size: 18px; }
   .rk-top-rankname { font-size: 12.5px; color: var(--rk-text2); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rk-top-xp { margin-top: 12px; font-family: var(--rk-ff-display); font-weight: 900; font-size: 15px; background: var(--metal); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .rk-top-1 .rk-top-xp { font-size: 20px; margin-top: 14px; }
+  .rk-top-xp {
+    margin-top: 12px; padding-top: 10px; font-family: var(--rk-ff-display); font-weight: 900; font-size: 15px; color: var(--xp);
+    border-top: 1px solid rgba(142,197,255,.14);
+  }
+  .rk-top-1 .rk-top-xp { font-size: 21px; margin-top: 14px; padding-top: 12px; }
 
   @media (max-width: 700px) {
     .rk-top3-row { flex-wrap: wrap; align-items: stretch; max-width: 460px; gap: 12px; }
     .rk-top-1 { order: 0; flex: 0 0 100%; }
     .rk-top-2 { order: 1; }
     .rk-top-3 { order: 2; }
-    .rk-top-2, .rk-top-3 { flex: 1 1 calc(50% - 6px); padding: 20px 8px 18px; }
+    .rk-top-2, .rk-top-3 { flex: 1 1 calc(50% - 6px); padding: 4px 8px 18px; --b1: 24px; --b2: 16px; }
     .rk-top-2 .rk-top-avawrap, .rk-top-3 .rk-top-avawrap { width: 62px; height: 62px; }
+    .rk-top-2 .rk-top-avawrap::after, .rk-top-3 .rk-top-avawrap::after { inset: -18px; }
+    .rk-top-2 .rk-top-stage::after, .rk-top-3 .rk-top-stage::after { font-size: 96px; }
+    .rk-top-2 .rk-top-stage, .rk-top-3 .rk-top-stage { padding: 30px 0 22px; }
     .rk-top-card .rk-top-name { font-size: 14px; }
     .rk-top-2 .rk-top-xp, .rk-top-3 .rk-top-xp { font-size: 13px; }
+    .rk-top-2 .rk-top-medal, .rk-top-3 .rk-top-medal { font-size: 14px; }
   }
 
-  /* ---------- 3 · CLASIFICACIÓN GLOBAL ---------- */
-  .rk-board-section { position: relative; z-index: 2; padding: 52px 1.5rem 10px; }
-  .rk-list-card { max-width: 940px; margin: 0 auto; }
-  .rk-list { display: grid; gap: 8px; }
+  /* =====================================================================
+     3 · CLASIFICACIÓN GLOBAL — placas con pestaña de posición
+     ===================================================================== */
+  .rk-board-section { position: relative; z-index: 2; padding: 40px 1.5rem 4px; }
+  .rk-list-card { max-width: 960px; margin: 0 auto; }
+  .rk-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
 
   .rk-row {
-    --b: 10px; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 9px 16px 9px 14px;
+    --b: 12px; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px 0 0;
     transition: filter .25s var(--rk-ease);
     --fill:
       linear-gradient(118deg, rgba(255,255,255,.04) 0, transparent 24%),
@@ -350,45 +461,52 @@
   .rk-row::before { --ec1: rgba(120,170,255,.2); --ec2: rgba(120,170,255,.06); }
   .rk-row:hover { filter: drop-shadow(0 6px 14px rgba(58,160,255,.25)); }
   .rk-row:hover::before { --ec1: rgba(58,160,255,.95); --ec2: rgba(58,160,255,.35); }
-  .rk-row-pos { width: 44px; flex-shrink: 0; font-family: var(--rk-ff-display); font-weight: 700; font-size: 13px; color: var(--rk-text2); transition: color .25s; }
+  .rk-row-pos { /* pestaña de posición, recortada con el mismo bisel de la placa */
+    align-self: stretch; flex: 0 0 56px; width: 56px; margin: 1px 2px 1px 1px; display: grid; place-items: center;
+    font-family: var(--rk-ff-display); font-weight: 700; font-size: 13px; color: var(--rk-text2);
+    background: linear-gradient(90deg, rgba(142,197,255,.10), rgba(142,197,255,.03));
+    border-right: 1px solid rgba(142,197,255,.14);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, calc(var(--b) - .6px) 100%, 0 calc(100% - var(--b) + .6px));
+    transition: color .25s;
+  }
   .rk-row:hover .rk-row-pos { color: var(--rk-blue-soft); }
-  .rk-row-ava { position: relative; flex-shrink: 0; width: 32px; height: 32px; }
+  .rk-row-ava { position: relative; flex-shrink: 0; width: 34px; height: 34px; }
   .rk-row .rk-avatar { border-width: 1.5px; }
   .rk-row .rk-avatar-fallback { font-size: 13px; }
   .rk-row .rk-flag { width: 17px; height: 12px; right: -4px; bottom: -3px; box-shadow: 0 0 0 1.5px #0B1424; }
-  .rk-row .rk-badge-ic { width: 24px; height: 24px; margin: 0; flex-shrink: 0; }
+  .rk-row .rk-badge-ic { width: 26px; height: 26px; margin: 0; flex-shrink: 0; }
   .rk-row-id { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .rk-row-name { font-family: var(--rk-ff-body); font-weight: 700; font-size: 14px; color: var(--rk-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-row-rankname { font-size: 12px; color: var(--rk-text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rk-row-xp { font-family: var(--rk-ff-display); font-weight: 700; font-size: 13px; color: var(--rk-text2); flex-shrink: 0; }
+  .rk-row-xp { flex-shrink: 0; min-width: 96px; padding-left: 14px; text-align: right; font-family: var(--rk-ff-display); font-weight: 700; font-size: 13px; color: var(--rk-text2); border-left: 1px solid rgba(142,197,255,.12); }
 
-  /* Posiciones 4–10: más presencia y acento competitivo */
+  /* Posiciones 4–10: más presencia y acento azul competitivo */
   .rk-row--elite {
-    --b: 14px; min-height: 66px; padding: 12px 20px 12px 16px;
+    --b: 16px; min-height: 70px;
     --fill:
       linear-gradient(90deg, rgba(58,160,255,.15), transparent 46%),
       linear-gradient(118deg, rgba(255,255,255,.06) 0, transparent 26%),
       linear-gradient(180deg, #14243D, #101C30);
   }
-  .rk-row--elite::before { --ec1: rgba(58,160,255,.55); --ec2: rgba(145,71,255,.26); }
-  .rk-row--elite .rk-row-pos { font-size: 16px; color: var(--rk-blue-soft); }
-  .rk-row--elite .rk-row-ava { width: 44px; height: 44px; }
+  .rk-row--elite::before { --ec1: rgba(58,160,255,.6); --ec2: rgba(145,71,255,.26); }
+  .rk-row--elite .rk-row-pos { flex-basis: 64px; width: 64px; font-size: 18px; color: var(--rk-text); background: linear-gradient(90deg, rgba(58,160,255,.42), rgba(58,160,255,.08)); border-right-color: rgba(58,160,255,.4); }
+  .rk-row--elite .rk-row-ava { width: 46px; height: 46px; }
   .rk-row--elite .rk-avatar { border-width: 2px; }
   .rk-row--elite .rk-avatar-fallback { font-size: 17px; }
   .rk-row--elite .rk-flag { width: 20px; height: 14px; }
-  .rk-row--elite .rk-badge-ic { width: 32px; height: 32px; }
+  .rk-row--elite .rk-badge-ic { width: 34px; height: 34px; }
   .rk-row--elite .rk-row-name { font-size: 15.5px; }
   .rk-row--elite .rk-row-rankname { font-size: 12.5px; }
   .rk-row--elite .rk-row-xp { font-size: 15px; color: var(--rk-text); }
 
-  .rk-loading, .rk-empty { text-align: center; padding: 50px 20px; color: var(--rk-text2); }
+  .rk-loading, .rk-empty { text-align: center; padding: 44px 20px; color: var(--rk-text2); }
   .rk-empty-ic { font-size: 32px; margin-bottom: 10px; }
   .rk-empty-title { font-family: var(--rk-ff-display); font-weight: 700; color: var(--rk-text); margin-bottom: 6px; }
   .rk-empty-sub { font-size: 14px; }
 
-  /* Tu posición — misma familia de placa que el leaderboard */
+  /* Tu posición — pestaña dorada + placa azul: conecta con el lenguaje del leaderboard */
   .rk-mypos {
-    --b: 16px; max-width: 940px; margin: 22px auto 0; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 16px 24px;
+    --b: 16px; max-width: 960px; margin: 20px auto 0; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; min-height: 74px; padding: 0 24px 0 0;
     filter: drop-shadow(0 12px 24px rgba(58,160,255,.2));
     --fill:
       linear-gradient(90deg, rgba(58,160,255,.2), rgba(145,71,255,.1)),
@@ -396,68 +514,118 @@
       linear-gradient(180deg, #14243D, #101C30);
   }
   .rk-mypos::before { --ec1: rgba(58,160,255,.9); --ec2: rgba(145,71,255,.4); }
-  .rk-mypos-label { font-family: var(--rk-ff-body); font-weight: 700; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--rk-blue-soft); }
-  .rk-mypos-pos { font-family: var(--rk-ff-display); font-weight: 900; font-size: 26px; line-height: 1.2; color: var(--rk-gold-hi); text-shadow: 0 0 16px rgba(234,196,111,.35); }
+  .rk-mypos-tab {
+    align-self: stretch; margin: 1px 0 1px 1px; padding: 10px 26px 10px 22px; display: flex; flex-direction: column; justify-content: center; gap: 2px;
+    background: linear-gradient(135deg, #F7E2A6, #EAC46F 60%, #C9A04A);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, calc(var(--b) - .6px) 100%, 0 calc(100% - var(--b) + .6px));
+  }
+  .rk-mypos-label { font-family: var(--rk-ff-body); font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #4A3708; }
+  .rk-mypos-pos { font-family: var(--rk-ff-display); font-weight: 900; font-size: 26px; line-height: 1.1; color: #1A1405; }
   .rk-mypos-id { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-  .rk-mypos-name { font-family: var(--rk-ff-body); font-weight: 700; font-size: 15.5px; color: var(--rk-text); overflow-wrap: anywhere; }
+  .rk-mypos-name { font-family: var(--rk-ff-body); font-weight: 700; font-size: 15.5px; color: var(--rk-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-mypos-rank { font-size: 12.5px; color: var(--rk-text2); }
   .rk-mypos-xp { font-family: var(--rk-ff-display); font-weight: 700; font-size: 15px; color: var(--rk-text); white-space: nowrap; }
 
   @media (max-width: 700px) {
-    .rk-row { gap: 9px; padding: 8px 12px 8px 10px; }
-    .rk-row-pos { width: 38px; font-size: 12px; }
-    .rk-row--elite { padding: 10px 14px 10px 12px; min-height: 60px; }
-    .rk-row--elite .rk-row-pos { font-size: 14px; }
+    .rk-row { gap: 9px; padding-right: 12px; }
+    .rk-row-pos { flex-basis: 46px; width: 46px; font-size: 12px; }
+    .rk-row--elite { min-height: 62px; }
+    .rk-row--elite .rk-row-pos { flex-basis: 50px; width: 50px; font-size: 15px; }
     .rk-row--elite .rk-row-ava { width: 38px; height: 38px; }
     .rk-row--elite .rk-badge-ic { width: 28px; height: 28px; }
-    .rk-row-xp, .rk-row--elite .rk-row-xp { font-size: 12px; }
-    .rk-mypos { justify-content: center; text-align: center; }
-    .rk-mypos-id { flex-basis: 100%; order: 3; }
+    .rk-row-xp, .rk-row--elite .rk-row-xp { min-width: 0; padding-left: 10px; font-size: 12px; }
+    .rk-mypos { gap: 10px; padding-right: 12px; flex-wrap: nowrap; }
+    .rk-mypos-tab { padding: 8px 14px 8px 12px; }
+    .rk-mypos-pos { font-size: 22px; }
+    .rk-mypos-id { flex: 1 1 0; min-width: 0; }
+    .rk-mypos-xp { font-size: 12.5px; }
   }
 
-  /* ---------- 4 · CAMINO A LEGENDARIO (ruta de rangos) ---------- */
-  .rk-ladder-section { position: relative; z-index: 2; padding: 56px 1.5rem 10px; }
+  /* =====================================================================
+     4 · CAMINO A LEGENDARIO — escalera ascendente. Cada escalón es más alto
+     que el anterior (--i viene del índice oficial en buildLadder()); en
+     pantallas angostas pasa a una ruta vertical en zigzag, sin scroll
+     horizontal.
+     ===================================================================== */
+  .rk-ladder-section { position: relative; z-index: 2; padding: 44px 1.5rem 4px; }
   .rk-ladder-row {
-    position: relative; display: flex; width: fit-content; max-width: min(1100px, 100%); margin: 0 auto;
-    overflow-x: auto; padding: 22px 10px 18px; scrollbar-width: thin; scrollbar-color: rgba(142,197,255,.3) transparent;
+    position: relative; display: flex; align-items: flex-end; gap: 4px; max-width: 1120px; margin: 0 auto; padding: 56px 0 0;
   }
-  .rk-ladder-row::-webkit-scrollbar { height: 6px; }
-  .rk-ladder-row::-webkit-scrollbar-thumb { background: rgba(142,197,255,.3); border-radius: 100px; }
-  .rk-ladder-step { position: relative; flex: 0 0 auto; width: 108px; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0 4px; }
-  .rk-ladder-step:not(:last-child)::before { /* conector hacia el siguiente rango */
-    content: ""; position: absolute; top: 25px; left: calc(50% + 32px); width: calc(100% - 64px); height: 2px;
-    background: rgba(142,197,255,.16);
+  .rk-ladder-row::after { /* suelo de la escalera */
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(142,197,255,.4), transparent);
   }
-  .rk-ladder-badge { width: 52px; height: 52px; object-fit: contain; transition: filter .3s var(--rk-ease), transform .3s var(--rk-ease); }
-  .rk-ladder-name { font-family: var(--rk-ff-body); font-weight: 700; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--rk-text2); text-align: center; line-height: 1.3; }
+  .rk-ladder-step {
+    --b: 12px; position: relative; isolation: isolate; flex: 1 1 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    height: calc(112px + var(--i, 0) * 15px); padding: 0 2px 14px;
+    --ec1: rgba(142,197,255,.24); --ec2: rgba(142,197,255,.02);
+    --fill: linear-gradient(180deg, rgba(20,36,61,.92), rgba(12,22,40,.45) 80%, rgba(12,22,40,.1));
+  }
+  .rk-ladder-step::before { clip-path: polygon(0 0, calc(100% - var(--b)) 0, 100% var(--b), 100% 100%, 0 100%); background: linear-gradient(180deg, var(--ec1), var(--ec2) 70%); position: absolute; inset: 0; z-index: -2; content: ""; pointer-events: none; transition: --ec1 .28s ease, --ec2 .28s ease; }
+  .rk-ladder-step::after { clip-path: polygon(0 0, calc(100% - var(--b) + .6px) 0, 100% calc(var(--b) - .6px), 100% 100%, 0 100%); background: var(--fill); position: absolute; inset: 1px 1px 0 1px; z-index: -1; content: ""; pointer-events: none; }
+  .rk-ladder-badge {
+    width: calc(40px + var(--i, 0) * 1.4px); height: calc(40px + var(--i, 0) * 1.4px); object-fit: contain; margin-top: -24px; flex-shrink: 0;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,.45)); transition: transform .3s var(--rk-ease), filter .3s var(--rk-ease);
+  }
+  .rk-ladder-name { font-family: var(--rk-ff-body); font-weight: 700; font-size: 9.5px; letter-spacing: 0; text-transform: uppercase; color: var(--rk-text2); text-align: center; line-height: 1.3; max-width: 100%; }
 
-  .rk-ladder-step.is-done .rk-ladder-badge { filter: drop-shadow(0 0 10px rgba(58,160,255,.45)); }
+  /* Completado: azul controlado */
+  .rk-ladder-step.is-done { --ec1: rgba(58,160,255,.85); --ec2: rgba(58,160,255,.04); --fill: linear-gradient(180deg, rgba(24,52,92,.92), rgba(14,28,50,.5) 80%, rgba(12,22,40,.1)); }
   .rk-ladder-step.is-done .rk-ladder-name { color: var(--rk-blue-soft); }
-  .rk-ladder-step.is-done:not(:last-child)::before { background: linear-gradient(90deg, #3AA0FF, #2A7FD4); box-shadow: 0 0 8px rgba(58,160,255,.5); }
-  .rk-ladder-step.is-future .rk-ladder-badge { filter: saturate(.55) brightness(.8); }
-  .rk-ladder-step.is-current .rk-ladder-badge { transform: scale(1.18); filter: drop-shadow(0 0 16px rgba(234,196,111,.65)); }
+  /* Futuro: más oscuro pero legible */
+  .rk-ladder-step.is-future .rk-ladder-badge { filter: saturate(.55) brightness(.82) drop-shadow(0 6px 8px rgba(0,0,0,.45)); }
+  /* Actual: dorado + escala + etiqueta */
+  .rk-ladder-step.is-current { --ec1: rgba(247,226,166,.95); --ec2: rgba(234,196,111,.08); --fill: linear-gradient(180deg, rgba(60,50,28,.92), rgba(24,26,36,.5) 80%, rgba(12,22,40,.1)); }
+  .rk-ladder-step.is-current .rk-ladder-badge { transform: scale(1.18); transform-origin: 50% 70%; filter: drop-shadow(0 0 14px rgba(234,196,111,.55)) drop-shadow(0 6px 8px rgba(0,0,0,.45)); }
   .rk-ladder-step.is-current .rk-ladder-name { color: var(--rk-gold-hi); }
-  .rk-ladder-step.is-current:not(:last-child)::before { background: linear-gradient(90deg, #EAC46F, rgba(142,197,255,.16)); }
-  .rk-ladder-step.is-current::after {
-    content: "Tu rango"; font-family: var(--rk-ff-body); font-weight: 700; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
-    color: #1A1405; background: linear-gradient(135deg, #F7E2A6, #EAC46F); padding: 3px 9px;
+  .rk-ladder-step.is-current .rk-ladder-name::after {
+    content: "Tu rango"; display: block; margin: 6px auto 0; width: fit-content; padding: 3px 7px;
+    font-size: 9px; letter-spacing: .04em; white-space: nowrap; color: #1A1405; background: linear-gradient(135deg, #F7E2A6, #EAC46F);
     clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
   }
-  /* Meta de la ruta: el último escalón siempre lleva acento dorado (prestigio) */
+  /* Meta: Legendario, escalón final con tratamiento premium */
+  .rk-ladder-step:last-child { --ec1: rgba(247,226,166,.8); --ec2: rgba(234,196,111,.06); --fill: radial-gradient(100% 60% at 50% 0%, rgba(234,196,111,.22), transparent 70%), linear-gradient(180deg, rgba(30,38,60,.95), rgba(12,22,40,.5) 80%, rgba(12,22,40,.1)); }
+  .rk-ladder-step:last-child .rk-ladder-badge { width: 66px; height: 66px; margin-top: -34px; filter: drop-shadow(0 0 16px rgba(234,196,111,.45)) drop-shadow(0 6px 8px rgba(0,0,0,.45)); }
   .rk-ladder-step:last-child .rk-ladder-name { color: var(--rk-gold); }
 
-  /* ---------- 5 · CTA DE MISIONES ---------- */
+  @media (max-width: 960px) {
+    .rk-ladder-row { flex-direction: column; align-items: stretch; gap: 0; max-width: 520px; padding: 6px 0; }
+    .rk-ladder-row::after { display: none; }
+    .rk-ladder-step {
+      display: grid; grid-template-columns: 1fr 64px 1fr; align-items: center; gap: 0; height: auto; min-height: 66px; padding: 0; flex: none;
+    }
+    .rk-ladder-step::after { display: none; }
+    .rk-ladder-step::before { /* tramo de ruta hacia el siguiente rango */
+      inset: auto; left: 50%; top: 50%; width: 3px; height: 100%; margin-left: -1.5px; z-index: 0; clip-path: none;
+      background: var(--ec1); opacity: .9;
+    }
+    .rk-ladder-step:last-child::before { display: none; }
+    .rk-ladder-step.is-future { --ec1: rgba(142,197,255,.2); }
+    .rk-ladder-step.is-current { --ec1: rgba(234,196,111,.9); }
+    .rk-ladder-badge { grid-column: 2; grid-row: 1; justify-self: center; position: relative; z-index: 1; margin: 0; width: 52px; height: 52px; }
+    .rk-ladder-step:last-child .rk-ladder-badge { width: 64px; height: 64px; margin-top: 0; }
+    .rk-ladder-name { grid-row: 1; font-size: 12px; }
+    .rk-ladder-step:nth-child(odd) .rk-ladder-name { grid-column: 1; text-align: right; padding-right: 12px; }
+    .rk-ladder-step:nth-child(even) .rk-ladder-name { grid-column: 3; text-align: left; padding-left: 12px; }
+    .rk-ladder-step:nth-child(odd).is-current .rk-ladder-name::after { margin-right: 0; margin-left: auto; }
+    .rk-ladder-step:nth-child(even).is-current .rk-ladder-name::after { margin-left: 0; margin-right: auto; }
+  }
+
+  /* =====================================================================
+     5 · CTA DE MISIONES
+     ===================================================================== */
   .rk-missions-cta {
-    --b: 20px; z-index: 2; width: min(720px, calc(100% - 3rem)); margin: 56px auto 80px; padding: 32px 28px; text-align: center;
+    --b: 20px; z-index: 2; width: min(720px, calc(100% - 3rem)); margin: 40px auto 72px; padding: 28px 28px; text-align: center;
     --fill:
-      radial-gradient(80% 90% at 50% 0%, rgba(234,196,111,.14), transparent 70%),
+      radial-gradient(80% 90% at 50% 0%, rgba(234,196,111,.12), transparent 70%),
       linear-gradient(118deg, rgba(255,255,255,.05) 0, transparent 26%),
       linear-gradient(180deg, #14243D, #101C30);
-    filter: drop-shadow(0 16px 30px rgba(234,196,111,.12));
+    filter: drop-shadow(0 16px 30px rgba(234,196,111,.10));
   }
-  .rk-missions-cta::before { --ec1: rgba(247,226,166,.75); --ec2: rgba(234,196,111,.22); }
-  .rk-missions-title { font-family: var(--rk-ff-display); font-weight: 900; font-size: 1.25rem; color: var(--rk-text); margin-bottom: 8px; }
-  .rk-missions-sub { color: var(--rk-text2); font-size: 15px; margin: 0 0 20px; }
+  .rk-missions-cta::before { --ec1: rgba(247,226,166,.7); --ec2: rgba(234,196,111,.2); }
+  .rk-missions-title { font-family: var(--rk-ff-display); font-weight: 900; font-size: 1.2rem; color: var(--rk-text); margin-bottom: 8px; }
+  .rk-missions-sub { color: var(--rk-text2); font-size: 15px; margin: 0 0 18px; }
   .rk-missions-btn {
     display: inline-flex; align-items: center; gap: 8px; font-family: var(--rk-ff-body); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
     color: #1A1405; background: linear-gradient(135deg, #F7E2A6, #EAC46F 55%, #C9A04A); padding: 13px 28px;
@@ -467,76 +635,12 @@
   .rk-missions-btn:hover { transform: translateY(-3px); filter: brightness(1.08); }
 
   @media (prefers-reduced-motion: reduce) {
-    .rk-bar-fill::after, .rk-profile-shell[data-state="loading"] { animation: none; }
-    .rk-plate::before, .rk-row, .rk-btn, .rk-missions-btn, .rk-ladder-badge, .rk-bar-fill { transition: none; }
+    .rk-bar-fill::after, .rk-top-1 .rk-top-stage::before, .rk-profile-shell[data-state="loading"] { animation: none; }
+    .rk-plate::before, .rk-ladder-step::before, .rk-row, .rk-btn, .rk-missions-btn, .rk-ladder-badge, .rk-bar-fill { transition: none; }
   }
   </style>
-
-  <!-- ================================================================
-       Tematica de Halloween — SOLO colores/decoración para esta página,
-       scopeada bajo "body.hw-halloween" (clase agregada únicamente al
-       <body> de este archivo) para no tocar v3-theme.css, style.css ni
-       ninguna otra página. No cambia ningún ID, ninguna estructura,
-       ningún script, ni los colores oro/plata/bronce del podio (son
-       información real de posición, no decoración). -->
-  <style>
-    body.hw-halloween{
-      background:
-        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
-        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%);
-      background-color:#0a0612;
-    }
-    body.hw-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
-    body.hw-halloween .v3-nav{
-      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
-      border-bottom:1px solid rgba(255,122,26,.28);
-    }
-    body.hw-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
-    body.hw-halloween .v3-page-links a{ color:#e7d7ff; }
-    body.hw-halloween .v3-page-links a:hover{ color:#ff9d3d; }
-    body.hw-halloween .rk-title{
-      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
-      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
-    }
-    body.hw-halloween .rk-missions-btn{ background:linear-gradient(135deg,#ff7a1a,#b043ff); color:#fff; }
-    body.hw-halloween .footer{ border-top:1px solid rgba(255,140,0,.18); }
-
-    /* ---- Decoraciones flotantes (puramente visuales) ---- */
-    .hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
-    .hw-decor span{ position:absolute; opacity:.5; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
-    .hw-decor .hw-bat{ font-size:22px; animation:hwFly 16s linear infinite; }
-    .hw-decor .hw-bat2{ font-size:16px; animation:hwFly 22s linear infinite reverse; opacity:.4; }
-    .hw-decor .hw-pumpkin{ font-size:26px; opacity:.5; animation:hwBob 6s ease-in-out infinite; }
-    .hw-decor .hw-ghost{ font-size:20px; opacity:.35; animation:hwBob 8s ease-in-out infinite; }
-    .hw-decor .hw-web{ font-size:34px; opacity:.28; }
-    @keyframes hwFly{
-      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
-      50%{ transform:translate(55vw,4vh) rotate(6deg); }
-      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
-    }
-    @keyframes hwBob{
-      0%,100%{ transform:translateY(0); }
-      50%{ transform:translateY(-10px); }
-    }
-    @media (max-width:700px){
-      .hw-decor .hw-pumpkin, .hw-decor .hw-ghost{ font-size:18px; }
-      .hw-decor .hw-web{ font-size:24px; }
-    }
-  </style>
 </head>
-<body class="hw-halloween">
-
-  <div class="hw-decor" aria-hidden="true">
-    <span class="hw-bat" style="top:8%;">🦇</span>
-    <span class="hw-bat2" style="top:22%;">🦇</span>
-    <span class="hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
-    <span class="hw-pumpkin" style="left:3%; top:14%;">🎃</span>
-    <span class="hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
-    <span class="hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
-    <span class="hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
-    <span class="hw-web" style="left:-4px; top:-4px;">🕸️</span>
-    <span class="hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
-  </div>
+<body>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -570,12 +674,12 @@
     </header>
 
     <!-- 1 · TU PERFIL COMPETITIVO
-         Panel horizontal único: rango (izq.), XP + progreso (centro) y
-         posición global (der.). #rkMyRank y #rkProgressSection siguen
-         mostrándose/ocultándose desde loadMyRank() exactamente igual que
-         antes; solo cambió dónde viven en la página. Todo sale tal cual de
-         my_rank_summary(). Sin sesión se muestra #rkGuest (sin datos
-         ficticios). -->
+         Panel horizontal único: escenario del rango (izq.), XP + progreso
+         (centro) y módulo de posición global (der.). #rkMyRank y
+         #rkProgressSection siguen mostrándose/ocultándose desde
+         loadMyRank() exactamente igual que antes; solo cambió dónde viven en
+         la página. Todo sale tal cual de my_rank_summary(). Sin sesión se
+         muestra #rkGuest (sin datos ficticios). -->
     <section class="rk-profile-section" data-reveal>
       <h2 class="rk-section-title"><span class="rk-line"></span><span class="rk-st-text">Tu perfil competitivo</span><span class="rk-line"></span></h2>
 
@@ -583,8 +687,10 @@
 
         <div class="rk-profile rk-plate" id="rkMyRank" hidden>
           <div class="rk-pf-zone rk-pf-left">
+            <div class="rk-pf-badgewrap">
+              <img id="rkMyBadge" class="rk-pf-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
+            </div>
             <div class="rk-pf-label">Rango actual</div>
-            <img id="rkMyBadge" class="rk-pf-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
             <div id="rkMyName" class="rk-pf-rank">—</div>
           </div>
 
@@ -613,9 +719,10 @@
             </div>
           </div>
 
-          <div class="rk-pf-zone rk-pf-right">
+          <div class="rk-pf-zone rk-pf-right rk-plate">
             <div class="rk-pf-label">Tu posición</div>
             <div id="rkMyPos" class="rk-pf-pos">—</div>
+            <div class="rk-pf-ticks" aria-hidden="true"></div>
           </div>
         </div>
 
@@ -660,7 +767,7 @@
       <!-- Tu posición — solo si hay sesión y ya existe posición, aunque no
            esté visible dentro de las filas cargadas arriba. -->
       <div class="rk-mypos rk-plate" id="rkMyPosCard" hidden>
-        <div>
+        <div class="rk-mypos-tab">
           <div class="rk-mypos-label">Tu posición</div>
           <div class="rk-mypos-pos" id="rkMyPosBig">—</div>
         </div>
@@ -747,6 +854,8 @@
     // RUTA DE RANGOS — construida una sola vez desde RANK_ORDER (estático,
     // sin llamada a Supabase). markLadderCurrent() solo compara ÍNDICES
     // dentro de esa lista (posición en el orden oficial), nunca XP.
+    // El índice también se expone como --i (solo para que el CSS dibuje la
+    // altura/tamaño creciente de la escalera): no es ningún cálculo de XP.
     // ===================================================================
     function buildLadder() {
       var el = document.getElementById('rkLadderRow');
@@ -756,7 +865,7 @@
         var name = ranks.rankName(code);
         var url = ranks.rankBadgeUrl(code);
         return (
-          '<div class="rk-ladder-step is-future" data-code="' + esc(code) + '" data-idx="' + i + '">' +
+          '<div class="rk-ladder-step is-future" data-code="' + esc(code) + '" data-idx="' + i + '" style="--i:' + i + '">' +
             (url ? '<img class="rk-ladder-badge" src="' + esc(url) + '" alt="" onerror="this.hidden=true;"/>' : '') +
             '<div class="rk-ladder-name">' + esc(name) + '</div>' +
           '</div>'
@@ -768,29 +877,24 @@
       var el = document.getElementById('rkLadderRow');
       if (!el) return;
       var idx = code ? RANK_ORDER.indexOf(code) : -1;
-      var currentStep = null;
       Array.prototype.forEach.call(el.querySelectorAll('.rk-ladder-step'), function (step) {
         var i = Number(step.getAttribute('data-idx'));
         step.classList.remove('is-current', 'is-done', 'is-future');
         step.removeAttribute('aria-current');
         if (idx < 0) { step.classList.add('is-future'); return; }
         if (i < idx) step.classList.add('is-done');
-        else if (i === idx) { step.classList.add('is-current'); step.setAttribute('aria-current', 'step'); currentStep = step; }
+        else if (i === idx) { step.classList.add('is-current'); step.setAttribute('aria-current', 'step'); }
         else step.classList.add('is-future');
       });
-      // Solo presentación: en pantallas donde la ruta hace scroll horizontal,
-      // deja el rango actual centrado dentro de la fila (sin mover la página).
-      if (currentStep && el.scrollWidth > el.clientWidth) {
-        el.scrollLeft = Math.max(0, currentStep.offsetLeft - (el.clientWidth - currentStep.offsetWidth) / 2);
-      }
     }
 
     // ===================================================================
     // LEADERBOARD — misma consulta de siempre a xp_leaderboard, ordenada por
     // xp desc, límite 50. Solo se divide visualmente top3 / resto usando
     // row.position (que ya viene resuelto de la vista): no se recalculan
-    // posiciones acá. Las clases extra del HTML generado (rk-plate,
-    // rk-row--elite, rk-row-ava) son únicamente de presentación.
+    // posiciones acá. Las clases/contenedores extra del HTML generado
+    // (rk-plate, rk-top-stage, rk-row--elite, rk-row-ava) son únicamente de
+    // presentación.
     // ===================================================================
     function rowParts(row) {
       var ranks = window.GeoArmyRanks;
@@ -815,8 +919,11 @@
         var pos = row.position;
         return (
           '<div class="rk-top-card rk-plate rk-top-' + esc(pos) + '">' +
-            '<div class="rk-top-medal"><span class="rk-top-hash">#</span>' + esc(pos) + '</div>' +
-            '<div class="rk-top-avawrap">' + p.avatar + p.flag + '</div>' +
+            '<div class="rk-top-stage" data-pos="' + esc(pos) + '">' +
+              '<span class="rk-top-crown" aria-hidden="true"></span>' +
+              '<div class="rk-top-avawrap">' + p.avatar + p.flag + '</div>' +
+              '<div class="rk-top-medal"><span class="rk-top-hash">#</span>' + esc(pos) + '</div>' +
+            '</div>' +
             p.badge +
             '<div class="rk-top-name">' + esc(row.display_name || 'Miembro') + '</div>' +
             '<div class="rk-top-rankname">' + p.rankNameTxt + '</div>' +
