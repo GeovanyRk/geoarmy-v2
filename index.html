@@ -697,7 +697,7 @@
       preview.onload = function () {
         if (!preview.naturalWidth) return;
         art.src = preview.src;
-        art.alt = 'El Taller de Santa: fábrica navideña con Santa dando la bienvenida';
+        art.alt = 'El Taller de Santa: fábrica navideña de juguetes';
         title.textContent = 'MUNDO 02 · EL TALLER DE SANTA';
         subtitle.textContent = 'Vista previa · Próximamente';
         world.classList.add('is-unlocked');
@@ -715,7 +715,12 @@
           link.removeAttribute('tabindex');
         });
       };
-      preview.src = new URL('assets/navidad/planeta-santa-720.webp', document.baseURI).href;
+      // Fase 1: usar el nuevo taller cuando esté disponible; conservar el anterior como respaldo.
+      preview.onerror = function () {
+        preview.onerror = null;
+        preview.src = new URL('assets/navidad/planeta-santa-720.webp', document.baseURI).href;
+      };
+      preview.src = new URL('assets/navidad/planeta-santa-fase-01.webp', document.baseURI).href;
     })();
   </script>
 
