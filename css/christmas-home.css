@@ -209,3 +209,48 @@
   .ga-xmas-garland .ga-gl-b { opacity: .8; }
   .ga-xmas-snow i { top: 0; }
 }
+
+/* V2 — Noche de invierno. Capa estacional intercambiable; no cambia el carrusel. */
+.ga-theme-christmas .v3-page {
+  background:
+    radial-gradient(ellipse 78% 65% at 50% -12%, #1c3b58 0%, #0b2035 42%, transparent 74%),
+    radial-gradient(ellipse 48% 60% at 0% 53%, rgba(18,76,70,.28), transparent 75%),
+    radial-gradient(ellipse 50% 52% at 100% 50%, rgba(28,68,102,.30), transparent 75%),
+    radial-gradient(ellipse 74% 25% at 50% 100%, rgba(97,156,185,.14), transparent 80%),
+    #050d18;
+}
+.ga-theme-christmas .v3-nebula { display: none; }
+.ga-xmas-corner { display: none; }
+.ga-theme-christmas .ga-xmas-corner {
+  display: block; position: absolute; width: min(390px, 25vw);
+  aspect-ratio: 420 / 220; pointer-events: none;
+  background-size: contain; background-repeat: no-repeat; opacity: .92;
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,.48));
+}
+.ga-xmas-corner--tl, .ga-xmas-corner--tr {
+  top: 0; background-image: url('../assets/navidad/esquina-superior.svg');
+}
+.ga-xmas-corner--bl, .ga-xmas-corner--br {
+  bottom: 0; background-image: url('../assets/navidad/esquina-inferior.svg');
+}
+.ga-xmas-corner--tl, .ga-xmas-corner--bl { left: 0; }
+.ga-xmas-corner--tr, .ga-xmas-corner--br { right: 0; transform: scaleX(-1); }
+.ga-theme-christmas .ga-gw-aura {
+  background:
+    radial-gradient(ellipse 32% 47% at 20% 50%, rgba(213,137,66,.23), transparent 73%),
+    radial-gradient(ellipse 34% 46% at 50% 50%, rgba(88,167,218,.23), transparent 76%),
+    radial-gradient(ellipse 28% 42% at 81% 48%, rgba(54,102,150,.16), transparent 75%),
+    radial-gradient(ellipse 55% 13% at 50% 0%, rgba(255,221,152,.12), transparent 80%);
+}
+@media (max-width: 1300px) {
+  .ga-theme-christmas .ga-gw-aura {
+    background:
+      radial-gradient(ellipse 78% 42% at 50% 50%, rgba(89,165,215,.23), transparent 76%),
+      radial-gradient(ellipse 80% 26% at 25% 85%, rgba(47,111,103,.17), transparent 75%);
+  }
+}
+@media (max-width: 760px) {
+  .ga-theme-christmas .ga-xmas-corner { width: min(180px, 31vw); opacity: .66; }
+  .ga-theme-christmas .ga-xmas-corner--tl,
+  .ga-theme-christmas .ga-xmas-corner--tr { opacity: .48; }
+}
