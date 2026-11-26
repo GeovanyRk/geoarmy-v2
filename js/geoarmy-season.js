@@ -198,7 +198,7 @@
     if (!source || !source.src) return;
     var base = source.src.replace(/js\/geoarmy-season\.js.*$/, '');
     var script = document.createElement('script');
-    script.src = base + 'js/navidad-perfiles-2026.js?v=3';
+    script.src = base + 'js/navidad-perfiles-2026.js?v=4';
     script.async = true;
     document.head.appendChild(script);
   } catch (e) { /* el adorno nunca debe impedir el uso de la página */ }
