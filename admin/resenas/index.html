@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Reseñas Fortnite — Geo Army</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(34,211,238,.07), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(124,58,237,.10), transparent 32%),
+        #090913;
+      color: #edf5ff;
+      font-family: 'Inter', sans-serif;
+    }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 18px 70px; }
+    .tag { color:#7ee7ff; font-size:11px; font-weight:900; letter-spacing:.16em; }
+    h1 { margin:.35rem 0 .3rem; font:900 1.8rem/1.1 'Space Grotesk',sans-serif; }
+    .sub { margin:0 0 24px; color:#9fb0c8; font-size:13px; line-height:1.55; }
+    .card, .review {
+      background:rgba(255,255,255,.035);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:15px;
+    }
+    .card { padding:20px; text-align:center; }
+    .review { padding:16px; margin-bottom:12px; }
+    .top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+    .user { display:flex; align-items:center; gap:10px; }
+    .avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; background:#181823; border:1px solid rgba(126,231,255,.28); }
+    .name { font-weight:800; font-size:14px; }
+    .login { color:#8191aa; font-size:11px; margin-top:2px; }
+    .badge { padding:5px 9px; border-radius:999px; font-size:10px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+    .pending { color:#7ee7ff; background:rgba(34,211,238,.10); border:1px solid rgba(34,211,238,.20); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0; }
+    .cell { color:#eaf2ff; font-size:12px; }
+    .cell span { display:block; color:#8191aa; font-size:10px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; }
+    .stars { color:#7ee7ff; letter-spacing:.08em; font-size:17px; }
+    .copy { margin:12px 0; color:#f3f7ff; font-size:13px; line-height:1.55; padding:12px; border-radius:10px; background:rgba(0,0,0,.16); }
+    .product { display:flex; align-items:center; gap:8px; color:#a9b8cf; font-size:12px; }
+    .product img { width:42px; height:42px; object-fit:contain; border-radius:9px; background:rgba(255,255,255,.04); }
+    .actions { display:flex; gap:9px; flex-wrap:wrap; margin-top:14px; }
+    button {
+      border:0; border-radius:10px; padding:9px 14px; color:#fff;
+      font-weight:800; cursor:pointer; font-family:inherit;
+    }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .approve { background:linear-gradient(135deg,#7c3aed,#22d3ee); }
+    .reject { background:#b94355; }
+    .refresh { background:rgba(255,255,255,.09); margin-bottom:16px; }
+    .empty { text-align:center; color:#8191aa; padding:38px 10px; }
+    .error { color:#ff8c96; font-size:12px; margin-top:9px; }
+    .notice { color:#a9b8cf; font-size:12px; margin-top:10px; }
+    .hidden { display:none !important; }
+  </style>
+  <script src="/geoarmy-v2/lib/supabase.min.js"></script>
+</head>
+<body>
+  <main class="wrap">
+    <div class="tag">GEO ARMY — PANEL INTERNO</div>
+    <h1>Reseñas Fortnite</h1>
+    <p class="sub">Aprueba o rechaza reseñas de usuarios con un canje Fortnite realmente entregado. Solo las aprobadas aparecen públicamente.</p>
+
+    <section id="loading" class="card">
+      <p>Verificando tu sesión…</p>
+    </section>
+
+    <section id="loggedOut" class="card hidden">
+      <p>Necesitas iniciar sesión con tu cuenta de Geo Army.</p>
+      <button id="loginBtn" class="approve">Continuar con Twitch</button>
+    </section>
+
+    <section id="forbidden" class="card hidden">
+      <p>Tu cuenta no tiene permisos de administrador.</p>
+    </section>
+
+    <section id="panel" class="hidden">
+      <button id="refreshBtn" class="refresh">↻ Actualizar</button>
+      <div id="list"></div>
+      <div id="listError" class="error"></div>
+    </section>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+
+    const SITE_BASE = '/';
+    let sb = null;
+
+    function show(id) {
+      ['loading','loggedOut','forbidden','panel'].forEach((x) => {
+        document.getElementById(x).classList.toggle('hidden', x !== id);
+      });
+    }
+
+    function esc(v) {
+      return String(v ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+    }
+
+    function stars(rating) {
+      const n = Math.max(1, Math.min(5, Number(rating) || 5));
+      return '★'.repeat(n) + '☆'.repeat(5 - n);
+    }
+
+    function fmtDate(v) {
+      if (!v) return '—';
+      try {
+        return new Date(v).toLocaleString('es', {
+          year:'numeric', month:'short', day:'2-digit',
+          hour:'2-digit', minute:'2-digit'
+        });
+      } catch {
+        return v;
+      }
+    }
+
+    async function moderate(reviewId, status, button, errEl) {
+      if (!confirm(status === 'approved' ? '¿Aprobar esta reseña?' : '¿Rechazar esta reseña?')) return;
+
+      const buttons = button.parentElement.querySelectorAll('button');
+      buttons.forEach((b) => b.disabled = true);
+      errEl.textContent = '';
+
+      try {
+        const res = await sb.rpc('admin_moderate_fortnite_review_v1', {
+          p_review_id: reviewId,
+          p_status: status
+        });
+
+        if (res.error) {
+          console.warn('[admin/reviews] error moderando', res.error);
+          errEl.textContent = 'No se pudo actualizar la reseña.';
+          buttons.forEach((b) => b.disabled = false);
+          return;
+        }
+
+        await loadReviews();
+      } catch (e) {
+        console.warn('[admin/reviews] excepción', e);
+        errEl.textContent = 'Error de conexión.';
+        buttons.forEach((b) => b.disabled = false);
+      }
+    }
+
+    function renderRow(row) {
+      const el = document.createElement('article');
+      el.className = 'review';
+
+      const avatar = row.avatar_url ? esc(row.avatar_url) : '/geoarmy-v2/logo.png';
+      const image = row.product_image ? esc(row.product_image) : '/geoarmy-v2/assets/store/fortnite-battle-pass.webp';
+
+      el.innerHTML = `
+        <div class="top">
+          <div class="user">
+            <img class="avatar" src="${avatar}" alt="" onerror="this.src='/geoarmy-v2/logo.png'">
+            <div>
+              <div class="name">${esc(row.display_name || row.twitch_login || 'Miembro')}</div>
+              <div class="login">${row.twitch_login ? '@' + esc(row.twitch_login) : ''}</div>
+            </div>
+          </div>
+          <span class="badge pending">Pendiente</span>
+        </div>
+
+        <div class="grid">
+          <div class="cell"><span>Calificación</span><div class="stars">${stars(row.rating)}</div></div>
+          <div class="cell"><span>Fecha</span>${esc(fmtDate(row.created_at))}</div>
+          <div class="cell"><span>Producto</span>${esc(row.product_name || 'Regalo Fortnite')}</div>
+        </div>
+
+        <div class="copy">“${esc(row.review_text || '')}”</div>
+
+        <div class="product">
+          <img src="${image}" alt="" onerror="this.src='/geoarmy-v2/assets/store/fortnite-battle-pass.webp'">
+          <div>
+            <strong>${esc(row.product_name || 'Regalo Fortnite')}</strong><br>
+            <span>✓ Canje verificado</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="approve" data-action="approved">Aprobar</button>
+          <button class="reject" data-action="rejected">Rechazar</button>
+        </div>
+        <div class="error"></div>
+      `;
+
+      const errEl = el.querySelector('.error');
+      el.querySelectorAll('[data-action]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          moderate(row.review_id, btn.dataset.action, btn, errEl);
+        });
+      });
+
+      return el;
+    }
+
+    async function loadReviews() {
+      const list = document.getElementById('list');
+      const err = document.getElementById('listError');
+      list.innerHTML = '<div class="empty">Cargando reseñas…</div>';
+      err.textContent = '';
+
+      try {
+        const res = await sb.rpc('admin_list_fortnite_reviews_v1', {
+          p_status: 'pending'
+        });
+
+        if (res.error) {
+          console.warn('[admin/reviews] error listando', res.error);
+          list.innerHTML = '';
+          err.textContent = 'No se pudieron cargar las reseñas.';
+          return;
+        }
+
+        const rows = res.data || [];
+
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">No hay reseñas pendientes por ahora.</div>';
+          return;
+        }
+
+        list.innerHTML = '';
+        rows.forEach((row) => list.appendChild(renderRow(row)));
+      } catch (e) {
+        console.warn('[admin/reviews] excepción listando', e);
+        list.innerHTML = '';
+        err.textContent = 'Error de conexión.';
+      }
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('No se pudo cargar ' + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await loadScript(SITE_BASE + 'js/geoarmy-config.js');
+
+        sb = window.supabase.createClient(
+          window.GEOARMY_SUPABASE_URL,
+          window.GEOARMY_SUPABASE_ANON_KEY
+        );
+
+        document.getElementById('loginBtn').addEventListener('click', () => {
+          try {
+            sessionStorage.setItem(
+              'geoarmy_return_to_v1',
+              window.location.pathname
+            );
+          } catch {}
+
+          sb.auth.signInWithOAuth({
+            provider: 'twitch',
+            options: {
+              redirectTo: window.location.origin + SITE_BASE + 'auth/callback/'
+            }
+          });
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', loadReviews);
+
+        const sessionRes = await sb.auth.getSession();
+        const session = sessionRes.data && sessionRes.data.session;
+
+        if (!session) {
+          show('loggedOut');
+          return;
+        }
+
+        const prof = await sb
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (prof.error || !prof.data || prof.data.role !== 'admin') {
+          show('forbidden');
+          return;
+        }
+
+        show('panel');
+        await loadReviews();
+
+        sb.auth.onAuthStateChange(async () => {
+          const s = await sb.auth.getSession();
+          if (!s.data.session) show('loggedOut');
+        });
+
+      } catch (e) {
+        console.warn('[admin/reviews] init error', e);
+        show('forbidden');
+      }
+    });
+  })();
+  </script>
+</body>
+</html>

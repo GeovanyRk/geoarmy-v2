@@ -1,0 +1,343 @@
+/* Mi Geo Army — Fase 1C: paneles premium (Billetera, Progreso y Cuenta). Solo presentación.
+ * Paleta Halloween espacial: negro / morado oscuro, naranja y dorado, acentos violeta. Sin azules.
+ * Todo va acotado por ID de panel; no se toca ningún ID, listener ni script. Los bloques que arma el JS
+ * original (#mgWalletGrid, #mgRequestsList) se estilizan solo por clases/estructura ya existentes.
+ * El ancho disponible se mide con container queries sobre cada panel (el carril lateral ocupa espacio
+ * en escritorio); sin soporte quedan las reglas base de una columna, que funcionan a cualquier ancho. */
+
+#mgtPanel-billetera, #mgtPanel-progreso, #mgtPanel-cuenta {
+  --p-orange: #ff7a2f;
+  --p-gold: #ffb84a;
+  --p-violet: #a54af0;
+  --p-purple: #9147ff;
+  --p-ink: #f4ecff;
+  --p-mute: #b9a6d6;
+  --p-line: rgba(255,184,74,.26);
+  --p-card: linear-gradient(160deg, rgba(40,19,56,.82), rgba(15,8,24,.9));
+  container-type: inline-size;
+  container-name: mgp;
+}
+#mgtPanel-billetera *, #mgtPanel-progreso *, #mgtPanel-cuenta * { box-sizing: border-box; }
+#mgtPanel-billetera [hidden], #mgtPanel-progreso [hidden], #mgtPanel-cuenta [hidden] { display: none !important; }
+
+/* Encabezados de sección comunes: medallón + línea que se desvanece */
+#mgtPanel-billetera .v3-now-header-sm,
+#mgtPanel-cuenta .v3-now-header-sm,
+#mgtPanel-progreso .mgt-prog-eyebrow {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 14px;
+  font-family: 'Orbitron', 'Rajdhani', system-ui, sans-serif; font-weight: 800; font-size: .78rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--p-gold);
+}
+#mgtPanel-billetera .v3-now-header-sm::after,
+#mgtPanel-progreso .mgt-prog-eyebrow::after {
+  content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,184,74,.4), transparent);
+}
+#mgtPanel-billetera .v3-now-header-sm .v3-now-ic,
+#mgtPanel-cuenta .v3-now-header-sm .v3-now-ic {
+  width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%; font-size: 14px; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, rgba(165,74,240,.45), rgba(40,19,56,.9)); border: 1px solid var(--p-line);
+}
+#mgtPanel-progreso .mgt-prog-eyebrow { margin-bottom: 0; }
+#mgtPanel-progreso .mgt-prog-eyebrow + .v3-xp-card { margin-top: 12px !important; }
+
+/* =====================================================================
+   BILLETERA
+   ===================================================================== */
+#mgtPanel-billetera .mgt-wal-top { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+#mgtPanel-billetera .mgt-wal-top > .v3-now-section {
+  margin: 0 !important; padding: 0 !important; max-width: none; display: flex; flex-direction: column; min-width: 0;
+}
+#mgtPanel-billetera .mgt-wallet-top { grid-template-columns: minmax(0, 1fr); flex: 1; }
+
+/* Héroe de saldo (G-Coins) */
+#mgtPanel-billetera #gcoins {
+  --ac: var(--p-gold);
+  position: relative; overflow: hidden; flex: 1;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "big" "sub" "btn";
+  align-content: center; row-gap: 6px; padding: 20px 20px 18px;
+  border: 1px solid rgba(255,184,74,.5); border-top: 1px solid rgba(255,184,74,.5); border-radius: 20px;
+  background:
+    radial-gradient(1.2px 1.2px at 88% 20%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,184,74,.6), transparent 60%),
+    radial-gradient(420px 220px at 0% 0%, rgba(255,184,74,.20), transparent 70%),
+    radial-gradient(380px 220px at 100% 100%, rgba(145,71,255,.22), transparent 70%),
+    linear-gradient(160deg, #26122f, #0f0818);
+  box-shadow: 0 0 0 1px rgba(145,71,255,.16), 0 14px 38px rgba(0,0,0,.45), 0 0 34px rgba(255,150,40,.12);
+}
+#mgtPanel-billetera #gcoins:hover { transform: none; }
+#mgtPanel-billetera #gcoins .v3-now-head { grid-area: head; border: 0; padding: 0 0 4px; color: var(--p-gold); font-size: .74rem; letter-spacing: .16em; }
+#mgtPanel-billetera #gcoins .v3-now-ic-img { width: 26px; height: 26px; filter: drop-shadow(0 0 8px rgba(255,184,74,.6)); }
+#mgtPanel-billetera #gcoins .v3-now-big {
+  grid-area: big; font-size: clamp(2.3rem, 11cqw, 3.5rem); color: #ffe3b0; line-height: 1.05;
+  text-shadow: 0 0 22px rgba(255,150,40,.45); overflow-wrap: anywhere;
+}
+#mgtPanel-billetera #gcoins .v3-now-big span { color: var(--p-gold); font-size: .42em; }
+#mgtPanel-billetera #gcoins .v3-now-sub { grid-area: sub; color: var(--p-mute); min-height: 0; }
+#mgtPanel-billetera #gcoins .v3-now-btn {
+  grid-area: btn; margin: 12px 0 0; justify-self: stretch; min-height: 44px; padding: 11px 18px;
+  display: inline-flex; align-items: center; justify-content: center; text-align: center; line-height: 1.2; letter-spacing: .02em;
+}
+
+/* Botones principales de esta pantalla (mismo lenguaje en G-Coins, recompensas y Tienda) */
+#mgtPanel-billetera .v3-now-btn, #mgtPanel-billetera .v3-x-connect-btn, #mgtPanel-cuenta .v3-x-connect-btn {
+  background: linear-gradient(135deg, var(--p-orange), var(--p-violet)) !important; color: #fff !important;
+  border: 0 !important; border-radius: 12px; font-weight: 800; box-shadow: 0 6px 20px rgba(255,110,20,.32);
+  text-decoration: none; cursor: pointer;
+}
+#mgtPanel-billetera .v3-now-btn:hover, #mgtPanel-billetera .v3-x-connect-btn:hover, #mgtPanel-cuenta .v3-x-connect-btn:hover { filter: brightness(1.12); }
+#mgtPanel-billetera .v3-now-btn:focus-visible, #mgtPanel-billetera .v3-x-connect-btn:focus-visible, #mgtPanel-cuenta .v3-x-connect-btn:focus-visible,
+#mgtPanel-cuenta #mgCountryBtn:focus-visible { outline: 2px solid var(--p-gold); outline-offset: 2px; }
+
+/* CTA de Tienda */
+#mgtPanel-billetera .mgt-wal-top .v3-x-card {
+  --ac: var(--p-gold);
+  flex: 1; flex-direction: column; align-items: stretch; justify-content: center; text-align: left; gap: 16px; padding: 20px;
+  border: 1px solid rgba(255,184,74,.5); border-radius: 20px;
+  background: radial-gradient(360px 200px at 100% 0%, rgba(255,122,47,.24), transparent 70%), radial-gradient(300px 200px at 0% 100%, rgba(145,71,255,.2), transparent 70%), linear-gradient(160deg, #2a1230, #120a18);
+  box-shadow: 0 14px 36px rgba(0,0,0,.4), 0 0 30px rgba(255,122,47,.14);
+}
+#mgtPanel-billetera .mgt-wal-top .v3-x-card-main { flex-direction: row; text-align: left; align-items: center; gap: 14px; }
+#mgtPanel-billetera .mgt-wal-top .v3-x-ic {
+  width: 54px; height: 54px; font-size: 24px; flex: 0 0 auto; background: radial-gradient(circle at 35% 30%, rgba(255,184,74,.35), rgba(40,19,56,.9));
+  border: 1px solid rgba(255,184,74,.5); box-shadow: 0 0 18px rgba(255,150,40,.3);
+}
+#mgtPanel-billetera .mgt-wal-top .v3-x-title { font-size: 1.05rem; color: var(--p-gold); }
+#mgtPanel-billetera .mgt-wal-top .v3-x-desc { color: var(--p-mute); max-width: none; }
+#mgtPanel-billetera .mgt-wal-top .v3-x-connect-btn {
+  width: 100%; justify-content: center; min-height: 46px; padding: 12px 18px; font-size: .8rem;
+}
+
+/* Mis recompensas: módulos compactos */
+#mgtPanel-billetera #mgWalletGrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+#mgtPanel-billetera #mgWalletGrid > .v3-table-empty { grid-column: 1 / -1; }
+#mgtPanel-billetera #mgWalletGrid .v3-now-card {
+  --ac: var(--p-violet);
+  position: relative; overflow: hidden; gap: 8px; padding: 14px 14px 14px;
+  border: 1px solid rgba(165,74,240,.42); border-top: 1px solid rgba(165,74,240,.42); border-radius: 16px;
+  background: radial-gradient(240px 120px at 100% 0%, color-mix(in srgb, var(--ac) 22%, transparent), transparent 70%), var(--p-card);
+  box-shadow: 0 10px 26px rgba(0,0,0,.35), 0 0 22px color-mix(in srgb, var(--ac) 16%, transparent);
+}
+#mgtPanel-billetera #mgWalletGrid .v3-now-card::before {
+  content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: var(--ac);
+  box-shadow: 0 0 10px var(--ac);
+}
+#mgtPanel-billetera #mgWalletGrid .v3-now-card.v3-c-gold { --ac: var(--p-gold); border-color: rgba(255,184,74,.5); }
+#mgtPanel-billetera #mgWalletGrid .v3-now-card.v3-c-blue { --ac: var(--p-orange); border-color: rgba(255,122,47,.5); }
+#mgtPanel-billetera #mgWalletGrid .v3-now-card.v3-c-purple { --ac: var(--p-violet); }
+#mgtPanel-billetera #mgWalletGrid .v3-now-card:hover { transform: translateY(-2px); }
+#mgtPanel-billetera #mgWalletGrid .v3-now-head {
+  gap: 8px; padding: 0; border: 0; font-size: .7rem; letter-spacing: .12em; color: var(--p-gold);
+}
+#mgtPanel-billetera #mgWalletGrid .v3-now-ic {
+  width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto; align-items: center; justify-content: center; font-size: 14px;
+  background: rgba(255,255,255,.06); border: 1px solid color-mix(in srgb, var(--ac) 60%, transparent);
+}
+#mgtPanel-billetera #mgWalletGrid .v3-now-ic-img { width: 16px; height: 16px; }
+#mgtPanel-billetera #mgWalletGrid .v3-now-big { font-size: clamp(1.05rem, 6.2cqw, 1.5rem); color: #fff1dc; overflow-wrap: anywhere; line-height: 1.15; }
+#mgtPanel-billetera #mgWalletGrid .v3-now-sub { color: var(--p-mute); font-size: 12px; min-height: 0; }
+#mgtPanel-billetera #mgWalletGrid .mg-redeem-btn {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 40px; margin: 6px 0 0; padding: 8px 10px;
+  font-size: .68rem; line-height: 1.2; text-align: center; white-space: normal; letter-spacing: .02em;
+}
+
+/* Mis solicitudes: historial compacto */
+#mgtPanel-billetera #misSolicitudes {
+  max-width: none; margin-top: 18px !important; margin-bottom: 0; padding: 18px 16px 16px; border-radius: 20px;
+  border: 1px solid var(--p-line); background: var(--p-card); box-shadow: 0 12px 30px rgba(0,0,0,.35);
+}
+#mgtPanel-billetera #misSolicitudes .v3-now-header-sm { margin-top: 0; }
+#mgtPanel-billetera #mgRequestsList { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+#mgtPanel-billetera #mgRequestsList .v3-table-card {
+  margin: 0 !important; padding: 11px 14px !important; border-radius: 12px; min-width: 0;
+  border: 1px solid rgba(255,255,255,.08); border-left: 3px solid var(--p-gold);
+  background: linear-gradient(160deg, rgba(60,28,78,.45), rgba(20,10,30,.6)); box-shadow: none;
+}
+#mgtPanel-billetera #mgRequestsList .v3-table-card > div { align-items: center; flex-wrap: nowrap !important; min-width: 0; }
+#mgtPanel-billetera #mgRequestsList .v3-table-card > div > div:first-child { min-width: 0; }
+#mgtPanel-billetera #mgRequestsList .v3-table-card > div > div:first-child > div:first-child { color: var(--p-ink); overflow-wrap: anywhere; }
+#mgtPanel-billetera #mgRequestsList .v3-now-sub { color: var(--p-mute); min-height: 0; }
+#mgtPanel-billetera #mgRequestsList .v3-table-card > div > div:last-child {
+  flex: 0 0 auto; padding: 3px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .03em;
+  color: #e9d8ff; background: rgba(145,71,255,.2); border: 1px solid rgba(165,74,240,.5);
+}
+/* Estados vacíos (cargando / sin datos / error) */
+#mgtPanel-billetera .v3-table-empty, #mgtPanel-billetera #misSolicitudes .v3-table-empty {
+  padding: 18px 14px; text-align: center; color: var(--p-mute); font-size: .88rem;
+  border: 1px dashed rgba(255,184,74,.3); border-radius: 12px; background: rgba(255,255,255,.02);
+}
+
+@container mgp (min-width: 300px) {
+  #mgtPanel-billetera #mgWalletGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container mgp (min-width: 520px) {
+  #mgtPanel-billetera #gcoins { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head head" "big btn" "sub btn"; column-gap: 20px; padding: 24px; }
+  #mgtPanel-billetera #gcoins .v3-now-btn { align-self: center; justify-self: end; margin: 0; }
+}
+@container mgp (min-width: 760px) {
+  #mgtPanel-billetera .mgt-wal-top { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+  #mgtPanel-billetera #gcoins { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "big" "sub" "btn"; }
+  #mgtPanel-billetera #gcoins .v3-now-btn { justify-self: start; margin-top: 14px; padding-left: 28px; padding-right: 28px; }
+  #mgtPanel-billetera #mgWalletGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@container mgp (min-width: 900px) {
+  #mgtPanel-billetera #gcoins { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head head" "big btn" "sub btn"; }
+  #mgtPanel-billetera #gcoins .v3-now-btn { justify-self: end; align-self: center; margin: 0; }
+  #mgtPanel-billetera #mgRequestsList { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* =====================================================================
+   PROGRESO — "Rango del jugador"
+   El marco exterior (.v3-xp-card) deja de dibujarse: queda un único escenario (.v3-xp-inner).
+   .v3-rank-right y .v3-rank-bottom-row pasan a display:contents solo para reordenar sus hijos en
+   la cuadrícula; no son controles ni tienen rol, y el estado oculto de cada hijo (atributo hidden)
+   se mantiene con la regla [hidden] de arriba.
+   ===================================================================== */
+#mgtPanel-progreso .v3-xp-card { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; max-width: none; }
+#mgtPanel-progreso .v3-xp-inner {
+  position: relative; overflow: hidden; padding: 22px 18px; border-radius: 22px;
+  border: 1px solid rgba(255,184,74,.4);
+  background:
+    radial-gradient(1.2px 1.2px at 10% 18%, rgba(255,255,255,.5), transparent 60%),
+    radial-gradient(1px 1px at 92% 14%, rgba(255,184,74,.6), transparent 60%),
+    radial-gradient(1.2px 1.2px at 80% 88%, rgba(255,255,255,.4), transparent 60%),
+    radial-gradient(520px 300px at 0% 0%, rgba(145,71,255,.28), transparent 70%),
+    radial-gradient(460px 280px at 100% 100%, rgba(255,122,47,.18), transparent 70%),
+    linear-gradient(160deg, #1d0e2b, #0d0716);
+  box-shadow: 0 0 0 1px rgba(145,71,255,.16), 0 16px 42px rgba(0,0,0,.45), 0 0 36px rgba(145,71,255,.14);
+}
+#mgtPanel-progreso .v3-rank-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: center; text-align: left;
+  grid-template-areas: "left" "prog" "next" "pos";
+}
+#mgtPanel-progreso .v3-rank-right, #mgtPanel-progreso .v3-rank-bottom-row { display: contents; }
+
+#mgtPanel-progreso .v3-rank-left { grid-area: left; position: relative; align-self: center; justify-self: center; min-width: 0; width: 100%; gap: 10px; padding: 6px 0; }
+#mgtPanel-progreso .v3-rank-left::before {
+  content: ""; position: absolute; left: 50%; top: 4px; width: min(260px, 90%); aspect-ratio: 1; transform: translateX(-50%);
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255,150,40,.34), rgba(165,74,240,.22) 45%, transparent 70%);
+}
+#mgtPanel-progreso .v3-rank-left > * { position: relative; }
+#mgtPanel-progreso .v3-rank-badge-big { width: clamp(150px, 46cqw, 210px); height: auto; aspect-ratio: 1; filter: drop-shadow(0 0 26px rgba(255,140,40,.5)) drop-shadow(0 0 16px rgba(145,71,255,.4)); }
+/* Sin insignia (sin datos o imagen que falla): anillo vacío en su lugar, sin icono roto */
+#mgtPanel-progreso .v3-rank-left:has(#rankBadgeBig[hidden])::after {
+  content: ""; width: 120px; height: 120px; border-radius: 50%; border: 2px dashed rgba(255,184,74,.4); order: -1; position: relative;
+}
+#mgtPanel-progreso .v3-rank-name-big {
+  font-size: clamp(1.35rem, 6cqw, 2rem); color: #ffe3b0; text-shadow: 0 0 20px rgba(255,150,40,.5); overflow-wrap: anywhere; line-height: 1.1;
+}
+#mgtPanel-progreso .v3-rank-xp-big {
+  padding: 5px 16px; border-radius: 999px; font-size: .95rem; color: #1a0d00; font-weight: 800;
+  background: linear-gradient(135deg, var(--p-gold), var(--p-orange)); box-shadow: 0 0 16px rgba(255,150,40,.35);
+}
+
+#mgtPanel-progreso #rankProgressBlock, #mgtPanel-progreso #rankMaxBlock { grid-area: prog; min-width: 0; }
+#mgtPanel-progreso .v3-rank-progress-title { color: var(--p-gold); font-size: .7rem; letter-spacing: .14em; margin-bottom: 8px; }
+#mgtPanel-progreso .v3-rank-progress-row { justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; align-items: baseline; }
+#mgtPanel-progreso .v3-rank-progress-text { color: var(--p-ink); font-size: .95rem; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+#mgtPanel-progreso .v3-rank-progress-pct { color: var(--p-gold); font-size: 1.5rem; font-weight: 900; text-shadow: 0 0 14px rgba(255,150,40,.45); }
+#mgtPanel-progreso .v3-xp-bar-bg { height: 16px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 1px 4px rgba(0,0,0,.6); }
+#mgtPanel-progreso .v3-xp-bar-fill {
+  border-radius: 999px; background: linear-gradient(90deg, var(--p-orange), var(--p-gold) 55%, var(--p-violet)); box-shadow: 0 0 16px rgba(255,150,40,.6);
+}
+#mgtPanel-progreso .v3-xp-note { color: var(--p-mute); font-size: .8rem; margin-top: 10px; overflow-wrap: anywhere; }
+#mgtPanel-progreso .v3-xp-note:empty { display: none; }
+#mgtPanel-progreso #rankMaxBlock { padding: 14px 16px; text-align: center; border-radius: 16px; border: 1px solid rgba(255,184,74,.5); background: radial-gradient(300px 100px at 50% 0%, rgba(255,184,74,.25), transparent 70%), rgba(255,255,255,.03); }
+#mgtPanel-progreso .v3-rank-max-title { color: var(--p-gold); font-size: 1.05rem; text-shadow: 0 0 18px rgba(255,184,74,.6); }
+
+#mgtPanel-progreso #rankNextWrap { grid-area: next; }
+#mgtPanel-progreso .v3-rank-position { grid-area: pos; }
+#mgtPanel-progreso .v3-rank-mini {
+  min-width: 0; padding: 14px 16px; text-align: left; border-radius: 16px;
+  border: 1px solid rgba(255,184,74,.28); background: linear-gradient(160deg, rgba(60,28,78,.5), rgba(18,9,28,.7));
+}
+#mgtPanel-progreso .v3-rank-mini-label { color: var(--p-gold); font-size: .66rem; letter-spacing: .14em; margin-bottom: 10px; }
+#mgtPanel-progreso .v3-rank-next-row { justify-content: flex-start; gap: 12px; min-width: 0; }
+#mgtPanel-progreso .v3-rank-next-row > div { min-width: 0; text-align: left; }
+#mgtPanel-progreso .v3-rank-next-badge { width: 48px; height: 48px; filter: drop-shadow(0 0 10px rgba(255,140,40,.4)); }
+#mgtPanel-progreso .v3-rank-next-name { color: #fff1dc; overflow-wrap: anywhere; font-size: .95rem; }
+#mgtPanel-progreso .v3-rank-next-xp, #mgtPanel-progreso .v3-rank-position-sub { color: var(--p-mute); }
+#mgtPanel-progreso .v3-rank-position-value { color: var(--p-gold); font-size: 1.9rem; text-shadow: 0 0 16px rgba(255,150,40,.4); overflow-wrap: anywhere; line-height: 1.1; }
+#mgtPanel-progreso .v3-rank-position-sub:empty { display: none; }
+
+@container mgp (min-width: 420px) {
+  #mgtPanel-progreso .v3-rank-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "left left" "prog prog" "next pos"; }
+  #mgtPanel-progreso .v3-rank-grid:has(#rankNextWrap[hidden]) { grid-template-areas: "left left" "prog prog" "pos pos"; }
+}
+@container mgp (min-width: 700px) {
+  #mgtPanel-progreso .v3-xp-inner { padding: 30px 30px; }
+  #mgtPanel-progreso .v3-rank-grid { grid-template-columns: minmax(230px, .8fr) repeat(2, minmax(0, 1fr)); grid-template-areas: "left prog prog" "left next pos"; gap: 18px 24px; }
+  #mgtPanel-progreso .v3-rank-grid:has(#rankNextWrap[hidden]) { grid-template-areas: "left prog prog" "left pos pos"; }
+  #mgtPanel-progreso .v3-rank-progress-pct { font-size: 1.9rem; }
+  #mgtPanel-progreso .v3-xp-bar-bg { height: 18px; }
+}
+
+/* =====================================================================
+   CUENTA
+   Tres módulos independientes; sin alturas forzadas (alineados arriba), así no hay espacios vacíos.
+   ===================================================================== */
+#mgtPanel-cuenta .mgt-acct-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+#mgtPanel-cuenta .mgt-acct-grid > .v3-now-section {
+  margin: 0 !important; padding: 18px 18px 18px !important; max-width: none; min-width: 0; position: relative; overflow: hidden;
+  border-radius: 20px; border: 1px solid var(--p-line);
+  background: radial-gradient(300px 160px at 100% 0%, rgba(145,71,255,.2), transparent 70%), var(--p-card);
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+}
+#mgtPanel-cuenta .mgt-acct-grid .v3-now-header-sm { margin: 0 0 14px; }
+#mgtPanel-cuenta .mgt-acct-grid .v3-x-card {
+  --ac: var(--p-gold);
+  display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 14px; text-align: left;
+  padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+#mgtPanel-cuenta .mgt-acct-grid .v3-x-card-main { flex-direction: row; align-items: center; text-align: left; gap: 14px; min-width: 0; }
+#mgtPanel-cuenta .mgt-acct-grid .v3-x-info { min-width: 0; flex: 1; }
+#mgtPanel-cuenta .mgt-acct-grid .v3-x-title { color: #fff1dc; font-size: 1.02rem; overflow-wrap: anywhere; }
+#mgtPanel-cuenta .mgt-acct-grid .v3-x-desc { color: var(--p-mute); max-width: none; }
+
+/* Twitch */
+#mgtPanel-cuenta .mgt-avatar {
+  width: 76px; height: 76px; border: 0; box-shadow: 0 0 0 3px #0d0716, 0 0 0 5px var(--p-orange), 0 0 18px rgba(255,122,47,.45), 0 0 26px rgba(145,71,255,.4);
+}
+/* País y bandera */
+#mgtPanel-cuenta .mgt-country .v3-x-card-main { align-items: center; }
+#mgtPanel-cuenta #mgNameFlag { width: 44px !important; height: auto !important; border-radius: 4px !important; flex: 0 0 auto; box-shadow: 0 0 0 1px rgba(255,255,255,.3), 0 0 14px rgba(165,74,240,.4) !important; }
+#mgtPanel-cuenta .mgt-country .v3-now-sub { margin: 0 !important; gap: 8px 10px !important; }
+#mgtPanel-cuenta #mgCountryName { color: #fff1dc; font-weight: 700; font-size: 1.02rem; overflow-wrap: anywhere; }
+#mgtPanel-cuenta #mgCountryBtn:not([hidden]) {
+  display: inline-flex !important; align-items: center; min-height: 36px;
+  padding: 8px 16px !important; font-size: 12px !important; font-weight: 800; color: #fff !important;
+  background: linear-gradient(135deg, var(--p-orange), var(--p-violet)) !important; box-shadow: 0 4px 14px rgba(255,110,20,.3);
+}
+#mgtPanel-cuenta #mgCountryMsg { font-size: 12px !important; }
+/* X */
+#mgtPanel-cuenta #cuentasVinculadas .v3-x-ic {
+  width: 50px; height: 50px; font-size: 21px; flex: 0 0 auto;
+  background: radial-gradient(circle at 35% 30%, rgba(165,74,240,.4), rgba(20,10,30,.95)); border: 1px solid var(--p-line); color: #fff;
+}
+#mgtPanel-cuenta #cuentasVinculadas .v3-x-connect-btn { width: 100%; justify-content: center; min-height: 44px; font-size: .78rem; }
+#mgtPanel-cuenta #cuentasVinculadas .v3-x-check { background: rgba(124,252,154,.14); color: #7CFC9A; }
+#mgtPanel-cuenta .v3-x-banner { background: rgba(255,255,255,.04); border-color: var(--p-line); border-left-color: var(--p-violet); border-radius: 12px; }
+#mgtPanel-cuenta .v3-x-banner-ok { border-left-color: #7CFC9A; }
+#mgtPanel-cuenta .v3-x-banner-warn { border-left-color: var(--p-gold); }
+#mgtPanel-cuenta .v3-x-banner-neutral { border-left-color: var(--p-violet); }
+
+@container mgp (min-width: 620px) {
+  #mgtPanel-cuenta .mgt-acct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #mgtPanel-cuenta .mgt-acct-grid > #cuentasVinculadas { grid-column: 1 / -1; }
+  #mgtPanel-cuenta #cuentasVinculadas .v3-x-card { flex-direction: row; align-items: center; justify-content: space-between; }
+  #mgtPanel-cuenta #cuentasVinculadas .v3-x-connect-btn { width: auto; min-width: 180px; }
+}
+@container mgp (min-width: 920px) {
+  #mgtPanel-cuenta .mgt-acct-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #mgtPanel-cuenta .mgt-acct-grid > #cuentasVinculadas { grid-column: auto; }
+  #mgtPanel-cuenta #cuentasVinculadas .v3-x-card { flex-direction: column; align-items: stretch; justify-content: flex-start; }
+  #mgtPanel-cuenta #cuentasVinculadas .v3-x-connect-btn { width: 100%; }
+}
+@container mgp (max-width: 340px) {
+  #mgtPanel-cuenta .mgt-avatar { width: 60px; height: 60px; }
+  #mgtPanel-cuenta #mgNameFlag { width: 36px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mgtPanel-billetera .v3-now-card, #mgtPanel-billetera .v3-now-btn, #mgtPanel-progreso .v3-xp-bar-fill { transition: none !important; }
+}

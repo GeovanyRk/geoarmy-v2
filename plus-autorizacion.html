@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- GEO ARMY Plus — página para que el BROADCASTER autorice su cuenta de Twitch (MODO SOMBRA: no enlazada desde ninguna otra página).
+     No muestra tokens, códigos ni URLs. Solo se usa mientras PLUS_AUTH_ENABLED está encendido (ver AUTORIZACION_TWITCH.md).
+     Usa la infraestructura que YA tiene el sitio, sin crear otra sesión: lib/supabase.min.js (copia fijada), js/geoarmy-config.js
+     (URL y clave PÚBLICAS del proyecto) y la sesión que supabase-js ya guarda en el navegador. Esta página solo LEE esa sesión.
+     NO carga js/geoarmy-account.js a propósito: ese archivo dibuja el widget de cuenta y activa la sincronización de perfil y los cosméticos.
+     Al publicarla va en la RAÍZ del sitio (junto a index.html; las rutas lib/ y js/ son relativas) y el script en js/. -->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Autorizar Twitch · GEO ARMY</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0b0d12; color: #e8eaf0; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+    main { max-width: 32rem; padding: 2rem; background: #151923; border-radius: 12px; }
+    button { font: inherit; padding: .7rem 1.2rem; border-radius: 8px; border: 0; background: #9146ff; color: #fff; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: progress; }
+    #plus-auth-message { margin-top: 1rem; min-height: 1.5rem; }
+    #plus-auth-message[data-tone="ok"] { color: #6ee7a1; }
+    #plus-auth-message[data-tone="warn"] { color: #fbd36b; }
+    #plus-auth-message[data-tone="error"] { color: #ff8b8b; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Autorizar cuenta de Twitch</h1>
+    <p>Solo la cuenta del broadcaster puede usar esta página. Twitch te pedirá confirmar la cuenta y un único permiso (leer suscripciones).</p>
+    <button id="plus-auth-start" type="button" disabled>Autorizar con Twitch</button>
+    <p id="plus-auth-message" role="status" aria-live="polite"></p>
+  </main>
+  <script src="lib/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <script src="js/geoarmy-plus-authorize.js?v=1"></script>
+  <script>GeoArmyPlusAuthorize.mount();</script>
+</body>
+</html>

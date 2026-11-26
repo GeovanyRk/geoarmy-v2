@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Streamer vs Viewer — La Arena · GeoArmy</title>
+  <meta name="description" content="Streamer vs Viewer V2: Geo contra la comunidad en un evento de Fortnite de tres horas. Marcador, reglamento, fila y historial."/>
+  <meta name="theme-color" content="#05030d"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,600;1,800;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Estilos compartidos del sitio (solo lectura; no se modifican): nav, widget de cuenta y modal de login. -->
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="../css/v3-theme.css"/>
+  <!-- Estilos propios de La Arena, todos bajo body.svv-page / .svv-* -->
+  <link rel="stylesheet" href="../css/svv-v4.css"/>
+  <!-- Google Analytics (mismo snippet que el resto del sitio) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VT78CC8X2V"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VT78CC8X2V');
+  </script>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch), igual que el resto de páginas -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../js/geoarmy-config.js"></script>
+</head>
+<body class="svv-page">
+  <!-- Filtro de rugosidad para el trazo de pincel del VS (solo decorativo) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="svv-rough" x="-12%" y="-12%" width="124%" height="124%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.028 0.11" numOctaves="3" seed="11" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+  </svg>
+  <a class="svv-skip" href="#svv-arena">Saltar al contenido</a>
+
+  <div class="v3-page">
+    <div class="v3-stars"></div>
+    <img src="../nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="../nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="../nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="../nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="../index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="../logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="../index.html#inicio">Inicio</a>
+          <a href="../comunidad.html">Comunidad</a>
+          <a href="../tienda.html">Tienda</a>
+          <a href="../puntos.html">Puntos</a>
+        </div>
+        <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="svv-main" id="svv-arena">
+
+      <!-- ============ A · HERO · MAIN EVENT ============ -->
+      <section class="svv-hero" aria-labelledby="svv-title">
+        <div class="svv-hero__stage" aria-hidden="true">
+          <div class="svv-hero__wedge svv-hero__wedge--geo"></div>
+          <div class="svv-hero__wedge svv-hero__wedge--viewer"></div>
+          <div class="svv-hero__lines svv-hero__lines--geo"></div>
+          <div class="svv-hero__lines svv-hero__lines--viewer"></div>
+          <div class="svv-hero__seam"></div>
+          <div class="svv-hero__floor"></div>
+        </div>
+
+        <div class="svv-hero__inner">
+          <p class="svv-eyebrow">Geo Army · Fortnite · La Arena</p>
+
+          <h1 class="svv-title" id="svv-title">
+            <span class="svv-title__geo">
+              <span class="svv-word__fill">Streamer</span>
+              <span class="svv-word__echo" aria-hidden="true">Streamer</span>
+            </span>
+            <span class="svv-title__vs" role="img" aria-label="contra">
+              <svg class="svv-vs__brush" viewBox="0 0 260 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="svv-brush-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#ff7a1a"/><stop offset=".48" stop-color="#ff5a1f"/>
+                    <stop offset=".52" stop-color="#7f35f5"/><stop offset="1" stop-color="#9a57ff"/>
+                  </linearGradient>
+                </defs>
+                <g filter="url(#svv-rough)">
+                  <path d="M74 12 L252 2 L224 284 L20 298 Z" fill="url(#svv-brush-grad)"/>
+                  <path d="M240 40 L258 36 L254 70 L238 72 Z M8 214 L26 208 L30 246 L10 250 Z" fill="url(#svv-brush-grad)" opacity=".85"/>
+                </g>
+                <path d="M158 6 L142 292" stroke="#fff3df" stroke-width="3" opacity=".9" fill="none"/>
+              </svg>
+              <span class="svv-vs__txt"><i class="svv-vs__v">V</i><i class="svv-vs__s">S</i></span>
+            </span>
+            <span class="svv-title__viewer">
+              <span class="svv-word__fill">Viewer</span>
+              <span class="svv-word__echo" aria-hidden="true">Viewer</span>
+            </span>
+          </h1>
+          <p class="svv-lede">Tres horas. Geo contra la comunidad. Cada kill cuenta.</p>
+
+          <div class="svv-console" role="group" aria-label="Estado del evento">
+            <div class="svv-clock" id="svv-clock" data-phase="none">
+              <span class="svv-clock__label" id="svv-clock-label">Duración de la edición</span>
+              <span class="svv-clock__time" id="svv-clock-text">3:00:00</span>
+              <svg class="svv-clock__bar" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                <line class="svv-clock__track" x1="0" y1="2" x2="100" y2="2"/>
+                <line class="svv-clock__fill" id="svv-clock-ring" x1="0" y1="2" x2="100" y2="2" pathLength="100"/>
+              </svg>
+            </div>
+
+            <div class="svv-console__info">
+              <div class="svv-status" id="svv-status" data-state="loading" role="status" aria-live="polite">
+                <span class="svv-status__dot" aria-hidden="true"></span>
+                <span id="svv-status-text">Conectando con la Arena…</span>
+              </div>
+              <dl class="svv-facts">
+                <div><dt>Edición</dt><dd id="svv-edition">—</dd></div>
+                <div><dt>Inicio</dt><dd id="svv-start-info">—</dd></div>
+                <div><dt>Formato</dt><dd>Fortnite · Dúos, Tríos y Squad</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <a class="svv-scroll" href="#svv-score">Ver marcador <span aria-hidden="true">↓</span></a>
+        </div>
+      </section>
+
+      <!-- ============ B · MARCADOR GLOBAL ============ -->
+      <section class="svv-score" id="svv-score" data-state="loading" aria-labelledby="svv-score-h">
+        <h2 class="svv-h2" id="svv-score-h">Marcador global</h2>
+
+        <div class="svv-banner" id="svv-score-banner" role="status" aria-live="polite" hidden></div>
+
+        <div class="svv-versus">
+          <div class="svv-side svv-side--geo">
+            <p class="svv-side__tag">GEO <b>×2</b></p>
+            <p class="svv-side__num" id="svv-geo-points" aria-label="Puntos de Geo">—</p>
+            <p class="svv-side__sub"><span id="svv-geo-kills">—</span> kills · cada una vale 2</p>
+          </div>
+
+          <div class="svv-core" aria-hidden="true"><span>VS</span></div>
+
+          <div class="svv-side svv-side--viewer">
+            <p class="svv-side__tag">VIEWERS <b>×1</b></p>
+            <p class="svv-side__num" id="svv-viewer-points" aria-label="Puntos de los viewers">—</p>
+            <p class="svv-side__sub"><span id="svv-viewer-kills">—</span> kills · cada una vale 1</p>
+          </div>
+        </div>
+
+        <div class="svv-bar" id="svv-bar" role="img" aria-label="Sin puntos todavía">
+          <div class="svv-bar__geo" id="svv-bar-geo"></div>
+          <div class="svv-bar__viewer"></div>
+          <div class="svv-bar__marker" id="svv-bar-marker"></div>
+          <div class="svv-bar__ticks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <p class="svv-bar__legend"><span>Geo</span><span id="svv-score-note">Marcador sin resultados</span><span>Comunidad</span></p>
+
+        <div class="svv-match" id="svv-match" hidden>
+          <p class="svv-match__head"><span class="svv-live-dot" aria-hidden="true"></span> Partida en curso <b id="svv-match-mode"></b></p>
+          <ul class="svv-match__players" id="svv-match-players"></ul>
+        </div>
+        <p class="svv-counts" id="svv-counts" hidden></p>
+      </section>
+
+      <!-- ============ C · REGISTRO / REGLAMENTO ============ -->
+      <section class="svv-protocol" id="svv-registro" aria-labelledby="svv-protocol-h">
+        <h2 class="svv-h2" id="svv-protocol-h">Registro y reglamento</h2>
+        <div class="svv-protocol__grid">
+          <ol class="svv-format" aria-label="Resumen del formato V2">
+            <li><b>3 h</b><span>Una edición dura tres horas.</span></li>
+            <li><b>×2 / ×1</b><span>Cada kill de Geo vale 2 puntos; cada kill de un viewer vale 1.</span></li>
+            <li><b>1–3</b><span>Geo juega con 1, 2 o 3 viewers por partida: Dúos, Tríos o Squad.</span></li>
+            <li><b>2</b><span>Hasta dos partidas por turno, con fila automática en la web.</span></li>
+            <li><b>Oficial</b><span>Eres participante oficial con al menos una partida válida. Si abandonas a mitad de partida, las kills que ya hiciste siguen contando para la comunidad.</span></li>
+          </ol>
+
+          <div class="svv-rules" id="svv-rules" data-state="loading">
+            <header class="svv-rules__head">
+              <h3 id="svv-rules-title">Reglamento</h3>
+              <span class="svv-rules__ver" id="svv-rules-version" hidden></span>
+            </header>
+            <div class="svv-rules__body" id="svv-rules-body" tabindex="0" aria-label="Texto del reglamento">
+              <p class="svv-muted">Cargando reglamento…</p>
+            </div>
+            <p class="svv-rules__hash" id="svv-rules-hash" hidden></p>
+            <div class="svv-rules__actions">
+              <button type="button" class="svv-btn svv-btn--accept" id="svv-btn-accept" disabled aria-disabled="true" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12l5 5 9-10"/></svg> Aceptar
+              </button>
+              <button type="button" class="svv-btn svv-btn--reject" id="svv-btn-reject" disabled aria-disabled="true" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg> Rechazar
+              </button>
+            </div>
+            <p class="svv-soon svv-note" id="svv-rules-note" data-kind="info" aria-live="polite"><span class="svv-lock" aria-hidden="true"></span><span id="svv-rules-note-text">Cargando tu estado…</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ D · FILA · PRÓXIMO SQUAD ============ -->
+      <section class="svv-queue" id="svv-fila" aria-labelledby="svv-queue-h">
+        <h2 class="svv-h2" id="svv-queue-h">Próximo squad</h2>
+
+        <!-- 6A-8 · Tu participación: llamado, lobby, oportunidades, kills y acciones del viewer (todo desde Supabase) -->
+        <div class="svv-me" id="svv-me" data-state="loading" data-kind="none" aria-labelledby="svv-me-h">
+          <header class="svv-me__head">
+            <h3 class="svv-h3" id="svv-me-h">Tu participación</h3>
+            <span class="svv-me__pill" id="svv-me-pill">Cargando…</span>
+          </header>
+          <p class="svv-me__msg" id="svv-me-msg" role="status" aria-live="polite">Cargando tu estado…</p>
+
+          <div class="svv-call" id="svv-call" hidden>
+            <p class="svv-call__title">Geo te llamó</p>
+            <p class="svv-call__time" id="svv-call-time" aria-hidden="true">2:00</p>
+            <div class="svv-call__bar" aria-hidden="true"><i id="svv-call-fill"></i></div>
+            <p class="svv-muted" id="svv-call-note">Confirma antes de que termine el plazo (lo decide Supabase).</p>
+            <button type="button" class="svv-btn svv-btn--join" id="svv-btn-confirm" disabled aria-disabled="true">Confirmar llamado</button>
+          </div>
+
+          <div class="svv-lobby" id="svv-lobby" hidden>
+            <p class="svv-lobby__title" id="svv-lobby-title">Lobby</p>
+            <p class="svv-lobby__time" id="svv-lobby-time" aria-hidden="true">3:00</p>
+            <p class="svv-muted" id="svv-lobby-text"></p>
+          </div>
+
+          <dl class="svv-opps" id="svv-opps" hidden aria-label="Tus oportunidades de partida">
+            <div><dt>Consumidas</dt><dd id="svv-op-consumed">0</dd></div>
+            <div><dt>Reservadas</dt><dd id="svv-op-reserved">0</dd></div>
+            <div><dt>Disponibles</dt><dd id="svv-op-remaining">0</dd></div>
+            <div><dt>Máximo</dt><dd id="svv-op-max">0</dd></div>
+          </dl>
+          <p class="svv-muted svv-opps__legend" id="svv-opps-legend" hidden><b>Consumida</b>: el Battle Bus ya comenzó contigo presente. <b>Reservada</b>: partida abierta que todavía no comenzó. <b>Disponibles</b>: lo que aún puedes jugar descontando las reservadas.</p>
+
+          <dl class="svv-mine" id="svv-mine" hidden aria-label="Tus kills y puntos">
+            <div><dt>Tus kills</dt><dd id="svv-mine-kills">0</dd></div>
+            <div><dt>Tus puntos</dt><dd id="svv-mine-points">0</dd></div>
+            <div id="svv-mine-match-box" hidden><dt>Kills en esta partida</dt><dd id="svv-mine-match">0</dd></div>
+          </dl>
+
+          <div class="svv-me__actions">
+            <button type="button" class="svv-btn svv-btn--ghost" id="svv-btn-login-me" hidden>Iniciar sesión con Twitch</button>
+            <button type="button" class="svv-btn svv-btn--ghost" id="svv-btn-me-retry" hidden>Reintentar</button>
+            <button type="button" class="svv-btn svv-btn--ghost" id="svv-btn-leave" hidden>Salir de la fila</button>
+            <span class="svv-leave-confirm" id="svv-leave-confirm" hidden>
+              <span>¿Salir de la fila? Si vuelves a entrar, quedarás al final.</span>
+              <button type="button" class="svv-btn svv-btn--reject" id="svv-btn-leave-yes">Sí, salir</button>
+              <button type="button" class="svv-btn svv-btn--ghost" id="svv-btn-leave-no">Cancelar</button>
+            </span>
+          </div>
+          <p class="svv-note" id="svv-me-feedback" data-kind="info" role="status" aria-live="polite" hidden></p>
+        </div>
+        <div class="svv-queue__grid">
+          <div class="svv-arena-seats">
+            <h3 class="svv-h3">En la arena</h3>
+            <ul class="svv-seats" id="svv-seats" aria-live="polite"></ul>
+            <p class="svv-muted" id="svv-seats-note"></p>
+            <p class="svv-muted svv-seats-legend">Los puntos de cada turno indican partidas consumidas; el punto tenue, una reservada.</p>
+          </div>
+
+          <div class="svv-waiting">
+            <h3 class="svv-h3">En espera <span class="svv-pill" id="svv-waiting-count">0</span></h3>
+            <ol class="svv-ladder" id="svv-waiting-list" aria-live="polite"></ol>
+            <p class="svv-muted" id="svv-waiting-note"></p>
+            <div class="svv-join">
+              <button type="button" class="svv-btn svv-btn--join" id="svv-btn-join" disabled aria-disabled="true">Unirme a la fila</button>
+              <p class="svv-soon svv-note" id="svv-join-note-box" data-kind="info" aria-live="polite"><span class="svv-lock" aria-hidden="true"></span><span id="svv-join-note">Cargando tu estado…</span></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ E · FICHA DEL COMBATIENTE ============ -->
+      <section class="svv-fighter" id="svv-ficha" data-state="loading" aria-labelledby="svv-fighter-h">
+        <h2 class="svv-h2" id="svv-fighter-h">Ficha del combatiente</h2>
+
+        <div class="svv-fighter__locked" id="svv-fighter-locked" hidden>
+          <div class="svv-fighter__ghost" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="svv-fighter__lockbody">
+            <span class="svv-lock svv-lock--big" aria-hidden="true"></span>
+            <p class="svv-fighter__lock-title">Ficha bloqueada</p>
+            <p class="svv-muted" id="svv-fighter-locked-msg">Inicia sesión con Twitch para ver tus partidas, kills y posición.</p>
+            <button type="button" class="svv-btn svv-btn--ghost" id="svv-fighter-login">Iniciar sesión con Twitch</button>
+          </div>
+        </div>
+
+        <div class="svv-fighter__sheet" id="svv-fighter-sheet" hidden>
+          <div class="svv-id">
+            <div class="svv-id__hex" aria-hidden="true"><span id="svv-id-initial">V</span></div>
+            <p class="svv-id__name" id="svv-id-name">—</p>
+            <p class="svv-id__badge" id="svv-id-badge" data-kind="none">—</p>
+            <p class="svv-id__rules" id="svv-id-rules"></p>
+          </div>
+          <dl class="svv-dials">
+            <div><dt>Partidas</dt><dd id="svv-st-matches">—</dd></div>
+            <div><dt>Kills</dt><dd id="svv-st-kills">—</dd></div>
+            <div><dt>Puntos</dt><dd id="svv-st-points">—</dd></div>
+            <div><dt>Posición</dt><dd id="svv-st-pos">—</dd></div>
+          </dl>
+          <div class="svv-past" id="svv-past" hidden>
+            <h3 class="svv-h3">Tus ediciones anteriores</h3>
+            <ul id="svv-past-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ F · COMODINES / ARSENAL ============ -->
+      <section class="svv-arsenal" id="svv-arsenal" aria-labelledby="svv-arsenal-h">
+        <h2 class="svv-h2" id="svv-arsenal-h">Arsenal</h2>
+        <p class="svv-arsenal__lede">Un solo comodín para jugar con ventaja. Así funciona.</p>
+        <ul class="svv-rack svv-rack--one">
+          <li class="svv-pw svv-pw--shield" id="svv-shield" data-state="soon">
+            <div class="svv-pw__top">
+              <span class="svv-pw__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 2.5 4.5 5.5v6c0 4.6 3.1 8.2 7.5 10 4.4-1.8 7.5-5.4 7.5-10v-6L12 2.5Z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></svg></span>
+              <span class="svv-pw__soon" id="svv-shield-badge">Próximamente</span>
+            </div>
+            <h3 class="svv-pw__name">Escudo</h3>
+            <p class="svv-pw__desc">Si Geo gana, te protege de perder 1,000 V-Bucks de tu billetera interna. Si ganan los Viewers, recibes tu premio normalmente.</p>
+            <p class="svv-pw__note" id="svv-shield-note" role="status" aria-live="polite">Se compra antes de tu primera partida. Máximo 1 por edición, no se transfiere y solo vale en esa edición.</p>
+            <p class="svv-pw__price"><b>2,000</b> G-Coins</p>
+            <div class="svv-pw__act" id="svv-shield-act" hidden>
+              <button type="button" class="svv-btn svv-btn--join" id="svv-btn-shield">Comprar Escudo</button>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ============ G · PREMIOS Y DEUDAS (solo texto: lo decide y lo aplica el servidor) ============ -->
+      <section class="svv-stakes" id="svv-stakes" aria-labelledby="svv-stakes-h">
+        <h2 class="svv-h2" id="svv-stakes-h">Qué se juega cada participante</h2>
+        <ul class="svv-stakes__list">
+          <li class="svv-stakes__row" data-kind="win"><b>Victoria de los Viewers</b><span>+1,000 V-Bucks para cada participante oficial.</span></li>
+          <li class="svv-stakes__row" data-kind="loss"><b>Victoria de Geo</b><span>−1,000 V-Bucks para cada participante oficial sin Escudo.</span></li>
+          <li class="svv-stakes__row" data-kind="shield"><b>Con Escudo válido</b><span>No se aplica la penalización.</span></li>
+          <li class="svv-stakes__row" data-kind="debt"><b>Si quedas con deuda</b><span>Persiste entre ediciones y se compensa con tus próximas recompensas de V-Bucks. La ves en <a href="../mi-geoarmy.html#mgWalletGrid">Mi Geo Army → Mis recompensas</a>.</span></li>
+        </ul>
+        <p class="svv-stakes__note" id="svv-stakes-note" role="status" aria-live="polite">Los montos los confirma y aplica el servidor cuando Geo cierra el resultado y los pagos de la edición están habilitados; esta página no descuenta nada.</p>
+      </section>
+
+      <!-- ============ G · HISTORIAL · BATALLAS ANTERIORES ============ -->
+      <section class="svv-history" id="svv-historial" aria-labelledby="svv-history-h">
+        <h2 class="svv-h2" id="svv-history-h">Batallas anteriores <small>Ediciones pasadas</small></h2>
+        <ol class="svv-timeline" id="svv-history-list" aria-live="polite"></ol>
+        <p class="svv-muted" id="svv-history-note">Cargando historial…</p>
+        <button type="button" class="svv-btn svv-btn--ghost" id="svv-history-more" hidden>Ver más ediciones</button>
+        <!-- Marcador histórico fijo (4 ediciones anteriores a V2). Es texto estático: no depende de Supabase ni de svv_get_history. -->
+        <div class="svv-legacy" id="svv-legacy" role="group" aria-labelledby="svv-legacy-h">
+          <h3 class="svv-legacy__title" id="svv-legacy-h">Antes de V2 <small>4 ediciones históricas</small></h3>
+          <div class="svv-legacy__score">
+            <div class="svv-legacy__side" data-side="viewer"><span class="svv-legacy__num">3</span><span class="svv-legacy__tag">Viewers</span><span class="svv-legacy__lbl">victorias</span></div>
+            <span class="svv-legacy__vs" aria-hidden="true">VS</span>
+            <div class="svv-legacy__side" data-side="geo"><span class="svv-legacy__num">1</span><span class="svv-legacy__tag">Geo</span><span class="svv-legacy__lbl">victoria</span></div>
+          </div>
+          <p class="svv-legacy__meta">Marcador histórico de las ediciones anteriores a Streamer vs Viewer V2.</p>
+        </div>
+      </section>
+
+      <footer class="svv-foot">
+        <p>Streamer vs Viewer V2 · Geo Army. El reglamento oficial de cada edición prevalece sobre cualquier resumen de esta página.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- 6A-8 · barra fija del llamado (se muestra solo mientras tienes un llamado vigente) -->
+  <div class="svv-callbar" id="svv-callbar" role="status" aria-live="polite" hidden>
+    <span class="svv-callbar__txt">Geo te llamó · <b id="svv-callbar-time">2:00</b></span>
+    <button type="button" class="svv-btn svv-btn--join" id="svv-btn-confirm2">Confirmar</button>
+  </div>
+
+  <script src="../js/geoarmy-account.js"></script>
+  <script src="../js/svv-v4.js"></script>
+</body>
+</html>

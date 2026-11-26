@@ -1,0 +1,137 @@
+/* =====================================================================
+   GEO ARMY · APARIENCIA «PLUS ESMERALDA»   (css/cosmetics/plus-emerald.css, v4)
+   ESTILOS PROPIOS de esta apariencia (id plus_emerald). SOLO PRESENTACIÓN. Maqueta visual: Geo Army Plus.
+   Lo carga js/geoarmy-cosmetics.js únicamente cuando algún elemento usa esta apariencia (definición en js/geoarmy-cosmetics-catalog.js).
+   La estructura común (marco, hueco de la barra, tamaños base de la foto por espacio, texto para lectores) vive en css/geoarmy-cosmetics.css.
+   Todo cuelga de la clase propia .gcos-plus: sin ella no hace efecto.
+   El MARCO es la imagen aprobada por Geo (assets/cosmetics/plus-emerald/frame.png, 768 px; mismo dibujo que el original de 1254 px): aro esmeralda con su
+   placa «PLUS» INCLUIDA y el centro transparente, así que la foto real se ve dentro. No hay placa HTML aparte (el catálogo declara badge: null).
+   Medidas de la imagen (sobre 1254 px): hueco circular de radio 437,5 centrado en (621, 625,5); placa de x 315–935 e y 985–1204.
+   ===================================================================== */
+
+/* El centro del hueco de la imagen queda 6 px a la izquierda del centro del lienzo: se compensa para que el hueco quede exactamente sobre la foto. */
+.gcos-plus .gcos-frame { margin-left: calc(var(--d) * (var(--gcos-fh) + .0067)); }
+
+/* =====================================================================
+   1) BARRA SUPERIOR
+   ===================================================================== */
+.ga-logged-in.gcos-plus {
+  border-color: #17c47e;
+  background-image: linear-gradient(90deg, rgba(20, 200, 125, .24), rgba(20, 200, 125, 0) 46%), linear-gradient(180deg, rgba(60, 240, 160, .09), rgba(60, 240, 160, 0));
+  box-shadow: 0 0 0 1px rgba(60, 240, 160, .26), 0 0 16px rgba(25, 217, 139, .42), inset 0 0 12px rgba(20, 190, 120, .2);
+}
+.ga-logged-in.gcos-plus:hover { border-color: #5cffb8; }
+
+/* =====================================================================
+   2) RANKING
+   ===================================================================== */
+/* 11–50: fila compacta */
+.rk-row.gcos-plus:not(.rk-row--elite) {
+  position: relative; min-height: 54px; background-color: #09130f;
+  background-image: linear-gradient(90deg, rgba(20, 200, 125, .15), rgba(20, 200, 125, .04) 45%, rgba(20, 200, 125, 0) 70%);
+  box-shadow: inset 0 1px 0 rgba(60, 240, 160, .5), inset 0 -1px 0 rgba(60, 240, 160, .5), inset 3px 0 0 #19d98b;
+}
+.rk-row.gcos-plus:not(.rk-row--elite):hover { background-color: #0d1c15; }
+.rk-row.gcos-plus:not(.rk-row--elite)::after {              /* acento diagonal esmeralda */
+  content: ""; position: absolute; top: 0; bottom: 0; right: 17%; width: 19%; pointer-events: none; z-index: 0;
+  background: linear-gradient(90deg, rgba(25, 217, 139, 0), rgba(25, 217, 139, .26) 55%, rgba(125, 255, 198, .45));
+  clip-path: polygon(34% 0, 100% 0, 66% 100%, 0 100%);
+}
+.rk-row.gcos-plus:not(.rk-row--elite)::before {
+  content: ""; position: absolute; top: 0; bottom: 0; right: 10%; width: 11%; pointer-events: none; z-index: 0;
+  background: linear-gradient(90deg, rgba(25, 217, 139, 0), rgba(25, 217, 139, .16));
+  clip-path: polygon(40% 0, 100% 0, 60% 100%, 0 100%);
+}
+.rk-row.gcos-plus > * { position: relative; z-index: 1; }
+.rk-row.gcos-plus .rk-row-ava { margin: 0 12px 0 8px; }
+.rk-row.gcos-plus .rk-flag { right: -12px; bottom: 9px; }   /* sobre la foto, por encima de la placa PLUS de la imagen (que ocupa el borde inferior) */
+
+/* 4–10: placa metálica teñida (con sus propias variables --edge / --fill) */
+.rk-row--elite.gcos-plus {
+  --edge: linear-gradient(135deg, #8dffd0, #0c7a52 46%, #4af0ad);
+  --fill:
+    linear-gradient(128deg, transparent 0 66%, rgba(60, 240, 160, .5) 66.3%, rgba(60, 240, 160, .1) 67.5%, rgba(20, 190, 120, .26) 70%, rgba(25, 217, 139, .38) 78%, rgba(20, 190, 120, 0) 78.4%, transparent 82%),
+    linear-gradient(128deg, transparent 0 82%, rgba(25, 217, 139, .18) 82.3%, rgba(25, 217, 139, 0) 86%),
+    linear-gradient(90deg, #0d2a1e, #09190f 38%, #06100b);
+  background-image: none; box-shadow: none; margin-top: 5px;
+}
+.rk-row--elite.gcos-plus:hover { --edge: linear-gradient(135deg, #c4ffe5, #25d68f 46%, #8dffd0); }
+.rk-row--elite.gcos-plus .rk-row-ava { margin: 0 18px 0 10px; }
+.rk-row--elite.gcos-plus .rk-row-ava .gcos-frame { --d: 46px; }   /* = diámetro real de la foto en 4–10 (escritorio): el hueco de la imagen coincide con la foto */
+.rk-row--elite.gcos-plus .rk-flag { right: -14px; bottom: 12px; }
+.rk-row--elite.gcos-plus .rk-row-pos { background: linear-gradient(180deg, #ffffff, #9dffd2 60%, #2fbf85); -webkit-background-clip: text; background-clip: text; }
+
+/* 1–3: el marco esmeralda SUSTITUYE al aro metálico y a las marcas finas del puesto (nada gris dentro del marco Plus).
+   La placa «PLUS» de la imagen cuelga bajo la foto (de 0,40 a 0,65 diámetros bajo el centro de la foto): la figura gana altura por abajo
+   y la placa del puesto «#N» baja debajo de ella (queda en su posición por defecto, bottom: 2px), así no se tapan. */
+.rk-top-card.gcos-plus .rk-top-avawrap::before,
+.rk-top-card.gcos-plus .rk-top-avawrap::after { display: none; }
+.rk-top-card.gcos-plus .rk-top-fig { padding-bottom: 46px; }
+.rk-top-1.gcos-plus .rk-top-fig { padding-top: 74px; padding-bottom: 68px; }   /* arriba: sitio para la corona de posición, por encima del marco */
+@media (max-width: 560px) {
+  .rk-top-card.gcos-plus .rk-top-fig { padding-bottom: 36px; }
+  .rk-top-1.gcos-plus .rk-top-fig { padding-top: 62px; padding-bottom: 50px; }
+}
+
+/* =====================================================================
+   3) TARJETA DE IDENTIDAD  (.mgt-id de css/mi-geoarmy-identity.css)
+   ===================================================================== */
+.mgt-id.gcos-plus {
+  --id-frame-a: #19d98b; --id-frame-b: #7dffc6;
+  --id-mute: #a9c9ba;
+  border-color: #17c47e;
+  background:
+    linear-gradient(120deg, transparent 0 56%, rgba(25, 217, 139, .0) 56%, rgba(25, 217, 139, .18) 62%, rgba(125, 255, 198, .08) 69%, transparent 69.3%),
+    radial-gradient(520px 260px at 0% 0%, rgba(20, 200, 125, .30), transparent 70%),
+    radial-gradient(1.2px 1.2px at 12% 18%, rgba(255, 255, 255, .55), transparent 60%),
+    radial-gradient(1px 1px at 86% 12%, rgba(150, 255, 205, .65), transparent 60%),
+    radial-gradient(1.2px 1.2px at 70% 82%, rgba(255, 255, 255, .4), transparent 60%),
+    radial-gradient(460px 240px at 100% 100%, rgba(15, 160, 100, .26), transparent 70%),
+    linear-gradient(160deg, #0b2a1e 0%, #04110b 100%);
+  box-shadow: 0 0 0 1px rgba(60, 240, 160, .34), 0 14px 40px rgba(0, 0, 0, .45), 0 0 28px rgba(25, 217, 139, .36), inset 0 0 34px rgba(20, 190, 120, .16);
+}
+.mgt-id.gcos-plus > *:not(.gcb-canvas) { position: relative; z-index: 1; }   /* :not(.gcb-canvas): el lienzo de confeti del cumpleaños debe seguir siendo absoluto */
+.mgt-id.gcos-plus:not(.mgt-id--bday)::before {             /* banda diagonal luminosa */
+  content: ""; position: absolute; top: 0; bottom: 0; right: 12%; width: 20%; pointer-events: none; z-index: 0;
+  background: linear-gradient(180deg, rgba(25, 217, 139, .30), rgba(25, 217, 139, .05) 60%, rgba(25, 217, 139, 0));
+  clip-path: polygon(46% 0, 100% 0, 54% 100%, 0 100%);
+}
+.mgt-id.gcos-plus:not(.mgt-id--bday)::after {              /* filete superior */
+  content: ""; position: absolute; left: 14px; right: 14px; top: 0; height: 2px; pointer-events: none; z-index: 2;
+  background: linear-gradient(90deg, transparent, rgba(210, 255, 236, .85) 30%, rgba(60, 240, 160, .95) 60%, transparent);
+}
+/* El marco Plus sustituye al anillo propio de la tarjeta; la foto real llena el hueco del marco */
+.mgt-id.gcos-plus .mgt-id-ring { padding: 0; background: #06150f; box-shadow: none; overflow: visible; }
+.mgt-id.gcos-plus .mgt-id-ring::before { display: none; }
+.mgt-id.gcos-plus .mgt-id-img { inset: 0; width: 100%; height: 100%; }
+.mgt-id.gcos-plus .mgt-id-badge { right: calc(var(--id-avatar) * -.2); bottom: calc(var(--id-avatar) * .12); z-index: 2; }
+/* hueco para que el marco y su placa PLUS no se recorten con el borde de la tarjeta */
+.mgt-id.gcos-plus .mgt-id-who {
+  padding: calc(var(--id-avatar) * .2) 0 calc(var(--id-avatar) * .34) calc(var(--id-avatar) * .2);
+  gap: calc(var(--id-avatar) * .2 + 8px);
+}
+.mgt-id.gcos-plus .mgt-id-name { text-shadow: 0 0 18px rgba(25, 217, 139, .45); }
+.mgt-id.gcos-plus .mgt-id-progress { border-color: rgba(60, 240, 160, .30); background: rgba(3, 14, 9, .6); }
+.mgt-id.gcos-plus .mgt-id-fill { background: linear-gradient(90deg, #ff7a2f, #ffb84a 55%, #7dffc6); }
+.mgt-id.gcos-plus .mgt-stat { border-color: rgba(60, 240, 160, .30); background: linear-gradient(180deg, rgba(14, 50, 36, .75), rgba(6, 22, 15, .75)); }
+.mgt-id.gcos-plus .mgt-stat-2 { border-color: rgba(60, 240, 160, .22); background: rgba(4, 18, 12, .55); }
+.mgt-id.gcos-plus .mgt-link { border-color: rgba(60, 240, 160, .45); background: rgba(25, 217, 139, .12); }
+.mgt-id.gcos-plus .mgt-link:hover { background: rgba(25, 217, 139, .22); border-color: rgba(125, 255, 198, .7); }
+/* (sin brillo animado extra: la imagen aprobada ya trae su propio resplandor y no se le añade nada encima) */
+/* Tarjeta estrecha (≤ 420 px): la identidad se apila (aro arriba, nombre y rango debajo, centrados) para que el nombre nunca se quede sin espacio. */
+@container (max-width: 420px) {
+  .mgt-id.gcos-plus .mgt-id-who { flex-direction: column; align-items: center; text-align: center; gap: calc(var(--id-avatar) * .2); padding: calc(var(--id-avatar) * .2) 0 calc(var(--id-avatar) * .42) 0; }
+  .mgt-id.gcos-plus .mgt-id-text { width: 100%; flex: 0 0 auto; }
+  .mgt-id.gcos-plus .mgt-id-name { justify-content: center; }
+  .mgt-id.gcos-plus .mgt-id-name > span:first-child { max-width: 100%; }
+  .mgt-id.gcos-plus .mgt-id-meta { justify-content: center; }
+}
+
+/* ---------- Filas Plus en móvil (≤ 440 px) — complementa la sección 0 de la base común ---------- */
+@media (max-width: 440px) {
+  .rk-row.gcos-plus:not(.rk-row--elite) .rk-row-ava { margin: 0 6px 0 5px; }
+  .rk-row.gcos-plus .rk-flag { right: -9px; }
+  .rk-row--elite.gcos-plus .rk-row-ava { margin: 0 5px 0 5px; }
+  .rk-row--elite.gcos-plus .rk-row-ava .gcos-frame { --d: 38px; }   /* = diámetro real de la foto en 4–10 (móvil) */
+  .rk-row--elite.gcos-plus .rk-flag { right: -10px; }
+}

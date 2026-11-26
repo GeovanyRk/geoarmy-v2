@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Control de la ruleta · Geo Army</title>
+  <style>
+    :root { color-scheme:dark; font:16px/1.5 system-ui,sans-serif; background:#101014; color:#faf5e8; }
+    body { max-width:44rem; margin:3rem auto; padding:0 1rem; }
+    button { font:inherit; border:1px solid #dfbf6e; border-radius:.5rem; padding:.55rem 1rem; background:#231e14; color:#ffe5a3; cursor:pointer; }
+    li { margin-block:.75rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+    ul { padding:0; } [hidden] { display:none; }
+  </style>
+</head>
+<body>
+  <h1>Control de la ruleta</h1>
+  <p id="estado-control" role="status">Comprobando sesión…</p>
+  <button id="entrar-control" hidden>Iniciar sesión con Twitch</button>
+  <button id="actualizar-control" hidden>Actualizar cola</button>
+  <ul id="cola-control" aria-label="Canjes listos para girar"></ul>
+  <script src="lib/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script src="js/ruleta-subs-control.js"></script>
+</body>
+</html>

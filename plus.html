@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Geo Army Plus — GeoArmy</title>
+  <meta name="description" content="Zona exclusiva para suscriptores de Geo Army Plus: misiones y recompensas."/>
+  <meta name="robots" content="noindex"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Mi Geo Army: cuentas (Supabase Auth + Twitch) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <!-- Página Plus: estilos propios, todo bajo ".pl". No toca style.css, v3-theme.css ni Misiones. -->
+  <link rel="stylesheet" href="css/plus-page.css?v=1"/>
+</head>
+<body>
+  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+  <div class="v3-page" style="min-height:100vh;">
+    <div class="v3-stars"></div>
+    <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
+    <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
+    <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
+    <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
+
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="misiones.html">Misiones</a>
+          <a href="puntos.html">Puntos</a>
+        </div>
+        <div class="v3-auth"><div id="geoAccountWidget"></div></div>
+      </div>
+    </nav>
+
+    <main class="pl" id="plRoot" data-state="loading">
+      <div class="pl-wrap">
+        <header class="pl-hero">
+          <span class="pl-eyebrow">◆ Zona exclusiva</span>
+          <h1 class="pl-title">GEO ARMY PLUS</h1>
+          <p class="pl-sub">Misiones y recompensas para quienes apoyan el canal con una suscripción activa de Twitch.</p>
+          <span class="pl-chip" id="plChip" role="status" aria-live="polite">Comprobando…</span>
+        </header>
+
+        <div class="pl-skel" id="plSkel" aria-hidden="true"></div>
+
+        <!-- Estados SIN datos de cuenta: texto fijo. Con Plus vigente el servidor entrega los datos y se muestra #plMain. -->
+        <section class="pl-card pl-gate" id="plGateAnon" hidden>
+          <h2 class="pl-h2">Inicia sesión para entrar</h2>
+          <p class="pl-p">Entra con tu cuenta de Twitch para comprobar si tienes Geo Army Plus.</p>
+          <div class="pl-gate-actions"><button type="button" class="pl-btn pl-btn--primary" id="plLogin">Iniciar sesión con Twitch</button></div>
+        </section>
+        <section class="pl-card pl-gate" id="plGateNoPlus" hidden>
+          <h2 class="pl-h2">Esta zona es para suscriptores de Twitch</h2>
+          <p class="pl-p">Geo Army Plus se activa con una suscripción activa al canal de Geo. Aún no vemos una suscripción vigente en tu cuenta.</p>
+          <ul class="pl-perks">
+            <li>Misión diaria de 10 G-Coins con solo entrar</li>
+            <li>Misiones semanales de Twitch con G-Coins</li>
+            <li>Apariencia esmeralda en tu perfil y en el ranking</li>
+          </ul>
+          <div class="pl-gate-actions"><a class="pl-btn pl-btn--primary" id="plSubscribe" href="https://www.twitch.tv/subs/geovannyrk" target="_blank" rel="noopener">Suscribirme en Twitch</a>
+            <button type="button" class="pl-btn" data-retry>Ya me suscribí: comprobar de nuevo</button></div>
+          <p class="pl-m-sub" style="margin-top:12px">Si te suscribes ahora, puede tardar unos minutos en reconocerse.</p>
+        </section>
+        <section class="pl-card pl-gate" id="plGateUnverified" hidden>
+          <h2 class="pl-h2">No pudimos confirmar tu suscripción</h2>
+          <p class="pl-p">Ahora mismo no podemos comprobar tu suscripción con Twitch. Si eres suscriptor, no has perdido nada: vuelve a entrar con tu cuenta de Twitch o inténtalo de nuevo en unos minutos.</p>
+          <div class="pl-gate-actions"><button type="button" class="pl-btn pl-btn--primary" data-retry>Comprobar de nuevo</button></div>
+        </section>
+        <section class="pl-card pl-gate" id="plGateUnknown" hidden>
+          <h2 class="pl-h2">No pudimos cargar tu estado</h2>
+          <p class="pl-p">Hubo un problema de conexión. Esto no significa que hayas perdido Plus. Inténtalo otra vez.</p>
+          <div class="pl-gate-actions"><button type="button" class="pl-btn pl-btn--primary" data-retry>Reintentar</button></div>
+        </section>
+        <section class="pl-card pl-gate" id="plGateOff" hidden>
+          <h2 class="pl-h2">Muy pronto</h2>
+          <p class="pl-p">Estamos preparando esta zona. Vuelve en unos días.</p>
+        </section>
+
+        <!-- CONTENIDO CON PLUS VIGENTE (se pinta solo con la respuesta del servidor) -->
+        <div id="plMain" hidden>
+          <div class="pl-card pl-m" id="plStale" hidden style="border-color:rgba(255,184,74,.5)">
+            <p class="pl-m-status is-warn">No pudimos actualizar los datos. Mostramos lo último que vimos.</p>
+            <div><button type="button" class="pl-btn" data-retry>Actualizar</button></div>
+          </div>
+
+          <div class="pl-sec">Piñatas Plus</div>
+          <section class="pl-card pl-m" aria-labelledby="plPinatasTitle">
+            <div class="pl-m-top">
+              <div class="pl-m-ico" aria-hidden="true"><img src="icons/pinata-fortnite.png" alt="" style="width:34px;height:34px;object-fit:contain"/></div>
+              <div class="pl-m-body">
+                <h2 class="pl-m-title" id="plPinatasTitle">Rompe las piñatas</h2>
+                <p class="pl-m-desc">Juega las piñatas de Fortnite y Overwatch. Tienes 5 intentos gratis al día en cada una.</p>
+              </div>
+            </div>
+            <div><a class="pl-btn pl-btn--primary" href="pinatas.html">Ir a las piñatas</a></div>
+          </section>
+
+          <div class="pl-sec">Misión diaria</div>
+          <!-- Misión diaria Plus (G-Coins). Se reclama SOLA al entrar a cualquier página (js/geoarmy-plus-daily.js); esta tarjeta solo muestra su estado. -->
+          <section class="pl-card pl-m" id="plDaily" data-state="idle" hidden aria-labelledby="plDailyTitle">
+            <div class="pl-m-top">
+              <div class="pl-m-ico" aria-hidden="true"><img src="gcoin-icon.png" alt="" width="28" height="28" onerror="this.hidden=true"/></div>
+              <div class="pl-m-body">
+                <h2 class="pl-m-title" id="plDailyTitle">Entrar a Geo Army <span class="pl-badge">Diaria</span></h2>
+                <p class="pl-m-desc">Entra con tu sesión iniciada y recibe 10 G-Coins una vez al día. Se acredita sola. Se reinicia a medianoche, hora de Nueva York.</p>
+              </div>
+            </div>
+            <p class="pl-m-status" id="plDailyStatus" role="status" aria-live="polite"></p>
+            <p class="pl-m-sub" id="plDailySub"></p>
+            <div><button type="button" class="pl-btn" id="plDailyRetry" hidden>Reintentar</button></div>
+          </section>
+
+          <div class="pl-sec">Misiones semanales</div>
+          <div class="pl-card pl-prev pl-m" id="plPrev" hidden>
+            <h2 class="pl-h2">Tienes una recompensa de la semana pasada</h2>
+            <div id="plPrevList"></div>
+            <p class="pl-m-sub" id="plPrevUntil"></p>
+          </div>
+          <p class="pl-m-status is-good" id="plClaimMsg" role="status" aria-live="polite" style="margin:0 2px 10px"></p>
+          <div class="pl-grid">
+            <section class="pl-card pl-m" id="plChat" data-status="disabled" aria-labelledby="plChatTitle">
+              <div class="pl-m-top">
+                <div class="pl-m-ico" aria-hidden="true">💬</div>
+                <div class="pl-m-body">
+                  <h2 class="pl-m-title" id="plChatTitle">Charla con la comunidad <span class="pl-badge" id="plChatBadge">—</span></h2>
+                  <p class="pl-m-desc">Envía 500 mensajes válidos en el chat de Twitch durante la semana.</p>
+                </div>
+              </div>
+              <div class="pl-reward">Recompensa: <img src="gcoin-icon.png" alt="" onerror="this.hidden=true"/> <span id="plChatReward">250</span> G-Coins</div>
+              <div class="pl-bar" id="plChatBarWrap" hidden><i id="plChatBar"></i></div>
+              <div class="pl-bar-row" id="plChatRow" hidden><span id="plChatCount"></span><span id="plChatPct"></span></div>
+              <p class="pl-m-status" id="plChatStatus"></p>
+              <p class="pl-m-sub" id="plChatSub"></p>
+              <div><button type="button" class="pl-btn pl-btn--primary" id="plChatBtn" hidden></button></div>
+            </section>
+            <section class="pl-card pl-m" id="plRedeem" data-status="disabled" aria-labelledby="plRedeemTitle">
+              <div class="pl-m-top">
+                <div class="pl-m-ico" aria-hidden="true">🎁</div>
+                <div class="pl-m-body">
+                  <h2 class="pl-m-title" id="plRedeemTitle">Ruletas del canal <span class="pl-badge" id="plRedeemBadge">—</span></h2>
+                  <p class="pl-m-desc">Gasta 5,000 puntos de canal en las ruletas de Fortnite y Overwatch durante la semana (las dos suman a la misma meta).</p>
+                </div>
+              </div>
+              <div class="pl-reward">Recompensa: <img src="gcoin-icon.png" alt="" onerror="this.hidden=true"/> <span id="plRedeemReward">200</span> G-Coins</div>
+              <div class="pl-bar" id="plRedeemBarWrap" hidden><i id="plRedeemBar"></i></div>
+              <div class="pl-bar-row" id="plRedeemRow" hidden><span id="plRedeemCount"></span><span id="plRedeemPct"></span></div>
+              <p class="pl-m-status" id="plRedeemStatus"></p>
+              <p class="pl-m-sub" id="plRedeemSub"></p>
+              <div><button type="button" class="pl-btn pl-btn--primary" id="plRedeemBtn" hidden></button></div>
+            </section>
+          </div>
+
+          <div class="pl-sec">Cómo cuenta cada misión</div>
+          <section class="pl-card pl-rules">
+            <details>
+              <summary>Mensajes de chat</summary>
+              <ul>
+                <li>Cuentan los mensajes que escribes con tu cuenta de Twitch vinculada a Geo Army.</li>
+                <li>Solo cuentan mientras el canal está en directo.</li>
+                <li>No cuentan los comandos que empiezan con «!», excepto <code>!speak</code> si lleva un mensaje válido. Los mensajes necesitan al menos 3 caracteres; en <code>!speak</code> solo se mide el texto después del comando.</li>
+                <li>Cuenta como máximo un mensaje cada 10 segundos, y no cuenta repetir el mismo mensaje seguido.</li>
+                <li>Hay un máximo de 150 mensajes contados por día.</li>
+              </ul>
+            </details>
+            <details>
+              <summary>Ruletas del canal (puntos de canal)</summary>
+              <ul>
+                <li>Solo cuentan los puntos que gastes en la recompensa «Ruleta de Fortnite» y en la «Ruleta de Overwatch». Las dos suman a la misma meta de 5,000 puntos.</li>
+                <li>No cuenta la recompensa que da G-Coins ni ninguna otra recompensa del canal.</li>
+                <li>Cuentan los canjes que ya figuran como cumplidos. Los que aún están pendientes se muestran como «en espera» y suman cuando se cumplen.</li>
+                <li>Si un canje se cancela, Twitch te devuelve los puntos y ese canje no cuenta.</li>
+              </ul>
+            </details>
+            <details>
+              <summary>Semana y plazo para reclamar</summary>
+              <ul>
+                <li>La semana va de lunes 00:00 a domingo 23:59, hora de Nueva York.</li>
+                <li>Cada misión se cobra una vez por semana.</li>
+                <li>Si terminas una misión al final de la semana, tienes 48 horas de gracia después del reinicio para reclamarla. Pasado ese plazo se pierde.</li>
+                <li>Necesitas Plus activo en el momento de reclamar.</li>
+              </ul>
+            </details>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-logo"><img src="logo.png" alt="GeoArmy" class="footer-logo-img"/>GeoArmy</div>
+        <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+        <div class="footer-code">geovanyrk.github.io</div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-ranks.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script src="js/geoarmy-plus-page.js?v=1"></script>
+</body>
+</html>

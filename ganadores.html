@@ -23,24 +23,43 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/geoarmy-config.js"></script>
   <link rel="stylesheet" href="css/v3-theme.css"/>
-  <link rel="stylesheet" href="css/ganadores.css"/>
+  <link rel="stylesheet" href="css/ganadores.css?v=20261121-fotos-historial"/>
+  <link rel="preload" as="image" href="assets/ganadores/salon-fondo.webp" type="image/webp" media="(min-width: 701px)">
+  <link rel="preload" as="image" href="assets/ganadores/salon-fondo-movil.webp" type="image/webp" media="(max-width: 700px)">
 </head>
-<body>
+<body class="gw-body">
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
+  <!-- Iconos del Salón (sprite local, solo decorativos) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="gw-ic-avatar" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4.2"/><path d="M3.8 22c.6-4.6 3.9-7.2 8.2-7.2s7.6 2.6 8.2 7.2z"/></symbol>
+    <symbol id="gw-ic-crown" viewBox="0 0 48 32"><path d="M3 9l10 8 11-14 11 14 10-8-4 21H7L3 9z"/><circle cx="3" cy="8" r="2.4"/><circle cx="24" cy="3" r="2.4"/><circle cx="45" cy="8" r="2.4"/></symbol>
+    <symbol id="gw-ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 21c0-4.2 3.6-6.6 8-6.6s8 2.4 8 6.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="gw-ic-gift" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8.5a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V12M12 8v13"/><path d="M12 8C10.6 4.6 6.6 4.4 6.6 6.6S9.6 8 12 8zm0 0c1.4-3.4 5.4-3.6 5.4-1.4S14.4 8 12 8z"/></g></symbol>
+    <symbol id="gw-ic-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3 3 8l9 5 9-5-9-5z"/><path d="m3 12.5 9 5 9-5M3 16.5l9 5 9-5"/></g></symbol>
+    <symbol id="gw-ic-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2.2"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+    <symbol id="gw-ic-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.8"/><path d="m20 20-3.9-3.9"/></g></symbol>
+  </svg>
+
   <!-- Shell visual V2 compartido (mismo que tienda.html/ranking.html/
-       comunidad.html): fondo espacial/nebulosas/nav. Envuelve solo nav +
-       hero; el resto de la página (podio/historial) vive fuera, igual
-       que en esas páginas. -->
-  <div class="v3-page">
+       comunidad.html): fondo espacial/nebulosas/nav. En esta página
+       envuelve nav + encabezado + podio + historial, para que el fondo
+       sea una sola escena continua (el modificador .gw-page, definido
+       solo en css/ganadores.css, adapta los colores a "Salón de la Fama"
+       sin tocar css/v3-theme.css). -->
+  <div class="v3-page gw-page">
     <div class="v3-stars"></div>
     <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
     <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
     <img src="nebula-bl.webp" alt="" class="v3-nebula v3-nebula-bl"/>
     <img src="nebula-br.webp" alt="" class="v3-nebula v3-nebula-br"/>
 
-    <!-- NAV -->
+    <!-- ESCENA: el fondo ilustrado (assets/ganadores/salon-fondo*.webp) vive en
+         .gw-stage::before y cubre nav + encabezado + podio. -->
+    <div class="gw-stage">
+
+    <!-- NAV (la navegación existente, sin rutas nuevas) -->
     <nav class="v3-nav">
       <div class="v3-nav-inner">
         <a href="index.html" class="v3-logo">
@@ -55,66 +74,102 @@
 
     <!-- HERO -->
     <section class="gw-hero">
-      <div class="gw-hero-bg" aria-hidden="true"><div class="gw-hero-grid"></div></div>
       <div class="gw-hero-inner" data-reveal>
         <a href="index.html#inicio" class="gw-back">← Volver al mapa</a>
         <div class="gw-eyebrow">✦ Salón de Ganadores ✦</div>
-        <h1 class="gw-title">Salón de Ganadores</h1>
+        <div class="gw-title-row">
+          <span class="gw-laurel gw-laurel-l" aria-hidden="true"></span>
+          <h1 class="gw-title"><span class="gw-title-l1">Salón de</span> <span class="gw-title-l2">Ganadores</span></h1>
+          <span class="gw-laurel gw-laurel-r" aria-hidden="true"></span>
+        </div>
         <p class="gw-sub">En Geo Army cualquiera puede llegar al podio.</p>
       </div>
     </section>
+
+    <!-- PODIO TOP 3 -- se calcula 100% en ganadores.js a partir de
+         public_winners (agrupado por usuario, ordenado por victorias).
+         El estado vacío/parcial se resuelve ahí mismo, sin datos ficticios.
+         ganadores.js solo escribe en .gw-slot-name y .gw-slot-count de cada
+         slot, alterna la clase is-empty, y muestra/oculta #gwEmptyNote.
+         FOTOS DE PERFIL: public_winners hoy no trae avatar (solo id, usuario,
+         prize_label, currency_code, amount, event, won_at), así que cada
+         .gw-slot-avatar muestra una silueta elegante como marcador.
+         PEDESTALES: la imagen (oro/plata/bronce) se aplica por CSS como fondo de
+         .gw-slot-pedestal; el número 1/2/3 sigue siendo texto de la página. -->
+    <section class="gw-podium-wrap" aria-label="Podio de ganadores">
+      <div class="gw-podium" id="gwPodium">
+        <div class="gw-slot gw-slot-2" id="gwSlot2" role="group" aria-label="Segundo lugar">
+          <div class="gw-slot-card">
+            <span class="gw-slot-avatar" aria-hidden="true"><svg class="gw-avatar-ic"><use href="#gw-ic-avatar"/></svg></span>
+            <span class="gw-slot-name"><span class="gw-skel"></span></span>
+            <span class="gw-slot-count"></span>
+          </div>
+          <div class="gw-slot-pedestal"><span class="gw-slot-rank" aria-hidden="true">2</span></div>
+        </div>
+        <div class="gw-slot gw-slot-1" id="gwSlot1" role="group" aria-label="Primer lugar">
+          <span class="gw-slot-crown" aria-hidden="true"><svg><use href="#gw-ic-crown"/></svg></span>
+          <div class="gw-slot-card">
+            <span class="gw-slot-avatar" aria-hidden="true"><svg class="gw-avatar-ic"><use href="#gw-ic-avatar"/></svg></span>
+            <span class="gw-slot-name"><span class="gw-skel"></span></span>
+            <span class="gw-slot-count"></span>
+          </div>
+          <div class="gw-slot-pedestal"><span class="gw-slot-rank" aria-hidden="true">1</span></div>
+        </div>
+        <div class="gw-slot gw-slot-3" id="gwSlot3" role="group" aria-label="Tercer lugar">
+          <div class="gw-slot-card">
+            <span class="gw-slot-avatar" aria-hidden="true"><svg class="gw-avatar-ic"><use href="#gw-ic-avatar"/></svg></span>
+            <span class="gw-slot-name"><span class="gw-skel"></span></span>
+            <span class="gw-slot-count"></span>
+          </div>
+          <div class="gw-slot-pedestal"><span class="gw-slot-rank" aria-hidden="true">3</span></div>
+        </div>
+      </div>
+      <p class="gw-empty-note" id="gwEmptyNote" hidden>Aún no hay ganadores registrados. ¿Quién será el primero?</p>
+
+      <div class="gw-counter-row">
+        <span class="gw-rail" aria-hidden="true"></span>
+        <div class="gw-counter" id="gwCounter">
+          <span class="gw-counter-num" id="gwCounterNum">0</span>
+          <span class="gw-counter-sep" aria-hidden="true"></span>
+          <span class="gw-counter-label" id="gwCounterLabel">PREMIOS REGISTRADOS</span>
+        </div>
+        <span class="gw-rail" aria-hidden="true"></span>
+      </div>
+    </section>
+    </div><!-- /.gw-stage -->
+
+    <!-- Estado de error -- oculto por defecto, solo se muestra si falla la
+         consulta a Supabase (ver ganadores.js). Nunca expone el error técnico. -->
+    <div class="gw-error" id="gwErrorBox" hidden>
+      <div class="gw-error-ic">⚠️</div>
+      <p>No pudimos cargar el salón de ganadores. Intenta nuevamente.</p>
+    </div>
+
+    <!-- ÚLTIMOS GANADORES -->
+    <section class="gw-history-section" id="gwHistorySection">
+      <h2 class="gw-section-title"><span class="gw-line"></span>Últimos ganadores<span class="gw-line"></span></h2>
+      <div class="gw-search-wrap">
+        <svg class="gw-search-ic" aria-hidden="true"><use href="#gw-ic-search"/></svg>
+        <input id="gwSearch" class="gw-search" type="search" placeholder="Buscar ganador o premio..." aria-label="Buscar ganador o premio">
+      </div>
+      <div class="gw-table">
+        <!-- Encabezado de columnas (solo visual en computadora). Las filas
+             de #gwHistoryList las genera ganadores.js con 4 columnas en
+             este mismo orden: usuario, premio, evento (mecánica), fecha. -->
+        <div class="gw-list-head" aria-hidden="true">
+          <span class="gw-head-cell"><svg><use href="#gw-ic-user"/></svg>Ganador</span>
+          <span class="gw-head-cell"><svg><use href="#gw-ic-gift"/></svg>Premio</span>
+          <span class="gw-head-cell"><svg><use href="#gw-ic-layers"/></svg>Mecánica</span>
+          <span class="gw-head-cell gw-head-date"><svg><use href="#gw-ic-calendar"/></svg>Fecha</span>
+        </div>
+        <div class="gw-list" id="gwHistoryList">
+          <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
+          <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
+          <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
+        </div>
+      </div>
+    </section>
   </div>
-
-  <!-- PODIO TOP 3 -- se calcula 100% en ganadores.js a partir de
-       public_winners (agrupado por usuario, ordenado por victorias).
-       El estado vacío/parcial se resuelve ahí mismo, sin datos ficticios. -->
-  <section class="gw-podium-wrap">
-    <div class="gw-podium" id="gwPodium">
-      <div class="gw-slot gw-slot-2" id="gwSlot2">
-        <span class="gw-slot-medal">🥈</span>
-        <span class="gw-slot-name"><span class="gw-skel"></span></span>
-        <span class="gw-slot-count"></span>
-        <div class="gw-slot-pedestal">2</div>
-      </div>
-      <div class="gw-slot gw-slot-1" id="gwSlot1">
-        <span class="gw-slot-crown">👑</span>
-        <span class="gw-slot-medal">🥇</span>
-        <span class="gw-slot-name"><span class="gw-skel"></span></span>
-        <span class="gw-slot-count"></span>
-        <div class="gw-slot-pedestal">1</div>
-      </div>
-      <div class="gw-slot gw-slot-3" id="gwSlot3">
-        <span class="gw-slot-medal">🥉</span>
-        <span class="gw-slot-name"><span class="gw-skel"></span></span>
-        <span class="gw-slot-count"></span>
-        <div class="gw-slot-pedestal">3</div>
-      </div>
-    </div>
-    <p class="gw-empty-note" id="gwEmptyNote" hidden>Aún no hay ganadores registrados. ¿Quién será el primero?</p>
-
-    <div class="gw-counter" id="gwCounter">
-      <span class="gw-counter-num" id="gwCounterNum">0</span>
-      <span class="gw-counter-label" id="gwCounterLabel">PREMIOS REGISTRADOS</span>
-    </div>
-  </section>
-
-  <!-- Estado de error -- oculto por defecto, solo se muestra si falla la
-       consulta a Supabase (ver ganadores.js). Nunca expone el error técnico. -->
-  <div class="gw-error" id="gwErrorBox" hidden>
-    <div class="gw-error-ic">⚠️</div>
-    <p>No pudimos cargar el salón de ganadores. Intenta nuevamente.</p>
-  </div>
-
-  <!-- ÚLTIMOS GANADORES -->
-  <section class="gw-history-section" id="gwHistorySection">
-    <div class="gw-section-title"><span class="gw-line"></span>Últimos ganadores<span class="gw-line"></span></div>
-    <input id="gwSearch" class="gw-search" type="search" placeholder="Buscar ganador o premio..." aria-label="Buscar ganador o premio">
-    <div class="gw-list" id="gwHistoryList">
-      <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
-      <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
-      <div class="gw-row gw-row-skel"><span class="gw-skel"></span></div>
-    </div>
-  </section>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -129,6 +184,6 @@
   </footer>
 
   <script src="js/premium.js"></script>
-  <script src="ganadores.js"></script>
+  <script src="ganadores.js?v=20261121-fotos-historial"></script>
 </body>
 </html>

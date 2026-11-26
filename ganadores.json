@@ -709,7 +709,7 @@
       "moneda": "pavos",
       "evento": "ruleta de fn",
       "fecha": "25/7/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 72,
@@ -740,7 +740,7 @@
       "moneda": "pavos",
       "evento": "ruleta de fn",
       "fecha": "26/7/2026",
-      "entregado": false,
+      "entregado": true,
       "rankeable": false
     },
     {
@@ -761,7 +761,7 @@
       "moneda": "pavos",
       "evento": "Ruleta de bienvenido",
       "fecha": "26/7/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 77,
@@ -791,7 +791,7 @@
       "moneda": "owcoins",
       "evento": "Piñata Overwatch",
       "fecha": "27/7/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 80,
@@ -882,7 +882,7 @@
       "moneda": "pavos",
       "evento": "Piñata Fortnite",
       "fecha": "30/7/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 91,
@@ -912,7 +912,7 @@
       "moneda": "pavos",
       "evento": "Piñata Fortnite",
       "fecha": "3/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 94,
@@ -1002,7 +1002,7 @@
       "moneda": "pavos",
       "evento": "Ruleta de Fortnite",
       "fecha": "11/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 103,
@@ -1022,7 +1022,7 @@
       "moneda": "pavos",
       "evento": "Ruleta de Fortnite",
       "fecha": "13/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 105,
@@ -1032,7 +1032,7 @@
       "moneda": null,
       "evento": "Tienda de Oro",
       "fecha": "12/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 106,
@@ -1052,7 +1052,7 @@
       "moneda": "pavos",
       "evento": "Evento de fortnite",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 108,
@@ -1094,7 +1094,7 @@
       "moneda": "owcoins",
       "evento": "Recompensa de Stream 6hrs",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 112,
@@ -1104,7 +1104,7 @@
       "moneda": "owcoins",
       "evento": "Recompensa de Stream 6hrs",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 113,
@@ -1114,7 +1114,7 @@
       "moneda": "owcoins",
       "evento": "Recompensa de Stream 6hrs",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 114,
@@ -1124,7 +1124,7 @@
       "moneda": "owcoins",
       "evento": "Recompensa de Stream 6hrs",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 115,
@@ -1134,7 +1134,7 @@
       "moneda": "pavos",
       "evento": "Recompensa de Cofre",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 116,
@@ -1144,7 +1144,7 @@
       "moneda": "pavos",
       "evento": "Recompensa de Cofre",
       "fecha": "15/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1197,7 +1197,7 @@
       "moneda": null,
       "evento": "Tienda de Oro",
       "fecha": "18/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 122,
@@ -1296,7 +1296,7 @@
       "evento": "Recompensa de Cofre",
       "fecha": "18/8/2026",
       "creado": "2026-08-19T02:24:32.170Z",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 131,
@@ -1331,7 +1331,7 @@
       "evento": "Recompensa Stream 6hrs",
       "fecha": "18/8/2026",
       "creado": "2026-08-19T02:28:34.922Z",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 134,
@@ -1342,7 +1342,7 @@
       "evento": "Recompensa Stream 6hrs",
       "fecha": "18/8/2026",
       "creado": "2026-08-19T02:32:19.358Z",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 135,
@@ -1364,7 +1364,7 @@
       "moneda": null,
       "evento": "Tienda de Oro",
       "fecha": "19/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 137,
@@ -1398,7 +1398,7 @@
       "evento": "cofre",
       "fecha": "22/8/2026",
       "creado": "2026-08-23T02:35:36.889Z",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 140,
@@ -1432,7 +1432,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "16/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 143,
@@ -1443,7 +1443,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "20/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 144,
@@ -1754,7 +1754,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "20/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 170,
@@ -1776,7 +1776,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "16/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 172,
@@ -1787,7 +1787,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "20/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 173,
@@ -1798,7 +1798,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "20/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 174,
@@ -1809,7 +1809,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "16/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 175,
@@ -1820,7 +1820,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "20/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 176,
@@ -1831,7 +1831,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "15/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 177,
@@ -1842,7 +1842,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "17/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 178,
@@ -1853,7 +1853,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "17/8/2026",
-      "entregado": false
+      "entregado": true
     },
     {
       "id": 179,
@@ -1864,7 +1864,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "11/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1876,7 +1876,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "18/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1888,7 +1888,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "16/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1900,7 +1900,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "15/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1912,7 +1912,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "19/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1924,7 +1924,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "17/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1936,7 +1936,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "6/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1948,7 +1948,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "17/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1960,7 +1960,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "7/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1972,7 +1972,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "6/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1984,7 +1984,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "8/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -1996,7 +1996,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "17/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -2008,7 +2008,7 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "4/8/2026",
-      "entregado": false,
+      "entregado": true,
       "alcancia": true
     },
     {
@@ -2032,7 +2032,548 @@
       "rankeable": false,
       "evento": "Pase de Batalla",
       "fecha": "20/8/2026",
+      "entregado": true
+    },
+    {
+      "id": 194,
+      "usuario": "RickyeYT",
+      "premio": "2,000 V-Bucks",
+      "cantidad": 2000,
+      "moneda": "pavos",
+      "evento": "Tienda de Oro",
+      "fecha": "31/8/2026",
+      "entregado": true
+    },
+    {
+      "id": 195,
+      "usuario": "Eddy",
+      "premio": "2,750 Pavos",
+      "cantidad": 2750,
+      "moneda": "pavos",
+      "evento": "General",
+      "fecha": "6/9/2026",
+      "creado": "2026-09-07T03:18:16.502Z",
       "entregado": false
+    },
+    {
+      "id": 196,
+      "usuario": "Geovannyrk",
+      "premio": "10 Pavos",
+      "cantidad": 10,
+      "moneda": "pavos",
+      "evento": "ruleta",
+      "fecha": "17/9/2026",
+      "creado": "2026-09-17T23:25:55.043Z",
+      "entregado": false
+    },
+    {
+      "id": 198,
+      "usuario": "Cristian",
+      "premio": "250 OW Coins",
+      "cantidad": 250,
+      "moneda": "owcoins",
+      "evento": "Solución a Discusión de Ruleta",
+      "fecha": "2/10/2026",
+      "creado": "2026-10-03T01:03:14.300Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 50,
+      "wallet_credit_amount": 200,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 199,
+      "usuario": "Josema",
+      "premio": "250 OW Coins",
+      "cantidad": 250,
+      "moneda": "owcoins",
+      "evento": "Solución a Discusión de Ruleta",
+      "fecha": "2/10/2026",
+      "creado": "2026-10-03T01:04:20.206Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 50,
+      "wallet_credit_amount": 200,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 200,
+      "usuario": "fedriquechumpi",
+      "premio": "700 Pavos",
+      "cantidad": 700,
+      "moneda": "pavos",
+      "evento": "Ruleta de fn",
+      "fecha": "2/10/2026",
+      "creado": "2026-10-03T02:22:02.405Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 140,
+      "wallet_credit_amount": 560,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 201,
+      "usuario": "mufasa1912",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "3/10/2026",
+      "creado": "2026-10-04T01:39:13.166Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 202,
+      "usuario": "rickyeyt",
+      "premio": "1,500 Pavos",
+      "cantidad": 1500,
+      "moneda": "pavos",
+      "evento": "Edicion de video",
+      "fecha": "3/10/2026",
+      "creado": "2026-10-04T03:05:42.192Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 300,
+      "wallet_credit_amount": 1200,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 203,
+      "usuario": "Warnerr8",
+      "premio": "800 Pavos",
+      "cantidad": 800,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "4/10/2026",
+      "creado": "2026-10-04T20:48:38.924Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 160,
+      "wallet_credit_amount": 640,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 204,
+      "usuario": "matidk_0",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "4/10/2026",
+      "creado": "2026-10-04T23:58:04.477Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 205,
+      "usuario": "rickyeyt",
+      "premio": "1,500 Pavos",
+      "cantidad": 1500,
+      "moneda": "pavos",
+      "evento": "General",
+      "fecha": "5/10/2026",
+      "creado": "2026-10-06T01:49:33.223Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 300,
+      "wallet_credit_amount": 1200,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 206,
+      "usuario": "warner8",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta de Fortnite",
+      "fecha": "5/10/2026",
+      "creado": "2026-10-06T02:04:57.333Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 207,
+      "usuario": "warnerr8",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta de Fortnite",
+      "fecha": "5/10/2026",
+      "creado": "2026-10-06T02:09:02.059Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 208,
+      "usuario": "demencianoob",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Tienda de Oro",
+      "fecha": "6/10/2026",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 209,
+      "usuario": "alberto9134",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "6/10/2026",
+      "creado": "2026-10-07T00:53:45.380Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 210,
+      "usuario": "matidk_0",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "7/10/2026",
+      "creado": "2026-10-07T23:49:09.309Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 211,
+      "usuario": "xVania06",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "7/10/2026",
+      "creado": "2026-10-08T00:16:40.368Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 212,
+      "usuario": "Kiro_Hyer",
+      "premio": "1,200 Pavos",
+      "cantidad": 1200,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "8/10/2026",
+      "creado": "2026-10-08T23:15:54.488Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 240,
+      "wallet_credit_amount": 960,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 213,
+      "usuario": "elkid_rd36",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "8/10/2026",
+      "creado": "2026-10-08T23:23:05.596Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 214,
+      "usuario": "forsaken453",
+      "premio": "800 Pavos",
+      "cantidad": 800,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "9/10/2026",
+      "creado": "2026-10-10T01:48:19.426Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 160,
+      "wallet_credit_amount": 640,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 215,
+      "usuario": "kirbyx01",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "10/10/2026",
+      "creado": "2026-10-11T01:16:57.241Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 216,
+      "usuario": "matidk_0",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "11/10/2026",
+      "creado": "2026-10-11T23:32:59.065Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 217,
+      "usuario": "jose_m05a",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "11/10/2026",
+      "creado": "2026-10-11T23:52:08.729Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 218,
+      "usuario": "AlexJuanForever",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "12/10/2026",
+      "creado": "2026-10-12T23:41:54.132Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 219,
+      "usuario": "jjirgu",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "12/10/2026",
+      "creado": "2026-10-13T00:27:18.578Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 220,
+      "usuario": "Kiro_Hyer",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "13/10/2026",
+      "creado": "2026-10-13T23:19:13.020Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 221,
+      "usuario": "xVania06",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "16/10/2026",
+      "creado": "2026-10-17T01:29:34.484Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 222,
+      "usuario": "kirbyx01",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "16/10/2026",
+      "creado": "2026-10-17T01:32:02.606Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 223,
+      "usuario": "Kiro_Hyer",
+      "premio": "800 Pavos",
+      "cantidad": 800,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "17/10/2026",
+      "creado": "2026-10-18T00:43:30.279Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 160,
+      "wallet_credit_amount": 640,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 224,
+      "usuario": "elkid_rd36",
+      "premio": "800 Pavos",
+      "cantidad": 800,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "18/10/2026",
+      "creado": "2026-10-18T23:17:48.074Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 160,
+      "wallet_credit_amount": 640,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 225,
+      "usuario": "matidk_0",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta Ow",
+      "fecha": "18/10/2026",
+      "creado": "2026-10-18T23:18:31.628Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 226,
+      "usuario": "Kiro_Hyer",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "19/10/2026",
+      "creado": "2026-10-19T23:32:04.304Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 227,
+      "usuario": "jose_m05a",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "19/10/2026",
+      "creado": "2026-10-19T23:32:36.658Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 228,
+      "usuario": "Kiro_Hyer",
+      "premio": "800 Pavos",
+      "cantidad": 800,
+      "moneda": "pavos",
+      "evento": "Ruleta Fortnite",
+      "fecha": "20/10/2026",
+      "creado": "2026-10-20T23:16:37.970Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 160,
+      "wallet_credit_amount": 640,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 229,
+      "usuario": "kittykitty_katt",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "20/10/2026",
+      "creado": "2026-10-20T23:41:06.925Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 230,
+      "usuario": "matidk_0",
+      "premio": "500 OW Coins",
+      "cantidad": 500,
+      "moneda": "owcoins",
+      "evento": "Ruleta OW",
+      "fecha": "23/10/2026",
+      "creado": "2026-10-24T00:20:11.369Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
+    },
+    {
+      "id": 231,
+      "usuario": "matidk_0",
+      "premio": "500 Pavos",
+      "cantidad": 500,
+      "moneda": "pavos",
+      "evento": "General",
+      "fecha": "23/10/2026",
+      "creado": "2026-10-24T00:45:34.954Z",
+      "entregado": false,
+      "morvanna_curse_applied": true,
+      "morvanna_withheld_amount": 100,
+      "wallet_credit_amount": 400,
+      "morvanna_curse_rate": 0
     }
   ],
   "gastos": [],

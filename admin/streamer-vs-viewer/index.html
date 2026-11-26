@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#05030d"/>
+  <title>Panel de Geo — Streamer vs Viewer V2 · GeoArmy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,600;1,800;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Panel interno: estilos propios, aislados (todo bajo body.sva-page / .sva-*). No depende de css/style.css ni de la cuenta del sitio. -->
+  <link rel="stylesheet" href="../../css/svv-admin.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="../../js/geoarmy-config.js"></script>
+</head>
+<body class="sva-page">
+  <header class="sva-top">
+    <div class="sva-top__brand"><span class="sva-top__mark" aria-hidden="true"></span><div><b>PANEL DE GEO</b><small>Streamer vs Viewer V2</small></div></div>
+    <div class="sva-top__ctl">
+      <label class="sva-sel" for="sva-ed-select"><span>Edición</span>
+        <select id="sva-ed-select" disabled><option>—</option></select>
+      </label>
+      <span class="sva-conn" id="sva-conn" data-state="loading" role="status" aria-live="polite"><i aria-hidden="true"></i><span id="sva-conn-text">Conectando…</span></span>
+      <button type="button" class="sva-btn sva-btn--ghost" id="sva-refresh" disabled>Actualizar</button>
+      <a class="sva-link" href="../../streamer-vs-viewer/index.html" target="_blank" rel="noopener">Ver página pública ↗</a>
+    </div>
+  </header>
+
+  <main class="sva-main" id="sva-main">
+    <!-- Puerta de acceso: carga / sin sesión / sin permiso / error / lectura no instalada -->
+    <section class="sva-gate" id="sva-gate" data-state="loading" aria-live="polite">
+      <h1 class="sva-gate__title" id="sva-gate-title">Conectando con la Arena…</h1>
+      <p class="sva-gate__msg" id="sva-gate-msg">Verificando tu sesión.</p>
+      <div class="sva-gate__act">
+        <button type="button" class="sva-btn sva-btn--primary" id="sva-gate-login" hidden>Iniciar sesión con Twitch</button>
+        <button type="button" class="sva-btn" id="sva-gate-retry" hidden>Reintentar</button>
+      </div>
+    </section>
+
+    <div class="sva-app" id="sva-app" hidden>
+      <div class="sva-stale" id="sva-stale" role="alert" hidden></div>
+
+      <!-- Marcador -->
+      <section class="sva-board" id="sva-board" aria-label="Marcador de la edición" data-leader="tie">
+        <div class="sva-board__meta">
+          <span class="sva-pill" id="sva-b-status" data-kind="draft">—</span>
+          <span class="sva-board__ed" id="sva-b-edition">—</span>
+          <span class="sva-pill" id="sva-b-queue" data-kind="closed">Fila cerrada</span>
+          <span class="sva-pill sva-pill--warn" id="sva-b-last" hidden>Última ronda</span>
+          <span class="sva-board__clock" id="sva-b-clock" hidden>Tiempo restante <b id="sva-b-clock-t">—</b></span>
+        </div>
+        <div class="sva-score">
+          <div class="sva-score__side" data-side="geo"><span class="sva-score__tag">GEO <em>×2</em></span><span class="sva-score__num" id="sva-s-geo">0</span><span class="sva-score__k"><b id="sva-s-geo-k">0</b> kills</span></div>
+          <div class="sva-score__vs" aria-hidden="true">VS</div>
+          <div class="sva-score__side" data-side="viewer"><span class="sva-score__tag">VIEWERS <em>×1</em></span><span class="sva-score__num" id="sva-s-vw">0</span><span class="sva-score__k"><b id="sva-s-vw-k">0</b> kills</span></div>
+        </div>
+        <p class="sva-board__lead" id="sva-b-lead" aria-live="polite">Empate 0 – 0</p>
+      </section>
+
+      <!-- Acciones de la edición -->
+      <section class="sva-card" id="sva-event-card" aria-labelledby="sva-ev-h">
+        <h2 class="sva-h" id="sva-ev-h">Control de la edición</h2>
+        <p class="sva-hint" id="sva-ev-hint"></p>
+        <div class="sva-actions" id="sva-ev-actions"></div>
+      </section>
+
+      <div class="sva-cols">
+        <div class="sva-col">
+          <!-- Partida -->
+          <section class="sva-card sva-card--match" id="sva-match-card" aria-labelledby="sva-m-h">
+            <h2 class="sva-h" id="sva-m-h">Partida actual</h2>
+            <div id="sva-match"></div>
+          </section>
+
+          <!-- Fila -->
+          <section class="sva-card" id="sva-queue-card" aria-labelledby="sva-q-h">
+            <h2 class="sva-h" id="sva-q-h">Fila <small id="sva-q-count"></small></h2>
+            <div class="sva-actions" id="sva-q-actions"></div>
+            <ul class="sva-queue" id="sva-queue"></ul>
+            <p class="sva-empty" id="sva-queue-empty" hidden>No hay viewers en la fila.</p>
+          </section>
+        </div>
+
+        <div class="sva-col">
+          <section class="sva-card" aria-labelledby="sva-t-h">
+            <h2 class="sva-h" id="sva-t-h">Turnos activos</h2>
+            <ul class="sva-list" id="sva-turns"></ul>
+            <p class="sva-empty" id="sva-turns-empty" hidden>No hay turnos activos.</p>
+          </section>
+
+          <section class="sva-card" aria-labelledby="sva-r-h">
+            <h2 class="sva-h" id="sva-r-h">Partidas recientes</h2>
+            <ul class="sva-list" id="sva-recent"></ul>
+            <p class="sva-empty" id="sva-recent-empty" hidden>Todavía no hay partidas cerradas o anuladas.</p>
+          </section>
+
+          <section class="sva-card" aria-labelledby="sva-hist-h">
+            <details class="sva-hist" id="sva-hist">
+              <summary id="sva-hist-h">Historial de partidas <small>(corregir una kill anterior o restaurar una partida anulada)</small></summary>
+              <p class="sva-hint">Solo se consulta cuando abres esta sección o pulsas «Actualizar»: no se recarga cada pocos segundos.</p>
+              <div class="sva-hist__bar">
+                <label for="sva-h-filter">Mostrar
+                  <select id="sva-h-filter">
+                    <option value="">Todas</option>
+                    <option value="voided">Solo anuladas</option>
+                    <option value="closed">Solo cerradas</option>
+                  </select>
+                </label>
+                <button type="button" class="sva-btn sva-btn--ghost sva-btn--sm" id="sva-h-refresh">Actualizar</button>
+                <small class="sva-hint" id="sva-h-status" aria-live="polite"></small>
+              </div>
+              <p class="sva-form__msg" id="sva-h-msg" data-kind="err" role="alert" hidden></p>
+              <ul class="sva-list" id="sva-h-list"></ul>
+              <p class="sva-empty" id="sva-h-empty" hidden>Todavía no hay partidas cerradas o anuladas.</p>
+              <div class="sva-actions"><button type="button" class="sva-btn" id="sva-h-more" hidden>Cargar más partidas</button></div>
+            </details>
+          </section>
+
+          <section class="sva-card" aria-labelledby="sva-res-h" id="sva-result-card">
+            <h2 class="sva-h" id="sva-res-h">Resultado</h2>
+            <div id="sva-result"></div>
+          </section>
+
+          <section class="sva-card" aria-labelledby="sva-set-h" id="sva-settle-card" hidden>
+            <h2 class="sva-h" id="sva-set-h">Liquidación económica</h2>
+            <div id="sva-settle"></div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Preparar edición y reglamento -->
+      <details class="sva-card sva-setup" id="sva-setup">
+        <summary class="sva-h">Preparar edición y reglamento</summary>
+        <div class="sva-setup__grid">
+          <form class="sva-form" id="sva-new-form" autocomplete="off" novalidate>
+            <h3 class="sva-h3">Nueva edición</h3>
+            <label>Clave <input id="sva-n-key" maxlength="40" placeholder="v2-edicion-5" spellcheck="false"/></label>
+            <label>Número <input id="sva-n-num" type="number" min="1" step="1" inputmode="numeric" placeholder="5"/></label>
+            <label>Etiqueta (opcional) <input id="sva-n-label" maxlength="80" placeholder="Streamer vs Viewer V2 · Edición 5"/></label>
+            <label class="sva-check"><input id="sva-n-test" type="checkbox"/> Edición de prueba (sin número)</label>
+            <button type="submit" class="sva-btn sva-btn--primary" id="sva-n-btn">Crear edición</button>
+            <p class="sva-form__msg" id="sva-n-msg" role="status" aria-live="polite"></p>
+          </form>
+
+          <form class="sva-form sva-form--rules" id="sva-rules-form" autocomplete="off" novalidate>
+            <h3 class="sva-h3">Reglamento <small id="sva-rules-state"></small></h3>
+            <label>Título <input id="sva-r-title" maxlength="200" spellcheck="true"/></label>
+            <label>Texto (Markdown) <textarea id="sva-r-body" rows="12" spellcheck="true"></textarea></label>
+            <p class="sva-hint" id="sva-r-hint"></p>
+            <div class="sva-actions">
+              <button type="submit" class="sva-btn" id="sva-r-save">Guardar borrador</button>
+              <button type="button" class="sva-btn sva-btn--primary" id="sva-r-publish">Publicar reglamento…</button>
+            </div>
+            <p class="sva-form__msg" id="sva-r-msg" role="status" aria-live="polite"></p>
+          </form>
+
+          <form class="sva-form" id="sva-sched-form" autocomplete="off" novalidate>
+            <h3 class="sva-h3">Programar inicio</h3>
+            <label>Fecha y hora (tu zona horaria) <input id="sva-sc-at" type="datetime-local"/></label>
+            <button type="submit" class="sva-btn" id="sva-sc-btn">Programar edición</button>
+            <p class="sva-form__msg" id="sva-sc-msg" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </details>
+
+      <section class="sva-card" aria-labelledby="sva-a-h">
+        <h2 class="sva-h" id="sva-a-h">Registro de acciones <small>últimas 15</small></h2>
+        <ol class="sva-audit" id="sva-audit"></ol>
+      </section>
+    </div>
+  </main>
+
+  <!-- avisos -->
+  <div class="sva-toasts" id="sva-toasts" role="status" aria-live="polite"></div>
+
+  <!-- confirmación antes de acciones importantes o irreversibles -->
+  <div class="sva-modal" id="sva-modal" hidden>
+    <div class="sva-modal__bg" id="sva-modal-bg"></div>
+    <div class="sva-modal__box" role="dialog" aria-modal="true" aria-labelledby="sva-modal-title" aria-describedby="sva-modal-body" tabindex="-1">
+      <h2 class="sva-modal__title" id="sva-modal-title">Confirmar</h2>
+      <div class="sva-modal__body" id="sva-modal-body"></div>
+      <label class="sva-modal__reason" id="sva-modal-reason-w" hidden><span id="sva-modal-reason-l">Motivo</span><textarea id="sva-modal-reason" rows="3" maxlength="300"></textarea></label>
+      <p class="sva-modal__err" id="sva-modal-err" role="alert" hidden></p>
+      <div class="sva-modal__act">
+        <button type="button" class="sva-btn sva-btn--ghost" id="sva-modal-cancel">Cancelar</button>
+        <button type="button" class="sva-btn sva-btn--primary" id="sva-modal-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/svv-admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Pase Pirata — One Piece 2026 · GeoArmy</title>
+  <meta name="description" content="Mini Pase Pirata de GeoArmy: 10 islas, 20 misiones y 1,500 VBUCKS. Del 3 de noviembre al 1 de diciembre de 2026."/>
+  <meta name="robots" content="index, follow"/>
+  <meta name="theme-color" content="#0b1020"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&family=Cinzel:wght@600;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <!-- Mismo orden que el resto del sitio: supabase-js -> geoarmy-config.js -> v3-theme -> geoarmy-account.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <link rel="stylesheet" href="css/onepiece.css?v=7h1"/>
+  <!-- Recursos gráficos (slots). Mientras no existan, cada slot usa un relleno CSS provisional. -->
+  <link rel="stylesheet" href="css/onepiece-assets.css?v=7h1"/>
+</head>
+<body>
+
+  <!-- Iconos vectoriales provisionales (UI). Los definitivos se sustituirán por arte de ChatGPT si Geo lo aprueba. -->
+  <svg class="op-sprite" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a3"/><stop offset=".55" stop-color="#f2b134"/><stop offset="1" stop-color="#b36f0b"/></linearGradient>
+      <linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5672c"/><stop offset="1" stop-color="#5b3513"/></linearGradient>
+      <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8fd0ff"/><stop offset=".55" stop-color="#2f78e6"/><stop offset="1" stop-color="#173f9e"/></linearGradient>
+    </defs>
+    <symbol id="i-coin" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="url(#gGold)" stroke="#7a4a05" stroke-width="2.5"/><circle cx="24" cy="24" r="15.5" fill="none" stroke="#fff3c4" stroke-opacity=".7" stroke-width="2"/><text x="24" y="31.500" text-anchor="middle" font-family="Cinzel,serif" font-weight="900" font-size="22" fill="#6b3c05">G</text></symbol>
+    <symbol id="i-vcoin" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="url(#gBlue)" stroke="#e6f2ff" stroke-width="3"/><circle cx="24" cy="24" r="16" fill="none" stroke="#0e2f7a" stroke-opacity=".55" stroke-width="2"/><path d="M14.500 16h5.500l4 11 4-11h5.500L26.500 35h-5Z" fill="#fff"/></symbol>
+    <symbol id="i-wheel" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round"><circle cx="24" cy="24" r="10"/><circle cx="24" cy="24" r="3.500"/><path d="M24 3v10M24 35v10M3 24h10M35 24h10M9.200 9.200l7 7M31.800 31.800l7 7M38.800 9.200l-7 7M16.200 31.800l-7 7"/></symbol>
+    <symbol id="i-map" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11l12-4 12 4 12-4v30l-12 4-12-4-12 4Z"/><path d="M18 7v30M30 11v30M14 18l4 3M24 24l4-3M33 30l5 3"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 48 48"><path d="M6 15l9 8 9-14 9 14 9-8-3 22H9Z" fill="url(#gGold)" stroke="#7a4a05" stroke-width="2.500" stroke-linejoin="round"/><path d="M9 40h30" stroke="#7a4a05" stroke-width="3"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"><rect x="3.500" y="5" width="17" height="15" rx="2.500"/><path d="M8 3v4M16 3v4M3.500 10h17M8 14h2M12 14h2M16 14h.5M8 17h2M12 17h2"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V8a5 5 0 0 1 10 0v3"/><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor" fill-opacity=".25"/></symbol>
+    <symbol id="i-anchor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.200"/><path d="M12 7.200V21M7.500 11h9M4 14c0 3.500 3.500 7 8 7s8-3.500 8-7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.200 4.200L19 7"/></symbol>
+    <symbol id="i-skull" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.500c-4 0-7 2.700-7 6.500 0 2.200 1 3.700 2.500 4.600V18h9v-3.400C18 13.700 19 12.200 19 10c0-3.800-3-6.500-7-6.500Z"/><path d="M9.500 11h.01M14.500 11h.01M10.500 18v2.500M13.500 18v2.500"/></symbol>
+    <symbol id="i-scroll" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h11a2 2 0 0 1 2 2v1H9M7 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7M9 11h7M9 15h5"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V4M6 4h12l-3 4.500 3 4.500H6"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.400" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="18"/><path d="m31 17-4.500 10-10 4.500 4.500-10Z" fill="currentColor" fill-opacity=".3"/></symbol>
+    <symbol id="i-chest" viewBox="0 0 64 64"><path d="M8 30a24 18 0 0 1 48 0v4H8Z" fill="url(#gWood)" stroke="#2b1708" stroke-width="2.500" stroke-linejoin="round"/><rect x="8" y="33" width="48" height="23" rx="3" fill="url(#gWood)" stroke="#2b1708" stroke-width="2.500"/><path d="M8 33h48" stroke="#f0b93b" stroke-width="4"/><path d="M21 14v42M43 14v42" stroke="#d6a73f" stroke-width="4"/><rect x="28" y="30" width="8" height="11" rx="2" fill="url(#gGold)" stroke="#5a3a05" stroke-width="2"/></symbol>
+  </defs>
+  </svg>
+
+  <div class="v3-page op26" id="opRoot" data-op-state="loading" style="min-height:100vh;">
+    <!-- ===== FONDO: cubierta de barco. Slots: bg-cubierta, mastil-izq, mastil-der (hoy relleno CSS) ===== -->
+    <div class="op-bg" aria-hidden="true">
+      <div class="op-slot op-bg-deck" data-slot="bg-cubierta"></div>
+      <div class="op-slot op-mast op-mast-l" data-slot="mastil-izq"></div>
+      <div class="op-slot op-mast op-mast-r" data-slot="mastil-der"></div>
+      <div class="op-slot op-gulls" data-slot="gaviotas"></div>
+    </div>
+
+    <nav class="v3-nav">
+      <div class="v3-nav-inner">
+        <a href="index.html" class="v3-logo">
+          <span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span>
+          <span class="v3-wordmark">GEO ARMY</span>
+        </a>
+        <div class="v3-page-links">
+          <a href="index.html#inicio">Inicio</a>
+          <a href="tienda.html">Tienda</a>
+          <a href="misiones.html">Misiones</a>
+        </div>
+        <div class="v3-auth"><div id="geoAccountWidget"></div></div>
+      </div>
+    </nav>
+
+    <main class="op-main">
+
+      <!-- ========================= HERO ========================= -->
+      <section class="op-hero" aria-labelledby="opTitle">
+        <div class="op-hero-copy">
+          <p class="op-plank"><span>Mundo 02 · Operación One Piece</span></p>
+          <h1 class="op-title" id="opTitle"><span class="t1">Mini Pase</span> <span class="t2">Pirata</span><i class="op-slot op-hat" data-slot="sombrero-paja" aria-hidden="true"></i></h1>
+          <p class="op-lede">Diez islas, una ruta y un tesoro al final del mapa.</p>
+          <p class="op-dates"><svg class="op-ic"><use href="#i-cal"/></svg><span>3 nov – 1 dic 2026</span> <span class="op-seasonchip" id="opSeasonChip" hidden></span></p>
+
+          <ul class="op-chips" aria-label="Qué incluye">
+            <li><svg class="op-ic op-ic-lg"><use href="#i-coin"/></svg><span><b>3,750</b><small>G-Coins</small></span></li>
+            <li><svg class="op-ic op-ic-lg"><use href="#i-wheel"/></svg><span><b>10</b><small>niveles</small></span></li>
+            <li><svg class="op-ic op-ic-lg"><use href="#i-map"/></svg><span><b>20</b><small>misiones</small></span></li>
+            <li class="wide"><svg class="op-ic op-ic-lg"><use href="#i-vcoin"/></svg><span><b>1,500</b> VBUCKS</span></li>
+            <li class="wide gold"><svg class="op-ic op-ic-lg"><use href="#i-crown"/></svg><span>Pase de Batalla</span></li>
+          </ul>
+
+          <div class="op-cta" id="opCta"><span class="op-cta-loading">Cargando…</span></div>
+          <i class="op-slot op-barrel" data-slot="esquina-barril" aria-hidden="true"></i>
+        </div>
+
+        <div class="op-stage-wrap">
+          <!-- Planeta de diez islas (recurso real aprobado por Geo). Las 10 zonas interactivas se superponen
+               sobre los números ya dibujados en la imagen. -->
+          <div class="op-planet" id="opPlanet">
+            <picture>
+              <source media="(max-width: 640px)" srcset="assets/onepiece/planeta-diez-islas-720.webp">
+              <img class="op-planet-img" src="assets/onepiece/planeta-diez-islas.webp" width="1374" height="1145" alt="Planeta marítimo con la ruta de diez islas, una por nivel del Mini Pase" fetchpriority="high" decoding="async">
+            </picture>
+            <div class="op-nodes" id="opNodes"></div>
+            <div class="op-pop" id="opPop" hidden role="dialog" aria-live="polite"></div>
+            <span class="op-hint" id="opStageHint">Toca una isla</span>
+          </div>
+          <aside class="op-note" aria-label="Lema">
+            <span>Una ruta.<br>Un tesoro.<br>Una gran aventura.</span>
+            <svg class="op-ic"><use href="#i-skull"/></svg>
+          </aside>
+          <i class="op-slot op-compass" data-slot="brujula" aria-hidden="true"><svg><use href="#i-compass"/></svg></i>
+        </div>
+      </section>
+
+      <!-- ========================= PROGRESO (barra compacta) ========================= -->
+      <section class="op-block" id="progreso" aria-label="Tu travesía">
+        <div class="op-progress" id="opProgress"></div>
+      </section>
+
+      <!-- ========================= CAPÍTULOS ========================= -->
+      <section class="op-block" id="capitulos" aria-labelledby="opChapTitle">
+        <h2 class="op-h2" id="opChapTitle"><span>Cuatro capítulos</span></h2>
+        <ol class="op-chapters" id="opChapters"></ol>
+      </section>
+
+      <!-- ========================= RECOMPENSAS ========================= -->
+      <section class="op-block" id="niveles" aria-labelledby="opLvlTitle">
+        <h2 class="op-h2" id="opLvlTitle"><svg class="op-ic op-h2-ic"><use href="#i-chest"/></svg><span>Recompensas</span></h2>
+        <ol class="op-scrolls" id="opMedals"></ol>
+        <p class="op-legend"><span><svg class="op-ic"><use href="#i-vcoin"/></svg>Niveles 2–9 · 1,500 VBUCKS</span><span><svg class="op-ic"><use href="#i-crown"/></svg>Nivel 10 · Pase de Batalla</span></p>
+      </section>
+
+      <!-- ========================= MISIONES ========================= -->
+      <section class="op-block op-mis-block" id="misiones" aria-labelledby="opMisTitle">
+        <h2 class="op-h2 op-h2-inline" id="opMisTitle"><svg class="op-ic op-h2-ic"><use href="#i-scroll"/></svg><span>Misiones</span></h2>
+        <div class="op-missions" id="opMissions"></div>
+      </section>
+
+      <!-- ========================= COMPRA ========================= -->
+      <section class="op-block" id="pase" aria-labelledby="opBuyTitle">
+        <h2 class="op-sr" id="opBuyTitle">Conseguir el Mini Pase Pirata</h2>
+        <div class="op-buy" id="opBuy"></div>
+      </section>
+
+      <!-- ========================= REGLAS (acordeón) ========================= -->
+      <section class="op-block op-rules" id="reglas" aria-label="Reglas">
+        <details>
+          <summary><svg class="op-ic"><use href="#i-scroll"/></svg>Reglas de la temporada</summary>
+          <ul>
+            <li>La XP del pase es solo de temporada (máx. 900) y no cambia tu rango permanente. Las misiones dan hasta 75 XP; al llegar a 825 XP no suman más hasta completar la ruta final de Laugh Tale.</li>
+            <li>Compra final: no hay reembolsos.</li>
+            <li>Al cerrar la temporada ya no se completan misiones; tu historial queda visible.</li>
+            <li>Los VBUCKS van a tu billetera GEO ARMY para solicitar regalos; no se depositan directo en Fortnite.</li>
+            <li>El Pase de Batalla se entrega a mano y aparece como «pendiente» hasta entonces.</li>
+          </ul>
+        </details>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-logo"><img src="logo.png" alt="GeoArmy" class="footer-logo-img"/> GeoArmy</div>
+        <div class="footer-text">Comunidad de Geovannyrk · Twitch Affiliate</div>
+      </div>
+    </footer>
+  </div>
+
+  <noscript><p style="padding:1rem;color:#eaf2ff;background:#0b1020">Esta página necesita JavaScript para mostrar tu progreso.</p></noscript>
+
+  <script src="js/geoarmy-ranks.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <!-- Cumpleaños V1 (Fase 1B): onboarding de cuentas nuevas. Después de geoarmy-account.js. -->
+  <script src="js/geoarmy-birthday.js?v=1b2"></script>
+  <script src="js/onepiece.js?v=7h1"></script>
+  <script src="js/onepiece-smoke.js?v=7h1"></script>
+</body>
+</html>

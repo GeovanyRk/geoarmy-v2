@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Geo Army · Ruleta de suscriptores</title>
+  <style>
+    :root { --gold:#f8d16b; --card-height:clamp(160px, 19vw, 260px); --card-width:clamp(112px, 13.2vw, 180px); }
+    * { box-sizing:border-box; }
+    html, body { margin:0; min-height:100%; overflow:hidden; background:transparent; }
+    body { color:#fff; font-family:Arial,Helvetica,sans-serif; }
+    body.preview { background:radial-gradient(ellipse at center,#171421 0%,#08090e 72%); }
+    .preview-label { display:none; position:fixed; left:20px; top:18px; color:#fae9b0; padding:8px 12px; border:1px solid #755e31; border-radius:8px; font-size:13px; background:#17140f; }
+    body.preview .preview-label { display:block; }
+    .stage { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:max-content; max-width:100%; display:flex; flex-direction:column; align-items:center; opacity:0; transition:opacity .35s; }
+    .stage.visible { opacity:1; }
+    .brand { display:flex; align-items:center; gap:12px; margin-bottom:18px; filter:drop-shadow(0 4px 14px #000); }
+    .emblem { display:grid; place-items:center; width:56px; height:56px; border:2px solid #f7d17c; border-radius:16px; color:#1b1100; font-size:29px; font-weight:900; background:linear-gradient(150deg,#fff3bc,#e9a832 64%,#a8630c); box-shadow:0 0 22px #d6a2425e, inset 0 0 0 2px #ffffff40; }
+    .brand-text { text-align:left; line-height:1; }
+    .brand-text small { display:block; margin-bottom:4px; font-size:11px; font-weight:800; letter-spacing:.27em; color:#e3c87e; }
+    .brand-text strong { display:block; font-size:clamp(22px,2.6vw,34px); font-weight:900; font-style:italic; letter-spacing:-.05em; text-shadow:0 2px 0 #70501b,0 4px 9px #000; }
+    .brand-text strong span { color:var(--gold); }
+    .nameplate { min-height:35px; margin-bottom:15px; padding:8px 18px; text-align:center; border-radius:40px; border:1px solid #b8934f; background:#0b0a10ed; font-size:13px; font-weight:800; letter-spacing:.08em; color:#fff2d0; box-shadow:0 6px 20px #0009; }
+    .nameplate .game { color:#f6d782; }
+    .slots { display:grid; grid-template-columns:repeat(3,var(--card-width)); gap:12px; padding:13px; border:1px solid #9d793c; border-radius:19px; background:linear-gradient(145deg,#292014,#08080d 40%,#191422); box-shadow:0 0 0 4px #151018,0 18px 50px #000c,0 0 45px #b57a283d,inset 0 1px #fff4; }
+    .reel { height:var(--card-height); overflow:hidden; position:relative; border-radius:11px; border:2px solid #d4ac60; box-shadow:0 0 16px #e3aa3640,inset 0 0 16px #000; background:#0a0716; }
+    .reel::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(#0007,transparent 15%,transparent 85%,#0007); }
+    .belt { transform:translateY(0); will-change:transform; }
+    .card { position:relative; height:var(--card-height); overflow:hidden; border-radius:7px; background:#050505; }
+    .card-art { position:absolute; top:50%; left:0; width:100%; aspect-ratio:1199 / 1312; transform:translateY(-50%); background-image:url('assets/ruleta-subs/numeros-dorados.png'); background-size:200% 200%; background-position:var(--art-x) var(--art-y); background-repeat:no-repeat; }
+    .result { min-height:54px; margin-top:18px; padding:11px 20px; text-align:center; color:#fff; font-size:clamp(18px,2.4vw,30px); font-weight:900; font-style:italic; letter-spacing:.03em; text-shadow:0 3px 5px #000; }
+    .result.win { color:#ffe18a; filter:drop-shadow(0 0 14px #f5ae36); }
+    .result small { display:block; margin-top:4px; color:#f5e9cf; font-size:12px; font-style:normal; letter-spacing:.12em; }
+    @media (max-width:500px) { .slots { gap:5px; padding:8px; } .brand { margin-bottom:12px; } }
+    @media (prefers-reduced-motion:reduce) { .stage { transition:none; } }
+  </style>
+</head>
+<body>
+  <div class="preview-label">VISTA DE PRUEBA · NO ENTREGA PREMIOS</div>
+  <main class="stage" id="stage" aria-live="polite">
+    <div class="brand"><div class="emblem" aria-hidden="true">✦</div><div class="brand-text"><small>GEO ARMY</small><strong>RULETA <span>DE SUBS</span></strong></div></div>
+    <div class="nameplate"><span id="viewer"></span> <span aria-hidden="true">·</span> <span class="game" id="game"></span></div>
+    <div class="slots" aria-hidden="true"><div class="reel"><div class="belt"></div></div><div class="reel"><div class="belt"></div></div><div class="reel"><div class="belt"></div></div></div>
+    <div class="result" id="result"></div>
+  </main>
+  <script>
+  (() => {
+    'use strict';
+    // Esta pantalla solo representa un resultado ya confirmado por el servidor.
+    // No escoge ganadores, no acredita premios y no valida canjes de Twitch.
+    const params = new URLSearchParams(location.search);
+    const isPreview = params.get('demo') === '1';
+    const games = Object.freeze({
+      fortnite: { name:'FORTNITE', unit:'V-BUCKS', amounts:[500,800,1200] },
+      overwatch: { name:'OVERWATCH', unit:'MONEDAS OW', amounts:[500,1000] }
+    });
+    const artPositions = Object.freeze({
+      500: ['0%','0%'], 800: ['100%','0%'],
+      1000: ['0%','100%'], 1200: ['100%','100%']
+    });
+    const stage = document.querySelector('#stage');
+    const viewer = document.querySelector('#viewer');
+    const gameLabel = document.querySelector('#game');
+    const resultLabel = document.querySelector('#result');
+    const reels = [...document.querySelectorAll('.reel')];
+    const seen = new Set();
+    const queue = [];
+    let busy = false;
+    let sourceVisible = !document.hidden;
+    let visibilityWaiters = [];
+    const activeMotions = new Set();
+    let activeHold = null;
+    const spinAudio = new Audio('assets/ruleta-subs/slot-machine.mp3');
+    spinAudio.preload = 'auto';
+    spinAudio.volume = 0.35;
+    let soundRunning = false;
+    spinAudio.addEventListener('ended', () => { soundRunning = false; });
+
+    function playSound() {
+      const playback = spinAudio.play();
+      if (playback && typeof playback.catch === 'function') playback.catch(() => {});
+    }
+    function startSound() {
+      spinAudio.pause();
+      spinAudio.currentTime = 0;
+      soundRunning = true;
+      playSound();
+    }
+    function stopSound() {
+      soundRunning = false;
+      spinAudio.pause();
+      spinAudio.currentTime = 0;
+    }
+    async function waitForVisibility() {
+      while (!sourceVisible) await new Promise(resolve => visibilityWaiters.push(resolve));
+    }
+    function waitVisibleTime(milliseconds) {
+      return new Promise(resolve => {
+        let remaining = milliseconds, start = 0, timer = null, done = false;
+        const hold = {
+          pause() {
+            if (timer === null) return;
+            clearTimeout(timer); timer = null;
+            remaining = Math.max(0, remaining - (performance.now() - start));
+          },
+          resume() {
+            if (timer !== null || done) return;
+            start = performance.now();
+            timer = setTimeout(() => {
+              timer = null; done = true;
+              if (activeHold === hold) activeHold = null;
+              resolve();
+            }, remaining);
+          }
+        };
+        activeHold = hold;
+        if (sourceVisible) hold.resume();
+      });
+    }
+
+    function setSourceVisible(visible) {
+      if (sourceVisible === visible) return;
+      sourceVisible = visible;
+      if (!visible) {
+        for (const motion of activeMotions) motion.pause();
+        if (activeHold) activeHold.pause();
+        if (soundRunning) spinAudio.pause();
+        return;
+      }
+      for (const motion of activeMotions) motion.play();
+      if (activeHold) activeHold.resume();
+      if (soundRunning) playSound();
+      const waiters = visibilityWaiters; visibilityWaiters = [];
+      for (const resolve of waiters) resolve();
+      if (!busy && queue.length) void drain();
+      else if (!busy && isPreview) enqueuePreview();
+      else if (!busy) showReady();
+    }
+    window.addEventListener('obsSourceVisibleChanged', event => {
+      if (typeof event.detail?.visible === 'boolean') setSourceVisible(event.detail.visible);
+    });
+    document.addEventListener('visibilitychange', () => setSourceVisible(!document.hidden));
+
+    function valid(x) {
+      return x && typeof x.id === 'string' && x.id.length > 0 && x.id.length <= 180 &&
+        typeof x.viewer === 'string' && x.viewer.length > 0 && x.viewer.length <= 100 &&
+        Object.hasOwn(games,x.game) && typeof x.win === 'boolean' &&
+        (x.win ? Number.isSafeInteger(x.amount) && games[x.game].amounts.includes(x.amount) : x.amount == null) &&
+        typeof x.guaranteed === 'boolean' && (!x.guaranteed || x.win);
+    }
+
+    function card(amount) {
+      const [artX,artY] = artPositions[amount];
+      const el = document.createElement('div'); el.className='card';
+      const mark = document.createElement('div'); mark.className='card-art';
+      mark.style.setProperty('--art-x',artX); mark.style.setProperty('--art-y',artY);
+      el.append(mark); return el;
+    }
+
+    function showReady() {
+      viewer.textContent='RULETA LISTA'; gameLabel.textContent='ESPERANDO UN CANJE';
+      resultLabel.className='result'; resultLabel.textContent='ESPERANDO TIRADA';
+      [500,1000,1200].forEach((amount,i) => {
+        const belt=reels[i].querySelector('.belt');
+        for (const motion of belt.getAnimations()) motion.cancel();
+        belt.replaceChildren(card(amount)); belt.style.transform='translateY(0)';
+      });
+      stage.classList.add('visible');
+    }
+
+    async function render(event) {
+      const config=games[event.game];
+      viewer.textContent=event.viewer.toUpperCase(); gameLabel.textContent=config.name;
+      resultLabel.className='result'; resultLabel.textContent='¡BUENA SUERTE!';
+      stage.classList.add('visible');
+      startSound();
+      const targetIndex=event.win ? config.amounts.indexOf(event.amount) : -1;
+      const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const motions = reels.map((reel,i) => {
+        const belt=reel.querySelector('.belt');
+        for (const motion of belt.getAnimations()) motion.cancel();
+        belt.replaceChildren(); belt.style.transform='translateY(0)';
+        const finalIndex=event.win ? targetIndex : i % config.amounts.length;
+        const cycles=12+i*3;
+        for (let n=0;n<cycles;n++) {
+          const ix=(n+i) % config.amounts.length;
+          belt.append(card(config.amounts[ix],ix,config.unit));
+        }
+        belt.append(card(config.amounts[finalIndex],finalIndex,config.unit));
+        const offset=cycles * reel.getBoundingClientRect().height;
+        if (reduced) { belt.style.transform=`translateY(-${offset}px)`; return Promise.resolve(); }
+        const motion=belt.animate([{transform:'translateY(0)'},{transform:`translateY(-${offset}px)`}],
+          {duration:1800+i*550,easing:'cubic-bezier(.16,.72,.18,1)',fill:'forwards'});
+        activeMotions.add(motion);
+        return motion.finished.finally(() => activeMotions.delete(motion));
+      });
+      await Promise.all(motions);
+      await waitForVisibility();
+      if (event.win) {
+        resultLabel.classList.add('win');
+        resultLabel.textContent=`¡GANASTE ${event.amount} ${config.unit}!`;
+        if (event.guaranteed) { const tag=document.createElement('small'); tag.textContent='PREMIO GARANTIZADO'; resultLabel.append(tag); }
+      } else resultLabel.textContent='¡SIGUE INTENTANDO!';
+      if (isPreview) return;
+      await waitVisibleTime(5000);
+      stopSound();
+      stage.classList.remove('visible');
+      await waitVisibleTime(350);
+    }
+
+    async function drain() {
+      if (busy) return; busy=true;
+      try { while (queue.length) { await waitForVisibility(); const { event, onDone } = queue.shift();
+          try { await render(event); onDone?.(true); }
+          catch { seen.delete(event.id); onDone?.(false); } } }
+      finally {
+        busy=false;
+        if (queue.length) void drain();
+        else if (sourceVisible && !isPreview) showReady();
+      }
+    }
+    function showConfirmed(event, onDone) {
+      if (!valid(event) || seen.has(event.id)) return false;
+      seen.add(event.id); queue.push({ event: {...event}, onDone }); void drain(); return true;
+    }
+    window.GeoArmyRuletaOBS=Object.freeze({showConfirmed, isVisible: () => sourceVisible});
+
+    function enqueuePreview() {
+      const demoGame=params.get('juego') === 'fortnite' ? 'fortnite' : 'overwatch';
+      const demoWin=params.get('resultado') !== 'perder';
+      const requestedAmount=Number(params.get('cantidad'));
+      const demoAmount=games[demoGame].amounts.includes(requestedAmount) ? requestedAmount : (demoGame === 'fortnite' ? 800 : 1000);
+      showConfirmed({id:`demo-${++previewCount}`,viewer:'Participante',game:demoGame,win:demoWin,
+        amount:demoWin ? demoAmount : null,guaranteed:demoWin});
+    }
+    let previewCount=0;
+    if (isPreview) {
+      document.body.classList.add('preview');
+      if (sourceVisible) enqueuePreview();
+    } else if (sourceVisible) showReady();
+  })();
+  </script>
+<script src="js/ruleta-subs-obs.js?v=cola-1"></script>
+</body>
+</html>

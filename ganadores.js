@@ -6,6 +6,14 @@
 // NO se usa ganadores.json ni service_role — solo la config pública
 // (window.GEOARMY_SUPABASE_URL / GEOARMY_SUPABASE_ANON_KEY) que ya usa
 // el resto del sitio, protegida por RLS del lado de Supabase.
+//
+// FOTOS DEL PODIO Y EL HISTORIAL (solo presentación): se leen de la vista pública
+// gw_winner_avatars_v1 (winner_id -> avatar_url, puede ser null). Se
+// relacionan SOLO por winner_id === public_winners.id (nunca por nombre),
+// con consultas agrupadas. Si no hay foto, la imagen
+// falla, la consulta no responde, o el mismo ganador tiene fotos distintas
+// y no se puede saber cuál corresponde, se conserva la silueta y el resto
+// de la página funciona igual. No altera podio, contador, historial ni buscador.
 // =====================================================================
 (function () {
   'use strict';
@@ -121,6 +129,8 @@
   }
 
   var ALL_ROWS = [];
+  // La clave es el id del premio, nunca el nombre visible del ganador.
+  var HISTORY_AVATARS = Object.create(null);
 
   function renderHistory(rows) {
     var list = $('gwHistoryList');
@@ -132,13 +142,17 @@
     list.innerHTML = rows.map(function (r) {
       return (
         '<div class="gw-row">' +
-          '<span class="gw-row-user">' + esc(r.usuario || '') + '</span>' +
+          '<span class="gw-row-user">' +
+            '<span class="gw-row-avatar" aria-hidden="true" data-winner-id="' + esc(r.id) + '"></span>' +
+            '<span class="gw-row-name">' + esc(r.usuario || '') + '</span>' +
+          '</span>' +
           '<span class="gw-row-prize">' + esc(prizeLabel(r)) + '</span>' +
           '<span class="gw-row-event">' + esc(r.event || 'General') + '</span>' +
           '<span class="gw-row-date">' + esc(fmtFecha(r.won_at)) + '</span>' +
         '</div>'
       );
     }).join('');
+    pintarFotosHistorial();
   }
 
   // Filtro 100% del lado del cliente, sobre los mismos registros ya
@@ -162,6 +176,136 @@
     var err = $('gwErrorBox'); if (err) err.hidden = false;
   }
 
+  // ===================================================================
+  // FOTOS DEL PODIO -- ver nota de cabecera. Nada de aquí puede romper la
+  // página: cualquier fallo deja la silueta que ya trae el HTML.
+  // ===================================================================
+  var AVATAR_TIMEOUT_MS = 6000;
+
+  // Misma clave de agrupación que computePodium (usuario en minúsculas, sin espacios).
+  function groupKey(u) { return String(u || '').toLowerCase().trim(); }
+
+  // Solo URLs https (nada de javascript:, data:, http:, etc.).
+  function safeAvatarUrl(u) {
+    if (typeof u !== 'string') return null;
+    var t = u.trim();
+    if (!t) return null;
+    try { return new URL(t).protocol === 'https:' ? t : null; } catch (e) { return null; }
+  }
+
+  function setSlotPhoto(slotEl, url) {
+    var holder = slotEl && slotEl.querySelector('.gw-slot-avatar');
+    if (!holder) return;
+    var img = new Image();
+    img.className = 'gw-avatar-img';
+    img.alt = ''; // decorativa: el nombre ya está en el texto del puesto
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    // La foto solo reemplaza a la silueta cuando YA cargó bien; si falla, no pasa nada.
+    img.onload = function () {
+      if (!img.naturalWidth) return;
+      holder.appendChild(img);
+      holder.classList.add('has-photo');
+    };
+    img.onerror = function () { /* se conserva la silueta */ };
+    img.src = url;
+  }
+
+  // Adjuntar solo URLs validadas desde la vista; la silueta sigue visible
+  // hasta que el navegador haya cargado correctamente cada imagen.
+  function pintarFotosHistorial() {
+    var list = $('gwHistoryList');
+    if (!list) return;
+    list.querySelectorAll('.gw-row-avatar').forEach(function (holder) {
+      var url = HISTORY_AVATARS[holder.getAttribute('data-winner-id')];
+      if (!url || holder.querySelector('img')) return;
+      var img = document.createElement('img');
+      img.className = 'gw-row-avatar-img';
+      img.alt = '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.referrerPolicy = 'no-referrer';
+      img.onload = function () {
+        if (img.naturalWidth) holder.classList.add('has-photo');
+      };
+      img.onerror = function () { /* se conserva la silueta */ };
+      holder.appendChild(img);
+      img.src = url;
+    });
+  }
+
+  async function cargarFotosHistorial(sb, rows) {
+    var vistos = Object.create(null);
+    var ids = [];
+    rows.forEach(function (r) {
+      if (r.id == null || vistos[String(r.id)]) return;
+      vistos[String(r.id)] = true;
+      ids.push(r.id);
+    });
+    // Lotes acotados mantienen pequeñas las URLs de consulta y permiten
+    // mostrar las fotos disponibles aunque falle otro lote.
+    for (var i = 0; i < ids.length; i += 80) {
+      try {
+        var res = await withTimeout(
+          sb.from('gw_winner_avatars_v1').select('winner_id, avatar_url').in('winner_id', ids.slice(i, i + 80)),
+          AVATAR_TIMEOUT_MS
+        );
+        if (res.error) throw res.error;
+        (res.data || []).forEach(function (a) {
+          if (!a || a.winner_id == null) return;
+          var url = safeAvatarUrl(a.avatar_url);
+          if (url) HISTORY_AVATARS[String(a.winner_id)] = url;
+        });
+        // El buscador podría haber cambiado mientras llegaban las fotos.
+        pintarFotosHistorial();
+      } catch (e) {
+        console.warn('[ganadores] no se pudieron cargar algunas fotos del historial; se conserva la silueta', e);
+      }
+    }
+  }
+
+  async function cargarFotosPodio(sb, rows, top3) {
+    try {
+      if (!top3.length) return;
+      // Ids de premios (public_winners.id) de cada uno de los 3 grupos del podio.
+      var idsPorGrupo = top3.map(function (g) {
+        var k = groupKey(g.usuario);
+        return rows
+          .filter(function (r) { return r.id != null && groupKey(r.usuario) === k; })
+          .map(function (r) { return r.id; });
+      });
+      var todos = [].concat.apply([], idsPorGrupo);
+      if (!todos.length) return;
+
+      // UNA sola consulta para los 3 puestos (no una por registro).
+      var res = await withTimeout(
+        sb.from('gw_winner_avatars_v1').select('winner_id, avatar_url').in('winner_id', todos),
+        AVATAR_TIMEOUT_MS
+      );
+      if (res.error) throw res.error;
+      var porId = {};
+      (res.data || []).forEach(function (a) {
+        if (a && a.winner_id != null) porId[String(a.winner_id)] = a.avatar_url;
+      });
+
+      top3.forEach(function (g, i) {
+        var urls = [];
+        idsPorGrupo[i].forEach(function (id) {
+          var u = safeAvatarUrl(porId[String(id)]);
+          if (u && urls.indexOf(u) === -1) urls.push(u);
+        });
+        if (urls.length === 1) {
+          setSlotPhoto($('gwSlot' + (i + 1)), urls[0]); // top3[i] <-> gwSlot(i+1), igual que renderPodium
+        } else if (urls.length > 1) {
+          console.warn('[ganadores] "' + g.usuario + '" tiene ' + urls.length +
+            ' fotos distintas entre sus premios; no se puede saber cuál corresponde, se conserva la silueta');
+        }
+      });
+    } catch (e) {
+      console.warn('[ganadores] no se pudieron cargar las fotos del podio; se conserva la silueta', e);
+    }
+  }
+
   async function cargar() {
     var sb = getGanadoresClient();
     if (!sb) {
@@ -179,9 +323,13 @@
       if (res.error) throw res.error;
       var rows = res.data || [];
       ALL_ROWS = rows;
-      renderPodium(computePodium(rows));
+      var top3 = computePodium(rows);
+      renderPodium(top3);
       renderCounter(rows.length);
       renderHistory(rows);
+      // Las fotos se piden DESPUÉS de pintar todo y sin bloquear nada.
+      cargarFotosPodio(sb, rows, top3);
+      cargarFotosHistorial(sb, rows);
     } catch (e) {
       console.error('[ganadores] error cargando public_winners', e);
       mostrarError();

@@ -1,0 +1,202 @@
+/* =====================================================================
+   GEO ARMY · APARIENCIA «VIP VIOLETA Y PLATA»   (css/cosmetics/vip-violet-silver.css, v1)
+   ESTILOS PROPIOS de esta apariencia (id vip_violet_silver). Reproduce la maqueta aprobada por Geo. SOLO PRESENTACIÓN.
+   Lo carga js/geoarmy-cosmetics.js únicamente cuando algún elemento usa esta apariencia (definición en js/geoarmy-cosmetics-catalog.js).
+   La estructura común (marco, hueco de la barra, tamaños base de la foto por espacio, texto para lectores) vive en css/geoarmy-cosmetics.css.
+   Todo cuelga de la clase propia .gcos-vip: sin ella no hace efecto. La etiqueta «VIP» pertenece solo a este diseño.
+   ===================================================================== */
+
+/* =====================================================================
+   VARIABLES
+   ===================================================================== */
+:root {
+  --gcos-lilac:  #c9a8ff;
+  --gcos-violet: #9b3cff;
+  --gcos-neon:   #b45cff;
+  --gcos-deep:   #2b0b66;
+  --gcos-ink:    #120726;
+  --gcos-silver: #e6e9f2;
+}
+
+/* ---------- DISTINTIVO "VIP" (independiente del rango y del nombre) ---------- */
+.gcos-vip .gcos-badge {
+  position: absolute; left: 50%; top: calc(var(--d) * 1.2725); transform: translateX(-50%);
+  box-sizing: border-box; display: flex; align-items: center; justify-content: center;
+  gap: max(1.5px, calc(var(--d) * .03));
+  width: max(calc(var(--d) * .78), 31px); height: max(calc(var(--d) * .3), 13px);
+  border-radius: 999px; border: max(1px, calc(var(--d) * .016)) solid transparent;
+  background:
+    linear-gradient(180deg, #4d1ba3 0%, #2c0c69 55%, #1a0645 100%) padding-box,
+    linear-gradient(180deg, #ffffff, #b3bacd 40%, #eef1f8 62%, #7c849b) border-box;
+  box-shadow:
+    0 0 max(4px, calc(var(--d) * .08)) rgba(160, 70, 255, .85),
+    inset 0 0 max(3px, calc(var(--d) * .07)) rgba(190, 110, 255, .85),
+    0 max(1.5px, calc(var(--d) * .03)) max(2px, calc(var(--d) * .05)) rgba(0, 0, 0, .6);
+  font: 700 max(8px, calc(var(--d) * .15)) / 1 'Space Grotesk', system-ui, sans-serif;
+  letter-spacing: .03em; font-style: normal; white-space: nowrap;
+}
+.gcos-vip .gcos-badge::before {
+  content: ""; flex: 0 0 auto;
+  width: max(8px, calc(var(--d) * .17)); height: max(5.7px, calc(var(--d) * .12));
+  background: url("../../assets/cosmetics/vip-violet-silver/badge-crown.svg") center / contain no-repeat;
+}
+.gcos-vip .gcos-badge b {
+  font-weight: 700; padding-top: .04em;
+  background: linear-gradient(180deg, #ffffff, #e0e2f1 55%, #aab0c9);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+
+/* Animación suave: SOLO donde hay una única instancia visible (la tarjeta) y solo si el usuario no pidió menos movimiento. */
+@media (prefers-reduced-motion: no-preference) {
+  .gcos-frame--anim::after {
+    content: ""; position: absolute; left: 50%; top: calc(var(--d) * .9125); width: calc(var(--d) * 1.2); height: calc(var(--d) * 1.2);
+    transform: translate(-50%, -50%); border-radius: 50%;
+    box-shadow: 0 0 calc(var(--d) * .2) calc(var(--d) * .03) rgba(165, 80, 255, .55);
+    animation: gcosGlow 4.4s ease-in-out infinite;
+  }
+  @keyframes gcosGlow { 0%, 100% { opacity: .25; } 50% { opacity: .9; } }
+}
+
+/* =====================================================================
+   1) BARRA SUPERIOR — estilo propio
+   ===================================================================== */
+.ga-logged-in.gcos-vip {
+  border-color: #8a3ee0;
+  background-image: linear-gradient(90deg, rgba(110, 40, 210, .26), rgba(110, 40, 210, 0) 46%), linear-gradient(180deg, rgba(150, 70, 255, .10), rgba(150, 70, 255, 0));
+  box-shadow: 0 0 0 1px rgba(170, 100, 255, .30), 0 0 18px rgba(155, 60, 255, .50), inset 0 0 14px rgba(130, 50, 230, .22);
+}
+.ga-logged-in.gcos-vip:hover { border-color: #b57bff; }
+
+/* =====================================================================
+   2) RANKING  (.rk-row / .rk-top-card de ranking.html)
+   ===================================================================== */
+/* 11–50: fila compacta */
+.rk-row.gcos-vip:not(.rk-row--elite) {
+  position: relative; min-height: 54px; background-color: #0e0a1d;
+  background-image: linear-gradient(90deg, rgba(120, 50, 225, .15), rgba(120, 50, 225, .04) 45%, rgba(120, 50, 225, 0) 70%);
+  box-shadow: inset 0 1px 0 rgba(170, 100, 255, .55), inset 0 -1px 0 rgba(170, 100, 255, .55), inset 3px 0 0 var(--gcos-violet);
+}
+.rk-row.gcos-vip:not(.rk-row--elite):hover { background-color: #150f2b; }
+.rk-row.gcos-vip:not(.rk-row--elite)::after {                 /* acentos diagonales violetas (como en la referencia) */
+  content: ""; position: absolute; top: 0; bottom: 0; right: 17%; width: 19%; pointer-events: none; z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(160, 80, 255, 0), rgba(160, 80, 255, .30) 55%, rgba(196, 130, 255, .55));
+  clip-path: polygon(34% 0, 100% 0, 66% 100%, 0 100%);
+}
+.rk-row.gcos-vip:not(.rk-row--elite)::before {
+  content: ""; position: absolute; top: 0; bottom: 0; right: 10%; width: 11%; pointer-events: none; z-index: 0;
+  background: linear-gradient(90deg, rgba(160, 80, 255, 0), rgba(160, 80, 255, .18));
+  clip-path: polygon(40% 0, 100% 0, 60% 100%, 0 100%);
+}
+.rk-row.gcos-vip > * { position: relative; z-index: 1; }
+.rk-row.gcos-vip .rk-row-ava { margin: 0 14px 0 8px; }
+.rk-row.gcos-vip .rk-flag { right: -16px; bottom: 6px; }   /* sobre la foto, por encima del distintivo VIP (que ocupa el borde inferior) */
+
+/* 4–10: placa metálica (se tiñe con sus propias variables --edge / --fill; sus pseudo-elementos no se tocan) */
+.rk-row--elite.gcos-vip {
+  --edge: linear-gradient(135deg, #d0aaff, #6a2ed0 46%, #b78cff);
+  --fill:
+    linear-gradient(128deg, transparent 0 66%, rgba(176, 100, 255, .55) 66.3%, rgba(176, 100, 255, .12) 67.5%, rgba(120, 50, 225, .30) 70%, rgba(150, 80, 245, .42) 78%, rgba(120, 50, 225, 0) 78.4%, transparent 82%),
+    linear-gradient(128deg, transparent 0 82%, rgba(150, 80, 245, .20) 82.3%, rgba(150, 80, 245, 0) 86%),
+    linear-gradient(90deg, #1d1440, #120d2a 38%, #0c0919);
+  background-image: none; box-shadow: none; margin-top: 5px;
+}
+.rk-row--elite.gcos-vip:hover { --edge: linear-gradient(135deg, #e6d2ff, #8a52f0 46%, #cbb0ff); }
+.rk-row--elite.gcos-vip .rk-row-ava { margin: 0 20px 0 10px; }
+.rk-row--elite.gcos-vip .rk-flag { right: -18px; bottom: 7px; }
+.rk-row--elite.gcos-vip .rk-row-pos { background: linear-gradient(180deg, #ffffff, #cdb6ff 60%, #8f78d6); -webkit-background-clip: text; background-clip: text; }
+
+/* 1–3: el marco VIP rodea el aro metálico del puesto y sus marcas finas (se ven DENTRO del marco), por eso --d vale más
+   que la foto. La placa "#N" conserva su sitio (cuelga bajo la foto) y el distintivo VIP queda justo debajo de ella;
+   la figura gana altura por abajo y la placa se sube lo mismo (bottom) para no moverse. */
+.rk-top-card.gcos-vip .gcos-badge { width: calc(var(--d) * .62); height: calc(var(--d) * .22); font-size: calc(var(--d) * .12); }
+.rk-top-card.gcos-vip .rk-top-avawrap .gcos-frame { --d: 120px; }
+.rk-top-card.gcos-vip .gcos-badge { top: calc(var(--d) * .9125 + 63px); }
+.rk-top-card.gcos-vip .rk-top-fig { padding-bottom: 52px; }
+.rk-top-card.gcos-vip .rk-top-medal { bottom: 34px; }
+.rk-top-1.gcos-vip .rk-top-avawrap .gcos-frame { --d: 164px; }
+.rk-top-1.gcos-vip .gcos-badge { top: calc(var(--d) * .9125 + 87px); }
+.rk-top-1.gcos-vip .rk-top-fig { padding-top: 132px; padding-bottom: 70px; }  /* sitio para la corona dorada POR ENCIMA de la corona del marco, con aire entre ambas */
+.rk-top-1.gcos-vip .rk-top-crown { top: 6px; width: 42px; height: 26px; }      /* corona de posición: más pequeña y más arriba */
+.rk-top-1.gcos-vip .rk-top-medal { bottom: 44px; }
+@media (max-width: 560px) {
+  .rk-top-card.gcos-vip .rk-top-avawrap .gcos-frame { --d: 88px; }
+  .rk-top-card.gcos-vip .gcos-badge { top: calc(var(--d) * .9125 + 48px); }
+  .rk-top-card.gcos-vip .rk-top-fig { padding-bottom: 42px; }
+  .rk-top-card.gcos-vip .rk-top-medal { bottom: 26px; }
+  .rk-top-1.gcos-vip .rk-top-avawrap .gcos-frame { --d: 118px; }
+  .rk-top-1.gcos-vip .gcos-badge { top: calc(var(--d) * .9125 + 66px); }
+  .rk-top-1.gcos-vip .rk-top-fig { padding-top: 98px; padding-bottom: 55px; }
+  .rk-top-1.gcos-vip .rk-top-crown { top: 3px; width: 33px; height: 20px; }
+  .rk-top-1.gcos-vip .rk-top-medal { bottom: 33px; }
+}
+
+/* =====================================================================
+   3) TARJETA DE IDENTIDAD  (.mgt-id de css/mi-geoarmy-identity.css)
+   ===================================================================== */
+.mgt-id.gcos-vip {
+  --id-frame-a: #e6e9f2; --id-frame-b: #9b3cff;
+  border-color: #9a45f0;
+  background:
+    linear-gradient(120deg, transparent 0 56%, rgba(165, 85, 255, .0) 56%, rgba(165, 85, 255, .22) 62%, rgba(190, 120, 255, .10) 69%, transparent 69.3%),
+    radial-gradient(520px 260px at 0% 0%, rgba(150, 70, 255, .34), transparent 70%),
+    radial-gradient(1.2px 1.2px at 12% 18%, rgba(255, 255, 255, .55), transparent 60%),
+    radial-gradient(1px 1px at 86% 12%, rgba(205, 160, 255, .65), transparent 60%),
+    radial-gradient(1.2px 1.2px at 70% 82%, rgba(255, 255, 255, .4), transparent 60%),
+    radial-gradient(460px 240px at 100% 100%, rgba(120, 50, 225, .30), transparent 70%),
+    linear-gradient(160deg, #1b0c3d 0%, #0d0621 100%);
+  box-shadow: 0 0 0 1px rgba(170, 100, 255, .38), 0 14px 40px rgba(0, 0, 0, .45), 0 0 30px rgba(155, 60, 255, .42), inset 0 0 34px rgba(120, 40, 220, .20);
+}
+.mgt-id.gcos-vip > *:not(.gcb-canvas) { position: relative; z-index: 1; }   /* :not(.gcb-canvas): el lienzo de confeti del cumpleaños debe seguir siendo absoluto */
+.mgt-id.gcos-vip:not(.mgt-id--bday)::before {               /* banda diagonal luminosa (referencia: arriba a la derecha) */
+  content: ""; position: absolute; top: 0; bottom: 0; right: 12%; width: 20%; pointer-events: none; z-index: 0;
+  background: linear-gradient(180deg, rgba(165, 90, 255, .34), rgba(165, 90, 255, .05) 60%, rgba(165, 90, 255, 0));
+  clip-path: polygon(46% 0, 100% 0, 54% 100%, 0 100%);
+}
+.mgt-id.gcos-vip:not(.mgt-id--bday)::after {                /* filete plata-violeta superior */
+  content: ""; position: absolute; left: 14px; right: 14px; top: 0; height: 2px; pointer-events: none; z-index: 2;
+  background: linear-gradient(90deg, transparent, rgba(223, 227, 238, .85) 30%, rgba(190, 130, 255, .95) 60%, transparent);
+}
+/* El marco VIP sustituye al anillo naranja/violeta propio de la tarjeta (la foto llena el aro) */
+.mgt-id.gcos-vip .mgt-id-ring { padding: 0; background: #170a24; box-shadow: none; overflow: visible; }
+.mgt-id.gcos-vip .mgt-id-ring::before { display: none; }
+.mgt-id.gcos-vip .mgt-id-img { inset: 0; width: 100%; height: 100%; }
+.mgt-id.gcos-vip .mgt-id-badge { right: calc(var(--id-avatar) * -.17); bottom: calc(var(--id-avatar) * .02); z-index: 2; }
+/* hueco para que laureles, corona y distintivo no se recorten con el borde de la tarjeta */
+.mgt-id.gcos-vip .mgt-id-who {
+  padding: calc(var(--id-avatar) * .4125 - 12px) 0 calc(var(--id-avatar) * .2) calc(var(--id-avatar) * .28 - 10px);
+  gap: calc(var(--id-avatar) * .28 + 8px);
+}
+.mgt-id.gcos-vip .mgt-stat { border-color: rgba(182, 140, 255, .34); }
+.mgt-id.gcos-vip .mgt-stat-2 { border-color: rgba(182, 140, 255, .26); }
+
+/* Tarjeta estrecha (≤ 420 px de ancho de tarjeta, es decir móviles): el marco con laureles necesita sitio, así que
+   la identidad se apila (marco arriba, nombre y rango debajo, centrados). Así el nombre nunca se queda sin espacio. */
+@container (max-width: 420px) {
+  .mgt-id.gcos-vip .mgt-id-who { flex-direction: column; align-items: center; text-align: center; gap: calc(var(--id-avatar) * .22); padding: calc(var(--id-avatar) * .4125 - 12px) 0 calc(var(--id-avatar) * .2) 0; }
+  .mgt-id.gcos-vip .mgt-id-text { width: 100%; flex: 0 0 auto; }
+  .mgt-id.gcos-vip .mgt-id-name { justify-content: center; }
+  .mgt-id.gcos-vip .mgt-id-name > span:first-child { max-width: 100%; }
+  .mgt-id.gcos-vip .mgt-id-meta { justify-content: center; }
+}
+
+/* ---------- Filas VIP en móvil (≤ 440 px) — complementa la sección 0 ---------- */
+@media (max-width: 440px) {
+  /* VIP: el marco necesita ~10 px a cada lado de la foto; la bandera se acerca a la foto para no pisar la insignia */
+  .rk-row.gcos-vip:not(.rk-row--elite) .rk-row-ava { margin: 0 5px 0 4px; }
+  .rk-row.gcos-vip .rk-flag { right: -10px; }
+  .rk-row--elite.gcos-vip .rk-row-ava { margin: 0 6px 0 5px; }
+  .rk-row--elite.gcos-vip .rk-row-ava .gcos-frame { --d: 37px; }
+  .rk-row--elite.gcos-vip .rk-flag { right: -12px; }
+  /* Podio: los puestos laterales quedan a ~16 px del borde y el marco VIP (más ancho que la columna) lo rebasaría; se acercan 4 px al centro. */
+  .rk-top-2.gcos-vip { transform: translateX(4px); }
+  .rk-top-3.gcos-vip { transform: translateX(-4px); }
+}
+@media (max-width: 360px) {
+  .rk-top-card.gcos-vip .rk-top-avawrap .gcos-frame { --d: 84px; }
+  .rk-top-1.gcos-vip .rk-top-avawrap .gcos-frame { --d: 112px; }
+  .rk-top-1.gcos-vip .rk-top-fig { padding-top: 92px; }
+}
+@media (max-width: 340px) {
+  .rk-top-card.gcos-vip .rk-top-avawrap .gcos-frame { --d: 75px; }   /* mínimo que aún rodea las marcas finas del puesto a 320 px */
+}

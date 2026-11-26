@@ -1,0 +1,80 @@
+/* ============================================================================
+   GEO ARMY Plus · PÁGINA EXCLUSIVA (plus.html) — css/plus-page.css. Solo presentación; todo bajo ".pl" / prefijo "pl-".
+   No toca css/style.css, css/v3-theme.css ni misiones. Paleta esmeralda de Plus.
+   ============================================================================ */
+.pl { --pl-ac: #19d98b; --pl-ac2: #7dffc6; --pl-bg: rgba(6, 22, 16, .82); --pl-line: rgba(60, 240, 160, .32); --pl-txt: #eafff5; --pl-mut: #a9d6c2; }
+.pl [hidden] { display: none !important; }
+.pl-wrap { position: relative; z-index: 2; max-width: 980px; margin: 0 auto; padding: 28px 18px 70px; color: var(--pl-txt); font-family: Inter, system-ui, sans-serif; }
+
+/* Cabecera */
+.pl-hero { position: relative; text-align: center; padding: 34px 18px 26px; }
+.pl-eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 700 11px/1 Orbitron, Inter, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--pl-ac2);
+  border: 1px solid var(--pl-line); border-radius: 999px; padding: 7px 14px; background: rgba(25, 217, 139, .08); }
+.pl-title { margin: 14px 0 8px; font: 900 clamp(30px, 6vw, 48px)/1.05 Orbitron, 'Space Grotesk', sans-serif; letter-spacing: .02em;
+  background: linear-gradient(180deg, #eafff5, #3cf0a0 70%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pl-sub { margin: 0 auto; max-width: 560px; color: var(--pl-mut); font-size: 15px; line-height: 1.55; }
+.pl-chip { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; border: 1px solid var(--pl-line); background: rgba(6, 22, 16, .7); }
+.pl-chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #6b7f77; }
+.pl[data-state="plus"] .pl-chip { color: #bff6d5; border-color: rgba(60, 240, 160, .6); }
+.pl[data-state="plus"] .pl-chip::before { background: var(--pl-ac); box-shadow: 0 0 10px var(--pl-ac); }
+.pl[data-state="unknown"] .pl-chip::before, .pl[data-state="unverified"] .pl-chip::before { background: #ffb84a; }
+
+/* Tarjetas */
+.pl-card { position: relative; border-radius: 18px; padding: 18px; margin: 0 0 16px; background: linear-gradient(180deg, rgba(10, 40, 29, .72), var(--pl-bg)); border: 1px solid var(--pl-line);
+  box-shadow: 0 18px 40px -28px rgba(25, 217, 139, .6); }
+.pl-h2 { margin: 0 0 4px; font: 700 18px/1.25 'Space Grotesk', Inter, sans-serif; color: #f2fff9; }
+.pl-sec { margin: 26px 2px 12px; font: 700 12px/1 Orbitron, Inter, sans-serif; letter-spacing: .16em; text-transform: uppercase; color: var(--pl-ac2); }
+.pl-p { margin: 0 0 10px; color: var(--pl-mut); font-size: 14px; line-height: 1.55; }
+.pl-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 720px) { .pl-grid { grid-template-columns: 1fr; } .pl-wrap { padding: 18px 14px 60px; } }
+
+/* Mensajes de estado (sin Plus / sin sesión / error) */
+.pl-gate { text-align: center; padding: 26px 20px; }
+.pl-gate .pl-h2 { font-size: 21px; margin-bottom: 8px; }
+.pl-gate-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 14px; }
+.pl-btn { display: inline-block; cursor: pointer; text-decoration: none; border-radius: 12px; padding: 11px 18px; font: 700 14px/1.2 Inter, system-ui, sans-serif;
+  color: var(--pl-txt); background: transparent; border: 1px solid var(--pl-line); }
+.pl-btn--primary { background: linear-gradient(135deg, #14c47e, #0a7a52); border-color: #3cf0a0; color: #03140d; }
+.pl-btn:disabled { opacity: .6; cursor: default; }
+.pl-btn:focus-visible { outline: 2px solid var(--pl-ac2); outline-offset: 2px; }
+.pl-perks { list-style: none; margin: 14px auto 0; padding: 0; max-width: 420px; text-align: left; display: grid; gap: 8px; }
+.pl-perks li { position: relative; padding-left: 22px; font-size: 14px; color: #d9fff0; }
+.pl-perks li::before { content: "◆"; position: absolute; left: 0; top: 1px; color: var(--pl-ac); font-size: 11px; }
+
+/* Misión (diaria y semanales) */
+.pl-m { display: flex; flex-direction: column; gap: 10px; }
+.pl-m-top { display: flex; align-items: flex-start; gap: 12px; }
+.pl-m-ico { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 20px; background: rgba(25, 217, 139, .12); border: 1px solid var(--pl-line); }
+.pl-m-ico img { width: 28px; height: 28px; object-fit: contain; }
+.pl-m-body { min-width: 0; flex: 1 1 auto; }
+.pl-m-title { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 700 16px/1.25 'Space Grotesk', Inter, sans-serif; color: #f2fff9; }
+.pl-badge { padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #c9ffe6; background: rgba(25, 217, 139, .14); border: 1px solid var(--pl-line); }
+.pl-badge--soon { color: #ffe3a6; background: rgba(255, 184, 74, .12); border-color: rgba(255, 184, 74, .4); }
+.pl-badge--done { color: #03140d; background: #3cf0a0; border-color: #3cf0a0; }
+.pl-m-desc { margin: 3px 0 0; font-size: 13px; line-height: 1.45; color: var(--pl-mut); }
+.pl-m-status { margin: 0; font-size: 14px; font-weight: 600; color: #f2fff9; }
+.pl-m-status.is-good { color: #bff6d5; }
+.pl-m-status.is-warn { color: #ffe3a6; }
+.pl-m-sub { margin: 0; font-size: 12px; color: #8fbfa9; line-height: 1.4; }
+.pl-m-sub:empty, .pl-m-status:empty { display: none; }
+.pl-bar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: hidden; border: 1px solid rgba(60, 240, 160, .2); }
+.pl-bar > i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #14c47e, #7dffc6); transition: width .5s ease; }
+.pl-bar-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--pl-mut); margin-top: -4px; }
+.pl-reward { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; color: #eafff5; }
+.pl-reward img { width: 18px; height: 18px; }
+@media (prefers-reduced-motion: reduce) { .pl-bar > i { transition: none; } }
+
+/* Banner de semana anterior */
+.pl-prev { border-color: rgba(255, 184, 74, .5); background: linear-gradient(180deg, rgba(48, 34, 8, .6), rgba(22, 16, 6, .8)); }
+.pl-prev .pl-h2 { color: #ffe3a6; }
+
+/* Reglas (cómo cuenta cada misión) */
+.pl-rules details { border-top: 1px solid rgba(60, 240, 160, .18); padding: 10px 0; }
+.pl-rules details:first-of-type { border-top: 0; }
+.pl-rules summary { cursor: pointer; font-weight: 700; color: #f2fff9; font-size: 14.5px; }
+.pl-rules summary:focus-visible { outline: 2px solid var(--pl-ac2); outline-offset: 3px; border-radius: 6px; }
+.pl-rules ul { margin: 8px 0 2px; padding-left: 18px; color: var(--pl-mut); font-size: 13.5px; line-height: 1.55; }
+.pl-rules li { margin: 3px 0; }
+.pl-skel { height: 120px; border-radius: 18px; background: linear-gradient(90deg, rgba(255,255,255,.03), rgba(255,255,255,.08), rgba(255,255,255,.03)); background-size: 200% 100%; animation: plSk 1.4s linear infinite; margin-bottom: 14px; }
+@keyframes plSk { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .pl-skel { animation: none; } }

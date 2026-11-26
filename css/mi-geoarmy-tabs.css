@@ -1,0 +1,74 @@
+/* Mi Geo Army — subpestañas (Fase 1A). Solo presentación.
+ * Sin html.mgt-ready (JS no cargó) la barra de pestañas se oculta y todos los paneles
+ * quedan visibles: la página se ve como la columna larga de antes. */
+
+.mgt-shell { position: relative; z-index: 2; max-width: 1380px; margin: 26px auto 0; padding: 0 1.5rem 70px; }
+.mgt-nav { display: none; }
+.mgt-tab[hidden] { display: none !important; }
+
+/* Los bloques originales traen su propio ancho/relleno de página: dentro del shell lo fija el shell. */
+.mgt-stage .v3-now-section { max-width: none; margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
+.mgt-stage .v3-now-section { padding-bottom: 0; margin-top: 0; }
+.mgt-stage .v3-now-section:first-child { margin-top: 0; }
+.mgt-stage .v3-table-wrap, .mgt-stage .v3-xp-card { margin-top: 0; }
+/* Separación uniforme entre bloques de un panel (pisa los margin/padding en línea heredados de la columna larga). */
+.mgt-panel > * + * { margin-top: 22px !important; }
+.mgt-stage .v3-table-wrap { max-width: none; margin-left: 0; margin-right: 0; }
+.mgt-stage .v3-xp-card { max-width: none; margin-left: 0; margin-right: 0; }
+.mgt-stage { min-width: 0; }
+.mgt-wallet-top { grid-template-columns: minmax(0, 420px); }
+
+.mgt-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(145,71,255,.5); flex-shrink: 0; }
+.mgt-country .v3-x-card-main { align-items: center; }
+
+/* ===== Con JS: una sola sección visible a la vez ===== */
+html.mgt-ready .mgt-panel { display: none; }
+html.mgt-ready .mgt-panel.is-active { display: block; }
+html.mgt-ready .mgt-panel[hidden] { display: none; }
+
+/* ===== Pestañas compactas (por debajo de 1100px) ===== */
+html.mgt-ready .mgt-nav {
+  display: flex; gap: 8px; margin: 0 0 22px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  padding: 4px;
+  border: 1px solid rgba(255,184,74,.30); border-radius: 16px;
+  background: linear-gradient(180deg, rgba(34,16,46,.78), rgba(18,9,28,.78));
+  box-shadow: 0 0 22px rgba(145,71,255,.10);
+}
+html.mgt-ready .mgt-nav::-webkit-scrollbar { display: none; }
+
+.mgt-tab {
+  appearance: none; border: 1px solid transparent; background: transparent; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  flex: 1 1 0; min-width: max-content; min-height: 44px; padding: 8px 14px; border-radius: 12px;
+  color: #d9c7e8; font-family: 'Orbitron', sans-serif; font-size: 12px; letter-spacing: .06em; white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.mgt-tab:hover { color: #ffd98a; background: rgba(255,153,51,.10); }
+.mgt-tab:focus-visible { outline: 2px solid #ffb84a; outline-offset: 2px; }
+.mgt-tab.is-active {
+  color: #ffe2a8; border-color: rgba(255,184,74,.65);
+  background: linear-gradient(135deg, rgba(255,122,47,.30), rgba(145,71,255,.34));
+  box-shadow: 0 0 14px rgba(255,153,51,.18);
+}
+.mgt-tab-ic { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; font-size: 16px; line-height: 1; }
+.mgt-tab-ic-img { width: 20px; height: 20px; object-fit: contain; }
+
+/* ===== Riel lateral (1100px o más) ===== */
+@media (min-width: 1100px) {
+  html.mgt-ready .mgt-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+  html.mgt-ready .mgt-nav {
+    flex-direction: column; gap: 6px; margin: 0; padding: 10px; overflow: visible;
+    position: static; /* sin sticky/fixed: la navegación no flota sobre el contenido */
+  }
+  .mgt-tab { flex: none; justify-content: flex-start; min-width: 0; width: 100%; padding: 10px 14px; font-size: 13px; }
+}
+
+@media (max-width: 560px) {
+  .mgt-shell { padding-left: 1rem; padding-right: 1rem; }
+  html.mgt-ready .mgt-nav { gap: 4px; padding: 4px; }
+  .mgt-tab { flex-direction: column; gap: 2px; padding: 6px 8px; font-size: 10px; letter-spacing: .03em; }
+  .mgt-wallet-top { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) { .mgt-tab { transition: none; } }

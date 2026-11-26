@@ -728,3 +728,32 @@ html.panels-ready .panel.is-active { display: block; }
   .ga-name { display: none; }
   .ga-dropdown { right: -10px; }
 }
+
+/* ===== Racha Diaria en el header: chip "🔥 N" (js/geoarmy-account.js) =====
+   Va después de la insignia de rango, dentro del mismo pill. Solo existe en
+   el DOM cuando current_streak > 0 (no hay estado oculto: si no hay racha,
+   el chip simplemente no se dibuja). Compacto: emoji + número, una línea. */
+.ga-streak {
+  display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0; margin-left: 3px;
+  padding: 2px 8px 2px 6px; border-radius: 100px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; line-height: 1.25;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+  color: #ffb84a; background: rgba(255,122,47,.12); border: 1px solid rgba(255,122,47,.38);
+}
+.ga-streak-ic { font-size: 12px; line-height: 1; }
+@media (max-width: 480px) {
+  .ga-streak { margin-left: 0; padding: 1px 6px 1px 5px; font-size: 11.5px; }
+  .ga-logged-in:has(.ga-streak) { gap: 6px; padding-left: 12px; padding-right: 12px; }
+}
+@media (max-width: 360px) {
+  .ga-streak { padding: 1px 5px 1px 4px; font-size: 11px; gap: 2px; }
+  .ga-streak-ic { font-size: 11px; }
+  .ga-logged-in:has(.ga-streak) { gap: 5px; padding-left: 10px; padding-right: 10px; }
+}
+/* 320 px: el pill con racha de 3 cifras no cabe en la fila del nav (misiones,
+   ranking, mi-geoarmy) y saltaría a una segunda línea; se compacta un poco más. */
+@media (max-width: 339px) {
+  .ga-logged-in:has(.ga-streak) { gap: 4px; padding-left: 9px; padding-right: 9px; }
+  .ga-streak { padding: 1px 4px 1px 3px; font-size: 10.5px; gap: 1px; margin-left: 0; }
+  .ga-streak-ic { font-size: 10px; }
+}

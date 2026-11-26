@@ -1,0 +1,28 @@
+/* onepiece-assets.css — RECURSOS GRÁFICOS de One Piece 2026 (slots).
+ *
+ * Estado actual: el ÚNICO recurso real es el planeta de diez islas, que va como <img> en onepiece.html
+ *   (assets/onepiece/planeta-diez-islas.webp y planeta-diez-islas-720.webp).
+ *
+ * Todo lo demás son "slots": mientras no exista el archivo, la página usa rellenos CSS/vectoriales provisionales.
+ * Cuando ChatGPT entregue un recurso, basta con DESCOMENTAR su línea y poner el nombre real del archivo.
+ * Los nombres de abajo son SOLO una propuesta de nomenclatura para quien genere las imágenes: esos archivos
+ * todavía NO existen en el proyecto.
+ *
+ * Para ver en pantalla qué slots faltan: abrir onepiece.html?slots=1
+ */
+/* FASE 2D — INTEGRADOS (ya no son slots): capitulo-1..4, cofre-pequeno, cofre-pase-batalla, cofre-tesoro-monedas.
+ *   Se cargan como <img loading="lazy"> con tamaño explícito desde js/onepiece.js (objeto ART), sin duplicar descargas. */
+:root {
+  /* --img-bg-cubierta:        url('../assets/onepiece/bg-cubierta.webp');        */
+  /* --img-mastil-izq:         url('../assets/onepiece/mastil-izq.webp');         */
+  /* --img-mastil-der:         url('../assets/onepiece/mastil-der.webp');         */
+  /* --img-gaviotas:           url('../assets/onepiece/gaviotas.webp');           */
+  /* --img-sombrero-paja:      url('../assets/onepiece/sombrero-paja.webp');      */
+  /* --img-esquina-barril:     url('../assets/onepiece/esquina-barril.webp');     */
+  /* --img-brujula:            url('../assets/onepiece/brujula.webp');            */
+  /* --img-textura-madera:     url('../assets/onepiece/textura-madera.webp');     */
+  /* --img-textura-pergamino:  url('../assets/onepiece/textura-pergamino.webp');  */
+  /* --img-moneda-vbucks:      url('../assets/onepiece/moneda-vbucks.webp');      */
+  /* --img-cartel-wanted:      url('../assets/onepiece/cartel-wanted.webp');      */
+  /* --img-cuerda-ancla:       url('../assets/onepiece/cuerda-ancla.webp');       */
+}

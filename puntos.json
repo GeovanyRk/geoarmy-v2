@@ -1,0 +1,301 @@
+{
+  "mufasa1912": {
+    "usuario": "mufasa1912",
+    "ganado": 20785,
+    "gastado": 20000,
+    "operaciones": {
+      "220ef20d438caf37d442d20e46c5e25d97969679a312cc4ea771c464188ca680": {
+        "puntos": 10000,
+        "saldoRestante": 10785,
+        "en": "2026-10-26T00:00:45.342Z"
+      },
+      "99531176c4713f901e1bbce9572de2dec4f097021be3a7410a6ae5bbb631a661": {
+        "puntos": 10000,
+        "saldoRestante": 785,
+        "en": "2026-10-26T00:00:57.630Z"
+      }
+    }
+  },
+  "kirbyx01": {
+    "usuario": "kirbyx01",
+    "ganado": 37715,
+    "gastado": 23000,
+    "operaciones": {
+      "aac1be8a55971a13f18bfd83cd47d5378fad27cfc96130152526f417220ad436": {
+        "puntos": 10000,
+        "saldoRestante": 9725,
+        "en": "2026-10-21T21:26:23.640Z"
+      },
+      "3252d4fd045050cf783d801f2e8335acf801c238a5c079d2c7a191bbe3a6a610": {
+        "puntos": 10000,
+        "saldoRestante": 5665,
+        "en": "2026-11-01T00:06:36.775Z"
+      }
+    }
+  },
+  "alberto9134": {
+    "usuario": "alberto9134",
+    "ganado": 5570,
+    "gastado": 1000
+  },
+  "matidk_0": {
+    "usuario": "matidk_0",
+    "ganado": 140475,
+    "gastado": 138750,
+    "operaciones": {
+      "4d24a288dbabe0afe605280e2532581e4c81569dc5699b0bb7b77f4e61ac8ea2": {
+        "puntos": 10000,
+        "saldoRestante": 6955,
+        "en": "2026-10-11T01:26:57.582Z"
+      },
+      "694962399f718c728705c313cfb6960da7345f9178f4da824a9c12ce3d25eef5": {
+        "puntos": 10000,
+        "saldoRestante": 2145,
+        "en": "2026-10-22T00:26:17.182Z"
+      },
+      "2653c34c8e47bdd408b9878cbb85bef8ba49b8cedd7799ea10892a829b49bd7a": {
+        "puntos": 10000,
+        "saldoRestante": 885,
+        "en": "2026-11-01T23:55:18.499Z"
+      },
+      "0350cb7b2b83378b6b46f2c99e19c4a3b9c9083c98b74553de0e79c24f32c4d4": {
+        "puntos": 10000,
+        "saldoRestante": 865,
+        "en": "2026-11-18T01:51:04.184Z"
+      }
+    }
+  },
+  "kittykitty_katt": {
+    "usuario": "kittykitty_katt",
+    "ganado": 23940,
+    "gastado": 22000,
+    "operaciones": {
+      "ea7c98d70e322e94ca4cfadf43c25c82a9edb08d56ad7f1faa3940365eb7692e": {
+        "puntos": 5000,
+        "saldoRestante": 3940,
+        "en": "2026-10-23T22:21:08.415Z"
+      },
+      "0ba4eb1e68c126f4cc7aa153dc723a2d02bc073f42d552b5ce97d1fe2cbb952a": {
+        "puntos": 2000,
+        "saldoRestante": 1940,
+        "en": "2026-10-23T22:21:14.330Z"
+      }
+    }
+  },
+  "fedriquechumpi": {
+    "usuario": "fedriquechumpi",
+    "ganado": 80790,
+    "gastado": 73800,
+    "operaciones": {
+      "2ab6a2ba52b06060273e29a519392b1fe26480d5940cc47b7d486e9495c41326": {
+        "puntos": 10000,
+        "saldoRestante": 4100,
+        "en": "2026-10-17T01:24:51.446Z"
+      },
+      "54a0816b26787079ff41f05fde4363b844214858edfbf5b08269cd3c8cd4c7d0": {
+        "puntos": 10000,
+        "saldoRestante": 780,
+        "en": "2026-11-06T00:58:38.676Z"
+      }
+    }
+  },
+  "warnerr8": {
+    "usuario": "warnerr8",
+    "ganado": 12080,
+    "gastado": 4000
+  },
+  "maikyx__": {
+    "usuario": "maikyx__",
+    "ganado": 7445,
+    "gastado": 1400
+  },
+  "kiro_hyer": {
+    "usuario": "Kiro_Hyer",
+    "ganado": 14265,
+    "gastado": 12500,
+    "operaciones": {
+      "b58d0b8e4907bd80d2b148f25e4f64b078764d3719e50d9ba105936523ef1667": {
+        "puntos": 2000,
+        "saldoRestante": 495,
+        "en": "2026-11-13T00:44:49.781Z"
+      },
+      "54f6fa87a09aeac7ed6aa78b8b567eeaa524036018f3775e9c42c6cafac25ec8": {
+        "puntos": 2000,
+        "saldoRestante": 775,
+        "en": "2026-11-19T00:50:46.692Z"
+      }
+    }
+  },
+  "502jona": {
+    "usuario": "502jona",
+    "ganado": 200,
+    "gastado": 0
+  },
+  "cristiandan89": {
+    "usuario": "cristiandan89",
+    "ganado": 11455,
+    "gastado": 10000,
+    "operaciones": {
+      "50419f0708504a59beb53b735c9996074f55852b22594f47739406f84af9bf40": {
+        "puntos": 10000,
+        "saldoRestante": 175,
+        "en": "2026-11-15T23:20:59.165Z"
+      }
+    }
+  },
+  "forsaken453": {
+    "usuario": "forsaken453",
+    "ganado": 32380,
+    "gastado": 26000,
+    "operaciones": {
+      "971091bdb4b4b20ddd5c1cdbaeafc518ba66b504faad376140135f0f6ca6f8aa": {
+        "puntos": 10000,
+        "saldoRestante": 15330,
+        "en": "2026-10-30T03:29:18.377Z"
+      },
+      "6678a6ffa4185b8f6faaca6b47b5ee3af85d8fa220843509c6363c675ab3c395": {
+        "puntos": 10000,
+        "saldoRestante": 5330,
+        "en": "2026-10-30T03:29:27.460Z"
+      },
+      "253f111d11de93b2f2150a29a66a3bfceb932e27569c67f41917e4b34b382a8c": {
+        "puntos": 5000,
+        "saldoRestante": 370,
+        "en": "2026-10-31T00:19:58.742Z"
+      }
+    }
+  },
+  "alexjuanforever": {
+    "usuario": "AlexJuanForever",
+    "ganado": 1875,
+    "gastado": 0
+  },
+  "ph3rxyz": {
+    "usuario": "PH3Rxyz",
+    "ganado": 2470,
+    "gastado": 0
+  },
+  "axismoder": {
+    "usuario": "AxisModer",
+    "ganado": 1490,
+    "gastado": 0
+  },
+  "joshi_rexgg": {
+    "usuario": "joshi_rexgg",
+    "ganado": 680,
+    "gastado": 0
+  },
+  "josem55a": {
+    "usuario": "josem55a",
+    "ganado": 13790,
+    "gastado": 4250
+  },
+  "shadowcasreal1": {
+    "usuario": "ShadowcasReal1",
+    "ganado": 6440,
+    "gastado": 5000
+  },
+  "ermichael94": {
+    "usuario": "ermichael94",
+    "ganado": 9350,
+    "gastado": 6000
+  },
+  "marianxec": {
+    "usuario": "marianxec",
+    "ganado": 6110,
+    "gastado": 0
+  },
+  "mericrissmas": {
+    "usuario": "mericrissmas",
+    "ganado": 220,
+    "gastado": 0
+  },
+  "skky_de_nile": {
+    "usuario": "skky_de_nile",
+    "ganado": 14020,
+    "gastado": 13000,
+    "operaciones": {
+      "af0a42b1ab2e784f2425c25fa8652fd6e9c4704a6941b067c1623ac61e8e06e2": {
+        "puntos": 5000,
+        "saldoRestante": 4360,
+        "en": "2026-10-15T00:12:46.301Z"
+      },
+      "cd9dab998a094202293826f693168752e7a41162d0918bfab344d21a1611f0a4": {
+        "puntos": 2000,
+        "saldoRestante": 2360,
+        "en": "2026-10-15T00:13:21.025Z"
+      },
+      "6c92048e72857ccdaa9df5f014ccb20041e113e31296ee01cfd076a97705de41": {
+        "puntos": 2000,
+        "saldoRestante": 380,
+        "en": "2026-10-15T00:13:44.965Z"
+      }
+    }
+  },
+  "krager_27": {
+    "usuario": "Krager_27",
+    "ganado": 400,
+    "gastado": 0
+  },
+  "hoseokie13": {
+    "usuario": "hoseokie13",
+    "ganado": 1920,
+    "gastado": 0
+  },
+  "izanlego05": {
+    "usuario": "izanlego05",
+    "ganado": 60,
+    "gastado": 0
+  },
+  "charliecharliev": {
+    "usuario": "charliecharliev",
+    "ganado": 160,
+    "gastado": 0
+  },
+  "elkid_rd36": {
+    "usuario": "elkid_rd36",
+    "ganado": 11510,
+    "gastado": 10000,
+    "operaciones": {
+      "eb12c7ff61699360fd67d679e9e32b609c1db9606633268abfd2a757779a579b": {
+        "puntos": 10000,
+        "saldoRestante": 1510,
+        "en": "2026-10-31T01:01:10.860Z"
+      }
+    }
+  },
+  "toji_fushijiro": {
+    "usuario": "toji_fushijiro",
+    "ganado": 5330,
+    "gastado": 5000,
+    "operaciones": {
+      "441cb8643eab31a4d21d55b3be87be03507a22d93af128b94d546fcb6e61ca7e": {
+        "puntos": 5000,
+        "saldoRestante": 330,
+        "en": "2026-10-28T01:03:29.806Z"
+      }
+    }
+  },
+  "https_karla_": {
+    "usuario": "https_karla_",
+    "ganado": 100,
+    "gastado": 0
+  },
+  "vdezzxn": {
+    "usuario": "vDezzxn",
+    "ganado": 350,
+    "gastado": 0
+  },
+  "joseangelyoon_rk": {
+    "usuario": "JoseAngelYoon_Rk",
+    "ganado": 4150,
+    "gastado": 2000,
+    "operaciones": {
+      "b7a91461bc80444ca61cb295d0ef70ac7f5255bc4fc0b1a7df9a6c4b1b51b77a": {
+        "puntos": 2000,
+        "saldoRestante": 1460,
+        "en": "2026-11-18T23:48:16.071Z"
+      }
+    }
+  }
+}

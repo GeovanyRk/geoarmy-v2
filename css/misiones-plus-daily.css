@@ -1,0 +1,35 @@
+/* ============================================================================
+   Misiones — tarjeta «Misión diaria Plus» (G-Coins). Archivo APARTE (no toca css/misiones-v4.css ni las tarjetas de XP).
+   Todo va bajo ".ms4 .ms-plus-daily" / prefijo "ms-pd-". Solo presentación: el estado lo decide el servidor.
+   ============================================================================ */
+.ms4 .ms-plus-daily {
+  --pd-ac: #ffb84a;
+  display: flex; align-items: flex-start; gap: 14px; margin: 0 0 18px; padding: 15px 16px; border-radius: 16px; position: relative;
+  background: linear-gradient(180deg, rgba(36,20,56,.74), rgba(14,8,22,.86));
+  border: 1px solid color-mix(in srgb, var(--pd-ac) 38%, rgba(255,255,255,.08));
+  box-shadow: 0 16px 34px -26px color-mix(in srgb, var(--pd-ac) 70%, transparent);
+}
+.ms4 .ms-plus-daily[hidden] { display: none; }
+.ms4 .ms-plus-daily[data-state="granted"], .ms4 .ms-plus-daily[data-state="already_claimed"] { --pd-ac: #3ddc84; }
+.ms4 .ms-plus-daily[data-state="unconfirmed"] { --pd-ac: #ffb84a; }
+.ms4 .ms-plus-daily[data-state="plus_required"] { --pd-ac: #a79fbd; }
+.ms4 .ms-pd-icon { flex: 0 0 auto; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--pd-ac) 14%, transparent); border: 1px solid color-mix(in srgb, var(--pd-ac) 40%, transparent); }
+.ms4 .ms-pd-icon img { width: 30px; height: 30px; object-fit: contain; }
+.ms4 .ms-pd-body { min-width: 0; flex: 1 1 auto; }
+.ms4 .ms-pd-top { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ms4 .ms-pd-title { margin: 0; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #f4ecff; }
+.ms4 .ms-pd-badge { padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #ffe3a6; background: rgba(255,184,74,.12); border: 1px solid rgba(255,184,74,.4); }
+.ms4 .ms-pd-desc { margin: 4px 0 0; font-size: 13px; line-height: 1.45; color: #cfc3e3; }
+.ms4 .ms-pd-status { margin: 10px 0 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: #f4ecff; }
+.ms4 .ms-plus-daily[data-state="granted"] .ms-pd-status, .ms4 .ms-plus-daily[data-state="already_claimed"] .ms-pd-status { color: #bff6d5; }
+.ms4 .ms-plus-daily[data-state="unconfirmed"] .ms-pd-status { color: #ffe3a6; }
+.ms4 .ms-plus-daily[data-state="plus_required"] .ms-pd-status { color: #ddd5ee; }
+.ms4 .ms-pd-sub { margin: 3px 0 0; font-size: 12px; line-height: 1.4; color: #b4a8cb; }
+.ms4 .ms-pd-sub:empty { display: none; }
+.ms4 .ms-pd-btn { margin-top: 10px; padding: 7px 14px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; color: #2a1a05; background: linear-gradient(90deg, #ffb84a, #ff7a2f); border: 0; }
+.ms4 .ms-pd-btn[hidden] { display: none; }
+.ms4 .ms-pd-btn:disabled { opacity: .6; cursor: default; }
+@media (max-width: 520px) { .ms4 .ms-plus-daily { padding: 13px; gap: 11px; } .ms4 .ms-pd-icon { width: 38px; height: 38px; } }
+/* Página Plus encendida: la tarjeta es solo un acceso a plus.html. */
+.ms4 .ms-pd-link { display: inline-block; margin-top: 10px; text-decoration: none; }
+.ms4 .ms-pd-link[hidden] { display: none; }

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Piñatas Plus — GeoArmy</title>
+  <meta name="robots" content="noindex"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/v3-theme.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
+  <style>
+    /* Variables propias: la página es AUTOSUFICIENTE (ya no enlaza css/style.css, que no viaja en este ZIP). Los valores son los de css/style.css del sitio.
+       AL INTEGRARLA en el sitio: se puede enlazar css/style.css (nav, pie) ANTES de este bloque <style>; estas variables son idénticas a las del sitio, así que no cambian nada. */
+    :root { --bg:#08080a; --bg2:#131316; --bg3:#1c1c21; --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.16); --text:#f6f6f8; --text2:#a9a9b4; --text3:#6f6f7d;
+            --accent:#9147ff; --accent-light:#c9a3ff; --gold:#ffd23f; --radius-sm:10px; --radius-lg:24px; --ease:cubic-bezier(.16,1,.3,1);
+            --card-bg:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01) 40%),var(--bg2); --card-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 24px 48px -28px rgba(0,0,0,.7); }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; }
+    html, body { overflow-x:hidden; }
+  </style>
+  <style>
+    /* ===== Estilos copiados SIN CAMBIOS del tienda.html antiguo (prefijo ti-), salvo lo marcado «WEB:» ===== */
+    .ti-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.1em;
+      color:var(--gold); background:rgba(255,210,63,0.1); border:1px solid rgba(255,210,63,.25); padding:5px 14px; border-radius:100px; margin-bottom:1.4rem; }
+    .ti-sub { color:var(--text2); font-size:16.5px; max-width:540px; margin:0 auto; line-height:1.7; }
+    .ti-coin-icon { height:1em; width:1em; vertical-align:-0.15em; }
+    .ti-item-costo { display:inline-flex; align-items:center; gap:6px; width:fit-content; color:#ffd23f; font-weight:700; font-family:'Space Grotesk',sans-serif;
+      background:rgba(255,210,63,.1); border:1px solid rgba(255,210,63,.25); padding:5px 12px; border-radius:100px; font-size:.92rem; }
+    .ti-canjear-btn { position:relative; overflow:hidden; isolation:isolate; font-family:'Space Grotesk',sans-serif; font-weight:700; letter-spacing:.01em; border:none; border-radius:var(--radius-sm);
+      padding:12px 18px; cursor:pointer; color:#fff; background:linear-gradient(135deg,var(--accent),#6c1fe0); transition:opacity .2s,transform .35s var(--ease),box-shadow .35s var(--ease); box-shadow:0 10px 26px -12px rgba(145,71,255,.55); }
+    .ti-canjear-btn::before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.3) 50%,transparent 70%); transform:translateX(-120%); transition:transform .7s var(--ease); }
+    .ti-canjear-btn:hover:not(:disabled) { transform:translateY(-2px); }
+    .ti-canjear-btn:hover:not(:disabled)::before { transform:translateX(120%); }
+    .ti-canjear-btn:disabled { opacity:.4; cursor:not-allowed; background:var(--bg3); box-shadow:none; }
+
+    /* ===== Piñata (CSS original) ===== */
+    .ti-pinata-header { max-width:720px; margin:3.5rem auto 0; padding:0 1.5rem; text-align:center; }
+    .ti-pinata-header h2 { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.7rem,3.6vw,2.3rem); font-weight:700; letter-spacing:-0.02em; margin-bottom:.6rem; }
+    .ti-pinata-grid { max-width:900px; margin:2rem auto 0; padding:0 1.5rem 1rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.4rem; }
+    .ti-pinata-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.6rem; display:flex; flex-direction:column; align-items:center; gap:14px; box-shadow:var(--card-shadow); }
+    .ti-pinata-stage { position:relative; width:100%; max-width:220px; height:240px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; isolation:isolate; }
+    .ti-pinata-stage::before { content:""; position:absolute; left:50%; bottom:6px; z-index:-1; width:130px; height:34px; transform:translateX(-50%); background:radial-gradient(closest-side,rgba(255,210,63,.28),transparent 75%); filter:blur(4px); }
+    .ti-pinata-rope { width:3px; height:26px; margin-bottom:-2px; background:repeating-linear-gradient(180deg,#7a5230,#7a5230 5px,#5c3d22 5px,#5c3d22 10px); }
+    .ti-pinata-obj { position:relative; width:100%; height:200px; filter:drop-shadow(0 10px 18px rgba(0,0,0,.45)) drop-shadow(0 0 22px rgba(255,210,63,.18));
+      /* WEB: aquí iba «animation: tiPinataSwing 2.6s ease-in-out infinite». Ahora el balanceo y el golpe los mueve JavaScript con las MISMAS curvas y tiempos
+         (los @keyframes se congelan si el sistema tiene «reducir movimiento»; las transiciones de abajo, no). */ }
+    .ti-pinata-obj .half { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:transform .7s cubic-bezier(.4,-0.2,.6,1.3),opacity .6s ease; }
+    .ti-pinata-obj .half .art { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+    .ti-pinata-obj .half img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
+    .ti-pinata-obj .half.top { clip-path:inset(0 0 50% 0); }
+    .ti-pinata-obj .half.bottom { clip-path:inset(50% 0 0 0); }
+    .ti-pinata-obj.break .half.top { transform:translateY(-56px) rotate(-16deg); opacity:0; }
+    .ti-pinata-obj.break .half.bottom { transform:translateY(56px) rotate(16deg); opacity:0; }
+    .ti-pinata-result { position:absolute; bottom:6px; left:50%; transform:translate(-50%,10px); font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:.95rem; text-align:center; white-space:nowrap; opacity:0; transition:opacity .3s ease,transform .3s ease; pointer-events:none; }
+    .ti-pinata-result.show { opacity:1; transform:translate(-50%,0); }
+    .ti-pinata-result.win { color:#ffd23f; text-shadow:0 0 10px rgba(255,210,63,.5); }
+    .ti-pinata-result.lose { color:var(--text3); font-weight:600; font-size:.85rem; }
+    .ti-pinata-confetti { position:fixed; top:-10px; width:8px; height:13px; opacity:.95; pointer-events:none; z-index:999; }
+    .ti-pinata-nombre { font-family:'Space Grotesk',sans-serif; font-size:1.05rem; font-weight:600; }
+
+    /* ===== WEB: añadidos de la versión Plus ===== */
+    #pnDemo { margin:0 auto; max-width:900px; padding:8px 14px; text-align:center; font-weight:700; letter-spacing:.08em; font-size:13px; background:#5a1414; border-bottom:1px solid #ff7a7a; color:#ffd7d7; }
+    .pn-demo-prob { margin-top:4px; font-weight:500; letter-spacing:0; font-size:12.5px; color:#ffc9c9; }
+    .pn-prizes { font-size:.84rem; color:#9be37e; text-align:center; margin:-4px 0 0; }
+    .pn-premios { font-size:.82rem; color:var(--text3); text-align:center; margin-top:-6px; }
+    .pn-chips { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+    .pn-chip { font-size:.8rem; font-weight:600; padding:4px 11px; border-radius:100px; border:1px solid var(--border2); color:var(--text2); background:rgba(255,255,255,.03); }
+    .pn-chip b { color:#ffd23f; font-family:'Space Grotesk',sans-serif; }
+    .pn-btn { min-width:220px; }
+    .pn-btn.armed { background:linear-gradient(135deg,#ff7a7a,#e63946); }
+    .pn-msg { min-height:2.6em; margin:0; text-align:center; font-size:.88rem; line-height:1.45; color:var(--text2); max-width:280px; }
+    .pn-msg.err { color:#ff9a9a; } .pn-msg.ok { color:#9be37e; }
+    .ti-pinata-obj.is-closed { opacity:.45; filter:grayscale(.7) drop-shadow(0 6px 10px rgba(0,0,0,.4)); }
+    .pn-legal { max-width:640px; margin:1.4rem auto 3rem; padding:0 1.5rem; text-align:center; font-size:.8rem; color:var(--text3); line-height:1.6; }
+  </style>
+</head>
+<body>
+  <nav class="v3-nav">
+    <div class="v3-nav-inner">
+      <a href="index.html" class="v3-logo"><span class="v3-logo-mark"><img src="logo.png" alt="GeoArmy"/></span><span class="v3-wordmark">GEO ARMY</span></a>
+      <div class="v3-page-links"><a href="index.html">Inicio</a><a href="plus.html">Plus</a><a href="mi-geoarmy.html">Mi billetera</a></div>
+      <div class="v3-auth"><div id="geoAccountWidget"></div></div>
+    </div>
+  </nav>
+
+  <div id="pnDemo" hidden><div>MODO DEMO · SIN SERVIDOR REAL · SIN G-COINS NI PREMIOS REALES</div><div id="pnDemoProb" class="pn-demo-prob"></div></div>
+
+  <div class="ti-pinata-header">
+    <div class="ti-eyebrow"><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 14.35 8.15 20.5 10.5l-6.15 2.35L12 19l-2.35-6.15L3.5 10.5l6.15-2.35L12 2Z"/><path d="m19 16.5.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8Z"/></svg> Beneficio Plus</div>
+    <h2>Rompe la piñata y gana</h2>
+    <p class="ti-sub">Cada día tienes <strong>5 intentos gratis en cada piñata</strong>. Si quieres seguir, cada intento extra cuesta <strong>5 G-Coins</strong>. Hay un ganador al día por piñata: cuando alguien gana, esa piñata se cierra hasta mañana. Es de azar, juega con cabeza.</p>
+  </div>
+  <div id="pnGrid" class="ti-pinata-grid"></div>
+  <p class="pn-legal">Los premios se acreditan automáticamente en tu billetera de GEO ARMY (V-Bucks de Fortnite y OW Coins de Overwatch). Una piñata cerrada no gasta tus intentos ni tus G-Coins. El día se reinicia a medianoche de Nueva York.</p>
+
+  <script src="js/premium.js"></script>
+  <script src="js/geoarmy-ranks.js"></script>
+  <script src="js/geoarmy-account.js"></script>
+  <script src="js/pinata-provider.js"></script>
+  <script src="js/geoarmy-pinata-wiring.js"></script>
+  <script>
+  /* =====================================================================================================================
+     GEO ARMY PLUS · PIÑATAS (Fortnite y Overwatch) — BORRADOR LOCAL, FASE 1 (revisión 5).
+     Animación (balanceo → golpe → ruptura → resultado → confeti) y tiempos: los del tienda.html antiguo (400 ms golpe, 500 ms ruptura→resultado, 3800 ms resultado).
+     Cambios (marcados «WEB:»; rev. 5: estado 'paused'): el NAVEGADOR YA NO DECIDE NADA. El proveedor del servidor decide acceso, intento, cobro, sorteo y cierre.
+     Aquí NO hay probabilidades ni topes: solo se anima el resultado que dicta el servidor.
+     Contrato del proveedor (window.GEOARMY_PINATA_PROVIDER):
+       status(pinata)              -> { state:'ready'|'closed'|'paused'|'no_session'|'no_plus'|'disabled', account_id, free_left, free_total, cost, balance, next_reset_at, last_attempt, prizes:[{day,prize_code,label,currency_code,amount,debt_offset}] }
+       attempt(pinata, request_id, max_cost)
+                                   -> { status:'ok'|'duplicate'|'closed'|'confirm_required'|'insufficient_funds'|'rate_limited'|'no_plus'|'disabled'|'paused'|'error', attempt_id, outcome:'win'|'lose', prize_code, paid, cost, authorized_cost,
+                                        credit:{currency_code,amount,debt_offset}|null, required_cost, state }
+       lookup(pinata, request_id)  -> { status:'found'|'not_found', attempt_id, outcome, prize_code, paid, cost, authorized_cost, credit, state }     (SOLO LECTURA: no crea intento, no cobra, no sortea)
+     COSTO AUTORIZADO (rev. 4): cada request_id viaja con max_cost = 0 («acepté un intento GRATIS») o el costo mostrado (solo DESPUÉS de pulsar «Confirmar: cobrar»). El servidor lo comprueba antes
+     de cobrar, sortear o registrar y, si el costo real lo supera, responde 'confirm_required' sin consumir nada. La autorización se guarda junto al id pendiente y los reintentos
+     usan SIEMPRE la original (nunca se «mejora» sola). 'confirm_required' es definitiva (el id no se usó): se descarta y se vuelve a pedir confirmación con un id NUEVO.
+     PREMIOS (rev. 4): el servidor los ACREDITA solo en la billetera (VBUCKS / OWCOINS) dentro de la misma operación del intento; la web solo lo muestra (credit / prizes).
+     PAUSA AUTOMÁTICA (rev. 5/6): si falla la acreditación de un premio, el servidor pausa ESA piñata. status() devuelve state:'paused'; attempt() devuelve status:'paused' o
+     'credit_failed' (rev. 7): SOLO una respuesta «sin intento» (closed / confirm_required / insufficient_funds / paused) con request_state: 'none' = la base GUARDÓ una decisión definitiva para ese
+     id bajo su bloqueo (ni una petición anterior con ese id, aún en camino, podrá procesarse después) → se descarta; sin esa señal ('unknown': pausa local, base inaccesible, base antigua,
+     credit_failed) el id y su autorización se CONSERVAN. lookup puede devolver además { status:'decided', decision } (decisión guardada: se descarta el id). Un lookup 'not_found' NUNCA borra un id (solo lectura: el intento original puede estar terminando): el id se
+     resuelve reintentando el MISMO id con su autorización original (la base responde duplicate / closed / paused de forma definitiva). Un id registrado antes de la pausa
+     sigue devolviendo 'duplicate'.
+     INTENTO PENDIENTE: cada request_id se guarda en SU PROPIA clave de localStorage (cuenta + piñata + id): dos pestañas nunca se pisan entre sí. No caduca por
+     tiempo: solo se borra ESE id cuando el servidor da una respuesta definitiva (ok, duplicate, closed, insufficient_funds). 'no_plus', 'disabled', 'rate_limited'
+     y 'error' NO son definitivas (el servidor las devuelve antes de mirar el id): el pendiente se conserva y se consulta con lookup().
+     SESIÓN: el proveedor debe emitir window.dispatchEvent(new Event('ga-pinata-account-changed')) al iniciar/cerrar sesión o cambiar de cuenta; la página
+     cancela al instante cualquier animación/respuesta en curso y no muestra nada de la cuenta anterior. (Además, si status() trae otro account_id, se hace lo mismo.)
+     status() devuelve account_id y prizes AUNQUE el estado sea no_plus o disabled: quien ya ganó siempre puede ver sus premios.
+     Sin proveedor la página queda inerte («Próximamente»). ?demo=1 carga el servidor de mentira (js/pinata-demo-servidor.js).
+     ===================================================================================================================== */
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var Q = new URLSearchParams(location.search);
+
+    /* WEB: SOLO PRESENTACIÓN. Imágenes: las MISMAS rutas del original (icons/pinata-fortnite.png, icons/pinata-ow.png). */
+    var PINATAS = [
+      { key: 'fortnite', nombre: 'Piñata Fortnite',  art: '<img src="icons/pinata-fortnite.png" alt="Piñata Fortnite">', confeti: ['#ff2fb0', '#9b5cff', '#33e0d1', '#a6e22e', '#ffd23f'],
+        premios: { fn_500_vbucks: '500 V-Bucks', fn_800_vbucks: '800 V-Bucks', fn_1200_vbucks: '1,200 V-Bucks', fn_1500_vbucks: '1,500 V-Bucks' } },
+      { key: 'ow',       nombre: 'Piñata Overwatch', art: '<img src="icons/pinata-ow.png" alt="Piñata Overwatch">', confeti: ['#ff8c00', '#ffffff', '#2a2a2a', '#ffd23f'],
+        premios: { ow_500_coins: '500 OW Coins', ow_1000_coins: '1,000 OW Coins' } }
+    ];
+    var VIEW = {}, provider = null;
+
+    /* ---------- animación: las curvas del original (ease-in-out) movidas por JS ---------- */
+    function bezier(x1, y1, x2, y2) {
+      function cx(t) { return 3 * x1 * t * (1 - t) * (1 - t) + 3 * x2 * t * t * (1 - t) + t * t * t; }
+      function cy(t) { return 3 * y1 * t * (1 - t) * (1 - t) + 3 * y2 * t * t * (1 - t) + t * t * t; }
+      return function (x) { var lo = 0, hi = 1, t = x; for (var i = 0; i < 30; i++) { var v = cx(t); if (Math.abs(v - x) < 1e-5) break; if (v < x) lo = t; else hi = t; t = (lo + hi) / 2; } return cy(t); };
+    }
+    var EIO = bezier(.42, 0, .58, 1);
+    function kf(frames, u) {
+      for (var i = 0; i < frames.length - 1; i++) {
+        var a = frames[i], b = frames[i + 1];
+        if (u >= a[0] && u <= b[0]) { var e = EIO((u - a[0]) / (b[0] - a[0])); return [a[1] + (b[1] - a[1]) * e, a[2] + (b[2] - a[2]) * e]; }
+      }
+      var l = frames[frames.length - 1]; return [l[1], l[2]];
+    }
+    var SWING = [[0, -5, 0], [.5, 5, 0], [1, -5, 0]];                                        /* tiPinataSwing 2.6s infinite */
+    var SHAKE = [[0, 0, 0], [.2, -11, -7], [.4, 9, 6], [.6, -7, -4], [.8, 4, 3], [1, 0, 0]]; /* tiPinataShake .4s */
+    function loop(now) {
+      PINATAS.forEach(function (p) {
+        var v = VIEW[p.key]; if (!v) return; var o = v.obj, r;
+        if (v.mode === 'rest') { if (!v.restSet) { o.style.transform = 'none'; v.restSet = true; } return; }
+        v.restSet = false;
+        if (v.mode === 'shake') { var u = (now - v.t0) / 400; if (u >= 1) { v.mode = 'swing'; v.t0 = now; r = [0, 0]; } else r = kf(SHAKE, u); }
+        else { r = kf(SWING, (((now - v.t0) % 2600) + 2600) % 2600 / 2600); }
+        o.style.transform = 'rotate(' + r[0].toFixed(3) + 'deg) translateX(' + r[1].toFixed(3) + 'px)';
+      });
+      requestAnimationFrame(loop);
+    }
+    function spawnConfeti(count, palette) {       /* devuelve una función que lo cancela y quita las piezas */
+      var parts = [], t0 = performance.now(), dead = false;
+      for (var i = 0; i < count; i++) {
+        var el = document.createElement('div'); el.className = 'ti-pinata-confetti';
+        el.style.left = Math.random() * 100 + 'vw'; el.style.background = palette[Math.floor(Math.random() * palette.length)];
+        var dur = (1.6 + Math.random() * 1.2) * 1000; document.body.appendChild(el);
+        parts.push({ el: el, dur: dur, rot0: Math.random() * 360, rot1: 360 + Math.random() * 360 });
+      }
+      (function tick(now) {
+        if (dead) return; var alive = 0;
+        parts.forEach(function (c) {
+          if (!c.el) return; var u = (now - t0) / c.dur;
+          if (u >= 1) { c.el.remove(); c.el = null; return; } alive++;
+          var e = u * u * u * 0.5 + u * 0.5;
+          c.el.style.transform = 'translateY(' + (e * innerHeight).toFixed(1) + 'px) rotate(' + (c.rot0 + c.rot1 * u).toFixed(1) + 'deg)';
+        });
+        if (alive) requestAnimationFrame(tick);
+      })(t0);
+      return function () { dead = true; parts.forEach(function (c) { if (c.el) { c.el.remove(); c.el = null; } }); };
+    }
+
+    /* ---------- utilidades ---------- */
+    function newId() { return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }); }
+    function withTimeout(pr, ms) { return new Promise(function (ok, ko) { var t = setTimeout(function () { ko(new Error('timeout')); }, ms); pr.then(function (v) { clearTimeout(t); ok(v); }, function (e) { clearTimeout(t); ko(e); }); }); }
+    function fmtLeft(iso) { var s = Math.max(0, Math.floor((new Date(iso) - Date.now()) / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h + ' h ' + (m < 10 ? '0' : '') + m + ' min ' + (x < 10 ? '0' : '') + x + ' s'; }
+    function prizeLabel(p, code) { return p.premios[code] || code; }
+    function fmtDay(d) { try { return new Date(d + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'short' }); } catch (e) { return d; } }
+
+    /* ---------- intento pendiente: guardado por CUENTA + PIÑATA, sin caducidad por tiempo ----------
+       localStorage (sobrevive a recargar y a cerrar el navegador). Si el navegador no lo permite se usa memoria (se pierde al recargar: PERSIST=false).
+       LÍMITE (no se puede arreglar desde la web): si se borran los datos del navegador o se entra desde otro dispositivo, este id ya no existe.
+       Lo cubre el SERVIDOR (ver PROPUESTA_PINATAS.md §4): status() devuelve last_attempt y prizes (premios acreditados) de la cuenta, así un PREMIO nunca depende de este id. */
+    var STORE = (function () { try { var s = window.localStorage, k = '__ga_probe'; s.setItem(k, '1'); s.removeItem(k); return s; } catch (e) { return null; } })();
+    var MEM = {}, PERSIST = !!STORE;
+    function ppre(acct, pin) { return 'geoarmy-pinata-pending:v3:' + acct + ':' + pin + ':'; }       /* UNA clave por request_id: no hay lectura-modificación-escritura que se pise */
+    function listPending(acct, pin) {
+      if (!acct) return []; var pre = ppre(acct, pin), out = [], keys = [];
+      try { if (STORE) { for (var i = 0; i < STORE.length; i++) keys.push(STORE.key(i)); } } catch (e) {}
+      Object.keys(MEM).forEach(function (k) { if (keys.indexOf(k) < 0) keys.push(k); });
+      keys.forEach(function (k) {
+        if (k.indexOf(pre) !== 0) return; var raw = null; try { raw = STORE && STORE.getItem(k) != null ? STORE.getItem(k) : MEM[k]; } catch (e) { raw = MEM[k]; }
+        try { var o = JSON.parse(raw); if (o && o.id && k === pre + o.id && o.acct === acct && o.pin === pin) { o.max = +o.max > 0 ? +o.max : 0; out.push(o); } } catch (e) {}   /* sin 'max' (formato anterior) = autorizó 0: jamás se asume un pago */   /* debe coincidir con ESTA cuenta, ESTA piñata y su propio id */
+      });
+      return out.sort(function (x, y) { return x.t - y.t; });
+    }
+    function writePending(o) { var k = ppre(o.acct, o.pin) + o.id, val = JSON.stringify(o); try { if (STORE) STORE.setItem(k, val); else MEM[k] = val; } catch (e) { MEM[k] = val; PERSIST = false; } }
+    function clearPending(acct, pin, id) { var k = ppre(acct, pin) + id; try { if (STORE) STORE.removeItem(k); } catch (e) {} delete MEM[k]; }   /* borra SOLO ese id */
+
+    /* ---------- tarjetas ---------- */
+    function buildCard(p) {
+      var card = document.createElement('div'); card.className = 'ti-pinata-card'; card.id = 'pn-' + p.key;
+      card.innerHTML =
+        '<div class="ti-pinata-stage"><div class="ti-pinata-rope"></div>' +
+        '<div class="ti-pinata-obj" id="tiPinataObj-' + p.key + '"><div class="half top"><div class="art">' + p.art + '</div></div><div class="half bottom"><div class="art">' + p.art + '</div></div></div>' +
+        '<div class="ti-pinata-result" id="tiPinataResult-' + p.key + '"></div></div>' +
+        '<div class="ti-pinata-nombre">' + p.nombre + '</div>' +
+        '<div class="pn-premios">Premios: ' + Object.keys(p.premios).map(function (c) { return p.premios[c]; }).join(' · ') + '</div>' +
+        '<div class="pn-chips"><span class="pn-chip" data-c="free" hidden>Gratis hoy: <b></b></span><span class="pn-chip" data-c="bal" hidden>Saldo: <b></b> G-Coins</span><span class="pn-chip" data-c="reset" hidden>Reinicio en <b></b></span></div>' +
+        '<p class="pn-prizes" hidden></p>' +
+        '<button type="button" class="ti-canjear-btn pn-btn" id="tiPinataBtn-' + p.key + '" disabled>Cargando…</button>' +
+        '<p class="pn-msg" id="pnMsg-' + p.key + '" role="status" aria-live="polite"></p>';
+      $('pnGrid').appendChild(card);
+      var v = VIEW[p.key] = { p: p, card: card, obj: card.querySelector('.ti-pinata-obj'), btn: card.querySelector('.pn-btn'), msg: card.querySelector('.pn-msg'), prizes: card.querySelector('.pn-prizes'),
+                              res: card.querySelector('.ti-pinata-result'), state: null, acct: undefined, busy: false, dirty: false, armed: false, armTimer: null, mode: 'swing', t0: performance.now(), pendings: [], looked: {}, notFound: {}, gen: 0, timers: [], stopConfeti: null, animating: false };
+      v.btn.addEventListener('click', function () { onClick(p.key); });
+      return v;
+    }
+    function say(v, text, cls) { v.msg.textContent = text || ''; v.msg.className = 'pn-msg' + (cls ? ' ' + cls : ''); }
+    function chip(v, c, val) { var el = v.card.querySelector('[data-c=' + c + ']'); if (val == null) { el.hidden = true; return; } el.hidden = false; el.querySelector('b').textContent = val; }
+    function setClosedLook(v, closed) { v.obj.classList.toggle('is-closed', !!closed); v.mode = closed ? 'rest' : (v.mode === 'rest' ? 'swing' : v.mode); if (!closed) v.t0 = performance.now(); }
+    function disarm(v) { v.armed = false; clearTimeout(v.armTimer); if (v.state && !v.busy) render(v); }
+    function endBusy(v) { v.busy = false; if (v.dirty) { v.dirty = false; refresh(v.p.key); } else { render(v); maybeRecover(v); } }
+    /* Todo paso diferido de la animación pasa por after(): al cambiar de cuenta se cancelan TODOS y no queda nada de la cuenta anterior en pantalla. */
+    function after(v, ms, fn) { var g = v.gen, id = setTimeout(function () { var i = v.timers.indexOf(id); if (i >= 0) v.timers.splice(i, 1); if (v.gen !== g) return; fn(); }, ms); v.timers.push(id); }
+    function cancelAnim(v) {
+      v.gen++; v.timers.forEach(clearTimeout); v.timers = []; if (v.stopConfeti) { v.stopConfeti(); v.stopConfeti = null; }
+      v.obj.classList.remove('hit', 'break'); v.res.classList.remove('show'); v.res.className = 'ti-pinata-result'; v.res.textContent = '';
+      v.mode = 'swing'; v.t0 = performance.now(); v.animating = false; v.busy = false; v.dirty = false; v.armed = false; clearTimeout(v.armTimer); say(v, '');
+    }
+
+    function render(v) {               /* pinta el botón y los chips a partir del estado que dicta el servidor */
+      var s = v.state || { state: 'loading' }, b = v.btn, st = s.state;
+      var open = st === 'ready', shows = open || st === 'closed';
+      chip(v, 'free', shows ? s.free_left + ' / ' + s.free_total : null);
+      chip(v, 'bal', s.balance != null && shows ? s.balance : null);
+      v.resetIso = s.next_reset_at || null; tickReset(v);
+      var pp = (s.prizes || []).slice(0, 3);      /* premios YA acreditados: se muestran SIEMPRE, también sin Plus o con la piñata apagada */
+      v.prizes.hidden = !pp.length; v.prizes.textContent = pp.length ? '💰 Premios acreditados en tu billetera: ' + pp.map(function (x) { return prizeLabel(v.p, x.prize_code) + ' (' + fmtDay(x.day) + ')'; }).join(', ') : '';
+      setClosedLook(v, st === 'closed');
+      if (v.busy) return;
+      b.classList.toggle('armed', v.armed);
+      if (st === 'loading') { b.disabled = true; b.textContent = 'Cargando…'; return; }
+      if (st === 'coming_soon' || st === 'disabled') { b.disabled = true; b.textContent = 'Próximamente'; say(v, 'Esta piñata aún no está disponible.'); return; }
+      if (st === 'no_session') { b.disabled = true; b.textContent = 'Inicia sesión'; say(v, 'Inicia sesión con Twitch para jugar.'); return; }
+      if (st === 'no_plus') { b.disabled = true; b.textContent = 'Solo miembros Plus'; say(v, 'Las piñatas son un beneficio de Geo Army Plus.'); return; }
+      if (st === 'paused') {
+        if (v.pendings.length) { b.disabled = false; b.textContent = 'Recuperar resultado de tu intento'; if (!v.msg.textContent) say(v, 'Tienes un intento anterior sin confirmar. Pulsa para ver su resultado: no se cobra ni se juega de nuevo.'); return; }
+        b.disabled = true; b.textContent = 'En pausa'; say(v, 'Esta piñata está en pausa temporalmente. Vuelve más tarde: no se te cobra nada.'); return;
+      }
+      if (st === 'closed') {
+        if (v.pendings.length) { b.disabled = false; b.textContent = 'Recuperar resultado de tu intento'; if (!v.msg.textContent) say(v, 'Tienes un intento anterior sin confirmar. Pulsa para ver su resultado: no se cobra ni se juega de nuevo.'); return; }
+        b.disabled = true; b.textContent = 'Cerrada hasta mañana';
+        var la = s.last_attempt;
+        if (la && la.outcome === 'win') say(v, '¡Hoy ganaste ' + prizeLabel(v.p, la.prize_code) + '! Ya se acreditó en tu billetera.', 'ok');
+        else say(v, 'Hoy ya hubo ganador en esta piñata. Vuelve mañana: no se te cobra nada.');
+        return;
+      }
+      var paid = s.free_left <= 0;
+      if (v.pendings.length) { b.disabled = false; b.textContent = 'Reintentar (no se cobra dos veces)'; return; }
+      b.disabled = false;
+      b.textContent = v.armed ? 'Confirmar: cobrar ' + s.cost + ' G-Coins' : (paid ? 'Romper piñata · ' + s.cost + ' G-Coins' : 'Romper piñata (gratis)');
+      if (!v.msg.textContent) say(v, paid ? 'Se acabaron tus intentos gratis de hoy. Cada intento extra cuesta ' + s.cost + ' G-Coins.' : 'Te quedan ' + s.free_left + ' intentos gratis hoy.');
+    }
+    function tickReset(v) { chip(v, 'reset', v.resetIso && v.state && (v.state.state === 'ready' || v.state.state === 'closed') ? fmtLeft(v.resetIso) : null); }
+
+    /* ---------- estado, cambio de cuenta y recuperación ---------- */
+    function applyStatus(v, s) {
+      var acct = s.account_id || null, changed = acct !== v.acct;
+      if (changed) { cancelAnim(v); v.acct = acct; v.looked = {}; v.notFound = {}; }    /* otra cuenta (o cerró sesión): se corta TODO lo de la cuenta anterior y NO se hereda nada */
+      v.state = s;
+      if (v.busy) { v.dirty = true; return; }
+      v.pendings = listPending(acct, v.p.key);                         /* se relee de localStorage: incluye lo que hayan dejado OTRAS pestañas */
+      render(v); maybeRecover(v);
+    }
+    function refresh(key) {
+      var v = VIEW[key];
+      if (!provider) { applyStatus(v, { state: 'coming_soon' }); return Promise.resolve(); }
+      var g = v.gen;
+      return withTimeout(provider.status(key), 10000).then(function (s) { applyStatus(v, s); }, function () { if (v.busy || v.gen !== g) return; v.state = { state: 'loading' }; render(v); say(v, 'No pudimos cargar el estado. Recarga la página.', 'err'); });
+    }
+    function maybeRecover(v) {           /* consulta (solo lectura) cada intento pendiente que esta pestaña aún no haya consultado */
+      if (v.busy || !provider || !v.state || v.state.state === 'no_session' || v.state.state === 'coming_soon' || v.state.state === 'loading') return;
+      var p = v.pendings.filter(function (x) { return !v.looked[x.id]; })[0]; if (p) recover(v, p);
+    }
+    function recover(v, pend) {          /* SOLO LECTURA: nunca crea otro intento ni cobra */
+      var key = v.p.key, acct0 = v.acct, g0 = v.gen; if (!pend || !provider) return;
+      v.busy = true; v.looked[pend.id] = true; v.btn.disabled = true; v.btn.textContent = 'Buscando tu intento anterior…'; say(v, '');
+      withTimeout(provider.lookup(key, pend.id), 10000).then(function (r) { return r; }, function () { return { status: 'error' }; }).then(function (r) {
+        if (r.status === 'found' || r.status === 'decided') clearPending(acct0, key, pend.id);       /* ya lo tenemos (o la base GUARDÓ que ese id nunca se jugará): ese id (solo ese) deja de ser pendiente, aunque la cuenta haya cambiado */
+        if (v.gen !== g0) return;                                           /* cambió la cuenta: no se muestra nada para la cuenta nueva */
+        if (r.status === 'found') {
+          v.pendings = v.pendings.filter(function (x) { return x.id !== pend.id; }); if (r.state) v.state = r.state;
+          animar(v, { status: 'duplicate', outcome: r.outcome, prize_code: r.prize_code, credit: r.credit, state: v.state, recuperado: true }); return;
+        }
+        if (r.status === 'decided') {         /* (rev. 7) decisión guardada: ese id no tiene intento ni lo tendrá (nada se cobró): se descarta con seguridad */
+          v.pendings = v.pendings.filter(function (x) { return x.id !== pend.id; }); if (r.state) v.state = r.state; endBusy(v);
+          say(v, 'Tu intento anterior no llegó a jugarse y no se cobró nada. Puedes volver a intentarlo cuando quieras.'); return;
+        }
+        if (r.status === 'not_found') {
+          v.notFound[pend.id] = true;          /* solo informativo: «no aparece AÚN». NUNCA se borra el id por esto (el original puede estar terminando en otra transacción/instancia) */
+          endBusy(v);
+          if (v.state && v.state.state === 'ready') say(v, 'Tu intento anterior aún no aparece en el servidor. Pulsa «Reintentar»: se jugará una sola vez.');
+          else say(v, 'Tu intento anterior aún no tiene resultado confirmado. Lo conservamos: pulsa el botón para confirmarlo. No se cobra dos veces.');
+          return;
+        }
+        v.looked[pend.id] = false; v.busy = false; render(v); say(v, 'No pudimos comprobar tu intento anterior. Pulsa el botón para intentarlo de nuevo.', 'err');
+      });
+    }
+
+    /* ---------- un intento ---------- */
+    function onClick(key) {
+      var v = VIEW[key], s = v.state; if (v.busy || !provider || !s) return;
+      var notOpen = s.state === 'closed' || s.state === 'paused';
+      if (notOpen && v.pendings.length && !v.notFound[v.pendings[0].id]) { recover(v, v.pendings[0]); return; }      /* 1.º: consulta de solo lectura */
+      if (s.state !== 'ready' && !(notOpen && v.pendings.length)) return;                                          /* 2.º: si «aún no aparece», se reintenta el MISMO id con su autorización original: la base responde de forma definitiva */
+      var paid = s.free_left <= 0 && !v.pendings.length;
+      if (paid && !v.armed) { v.armed = true; render(v); v.armTimer = setTimeout(function () { disarm(v); }, 4000); return; }   /* confirmación ANTES de cobrar */
+      v.armed = false; clearTimeout(v.armTimer);
+      var pend = v.pendings[0];                                          /* reintento del más antiguo, o intento nuevo con id nuevo */
+      if (!pend) { pend = { id: newId(), acct: v.acct, pin: key, t: Date.now(), max: paid ? s.cost : 0 }; writePending(pend); v.pendings.push(pend); }   /* la autorización (0 o el costo confirmado) queda guardada con el id */
+      v.looked[pend.id] = true;
+      var acct0 = v.acct, g0 = v.gen;
+      v.busy = true; v.btn.disabled = true; v.btn.textContent = 'Rompiendo…'; say(v, '');
+      withTimeout(provider.attempt(key, pend.id, pend.max), 15000).then(function (r) { return r; }, function () { return { status: 'unconfirmed' }; }).then(function (res) {
+        var noAttempt = res.status === 'closed' || res.status === 'confirm_required' || res.status === 'insufficient_funds' || res.status === 'paused';
+        /* (rev. 7) DEFINITIVA = el servidor dejó el resultado GUARDADO para ese id: ok/duplicate (el intento existe) o una respuesta «sin intento» con request_state 'none' (decisión guardada bajo su bloqueo:
+           ni siquiera una petición anterior con ese id, aún en camino, podrá procesarse después). Una respuesta «sin intento» SIN esa señal (base antigua, pausa local, fallo doble) conserva el id y su autorización. */
+        var definitive = res.status === 'ok' || res.status === 'duplicate' || (noAttempt && res.request_state === 'none');
+        if (definitive) clearPending(acct0, key, pend.id);              /* respuesta definitiva: SOLO este id (el de otras pestañas se conserva) */
+        if (v.gen !== g0) return;                                       /* cambió la cuenta mientras tanto: no se anima ni se muestra nada para la cuenta nueva */
+        if (definitive) v.pendings = v.pendings.filter(function (x) { return x.id !== pend.id; });
+        if (res.status === 'unconfirmed') {                             /* NO sabemos si el servidor lo procesó: el id se CONSERVA (no caduca) */
+          endBusy(v); say(v, PERSIST ? 'No pudimos confirmar tu intento. Pulsa «Reintentar»: no se cobrará dos veces. Si recargas o cierras la página, lo recuperamos al volver.'
+                                     : 'No pudimos confirmar tu intento. Pulsa «Reintentar»: no se cobrará dos veces. (Este navegador no permite guardarlo: si recargas, tu contador y tu saldo mostrarán lo que pasó.)', 'err'); return; }
+        if (res.status === 'paused') {                                    /* pausa: se conserva el resto del estado y se muestra el aviso de pausa */
+          v.state = Object.assign({}, v.state, { state: 'paused' }); endBusy(v); render(v);
+          if (res.request_state !== 'none') say(v, 'La piñata está en pausa y tu intento anterior aún no tiene resultado confirmado. Lo conservamos: vuelve a pulsar el botón en unos minutos. No se cobra dos veces.');
+          return; }
+        if (res.status === 'credit_failed') {                             /* (rev. 8) fallo al acreditar bajo el umbral: la base revirtió ESTE intento, pero NO es una decisión guardada: otra petición con el mismo id aún podría procesarse. El id y su autorización se CONSERVAN y la página NO afirma «no se cobró nada» hasta tener una decisión definitiva (ok/duplicate o request_state 'none') */
+          endBusy(v); say(v, 'No pudimos completar tu intento ahora (falló la acreditación del premio) y todavía no tenemos un resultado definitivo. Lo conservamos: pulsa «Reintentar» y se jugará una sola vez, sin cobrarte dos veces.', 'err'); return; }
+        if (noAttempt && !definitive) {                                  /* closed / confirm_required / insufficient_funds SIN decisión guardada: NO se sabe si una petición anterior con este id aún puede llegar → se conserva el id y su autorización */
+          if (res.state) v.state = res.state; endBusy(v);
+          say(v, 'Tu intento anterior aún no tiene resultado confirmado. Lo conservamos: pulsa el botón para confirmarlo. No se cobra dos veces.'); return; }
+        if (res.state) v.state = res.state;
+        if (res.status === 'ok' || res.status === 'duplicate') { animar(v, res); return; }
+        if (res.status === 'no_plus' || res.status === 'disabled') {   /* el servidor negó el acceso ANTES de mirar el id: ese intento pudo haberse procesado antes → se consulta, no se descarta */
+          v.looked[pend.id] = false; endBusy(v); return; }
+        if (res.status === 'confirm_required') {                       /* el costo real superó lo que autorizaste: NO se cobró ni se consumió nada. Se vuelve a mostrar el botón (de pago) y se pide confirmar */
+          endBusy(v); say(v, 'Se acabaron tus intentos gratis (usaste el último en otra pestaña). No se cobró nada. Si quieres un intento extra, confirma el pago de ' + (res.required_cost || (res.state && res.state.cost) || '') + ' G-Coins.'); return; }
+        var M = { closed: 'Alguien acaba de ganar esta piñata: quedó cerrada hasta mañana. No se te cobró nada.', insufficient_funds: 'No tienes G-Coins suficientes para un intento extra.',
+                  rate_limited: 'Vas muy rápido; espera un momento.', error: 'Ocurrió un error. Inténtalo de nuevo.' };
+        endBusy(v); say(v, M[res.status] || M.error, res.status === 'closed' ? '' : 'err');
+      });
+    }
+    var MONEDA = { VBUCKS: 'V-Bucks', OWCOINS: 'OW Coins' };
+    function creditNote(c) { return c && +c.debt_offset > 0 ? ' Se descontaron ' + c.debt_offset + ' ' + (MONEDA[c.currency_code] || c.currency_code) + ' de tu saldo para cubrir una deuda pendiente.' : ''; }
+    function animar(v, res) {          /* el flujo del original: golpe 400 ms → ruptura → 500 ms → resultado → 3800 ms → vuelve */
+      var p = v.p, obj = v.obj, resultEl = v.res, win = res.outcome === 'win';
+      var postState = v.state; v.state = Object.assign({}, postState, { state: 'ready' });
+      v.busy = true; v.animating = true; v.mode = 'shake'; v.t0 = performance.now(); obj.classList.add('hit');
+      after(v, 400, function () {
+        obj.classList.remove('hit'); obj.classList.add('break');
+        after(v, 500, function () {
+          var extra = (res.status === 'duplicate') ? ' Recuperamos tu intento anterior: no se cobró dos veces.' : '';
+          if (win) { resultEl.className = 'ti-pinata-result win'; resultEl.textContent = '¡Ganaste ' + prizeLabel(p, res.prize_code) + '!'; v.stopConfeti = spawnConfeti(70, p.confeti);
+                     say(v, '¡Felicidades! Ganaste ' + prizeLabel(p, res.prize_code) + '. Ya está acreditado en tu billetera.' + creditNote(res.credit) + extra, 'ok'); }
+          else { resultEl.className = 'ti-pinata-result lose'; resultEl.textContent = 'No ganaste, ¡suerte la próxima!'; say(v, 'No ganaste esta vez.' + extra); }
+          resultEl.classList.add('show'); chip(v, 'bal', postState.balance); chip(v, 'free', postState.free_left + ' / ' + postState.free_total);
+          after(v, 3800, function () {
+            resultEl.classList.remove('show'); obj.classList.remove('break'); v.state = postState; v.animating = false;
+            var m = v.msg.textContent, c = v.msg.className.replace('pn-msg', '').trim(); endBusy(v); if (v.state.state === 'ready' && !v.pendings.length) say(v, m, c);
+          });
+        });
+      });
+    }
+
+    /* ---------- arranque ---------- */
+    function boot() {
+      PINATAS.forEach(function (p) { buildCard(p); refresh(p.key); });
+      setInterval(function () { PINATAS.forEach(function (p) { var v = VIEW[p.key]; tickReset(v);
+        if (v.resetIso && !v.busy && new Date(v.resetIso) - Date.now() <= 0 && !v.resetDone) { v.resetDone = true; refresh(p.key).then(function () { v.resetDone = false; }); } }); }, 1000);
+      window.addEventListener('ga-pinata-refresh', function () { PINATAS.forEach(function (p) { var v = VIEW[p.key]; if (!v.busy) { v.armed = false; say(v, ''); } refresh(p.key); }); });
+      /* Cambio de sesión/cuenta: se CANCELA al instante todo lo de la cuenta anterior (animación, confeti, respuestas en vuelo) y se vuelve a pedir el estado. */
+      window.addEventListener('ga-pinata-account-changed', function () { PINATAS.forEach(function (p) { var v = VIEW[p.key]; cancelAnim(v); v.acct = '__cambiando__'; v.state = null; v.pendings = []; v.looked = {}; render(v); refresh(p.key); }); });
+      requestAnimationFrame(loop);
+    }
+    /* Proveedor: en producción lo inyecta la integración real (fase de implementación). Sin él, la página queda inerte («Próximamente»). */
+    if (Q.get('demo') === '1') {
+      var s = document.createElement('script'); s.src = 'js/pinata-demo-servidor.js';
+      s.onload = function () { provider = window.GEOARMY_PINATA_DEMO.create(); $('pnDemo').hidden = false; boot(); };
+      s.onerror = function () { boot(); }; document.head.appendChild(s);
+    } else { provider = window.GEOARMY_PINATA_PROVIDER || null; boot(); }
+  })();
+  </script>
+</body>
+</html>

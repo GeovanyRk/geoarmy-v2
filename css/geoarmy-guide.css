@@ -1,0 +1,63 @@
+/* Geo Army — guía de preguntas frecuentes; estilos aislados del planeta y del login. */
+#ga-guide-launcher, #ga-guide-panel {font-family:Inter,system-ui,-apple-system,sans-serif;box-sizing:border-box}
+#ga-guide-launcher *, #ga-guide-panel * {box-sizing:border-box}
+#ga-guide-launcher[hidden], #ga-guide-panel[hidden]{display:none!important}
+#ga-guide-launcher{position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(22px,calc(14px + env(safe-area-inset-bottom)));z-index:4500;display:flex;align-items:center;gap:9px;padding:10px 15px 10px 10px;color:#fff;background:linear-gradient(135deg,#6e4dfa,#4932d5);border:1px solid #9e8bff;border-radius:999px;box-shadow:0 15px 45px #110c33a8,0 0 0 5px #815df222;cursor:pointer;font-size:13px;font-weight:800;line-height:1.25;transition:transform .2s,box-shadow .2s}
+#ga-guide-launcher:hover{transform:translateY(-3px);box-shadow:0 20px 54px #190c50bd,0 0 0 6px #815df22f}
+#ga-guide-launcher .ga-guide-launcher-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#15102b;color:#ffe5a0;font-size:20px;box-shadow:inset 0 0 0 1px #ffffff29}
+#ga-guide-launcher .ga-guide-launcher-caption{display:block;color:#e1d8ff;font-size:10px;letter-spacing:.04em;font-weight:600;text-align:left}
+#ga-guide-launcher .ga-guide-launcher-title{display:block;text-align:left}
+#ga-guide-launcher:focus-visible, #ga-guide-panel :focus-visible{outline:3px solid #ffcf77;outline-offset:3px}
+#ga-guide-panel{position:fixed;bottom:max(18px,calc(12px + env(safe-area-inset-bottom)));right:max(18px,env(safe-area-inset-right));width:min(390px,calc(100vw - 24px));height:min(590px,calc(100dvh - 28px));z-index:4501;display:flex;flex-direction:column;overflow:hidden;color:#f9f6ff;border:1px solid #6e5a99;border-radius:22px;background:#151528;box-shadow:0 25px 70px #000b,0 0 0 2px #a28cff19;text-align:left}
+#ga-guide-panel .ga-guide-head{flex:none;display:flex;align-items:center;gap:12px;padding:17px 16px;background:linear-gradient(115deg,#693cff,#405feb);border-bottom:1px solid #d8c5ff3d}
+#ga-guide-panel .ga-guide-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;flex:none;background:linear-gradient(140deg,#20162c,#4b2c29);border:2px solid #f0c66e;color:#f8cb71;font-size:23px}
+#ga-guide-panel .ga-guide-head-title{min-width:0;flex:1}
+#ga-guide-panel .ga-guide-head-title strong{display:block;font-size:14px;line-height:1.25;color:white}
+#ga-guide-panel .ga-guide-head-title small{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;color:#efeaff}
+#ga-guide-panel .ga-guide-dot{display:inline-block;height:8px;width:8px;border-radius:50%;background:#8bf7b8;box-shadow:0 0 0 3px #54e38d32}
+#ga-guide-panel .ga-guide-close{align-self:flex-start;flex:none;border:0;background:#ffffff24;color:white;font-size:24px;border-radius:50%;height:34px;width:34px;cursor:pointer;line-height:1}
+#ga-guide-panel .ga-guide-close:hover{background:#ffffff48}
+#ga-guide-panel .ga-guide-feed{flex:1;min-height:0;overflow-y:auto;padding:18px 14px 15px;display:flex;flex-direction:column;gap:13px;overscroll-behavior:contain;scrollbar-color:#70588c transparent}
+#ga-guide-panel .ga-guide-bubble{max-width:91%;padding:12px 14px;border-radius:17px 17px 17px 5px;background:#22233b;color:#f3f0fb;font-size:13px;line-height:1.55;overflow-wrap:anywhere;white-space:pre-wrap;box-shadow:0 4px 15px #0002}
+#ga-guide-panel .ga-guide-bubble--user{align-self:flex-end;border-radius:17px 17px 5px 17px;background:#4935ac;color:white}
+#ga-guide-panel .ga-guide-bubble a{color:#ffd788;text-decoration:underline;text-underline-offset:3px;font-weight:800}
+#ga-guide-panel .ga-guide-quick{padding:0 14px 12px;display:flex;gap:7px;flex-wrap:wrap;background:#151528;flex:none}
+#ga-guide-panel .ga-guide-quick button{border:1px solid #756b9c;background:#24213c;border-radius:999px;padding:8px 11px;font:700 11px Inter,system-ui,sans-serif;color:#f1ebfc;cursor:pointer}
+#ga-guide-panel .ga-guide-quick button:hover{background:#403361;border-color:#bd99ff}
+#ga-guide-panel .ga-guide-compose{flex:none;display:flex;align-items:center;gap:9px;padding:11px 12px calc(11px + env(safe-area-inset-bottom));background:#1c1b32;border-top:1px solid #51446c}
+#ga-guide-panel .ga-guide-input{flex:1;min-width:0;border:1px solid #504764;border-radius:28px;background:#141429;color:#fff;font:500 13px Inter,system-ui,sans-serif;padding:13px 15px;outline:none}
+#ga-guide-panel .ga-guide-input::placeholder{color:#a8a2bd}
+#ga-guide-panel .ga-guide-input:focus{border-color:#c2a5ff}
+#ga-guide-panel .ga-guide-send{border:0;border-radius:50%;width:41px;height:41px;display:grid;place-items:center;cursor:pointer;background:linear-gradient(135deg,#7356ff,#4d43df);color:#fff;flex:none}
+#ga-guide-panel .ga-guide-send:hover{filter:brightness(1.14)}
+#ga-guide-panel .ga-guide-disclaimer{background:#1c1b32;color:#9992ad;font-size:10px;text-align:center;padding:0 10px 9px;line-height:1.3;flex:none}
+@media(max-width:540px){
+  #ga-guide-launcher{right:12px;bottom:calc(12px + env(safe-area-inset-bottom));padding:8px 11px 8px 8px}
+  #ga-guide-launcher .ga-guide-launcher-icon{height:36px;width:36px}
+  #ga-guide-panel{inset:auto 6px max(6px,env(safe-area-inset-bottom)) 6px;width:auto;height:min(620px,calc(100dvh - 16px));border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){#ga-guide-launcher{transition:none}}
+
+/* GEO ARMY / Geovany — avatar propio en lanzador y encabezado */
+#ga-guide-launcher .ga-guide-launcher-icon,
+#ga-guide-panel .ga-guide-avatar {padding:0;overflow:hidden;display:block;border:2px solid #f0c66e;background:#121125;box-shadow:0 0 0 2px rgba(255,217,130,.16)}
+#ga-guide-launcher .ga-guide-launcher-icon img,
+#ga-guide-panel .ga-guide-avatar img {display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+#ga-guide-panel .ga-guide-avatar{width:46px;height:46px}
+#ga-guide-panel .ga-guide-head-title small {font-weight:600}
+#ga-guide-panel .ga-guide-bubble{white-space:pre-wrap}
+/* Invitación discreta cuando el chat está cerrado, sin tapar el planeta. */
+#ga-guide-nudge, #ga-guide-nudge *{box-sizing:border-box}
+#ga-guide-nudge[hidden]{display:none!important}
+#ga-guide-nudge{font-family:Inter,system-ui,sans-serif;position:fixed;right:max(20px,env(safe-area-inset-right));bottom:max(103px,calc(95px + env(safe-area-inset-bottom)));z-index:4499;width:min(300px,calc(100vw - 30px));color:#fff;border-radius:18px;border:1px solid rgba(240,198,110,.68);background:linear-gradient(135deg,#25203e,#131324);box-shadow:0 13px 37px rgba(0,0,0,.58),0 0 0 3px rgba(235,180,87,.09);overflow:visible;animation:ga-guide-nudge-in .42s ease both}
+#ga-guide-nudge::after{content:'';position:absolute;right:40px;bottom:-8px;width:14px;height:14px;background:#171529;transform:rotate(45deg);border-right:1px solid rgba(240,198,110,.68);border-bottom:1px solid rgba(240,198,110,.68)}
+#ga-guide-nudge .ga-guide-nudge-open{border:0;cursor:pointer;width:100%;text-align:left;background:transparent;color:#fff;padding:17px 37px 17px 16px;display:flex;flex-direction:column;gap:7px;font-family:inherit}
+#ga-guide-nudge .ga-guide-nudge-eyebrow{color:#eec57b;font-size:10px;font-weight:900;letter-spacing:.11em}
+#ga-guide-nudge strong{font-size:14px;line-height:1.34;color:#fff}
+#ga-guide-nudge .ga-guide-nudge-sub{font-size:11px;line-height:1.4;color:#c6bedc}
+#ga-guide-nudge .ga-guide-nudge-dismiss{position:absolute;top:6px;right:7px;z-index:1;display:grid;place-items:center;border:0;border-radius:50%;width:28px;height:28px;background:rgba(255,255,255,.08);color:#dbd1f1;font:21px/1 Arial,sans-serif;cursor:pointer}
+#ga-guide-nudge .ga-guide-nudge-dismiss:hover{background:rgba(255,255,255,.2)}
+#ga-guide-nudge :focus-visible{outline:3px solid #ffcf77;outline-offset:3px}
+@keyframes ga-guide-nudge-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:540px){#ga-guide-nudge{right:12px;bottom:calc(83px + env(safe-area-inset-bottom));width:min(285px,calc(100vw - 24px))}}
+@media(prefers-reduced-motion:reduce){#ga-guide-nudge{animation:none}}

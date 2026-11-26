@@ -1,0 +1,164 @@
+/* Mi Geo Army — Identidad del jugador (Fase 1B). Solo presentación del panel Resumen.
+ * Paleta Halloween espacial: negro, morado, naranja y dorado. Sin azul predominante.
+ * Los espacios [data-mgt-slot] son puntos de extensión vacíos y ocultos (no hacen nada hoy). */
+
+.mgt-id {
+  --id-orange: #ff7a2f;
+  --id-gold: #ffb84a;
+  --id-purple: #9147ff;
+  --id-violet: #a54af0;
+  --id-ink: #f4ecff;
+  --id-mute: #b9a6d6;
+  --id-avatar: 112px;
+  --id-frame-a: var(--id-orange);   /* ganchos para marcos futuros */
+  --id-frame-b: var(--id-purple);
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  padding: 18px 16px 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,184,74,.38);
+  color: var(--id-ink);
+  background:
+    radial-gradient(1.2px 1.2px at 12% 18%, rgba(255,255,255,.55), transparent 60%),
+    radial-gradient(1px 1px at 86% 12%, rgba(255,184,74,.6), transparent 60%),
+    radial-gradient(1.2px 1.2px at 70% 82%, rgba(255,255,255,.4), transparent 60%),
+    radial-gradient(1px 1px at 28% 90%, rgba(255,122,47,.5), transparent 60%),
+    radial-gradient(520px 260px at 0% 0%, rgba(145,71,255,.30), transparent 70%),
+    radial-gradient(460px 240px at 100% 100%, rgba(255,122,47,.18), transparent 70%),
+    linear-gradient(160deg, #1b0d29 0%, #0e0716 100%);
+  box-shadow: 0 0 0 1px rgba(145,71,255,.18), 0 14px 40px rgba(0,0,0,.45), 0 0 34px rgba(145,71,255,.14);
+}
+.mgt-id > * + * { margin-top: 16px; }
+.mgt-id *, .mgt-id *::before, .mgt-id *::after { box-sizing: border-box; }
+
+/* ===== Puntos de extensión: ocultos y sin peso mientras estén vacíos ===== */
+[data-mgt-slot][hidden], .mgt-id-legacy[hidden] { display: none !important; }
+.mgt-id-banner:empty, .mgt-id-showcase:empty, .mgt-id-history:empty { display: none; }
+
+/* ===== Parte superior: identidad + progreso ===== */
+.mgt-id-top { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: center; }
+.mgt-id-who { display: flex; align-items: center; gap: 14px; min-width: 0; }
+
+/* Avatar */
+.mgt-id-avatar { position: relative; flex: 0 0 auto; width: var(--id-avatar); height: var(--id-avatar); }
+.mgt-id-ring {
+  position: relative; width: 100%; height: 100%; border-radius: 50%; padding: 4px; overflow: hidden;
+  background: conic-gradient(from 210deg, var(--id-frame-a), var(--id-gold), var(--id-frame-b), var(--id-violet), var(--id-frame-a));
+  box-shadow: 0 0 0 3px rgba(14,7,22,.9), 0 0 22px rgba(255,122,47,.38), 0 0 30px rgba(145,71,255,.34);
+  display: flex; align-items: center; justify-content: center;
+}
+.mgt-id-ring::before { /* disco interior oscuro: queda detrás de la foto y sirve de fondo del marcador */
+  content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #170a24;
+}
+.mgt-id-ph { position: relative; font-size: calc(var(--id-avatar) * .42); line-height: 1; opacity: .75; }
+.mgt-id-img { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); border-radius: 50%; object-fit: cover; background: #170a24; }
+.mgt-id-badge {
+  position: absolute; right: -6px; bottom: -6px; width: 44px; height: 44px; object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(255,184,74,.35));
+}
+.mgt-id-badge[hidden] { display: none; }
+
+/* Texto de identidad */
+.mgt-id-text { min-width: 0; flex: 1 1 auto; }
+.mgt-id-name {
+  display: flex; align-items: center; gap: 8px; min-width: 0;
+  font-family: 'Orbitron', 'Rajdhani', system-ui, sans-serif; font-weight: 800;
+  font-size: clamp(1.15rem, 5.4vw, 1.7rem); line-height: 1.15; letter-spacing: .01em; color: #fff;
+  text-shadow: 0 0 18px rgba(145,71,255,.45);
+}
+.mgt-id-name > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mgt-id-flag { flex: 0 0 auto; width: 26px; height: auto; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255,255,255,.25); }
+.mgt-id-flag[hidden] { display: none; }
+.mgt-id-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 8px; min-width: 0; }
+.mgt-id-rank {
+  display: inline-flex; max-width: 100%; padding: 4px 12px; border-radius: 14px; line-height: 1.25;
+  font-weight: 800; font-size: .86rem; letter-spacing: .03em; color: #1a0d00;
+  background: linear-gradient(135deg, var(--id-gold), var(--id-orange));
+  box-shadow: 0 0 14px rgba(255,150,50,.35);
+}
+.mgt-id-rank > span { min-width: 0; overflow-wrap: anywhere; }
+.mgt-id-rank[hidden], .mgt-id-country[hidden] { display: none; }
+.mgt-id-country { color: var(--id-mute); font-size: .85rem; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mgt-id-title:not([hidden]) { margin-top: 4px; color: var(--id-gold); font-size: .82rem; font-weight: 700; }
+
+/* ===== Progreso de rango ===== */
+.mgt-id-progress {
+  min-width: 0; padding: 12px 14px; border-radius: 16px;
+  border: 1px solid rgba(145,71,255,.28); background: rgba(10,5,18,.55);
+}
+.mgt-id-progress:not(:has(> :not([hidden]))) { display: none; }
+.mgt-id-progress > * + * { margin-top: 10px; }
+.mgt-id-prog-title, .mgt-id-label {
+  display: block; font-size: .7rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--id-mute);
+}
+.mgt-id-prog-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 6px; font-weight: 700; font-size: .9rem; flex-wrap: wrap; }
+.mgt-id-prog-row > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.mgt-id-pct { color: var(--id-gold); }
+.mgt-id-track { height: 12px; margin-top: 8px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.08); box-shadow: inset 0 1px 3px rgba(0,0,0,.6); }
+.mgt-id-fill {
+  height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, var(--id-orange), var(--id-gold) 55%, var(--id-violet));
+  box-shadow: 0 0 12px rgba(255,150,50,.55); transition: width .5s ease;
+}
+.mgt-id-note { margin: 6px 0 0; font-size: .78rem; color: var(--id-mute); overflow-wrap: anywhere; }
+.mgt-id-note:empty { display: none; }
+.mgt-id-max { font-weight: 800; color: var(--id-gold); text-align: center; padding: 6px 0; text-shadow: 0 0 14px rgba(255,184,74,.5); }
+.mgt-id-max[hidden], .mgt-id-prog[hidden], .mgt-id-next[hidden] { display: none; }
+.mgt-id-next { display: flex; align-items: center; gap: 10px; min-width: 0; padding-top: 10px; border-top: 1px dashed rgba(255,184,74,.25); }
+.mgt-id-next-badge { width: 38px; height: 38px; object-fit: contain; flex: 0 0 auto; opacity: .9; }
+.mgt-id-next-badge[hidden] { display: none; }
+.mgt-id-next-text { display: flex; flex-direction: column; min-width: 0; }
+.mgt-id-next-name { font-weight: 800; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mgt-id-next-xp { font-size: .78rem; color: var(--id-mute); }
+
+/* ===== Estadísticas compactas ===== */
+.mgt-id-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr)); gap: 10px; }
+.mgt-stat {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: 10px 12px; border-radius: 14px;
+  border: 1px solid rgba(255,184,74,.25); background: linear-gradient(180deg, rgba(40,20,58,.75), rgba(20,10,32,.75));
+}
+.mgt-stat-val { font-family: 'Orbitron', 'Rajdhani', system-ui, sans-serif; font-weight: 800; font-size: 1.25rem; line-height: 1.2; color: #fff; overflow-wrap: anywhere; }
+.mgt-stat-val span { font-size: .8em; margin-left: 2px; color: var(--id-gold); }
+.mgt-stat-sub { font-size: .74rem; color: var(--id-mute); min-height: 0; }
+.mgt-stat-sub:empty { display: none; }
+/* G-Coins: secundario (más sobrio que ranking y XP) */
+.mgt-stat-2 { border-color: rgba(145,71,255,.22); background: rgba(14,7,22,.55); }
+.mgt-stat-2 .mgt-stat-val { font-size: 1rem; color: #ffd9a3; }
+.mgt-stat-link { display: inline-flex; align-items: center; min-height: 32px; margin-top: 2px; font-size: .76rem; font-weight: 700; color: var(--id-gold); text-decoration: none; }
+.mgt-stat-link:hover { text-decoration: underline; }
+
+/* ===== Accesos rápidos ===== */
+.mgt-id-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.mgt-link {
+  flex: 1 1 120px; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 14px;
+  border-radius: 12px; border: 1px solid rgba(145,71,255,.45); background: rgba(145,71,255,.12);
+  color: var(--id-ink); font-weight: 700; font-size: .9rem; text-decoration: none; text-align: center;
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.mgt-link:hover { background: rgba(255,122,47,.18); border-color: rgba(255,184,74,.6); }
+.mgt-link:focus-visible, .mgt-stat-link:focus-visible { outline: 2px solid var(--id-gold); outline-offset: 2px; }
+
+/* ===== Más ancho: identidad a la izquierda, progreso a la derecha ===== */
+@container (min-width: 560px) {
+  .mgt-id-top { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; }
+  .mgt-id-top:has(> .mgt-id-progress:not(:has(> :not([hidden])))) { grid-template-columns: minmax(0, 1fr); }
+  .mgt-id-links .mgt-link { flex: 0 1 auto; min-width: 150px; }
+}
+@container (min-width: 760px) {
+  .mgt-id { --id-avatar: 132px; }
+  .mgt-id-name { font-size: 1.9rem; }
+  .mgt-stat-val { font-size: 1.45rem; }
+  .mgt-stat-2 .mgt-stat-val { font-size: 1.1rem; }
+}
+/* Sin soporte de container queries: se queda la versión móvil (una columna), que funciona a cualquier ancho. */
+
+@media (max-width: 360px) {
+  .mgt-id { --id-avatar: 88px; padding: 14px 12px 12px; border-radius: 18px; }
+  .mgt-id-who { gap: 10px; }
+  .mgt-id-badge { width: 34px; height: 34px; right: -4px; bottom: -4px; }
+  .mgt-id-flag { width: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mgt-id-fill, .mgt-link { transition: none; }
+}

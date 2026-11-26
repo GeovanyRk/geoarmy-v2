@@ -1,0 +1,112 @@
+/* =====================================================================
+   GEO ARMY Plus · PIN del mundo principal  (css/plus-pin.css)
+   Solo presentación. Se apoya en las reglas compartidas de .v3-planet-nav (css/v3-theme.css); no toca ningún otro pin.
+   Estados (los pone js/geoarmy-plus-pin.js en data-plus):
+     (sin atributo)  verificando → aspecto neutro esmeralda
+     "unverified"  no se pudo confirmar (red/servidor) → borde punteado + «?» ámbar, SIN candado; navega a plus.html (la página decide)
+     "open"    acceso Plus confirmado por el servidor → esmeralda brillante
+     "locked"  sin sesión o sin Plus (confirmado) → apagado, con candado; el clic abre la explicación
+   ===================================================================== */
+.v3-planet-nav a.ga-plus-pin .ga-plus-pin__label {
+  color: #c9ffe6; background: rgba(5, 22, 16, .94);
+  border: 1px solid rgba(60, 240, 160, .6); font-weight: 800;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+}
+.v3-planet-nav a.ga-plus-pin .ga-plus-pin__gem {
+  position: relative; background: radial-gradient(circle at 35% 28%, #0f4d36, #06150f 72%) !important;
+  border: 1px solid #19d98b !important;
+  box-shadow: 0 0 0 3px rgba(25, 217, 139, .14), 0 0 20px rgba(25, 217, 139, .5), 0 7px 22px rgba(0, 0, 0, .35);
+}
+.v3-planet-nav a.ga-plus-pin .ga-plus-pin__gem svg { width: 58%; height: 58%; display: block; overflow: visible; }
+.v3-planet-nav a.ga-plus-pin:hover .ga-plus-pin__gem,
+.v3-planet-nav a.ga-plus-pin:focus-visible .ga-plus-pin__gem {
+  box-shadow: 0 0 0 4px rgba(60, 240, 160, .26), 0 0 28px rgba(60, 240, 160, .75), 0 8px 26px rgba(0, 0, 0, .4);
+}
+.v3-planet-nav a.ga-plus-pin:focus-visible { outline: 2px solid #7dffc6; outline-offset: 4px; border-radius: 12px; }
+
+/* Abierto: latido suave (se apaga con «reducir movimiento») */
+.v3-planet-nav a.ga-plus-pin[data-plus="open"] .ga-plus-pin__gem { animation: gaPlusPulse 3.2s ease-in-out infinite; }
+@keyframes gaPlusPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(25, 217, 139, .14), 0 0 20px rgba(25, 217, 139, .5), 0 7px 22px rgba(0, 0, 0, .35); }
+  50%      { box-shadow: 0 0 0 6px rgba(25, 217, 139, .10), 0 0 30px rgba(60, 240, 160, .8), 0 7px 22px rgba(0, 0, 0, .35); }
+}
+@media (prefers-reduced-motion: reduce) { .v3-planet-nav a.ga-plus-pin[data-plus="open"] .ga-plus-pin__gem { animation: none; } }
+
+/* Bloqueado: apagado + candado. Sigue siendo enfocable y legible (contraste del contorno), no desaparece. */
+.v3-planet-nav a.ga-plus-pin[data-plus="locked"] .ga-plus-pin__gem {
+  background: radial-gradient(circle at 35% 28%, #1b2a25, #0a100e 72%) !important;
+  border-color: rgba(120, 190, 160, .55) !important;
+  box-shadow: 0 0 0 3px rgba(120, 190, 160, .08), 0 7px 22px rgba(0, 0, 0, .35);
+}
+.v3-planet-nav a.ga-plus-pin[data-plus="locked"] .ga-plus-pin__gem svg { filter: grayscale(.85) brightness(.8); }
+.v3-planet-nav a.ga-plus-pin .ga-plus-pin__lock { display: none; }
+.v3-planet-nav a.ga-plus-pin[data-plus="locked"] .ga-plus-pin__lock {
+  display: flex; position: absolute; right: -5px; bottom: -4px; width: 19px; height: 19px; border-radius: 50%;
+  align-items: center; justify-content: center; background: #10171a; border: 1px solid rgba(160, 220, 195, .7); color: #c9ffe6;
+}
+.v3-planet-nav a.ga-plus-pin .ga-plus-pin__lock svg { width: 11px; height: 11px; }
+@media (max-width: 560px) {
+  .v3-planet-nav a.ga-plus-pin .ga-plus-pin__lock { width: 16px; height: 16px; right: -4px; bottom: -3px; }
+  .v3-planet-nav a.ga-plus-pin .ga-plus-pin__lock svg { width: 9px; height: 9px; }
+}
+
+/* ---- Diálogo de explicación (solo para quien no tiene Plus / no ha iniciado sesión) ---- */
+.ga-plus-dialog { width: min(420px, calc(100vw - 28px)); max-width: none; max-height: min(92dvh, 640px); margin: auto; padding: 0;
+  border: 1px solid rgba(60, 240, 160, .55); border-radius: 20px; background: #07120d; color: #eafff5; overflow: auto;
+  box-shadow: 0 32px 110px rgba(0, 0, 0, .72), 0 0 0 1px rgba(25, 217, 139, .18); font-family: Inter, system-ui, sans-serif; }
+.ga-plus-dialog::backdrop { background: rgba(3, 8, 10, .78); backdrop-filter: blur(8px); }
+.ga-plus-dialog * { box-sizing: border-box; }
+.ga-plus-dialog__top { text-align: center; padding: 26px 26px 14px;
+  background: linear-gradient(180deg, rgba(25, 217, 139, .16), rgba(25, 217, 139, 0)); }
+.ga-plus-dialog__badge { display: inline-flex; align-items: center; gap: 6px; font: 800 11px/1 Orbitron, Inter, sans-serif; letter-spacing: .12em;
+  color: #7dffc6; border: 1px solid rgba(60, 240, 160, .5); border-radius: 999px; padding: 6px 12px; margin-bottom: 14px; }
+.ga-plus-dialog h2 { margin: 0 0 8px; font-size: 21px; line-height: 1.2; }
+.ga-plus-dialog p { margin: 0 0 10px; color: #bfe9d6; font-size: 14.5px; line-height: 1.5; }
+.ga-plus-dialog__body { padding: 0 26px 6px; }
+.ga-plus-dialog ul { list-style: none; margin: 4px 0 12px; padding: 0; display: grid; gap: 7px; }
+.ga-plus-dialog li { font-size: 14px; color: #d9fff0; padding-left: 22px; position: relative; line-height: 1.4; }
+.ga-plus-dialog li::before { content: "◆"; position: absolute; left: 0; top: 1px; color: #19d98b; font-size: 11px; }
+.ga-plus-dialog__actions { display: flex; flex-wrap: wrap; gap: 10px; padding: 8px 26px 24px; }
+.ga-plus-dialog__btn { flex: 1 1 150px; text-align: center; text-decoration: none; cursor: pointer; border-radius: 12px; padding: 12px 14px;
+  font: 700 14px/1.2 Inter, system-ui, sans-serif; border: 1px solid rgba(60, 240, 160, .55); color: #eafff5; background: transparent; }
+.ga-plus-dialog__btn--primary { background: linear-gradient(135deg, #14c47e, #0a7a52); border-color: #3cf0a0; color: #03140d; }
+.ga-plus-dialog__btn:focus-visible { outline: 2px solid #7dffc6; outline-offset: 2px; }
+.ga-plus-dialog__note { font-size: 12.5px; color: #8fbfa9; padding: 0 26px 18px; margin: 0; }
+
+/* ---- Ubicación FUERA del planeta (arriba-izquierda del globo, entre One Piece y el mundo activo) ----
+   Aquí el pin no tiene un planeta debajo que lo explique y en móvil no hay «pasar el cursor»: por eso su rótulo es SIEMPRE visible,
+   colocado bajo la gema (absoluto: no cambia el punto de anclaje del pin). Solo afecta a .ga-plus-pin; ningún otro pin cambia. */
+.v3-planet-nav a.ga-plus-pin .ga-plus-pin__label,
+.v3-planet-nav a.ga-plus-pin:hover .ga-plus-pin__label,
+.v3-planet-nav a.ga-plus-pin:focus-visible .ga-plus-pin__label {
+  position: absolute; top: calc(100% + 5px); left: 50%; margin: 0; order: 0; opacity: 1;
+  transform: translateX(-50%);
+  font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px;
+}
+.v3-planet-nav a.ga-plus-pin[data-plus="locked"] .ga-plus-pin__label { color: #9fcdb8; border-color: rgba(120, 190, 160, .5); }
+/* Móvil: el globo ocupa casi todo el ancho y no cabe el rótulo largo → rótulo corto «PLUS» (el nombre completo sigue en aria-label y al abrir). */
+@media (max-width: 560px) {
+  .v3-planet-nav a.ga-plus-pin .ga-plus-pin__label,
+  .v3-planet-nav a.ga-plus-pin:hover .ga-plus-pin__label,
+  .v3-planet-nav a.ga-plus-pin:focus-visible .ga-plus-pin__label { font-size: 0; padding: 2px 6px; top: calc(100% + 3px); }
+  .v3-planet-nav a.ga-plus-pin .ga-plus-pin__label::after { content: "PLUS"; font-size: 8.5px; letter-spacing: .08em; }
+}
+
+/* No verificado (red / servidor / respuesta rara): NO es «sin Plus» → sin candado. Borde punteado apagado + insignia «?» ámbar; el clic navega y plus.html vuelve a preguntar. */
+.v3-planet-nav a.ga-plus-pin[data-plus="unverified"] .ga-plus-pin__gem {
+  border: 1px dashed rgba(224, 196, 112, .85) !important;
+  background: radial-gradient(circle at 35% 28%, #17352b, #07120d 72%) !important;
+  box-shadow: 0 0 0 3px rgba(224, 196, 112, .08), 0 7px 22px rgba(0, 0, 0, .35);
+}
+.v3-planet-nav a.ga-plus-pin[data-plus="unverified"] .ga-plus-pin__gem svg { opacity: .72; }
+.v3-planet-nav a.ga-plus-pin[data-plus="unverified"] .ga-plus-pin__gem::after {
+  content: "?"; position: absolute; right: -5px; bottom: -4px; width: 19px; height: 19px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font: 800 12px/1 Inter, system-ui, sans-serif;
+  color: #2a1f00; background: #e6c872; border: 1px solid #fff3c4;
+}
+.v3-planet-nav a.ga-plus-pin[data-plus="unverified"] .ga-plus-pin__label { color: #e8d9a4; border-color: rgba(224, 196, 112, .55); }
+@media (max-width: 560px) {
+  .v3-planet-nav a.ga-plus-pin[data-plus="unverified"] .ga-plus-pin__gem::after { width: 16px; height: 16px; right: -4px; bottom: -3px; font-size: 10px; }
+}
+
+.v3-planet-nav a.ga-plus-pin[hidden] { display: none !important; }

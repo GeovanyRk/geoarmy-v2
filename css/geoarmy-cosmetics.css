@@ -1,0 +1,83 @@
+/* =====================================================================
+   GEO ARMY · APARIENCIAS · BASE COMÚN   (css/geoarmy-cosmetics.css, v2)
+   SOLO PRESENTACIÓN. Parte común a TODAS las apariencias; los estilos propios de cada una viven en css/cosmetics/<slug>.css
+   (se cargan solo si se usa esa apariencia; ver js/geoarmy-cosmetics-catalog.js y LEEME_PLATAFORMA_APARIENCIAS.md).
+
+   Clases que pone js/geoarmy-cosmetics.js:
+     .gcos-on          cualquier elemento decorado (barra, fila del ranking, tarjeta), sea cual sea la apariencia.
+     .gcos-ap-<id>     la apariencia concreta (también lleva sus variables --gcos-accent, --gcos-accent2, --gcos-ink, --gcos-text).
+     (clases propias) las que declare la definición (p. ej. .gcos-vip): ahí cuelgan los estilos de cada diseño.
+     .gcos-frame       marco: hijo del contenedor de la foto; su dibujo y proporciones vienen de la definición (--gcos-frame-img,
+                       --gcos-fs, --gcos-fy) y se escala con --d = diámetro de la FOTO (px). .gcos-badge: distintivo opcional (lo estiliza cada diseño).
+     .gcos-sr          texto solo para lectores de pantalla.
+   Sin cosmético, la web queda igual.
+
+   EXCEPCIÓN (sección 0): el AJUSTE MÓVIL DEL RANKING aprobado (nombres con más sitio a ≤ 440 px) SÍ afecta
+   a TODAS las filas, tengan o no cosmético, Y NO DEPENDE del interruptor GEOARMY_COSMETICS_ENABLED: ranking.html enlaza
+   este CSS directamente, así que con el interruptor en false el ajuste móvil sigue activo. Está aislado entre las marcas
+   "BEGIN AJUSTE-MOVIL-RANKING" y "END AJUSTE-MOVIL-RANKING" (sección 0): borrar o comentar solo ese bloque lo desactiva sin
+   tocar nada más.
+   ===================================================================== */
+
+/* =====================================================================
+   0) AJUSTE MÓVIL DEL RANKING (aprobado) — afecta a TODAS las filas 4–50, con o sin cosmético
+   ===================================================================== */
+/* Filas del ranking en móvil (≤ 440 px): más sitio para el nombre.
+   Antes: posición · foto · insignia · NOMBRE · XP en una sola línea → a 320 px el nombre se quedaba en 20–50 px ("J…").
+   Ahora: el nombre ocupa toda la línea superior; debajo, a la izquierda el nombre del rango y a la derecha el XP.
+   Posición, foto, bandera e insignia siguen a la izquierda, centradas en vertical. La letra no se reduce. */
+/* >>> BEGIN AJUSTE-MOVIL-RANKING */
+@media (max-width: 440px) {
+  .rk-row {
+    display: grid; align-items: center; align-content: center; column-gap: 7px; row-gap: 1px;
+    grid-template-columns: 34px auto auto minmax(0, 1fr) auto; padding-right: 12px;
+  }
+  .rk-row--elite { grid-template-columns: 44px auto auto minmax(0, 1fr) auto; padding-right: 14px; }
+  .rk-row-id { display: contents; }
+  .rk-row-pos, .rk-row--elite .rk-row-pos { grid-area: 1 / 1 / 3 / 2; width: auto; }
+  .rk-row-ava, .rk-row--elite .rk-row-ava { grid-area: 1 / 2 / 3 / 3; }
+  .rk-row > .rk-badge-ic { grid-area: 1 / 3 / 3 / 4; }
+  .rk-row-name { grid-area: 1 / 4 / 2 / 6; min-width: 0; align-self: end; }
+  .rk-row-rankname { grid-area: 2 / 4 / 3 / 5; min-width: 0; align-self: start; }
+  .rk-row-xp, .rk-row--elite .rk-row-xp { grid-area: 2 / 5 / 3 / 6; justify-self: end; align-self: start; font-size: 12.5px; }
+  .rk-row--elite .rk-row-rankname { font-size: 12px; }
+}
+/* <<< END AJUSTE-MOVIL-RANKING */
+
+/* =====================================================================
+   BASE DE MARCO Y TEXTO PARA LECTORES (comunes)
+   ===================================================================== */
+.gcos-sr { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ---------- MARCO ----------
+   El dibujo y las proporciones salen de la definición de la apariencia (variables puestas por js/geoarmy-cosmetics.js en el propio marco):
+     --gcos-frame-img  url del dibujo · --gcos-fs  tamaño del marco / diámetro de la foto · --gcos-fh  la mitad de --gcos-fs en negativo
+     (centra el marco) · --gcos-fy  distancia (en fotos) desde el borde superior del marco hasta el centro de la foto. */
+.gcos-frame {
+  --d: 26px;
+  position: absolute; z-index: 0; pointer-events: none;
+  left: 50%; top: calc(50% - var(--d) * var(--gcos-fy));
+  width: calc(var(--d) * var(--gcos-fs)); height: calc(var(--d) * var(--gcos-fs));
+  margin-left: calc(var(--d) * var(--gcos-fh));
+  background: var(--gcos-frame-img) center / 100% 100% no-repeat;
+}
+
+/* Diámetro base de la foto por espacio (--d). Cada apariencia puede ajustarlo en su propio CSS si su dibujo lo necesita. */
+.rk-row.gcos-on .rk-row-ava .gcos-frame { --d: 32px; }
+.rk-row--elite.gcos-on .rk-row-ava .gcos-frame { --d: 44px; }
+.rk-top-card.gcos-on .rk-top-avawrap .gcos-frame { --d: 84px; }
+.rk-top-1.gcos-on .rk-top-avawrap .gcos-frame { --d: 116px; }
+@media (max-width: 560px) {
+  .rk-top-card.gcos-on .rk-top-avawrap .gcos-frame { --d: 58px; }
+  .rk-top-1.gcos-on .rk-top-avawrap .gcos-frame { --d: 82px; }
+}
+.mgt-id.gcos-on .mgt-id-avatar .gcos-frame { --d: var(--id-avatar); }
+
+/* =====================================================================
+   1) BARRA SUPERIOR  (.ga-account-btn de css/style.css) — estructura común
+   ===================================================================== */
+.gcos-avatar-wrap { position: relative; display: inline-flex; flex: 0 0 auto; width: 26px; height: 26px; margin: -1px 3px -1px 4px; }
+.gcos-avatar-wrap .ga-avatar { width: 26px; height: 26px; }
+.gcos-avatar-wrap .gcos-frame { --d: 26px; }
+@media (max-width: 480px) { .gcos-avatar-wrap { margin-right: 4px; } }
+

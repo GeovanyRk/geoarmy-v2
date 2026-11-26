@@ -1,0 +1,87 @@
+/* Home — tarjeta "Racha diaria" (solo presentación; la lógica vive en js/index-racha.js).
+ * Paleta Halloween espacial, igual que la pestaña Racha de Mi Geo Army: negro, morado, naranja y dorado. Sin azul.
+ * Escritorio (>= 1180 px): flota en el espacio libre de arriba a la derecha del escenario, a 24 px del borde derecho.
+ * Por debajo: va en el flujo normal, justo debajo del header y antes de "Elige tu mundo". No es un pin del planeta. */
+
+.ga-racha {
+  --r-orange: #ff7a2f; --r-gold: #ffb84a; --r-violet: #a54af0; --r-purple: #9147ff;
+  --r-ink: #f4ecff; --r-mute: #b9a6d6; --r-lime: #d6f27a;
+  position: relative; z-index: 3; box-sizing: border-box;
+  width: min(100%, 420px); margin: 2px auto 16px; padding: 12px 14px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "flame body" "status status" "cta cta";
+  gap: 10px 12px; align-items: center; text-align: left; color: var(--r-ink);
+  border: 1px solid rgba(255, 184, 74, .62); border-radius: 18px;
+  background:
+    radial-gradient(1.2px 1.2px at 12% 20%, rgba(255, 255, 255, .5), transparent 60%),
+    radial-gradient(1px 1px at 88% 14%, rgba(255, 184, 74, .6), transparent 60%),
+    radial-gradient(280px 150px at 0% 0%, rgba(145, 71, 255, .30), transparent 70%),
+    radial-gradient(260px 150px at 100% 100%, rgba(255, 122, 47, .20), transparent 70%),
+    linear-gradient(160deg, #1b0d29 0%, #0e0716 100%);
+  box-shadow: 0 0 0 1px rgba(145, 71, 255, .16), 0 12px 30px rgba(0, 0, 0, .5), 0 0 26px rgba(255, 122, 47, .16);
+  animation: ga-racha-in .45s ease-out both;
+}
+.ga-racha *, .ga-racha *::before, .ga-racha *::after { box-sizing: border-box; }
+.ga-racha[hidden] { display: none !important; }
+@keyframes ga-racha-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+.ga-racha-flame { grid-area: flame; width: 46px; height: auto; filter: drop-shadow(0 0 9px rgba(255, 122, 47, .7)); }
+.ga-racha-body { grid-area: body; min-width: 0; }
+.ga-racha-kicker {
+  margin: 0; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: .66rem;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--r-gold);
+}
+.ga-racha-count { margin: 2px 0 0; display: flex; align-items: baseline; gap: 7px; line-height: 1; }
+.ga-racha-n {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 2.15rem; color: #fff;
+  text-shadow: 0 0 14px rgba(255, 122, 47, .55); font-variant-numeric: tabular-nums;
+}
+.ga-racha-u { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: .85rem; color: var(--r-mute); }
+
+/* Estado de hoy: lo más claro de la tarjeta (icono + frase, color por estado) */
+.ga-racha-status { grid-area: status; margin: 0; display: flex; align-items: flex-start; gap: 8px; font-size: .86rem; font-weight: 700; line-height: 1.25; }
+.ga-racha-status-text { text-wrap: balance; }
+.ga-racha-ic { flex: none; width: 18px; height: 18px; margin-top: 1px; }
+.ga-racha-ic circle { fill: var(--r-gold); }
+.ga-racha-ic path { fill: none; stroke: #1a1020; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; display: none; }
+.ga-racha[data-state="done"] .ga-racha-status { color: var(--r-lime); }
+.ga-racha[data-state="done"] .ga-racha-ic circle { fill: var(--r-lime); }
+.ga-racha[data-state="done"] .ga-racha-ic path { display: block; }
+.ga-racha[data-state="pending"] .ga-racha-status { color: var(--r-gold); }
+.ga-racha[data-state="pending"] .ga-racha-ic circle { fill: var(--r-orange); animation: ga-racha-pulse 1.8s ease-in-out infinite; transform-origin: center; }
+.ga-racha[data-state="new"] .ga-racha-status { color: #ffd978; }
+@keyframes ga-racha-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+
+/* CTA: enlace normal a Mi Geo Army (nunca registra nada) */
+.ga-racha-cta {
+  grid-area: cta; display: flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 16px;
+  border-radius: 12px; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: .76rem; letter-spacing: .06em;
+  text-decoration: none; white-space: nowrap; transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.ga-racha[data-state="pending"] .ga-racha-cta, .ga-racha[data-state="new"] .ga-racha-cta {
+  color: #1a0f08; background: linear-gradient(135deg, #ff7a2f, #ffb84a); box-shadow: 0 6px 18px -6px rgba(255, 122, 47, .75);
+}
+.ga-racha[data-state="done"] .ga-racha-cta {
+  color: var(--r-gold); background: rgba(145, 71, 255, .16); border: 1px solid rgba(255, 184, 74, .55);
+}
+.ga-racha-cta:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.ga-racha-cta:focus-visible { outline: 3px solid #ffdb91; outline-offset: 3px; }
+
+/* Entre 460 y 1179 px: fila horizontal compacta en el flujo normal */
+@media (min-width: 460px) and (max-width: 1179.98px) {
+  .ga-racha { width: min(100%, 560px); grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "flame body cta" "flame status cta"; column-gap: 14px; row-gap: 4px; }
+  .ga-racha-cta { padding-inline: 20px; }
+}
+
+/* Escritorio: flota en el espacio libre de arriba a la derecha, a 24 px del borde derecho de la pantalla */
+@media (min-width: 1180px) {
+  .ga-racha {
+    position: absolute; top: 20px; right: 1.5rem; left: auto;
+    width: 330px; margin: 0; padding: 11px 14px; gap: 8px 12px;
+  }
+  .ga-racha-cta { min-height: 34px; padding: 6px 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ga-racha, .ga-racha[data-state="pending"] .ga-racha-ic circle { animation: none !important; }
+  .ga-racha-cta { transition: none; }
+}

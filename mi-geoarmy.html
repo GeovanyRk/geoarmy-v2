@@ -21,6 +21,11 @@
   <script src="js/geoarmy-config.js"></script>
   <!-- Esta página sigue el estilo nuevo (V3), no el estilo viejo del resto del sitio -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
+  <link rel="stylesheet" href="css/mi-geoarmy-tabs.css?v=1a1"/>
+  <link rel="stylesheet" href="css/mi-geoarmy-identity.css?v=1b1"/>
+  <link rel="stylesheet" href="css/geoarmy-birthday-celebration.css?v=f2a"/><!-- Cumpleaños V1 Fase 2: celebración visual -->
+  <link rel="stylesheet" href="css/mi-geoarmy-panels.css?v=1c1"/>
+  <link rel="stylesheet" href="css/mi-geoarmy-streak.css?v=2a1"/>
 
   <!-- ================================================================
        Tematica de Halloween — SOLO decoración y colores para esta página.
@@ -132,6 +137,17 @@
       .mg-hw-decor .mg-hw-pumpkin, .mg-hw-decor .mg-hw-ghost{ font-size:18px; }
       .mg-hw-decor .mg-hw-web{ font-size:24px; }
     }
+  
+    /* Integración de deudas (6B-2C): saldo neto, deuda y estado negativo en Mis recompensas */
+    .mg-debt-badge { margin-left: 8px; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; border: 1px solid; vertical-align: middle; }
+    .mg-debt-badge[data-kind="neg"] { color: #ff6b81; border-color: rgba(255, 107, 129, .6); background: rgba(255, 107, 129, .1); }
+    .mg-debt-badge[data-kind="debt"] { color: #ffc247; border-color: rgba(255, 194, 71, .6); background: rgba(255, 194, 71, .1); }
+    .mg-wallet-neg { box-shadow: inset 0 0 0 1px rgba(255, 107, 129, .45); }
+    .mg-debt-rows { margin: 10px 0 0; display: grid; gap: 4px; }
+    .mg-debt-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: #aeb9d4; }
+    .mg-debt-row b { font-weight: 700; color: #e9eefc; }
+    .mg-debt-row.is-neg b { color: #ff6b81; }
+    .mg-debt-note { margin-top: 10px; font-size: 12px; line-height: 1.45; color: #8a9bbd; }
   </style>
 </head>
 <body>
@@ -192,45 +208,173 @@
       </button>
     </div>
 
+    <!-- Cumpleaños V1 (Fase 1B): aviso fino para quien aún no registra su fecha.
+         Lo muestra/oculta js/geoarmy-birthday.js; sin ese script queda oculto. -->
+    <div id="gaBdayNotice" class="gab-notice" role="region" aria-label="Cumpleaños" hidden>
+      <span aria-hidden="true">🎂</span>
+      <span class="gab-notice-t">Registra tu cumpleaños en Geo Army. Solo necesitamos tu día y mes.</span>
+      <button type="button" class="gab-notice-btn" id="gaBdayNoticeBtn">Registrar</button>
+    </div>
+
     <!-- Dashboard -->
     <div id="mgDashboard" hidden>
-      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-now-grid">
-          <div class="v3-now-card v3-c-purple">
-            <div class="v3-now-head"><span class="v3-now-ic">👤</span>Perfil</div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <img id="mgAvatar" src="" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(145,71,255,.5);flex-shrink:0;"/>
-              <div style="min-width:0;">
-                <div id="mgName" class="v3-now-winner-name" style="font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:6px;">
-                  <span id="mgNameText">—</span><img id="mgNameFlag" src="" alt="" hidden style="width:18px; height:13px; border-radius:2px; flex-shrink:0; box-shadow:0 0 0 1px rgba(255,255,255,.25);"/>
-                </div>
-                <div id="mgLevel" class="v3-now-sub">—</div>
-                <div class="v3-now-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
-                  <span id="mgCountryName">Sin país configurado</span>
-                  <button type="button" id="mgCountryBtn" hidden style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Elegir país</button>
-                  <span id="mgCountryMsg" style="font-size:11px; color:#7CFC9A;"></span>
-                </div>
-              </div>
-            </div>
-          </div>
+      <!-- ============================================================
+           Fase 1A -- Subpestañas de Mi Geo Army (js/mi-geoarmy-tabs.js +
+           css/mi-geoarmy-tabs.css). Los bloques de abajo son los MISMOS de
+           antes, solo reagrupados por panel: no cambia ningún id, clase ni
+           lógica. Los elementos "mgt*" son espejos de solo presentación
+           (los llena MgTabs.sync() copiando datos ya cargados).
+           Si el JS de pestañas no carga, todos los paneles quedan visibles
+           (columna larga, como antes) y la barra de pestañas se oculta.
+           ============================================================ -->
+      <div class="mgt-shell" id="mgtShell">
+        <div class="mgt-nav" id="mgtNav" role="tablist" aria-label="Secciones de Mi Geo Army" aria-orientation="horizontal">
+          <button type="button" class="mgt-tab is-active" role="tab" id="mgtTab-billetera" data-mgt-tab="billetera" aria-controls="mgtPanel-billetera" aria-selected="true">
+            <span class="mgt-tab-ic"><img class="mgt-tab-ic-img" src="gcoin-icon.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(129689)))"/></span><span class="mgt-tab-label">Billetera</span>
+          </button>
+          <button type="button" class="mgt-tab" role="tab" id="mgtTab-resumen" data-mgt-tab="resumen" aria-controls="mgtPanel-resumen" aria-selected="false" tabindex="-1">
+            <span class="mgt-tab-ic" aria-hidden="true">👤</span><span class="mgt-tab-label">Resumen</span>
+          </button>
+          <button type="button" class="mgt-tab" role="tab" id="mgtTab-progreso" data-mgt-tab="progreso" aria-controls="mgtPanel-progreso" aria-selected="false" tabindex="-1">
+            <span class="mgt-tab-ic" aria-hidden="true">📈</span><span class="mgt-tab-label">Progreso</span>
+          </button>
+          <!-- Racha Diaria (Fase 2): habilitada. La lógica vive en js/mi-geoarmy-streak.js. -->
+          <button type="button" class="mgt-tab" role="tab" id="mgtTab-racha" data-mgt-tab="racha" aria-controls="mgtPanel-racha" aria-selected="false" tabindex="-1">
+            <span class="mgt-tab-ic" aria-hidden="true">🔥</span><span class="mgt-tab-label">Racha</span>
+          </button>
+          <button type="button" class="mgt-tab" role="tab" id="mgtTab-cuenta" data-mgt-tab="cuenta" aria-controls="mgtPanel-cuenta" aria-selected="false" tabindex="-1">
+            <span class="mgt-tab-ic" aria-hidden="true">⚙️</span><span class="mgt-tab-label">Cuenta</span>
+          </button>
+        </div>
 
+        <div class="mgt-stage">
+
+      <!-- ===================== BILLETERA ===================== -->
+      <section class="mgt-panel" role="tabpanel" id="mgtPanel-billetera" aria-labelledby="mgtTab-billetera" data-mgt-panel="billetera">
+      <div class="mgt-wal-top">
+      <div class="v3-now-section">
+        <div class="v3-now-grid mgt-wallet-top">
           <div class="v3-now-card v3-c-gold" id="gcoins">
             <div class="v3-now-head"><img class="v3-now-ic-img" src="gcoin-icon.png" alt="" onerror="this.replaceWith(document.createTextNode(String.fromCodePoint(129689)))"/>G-Coins</div>
             <div class="v3-now-big" id="mgGcoins">—<span>G</span></div>
             <div class="v3-now-sub">G-Coins disponibles</div>
             <button type="button" class="v3-now-btn" id="mgRefreshSaldo" style="border:none; cursor:pointer; font-family:'Orbitron',sans-serif;">Actualizar saldo</button>
           </div>
-
-          <div class="v3-now-card v3-c-blue">
-            <div class="v3-now-head"><span class="v3-now-ic">🏆</span>Ranking</div>
-            <div class="v3-now-big" id="mgRank">—</div>
-            <div class="v3-now-sub" id="mgRankName"></div>
-            <div class="v3-now-sub" id="mgRankSub">Cargando…</div>
-            <a href="ranking.html" class="v3-now-btn" id="mgRankLink">Ver ranking</a>
-          </div>
         </div>
       </div>
 
+      <!-- Acceso a la tienda: solo un enlace a tienda.html (no toca compras ni saldos). -->
+      <div class="v3-now-section">
+        <div class="v3-x-card">
+          <div class="v3-x-card-main">
+            <span class="v3-x-ic">🛒</span>
+            <div class="v3-x-info">
+              <div class="v3-x-title">Tienda</div>
+              <p class="v3-x-desc">Canjea tus G-Coins por recompensas del canal.</p>
+            </div>
+          </div>
+          <a href="tienda.html" class="v3-btn-secondary v3-x-connect-btn">Ir a la tienda</a>
+        </div>
+      </div>
+      </div>
+
+      <!-- Mis recompensas: saldos reales de wallet_balances (Supabase). GCOIN
+           sigue aparte, viene de tienda-server (ver tarjeta G-Coins arriba). -->
+      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🎁</span>Mis recompensas</div>
+        <div class="v3-now-grid" id="mgWalletGrid">
+          <div class="v3-table-empty">Cargando…</div>
+        </div>
+      </div>
+
+      <!-- Mis solicitudes: historial de redemption_requests del propio usuario. -->
+      <div class="v3-table-wrap" id="misSolicitudes">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
+        <div id="mgRequestsList">
+          <div class="v3-table-empty">Cargando…</div>
+        </div>
+      </div>
+      </section>
+
+      <!-- ===================== RESUMEN (Fase 1B: identidad premium) =====================
+           Una sola tarjeta. Los nodos con id que ya existian (mgAvatar, mgName, mgNameText, mgLevel,
+           mgRank, mgRankName, mgRankSub, mgRankLink, mgtSumFlag, mgtSumGcoins) siguen aqui; los que
+           llenan las funciones originales de Progreso (rango, XP, barra, siguiente rango) se muestran
+           mediante espejos mgt* de solo presentacion que llena MgTabs.sync() (js/mi-geoarmy-tabs.js).
+           Los elementos [data-mgt-slot] estan vacios y ocultos a proposito: son solo puntos de
+           extension futuros (banner, titulo, vitrina, historial). No contienen funcionalidad. -->
+      <section class="mgt-panel" role="tabpanel" id="mgtPanel-resumen" aria-labelledby="mgtTab-resumen" data-mgt-panel="resumen">
+      <article class="mgt-id" id="mgtIdentity" aria-label="Identidad del jugador">
+        <div class="mgt-id-banner" data-mgt-slot="banner" hidden></div>
+
+        <div class="mgt-id-top">
+          <div class="mgt-id-who">
+            <div class="mgt-id-avatar" data-mgt-frame>
+              <div class="mgt-id-ring">
+                <span class="mgt-id-ph" aria-hidden="true">&#128100;</span>
+                <img id="mgAvatar" class="mgt-id-img" src="" alt="Avatar de Twitch" style="display:none;"/>
+              </div>
+              <img id="mgtBadge" class="mgt-id-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
+            </div>
+            <div class="mgt-id-text">
+              <div id="mgName" class="mgt-id-name"><span id="mgNameText">—</span><img id="mgtSumFlag" class="mgt-id-flag mgt-mirror-flag" src="" alt="" hidden onerror="this.hidden=true;"/></div>
+              <div class="mgt-id-title" data-mgt-slot="title" hidden></div>
+              <div class="mgt-id-meta">
+                <span class="mgt-id-rank" id="mgtRankChip" hidden><span id="mgLevel">—</span></span>
+                <span class="mgt-id-country" id="mgtCountryWrap" hidden><span id="mgtSumCountry"></span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mgt-id-progress">
+            <div id="mgtProgBlock" class="mgt-id-prog" hidden>
+              <div class="mgt-id-prog-title">Progreso al siguiente rango</div>
+              <div class="mgt-id-prog-row"><span id="mgtProgText">— / — XP</span><span id="mgtProgPct" class="mgt-id-pct">—%</span></div>
+              <div class="mgt-id-track" id="mgtProgTrack" role="progressbar" aria-label="Progreso al siguiente rango" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="mgt-id-fill" id="mgtProgFill"></div></div>
+              <p class="mgt-id-note" id="mgtProgNote"></p>
+            </div>
+            <div id="mgtMaxBlock" class="mgt-id-max" hidden>&#127942; Rango máximo alcanzado</div>
+            <div id="mgtNextWrap" class="mgt-id-next" hidden>
+              <img id="mgtNextBadge" class="mgt-id-next-badge" src="" alt="" hidden onerror="this.hidden=true;"/>
+              <div class="mgt-id-next-text"><span class="mgt-id-label">Siguiente rango</span><span id="mgtNextName" class="mgt-id-next-name">—</span><span id="mgtNextXp" class="mgt-id-next-xp">— XP</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mgt-id-stats">
+          <div class="mgt-stat">
+            <span class="mgt-id-label">Ranking</span>
+            <div class="mgt-stat-val" id="mgRank">—</div>
+            <span class="mgt-stat-sub" id="mgtTopSub"></span>
+          </div>
+          <div class="mgt-stat">
+            <span class="mgt-id-label">XP total</span>
+            <div class="mgt-stat-val" id="mgtXp">— XP</div>
+          </div>
+          <div class="mgt-stat mgt-stat-2">
+            <span class="mgt-id-label">G-Coins</span>
+            <div class="mgt-stat-val" id="mgtSumGcoins">—<span>G</span></div>
+            <a href="#billetera" class="mgt-stat-link">Ver billetera</a>
+          </div>
+        </div>
+        <!-- Nodos originales del resumen de ranking: los sigue llenando loadRankSummary(); aqui no se muestran
+             (su dato ya se ve en la tarjeta). Se conservan por compatibilidad. -->
+        <div class="mgt-id-legacy" hidden><span id="mgRankName"></span><span id="mgRankSub">Cargando…</span></div>
+
+        <div class="mgt-id-showcase" data-mgt-slot="showcase" hidden></div>
+
+        <nav class="mgt-id-links" aria-label="Accesos rápidos">
+          <a href="misiones.html" class="mgt-link">&#127919; Misiones</a>
+          <a href="ranking.html" class="mgt-link" id="mgRankLink">Ver ranking</a>
+          <a href="#progreso" class="mgt-link">&#128200; Progreso</a>
+        </nav>
+      </article>
+      <div class="mgt-id-history" data-mgt-slot="history" hidden></div>
+      </section>
+
+      <!-- ===================== PROGRESO ===================== -->
+      <section class="mgt-panel" role="tabpanel" id="mgtPanel-progreso" aria-labelledby="mgtTab-progreso" data-mgt-panel="progreso">
+      <div class="mgt-prog-eyebrow">Rango del jugador</div>
       <!-- Perfil Grande — tarjeta de rango. Reemplaza por completo el bloque
            legado de "Nivel X / X,000 XP" (arriba se calculaba todo en el
            cliente con profile.xp % 1000). Ahora TODO sale tal cual de
@@ -283,33 +427,115 @@
           </div>
         </div>
       </div>
+      </section>
 
-      <!-- Misiones: CTA compacto únicamente. Toda la lógica real (leer
-           my_missions_status(), progreso, y el claim de STREAM_RETWEET vía
-           claim-stream-retweet) vive en misiones.html — no se duplica acá
-           ninguna llamada ni estado. Reusa las mismas clases .v3-x-* de la
-           tarjeta de "Cuentas vinculadas" (mismo layout icono+texto+botón),
-           sin agregar CSS nueva. -->
-      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
+      <!-- ===================== RACHA DIARIA (Fase 2) ===================== -->
+      <section class="mgt-panel" role="tabpanel" id="mgtPanel-racha" aria-labelledby="mgtTab-racha" data-mgt-panel="racha">
+        <div id="mgStreak" class="mgs" data-state="loading" data-day="none" aria-busy="true">
+          <div class="mgs-eyebrow">Racha diaria</div>
+          <p class="mgs-sr" id="mgsLive" role="status" aria-live="polite"></p>
+
+          <div class="mgs-signedout" id="mgsSignedOut" hidden>Inicia sesión con Twitch para ver y registrar tu racha diaria.</div>
+
+          <div class="mgs-error" id="mgsError" role="alert" hidden>
+            <span class="mgs-error-ic" aria-hidden="true">⚠️</span>
+            <p id="mgsErrorText">No pudimos cargar tu racha.</p>
+            <button type="button" class="mgs-btn mgs-btn-ghost" id="mgsRetry">Reintentar</button>
+          </div>
+
+          <div class="mgs-body">
+            <section class="mgs-card mgs-hero" aria-labelledby="mgsHeadline">
+              <div class="mgs-medal" id="mgsMedal" style="--p:0">
+                <div class="mgs-medal-disc">
+                  <svg class="mgs-flame" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                    <defs>
+                      <linearGradient id="mgsFl1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a1f"/><stop offset=".55" stop-color="#ff9a2e"/><stop offset="1" stop-color="#ffd978"/></linearGradient>
+                      <linearGradient id="mgsFl2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb84a"/><stop offset="1" stop-color="#fff2c4"/></linearGradient>
+                    </defs>
+                    <path fill="url(#mgsFl1)" d="M33 3c2 11-7 16-7 27 0 6 4 10 8 10 5 0 9-4 9-11 0-4-1-7-3-10 8 5 12 13 12 22 0 13-9 22-20 22S11 54 11 41C11 29 23 22 27 9c1-3 3-5 6-6z"/>
+                    <path fill="url(#mgsFl2)" d="M32 30c1 5-4 8-4 13 0 4 3 7 6 7s6-3 6-7c0-3-1-5-2-7 4 2 6 6 6 10 0 8-5 11-10 11s-10-4-10-11c0-5 5-8 8-16z" opacity=".95"/>
+                  </svg>
+                  <span class="mgs-num" id="mgsNum">—</span>
+                </div>
+              </div>
+              <div class="mgs-hero-text">
+                <span class="mgs-numlabel" id="mgsNumLabel">Racha actual</span>
+                <span class="mgs-status" id="mgsStatus" tabindex="-1">Cargando…</span>
+                <h2 class="mgs-headline" id="mgsHeadline"></h2>
+                <p class="mgs-sub" id="mgsSub"></p>
+                <button type="button" class="mgs-btn mgs-btn-main" id="mgsClaim" hidden><span id="mgsClaimLabel">Registrar asistencia</span></button>
+                <p class="mgs-note" id="mgsNote" hidden></p>
+              </div>
+            </section>
+
+            <div class="mgs-stats">
+              <div class="mgs-stat"><span class="mgs-stat-label">Mejor racha</span><span class="mgs-stat-val" id="mgsBest">—</span></div>
+              <div class="mgs-stat"><span class="mgs-stat-label">Asistencias totales</span><span class="mgs-stat-val" id="mgsTotal">—</span></div>
+              <div class="mgs-stat"><span class="mgs-stat-label">Último registro</span><span class="mgs-stat-val mgs-stat-date" id="mgsLast">—</span></div>
+            </div>
+
+            <section class="mgs-card mgs-next" aria-labelledby="mgsNextTitle">
+              <h3 class="mgs-h" id="mgsNextTitle">Próximo hito</h3>
+              <div class="mgs-bar" id="mgsNextBar" role="progressbar" aria-labelledby="mgsNextTitle" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="mgs-bar-fill" id="mgsNextFill"></div></div>
+              <p class="mgs-next-text" id="mgsNextText">—</p>
+            </section>
+
+            <section class="mgs-card mgs-weekcard" aria-labelledby="mgsWeekTitle">
+              <h3 class="mgs-h" id="mgsWeekTitle">Esta semana</h3>
+              <ol class="mgs-week" id="mgsWeek"></ol>
+            </section>
+
+            <section class="mgs-card mgs-badgescard" aria-labelledby="mgsBadgesTitle">
+              <h3 class="mgs-h" id="mgsBadgesTitle">Insignias de racha</h3>
+              <ul class="mgs-badges" id="mgsBadges"></ul>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== CUENTA ===================== -->
+      <section class="mgt-panel" role="tabpanel" id="mgtPanel-cuenta" aria-labelledby="mgtTab-cuenta" data-mgt-panel="cuenta">
+      <div class="mgt-acct-grid">
+      <div class="v3-now-section">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">👤</span>Información de la cuenta</div>
         <div class="v3-x-card">
           <div class="v3-x-card-main">
-            <span class="v3-x-ic">🎯</span>
+            <img id="mgtAcctAvatar" class="mgt-avatar" src="" alt="" style="display:none;"/>
             <div class="v3-x-info">
-              <div class="v3-x-title">Misiones</div>
-              <p class="v3-x-desc">Completa misiones y gana XP para subir de rango.</p>
+              <div class="v3-x-title" id="mgtAcctName">—</div>
+              <p class="v3-x-desc">Tu avatar y tu nombre vienen de tu cuenta de Twitch.</p>
             </div>
           </div>
-          <a href="misiones.html" class="v3-btn-secondary v3-x-connect-btn">Ver misiones</a>
         </div>
       </div>
 
-      <!-- Mis recompensas: saldos reales de wallet_balances (Supabase). GCOIN
-           sigue aparte, viene de tienda-server (ver tarjeta G-Coins arriba). -->
-      <div class="v3-now-section" style="margin-top:6px; padding-bottom:0;">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🎁</span>Mis recompensas</div>
-        <div class="v3-now-grid" id="mgWalletGrid">
-          <div class="v3-table-empty">Cargando…</div>
+      <div class="v3-now-section">
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🌍</span>Mi país y bandera</div>
+        <div class="v3-x-card mgt-country">
+          <div class="v3-x-card-main">
+            <img id="mgNameFlag" src="" alt="" hidden style="width:18px; height:13px; border-radius:2px; flex-shrink:0; box-shadow:0 0 0 1px rgba(255,255,255,.25);"/>
+            <div class="v3-x-info">
+                <div class="v3-now-sub" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:2px;">
+                  <span id="mgCountryName">Sin país configurado</span>
+                  <button type="button" id="mgCountryBtn" hidden style="border:none; cursor:pointer; background:rgba(145,71,255,.18); color:#eaf2ff; border-radius:999px; padding:2px 10px; font-size:11px; font-family:'Orbitron',sans-serif;">Elegir país</button>
+                  <span id="mgCountryMsg" style="font-size:11px; color:#7CFC9A;"></span>
+                </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Cumpleaños V1 (Fase 1B): tarjeta permanente. La llena js/geoarmy-birthday.js
+           con las RPC get_my_birthday_status() / set_my_birthday(); oculta por defecto. -->
+      <div class="v3-now-section" id="gaBdaySection" hidden>
+        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">🎂</span>Mi cumpleaños</div>
+        <div class="v3-x-card">
+          <div class="v3-x-card-main">
+            <div class="v3-x-info" id="gaBdayInfo"></div>
+          </div>
+          <button type="button" class="v3-btn-secondary v3-x-connect-btn" id="gaBdayBtn" hidden>Registrar cumpleaños</button>
+        </div>
+        <div class="gab-gp-wrap" id="gaBdayGift"></div>
       </div>
 
       <!-- Cuentas vinculadas: UI cableada al backend real de X (ya validado
@@ -349,15 +575,11 @@
           <button type="button" class="v3-btn-secondary v3-x-connect-btn" id="xConnectBtn">Conectar X</button>
         </div>
       </div>
+      </div>
+      </section>
 
-      <!-- Mis solicitudes: historial de redemption_requests del propio usuario. -->
-      <div class="v3-table-wrap" id="misSolicitudes">
-        <div class="v3-now-header v3-now-header-sm"><span class="v3-now-ic">📨</span>Mis solicitudes</div>
-        <div id="mgRequestsList">
-          <div class="v3-table-empty">Cargando…</div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -376,6 +598,16 @@
   <script src="js/premium.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
+  <!-- Cosméticos (marco VIP): solo presentación. Inerte mientras GEOARMY_COSMETICS_ENABLED sea false (js/geoarmy-config.js). -->
+  <script src="js/geoarmy-cosmetics.js?v=2"></script>
+  <!-- Fase 1A: router de subpestañas. Va ANTES del script en línea para leer ?x_connect=
+       antes de que initXAccountUI() lo limpie de la URL. -->
+  <script src="js/mi-geoarmy-tabs.js?v=1b1"></script>
+  <script src="js/mi-geoarmy-streak.js?v=2a1"></script>
+  <!-- Cumpleaños V1 (Fase 1B). Va DESPUÉS de geoarmy-account.js (usa su sesión). -->
+  <script src="js/geoarmy-birthday.js?v=3a"></script>
+  <!-- Cumpleaños V1 (Fase 2): celebración visual el día del cumpleaños (America/New_York). Solo presentación. -->
+  <script src="js/geoarmy-birthday-celebration.js?v=f2b"></script>
   <script>
   (function () {
     var currentCountryCode = null; // solo lectura de estado en memoria para el botón "Cambiar país"
@@ -591,10 +823,116 @@
       } catch (e) { return iso; }
     }
 
+    // ===== Posición por moneda con deuda (Fase 6B-2C) =====
+    // VBUCKS / OWCOINS / PAYPAL_USD se muestran con get_my_wallet_positions() (campos que devuelve debt_position_json: currency, decimals, balance, reserved, debt,
+    // pending_penalty, net, available_to_redeem, can_redeem, debt_applicable, debt_policy_enabled, blocked_reason). TODAS las cifras vienen del servidor: aquí no se calcula
+    // ninguna deuda ni se descuenta nada. Si la lectura falla NO se muestra ningún saldo de esas monedas (nunca un saldo falso).
+    // TWITCH_SUB queda con su lectura de siempre (wallet_balances) y GCOIN no se toca (tarjeta G-Coins de arriba, tienda-server).
+    var DEBT_CURRENCIES = ['VBUCKS', 'OWCOINS', 'PAYPAL_USD'];
+    var walletSeq = 0;
+
+    function numOrNull(v) {
+      if (typeof v === 'string' && v.trim() !== '') v = Number(v);
+      return (typeof v === 'number' && isFinite(v)) ? v : null;
+    }
+
+    // Valida una fila de la RPC; null si falta o es inválido algún campo numérico (entonces esa moneda se trata como error, no como cero).
+    function normalizarPosicion(raw) {
+      if (!raw || typeof raw !== 'object' || typeof raw.currency !== 'string') return null;
+      var fields = ['balance', 'reserved', 'debt', 'pending_penalty', 'net', 'available_to_redeem'], o = { currency: raw.currency }, i, n;
+      for (i = 0; i < fields.length; i++) {
+        n = numOrNull(raw[fields[i]]);
+        if (n === null) return null;
+        o[fields[i]] = n;
+      }
+      if (o.reserved < 0 || o.debt < 0 || o.pending_penalty < 0 || o.available_to_redeem < 0) return null;
+      o.can_redeem = raw.can_redeem === true;
+      o.debt_applicable = raw.debt_applicable === true;
+      o.debt_policy_enabled = raw.debt_policy_enabled === true;
+      o.blocked_reason = typeof raw.blocked_reason === 'string' ? raw.blocked_reason : null;
+      return o;
+    }
+
+    function formatWalletSigned(cur, valor) {
+      var n = Number(valor || 0);
+      return (n < 0 ? '−' : '') + formatWalletAmount(cur, Math.abs(n));
+    }
+
+    // Modelo de presentación de una moneda (sin DOM). Solo reformatea lo que dijo el servidor.
+    function vistaPosicion(cur, pos) {
+      var tieneDeuda = pos.debt > 0 || pos.pending_penalty > 0;
+      var negativo = pos.net < 0;
+      var rows = [];
+      if (pos.debt_applicable) {
+        rows.push({ kind: 'net', label: 'Saldo neto', text: formatWalletSigned(cur, pos.net), neg: negativo });
+        if (pos.debt > 0) rows.push({ kind: 'debt', label: 'Deuda pendiente', text: formatWalletAmount(cur, pos.debt), neg: true });
+        if (pos.pending_penalty > 0) rows.push({ kind: 'pending', label: 'Penalización por aplicar', text: formatWalletAmount(cur, pos.pending_penalty), neg: true });
+      }
+      var note = null;
+      if (tieneDeuda) {
+        note = 'Tus próximas recompensas de esta moneda se aplican primero a esta deuda.';
+        if (!pos.debt_policy_enabled) note += ' La compensación automática aún no está activa: la deuda se conserva.';
+        if (!pos.can_redeem) note += ' Los canjes de esta moneda están bloqueados mientras exista deuda.';
+      }
+      return {
+        big: formatWalletAmount(cur, pos.available_to_redeem),
+        sub: 'Disponible para canjear' + (pos.reserved > 0 ? ' · ' + formatWalletAmount(cur, pos.reserved) + ' reservado' : ''),
+        rows: rows,
+        badge: negativo ? { kind: 'neg', text: 'Saldo negativo' } : (tieneDeuda ? { kind: 'debt', text: 'Con deuda' } : null),
+        note: note,
+        negative: negativo,
+        canRedeem: pos.can_redeem === true && puedeSolicitarMoneda(cur, pos.available_to_redeem),
+        disponible: pos.available_to_redeem
+      };
+    }
+
+    function cardPosicion(cur, v) {
+      var rowsHtml = v.rows.length ? '<div class="mg-debt-rows">' + v.rows.map(function (r) {
+        return '<div class="mg-debt-row' + (r.neg ? ' is-neg' : '') + '" data-row="' + r.kind + '"><span>' + esc(r.label) + '</span><b>' + esc(r.text) + '</b></div>';
+      }).join('') + '</div>' : '';
+      return (
+        '<div class="v3-now-card ' + cur.accent + (v.negative ? ' mg-wallet-neg' : '') + '" data-currency="' + cur.code + '">' +
+          '<div class="v3-now-head"><span class="v3-now-ic">' + cur.icon + '</span>' + esc(cur.label) +
+            (v.badge ? '<span class="mg-debt-badge" data-kind="' + v.badge.kind + '">' + esc(v.badge.text) + '</span>' : '') + '</div>' +
+          '<div class="v3-now-big">' + esc(v.big) + '</div>' +
+          '<div class="v3-now-sub">' + esc(v.sub) + '</div>' +
+          rowsHtml +
+          (v.note ? '<div class="mg-debt-note">' + esc(v.note) + '</div>' : '') +
+          (v.canRedeem
+            ? '<button type="button" class="v3-now-btn mg-redeem-btn" data-currency="' + cur.code + '" data-disponible="' + v.disponible + '" style="border:none; cursor:pointer; font-family:\'Orbitron\',sans-serif;">Solicitar recompensa</button>'
+            : '')
+        + '</div>'
+      );
+    }
+
+    // Tarjeta sin cifras: carga fallida, sesión caducada o moneda sin posición. Nunca muestra un saldo.
+    function cardSinPosicion(cur, kind) {
+      var msg = kind === 'auth' ? 'Tu sesión caducó. Inicia sesión de nuevo para ver tu saldo.'
+              : kind === 'missing' ? 'Esta moneda no está disponible por ahora.'
+              : 'No pudimos cargar tu saldo de esta moneda.';
+      return (
+        '<div class="v3-now-card ' + cur.accent + '" data-currency="' + cur.code + '" data-error="' + kind + '">' +
+          '<div class="v3-now-head"><span class="v3-now-ic">' + cur.icon + '</span>' + esc(cur.label) + '</div>' +
+          '<div class="v3-now-big">—</div>' +
+          '<div class="v3-now-sub">' + esc(msg) + '</div>' +
+          (kind === 'error' ? '<button type="button" class="v3-now-btn mg-wallet-retry" style="border:none; cursor:pointer; font-family:\'Orbitron\',sans-serif;">Reintentar</button>' : '') +
+        '</div>'
+      );
+    }
+
+    function esErrorDeSesion(err, status) {
+      if (status === 401 || status === 403) return true;
+      var code = err && err.code ? String(err.code) : '';
+      var msg = err && err.message ? String(err.message) : '';
+      return code === '28000' || code === '42501' || /jwt|no autenticado|not authenticated/i.test(msg);
+    }
+
     async function loadWallets(sb, userId) {
       var grid = document.getElementById('mgWalletGrid');
       if (!grid) return;
+      var seq = ++walletSeq;
       var res = await sb.from('wallet_balances').select('currency_code, balance, reserved').eq('profile_id', userId);
+      if (seq !== walletSeq) return;
       if (res.error) {
         console.warn('[mi-geoarmy] no se pudieron leer los saldos de wallet', res.error);
         grid.innerHTML = '<div class="v3-table-empty">No se pudieron cargar tus recompensas.</div>';
@@ -603,12 +941,37 @@
       var byCurrency = {};
       (res.data || []).forEach(function (row) { byCurrency[row.currency_code] = row; });
 
+      // Posición firmada (saldo neto, deuda, disponible) de las monedas con reglas de deuda: SOLO del servidor.
+      var posState = 'ok', posByCode = {};
+      var pr = await sb.rpc('get_my_wallet_positions');
+      if (seq !== walletSeq) return;
+      if (pr.error) {
+        console.warn('[mi-geoarmy] no se pudo leer la posición de billetera', pr.error);
+        posState = esErrorDeSesion(pr.error, pr.status) ? 'auth' : 'error';
+      } else {
+        var data = pr.data;
+        if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { data = null; } }
+        if (!Array.isArray(data)) posState = 'error';
+        else data.forEach(function (raw) {
+          var p = normalizarPosicion(raw);
+          if (p) posByCode[p.currency] = p; else if (raw && typeof raw.currency === 'string') posByCode[raw.currency] = 'invalid';
+        });
+      }
+
       grid.innerHTML = WALLET_CURRENCIES.map(function (cur) {
+        if (DEBT_CURRENCIES.indexOf(cur.code) !== -1) {
+          if (posState !== 'ok') return cardSinPosicion(cur, posState);
+          var pos = posByCode[cur.code];
+          if (pos === 'invalid') return cardSinPosicion(cur, 'error');
+          if (!pos) return cardSinPosicion(cur, 'missing');
+          return cardPosicion(cur, vistaPosicion(cur, pos));
+        }
+        // TWITCH_SUB: lectura y tarjeta de siempre
         var row = byCurrency[cur.code];
         var balance = row ? Number(row.balance) : 0;
         var reserved = row ? Number(row.reserved) : 0;
         var disponible = balance - reserved;
-        var puedeSolicitar = disponible > 0;
+        var puedeSolicitar = puedeSolicitarMoneda(cur, disponible);
         return (
           '<div class="v3-now-card ' + cur.accent + '">' +
             '<div class="v3-now-head"><span class="v3-now-ic">' + cur.icon + '</span>' + esc(cur.label) + '</div>' +
@@ -629,6 +992,9 @@
           var disponible = Number(btn.getAttribute('data-disponible'));
           openRedeemModal(sb, findCurrency(code), disponible, userId);
         });
+      });
+      Array.prototype.forEach.call(grid.querySelectorAll('.mg-wallet-retry'), function (btn) {
+        btn.addEventListener('click', function () { btn.disabled = true; loadWallets(sb, userId); });
       });
     }
 
@@ -653,23 +1019,75 @@
       return { ok: true, monto: monto };
     }
 
+    // Validación pura del monto de OW Coins -- a diferencia de VBUCKS, el
+    // canje real con Blizzard solo entrega en paquetes fijos de 500 OW
+    // Coins, así que el monto solicitado SIEMPRE debe ser un múltiplo de
+    // 500 (mínimo 500) y nunca mayor al disponible. El resto del saldo que
+    // no entra en un paquete completo se queda disponible en la billetera
+    // para una solicitud futura. Función pura (igual que
+    // validarMontoVbucks) para poder testearla copiándola literal en el
+    // archivo de pruebas.
+    var OWCOINS_PAQUETE = 500;
+    function validarMontoOwcoins(rawValue, disponible) {
+      var texto = String(rawValue == null ? '' : rawValue).trim();
+      if (texto === '') return { ok: false, error: 'Elige el paquete de OW Coins que quieres solicitar.' };
+      var monto = Number(texto);
+      if (!Number.isFinite(monto) || !Number.isInteger(monto) || monto <= 0) {
+        return { ok: false, error: 'El monto debe ser un número entero mayor que 0.' };
+      }
+      if (monto < OWCOINS_PAQUETE) {
+        return { ok: false, error: 'El mínimo por solicitud es ' + OWCOINS_PAQUETE + ' OW Coins.' };
+      }
+      if (monto % OWCOINS_PAQUETE !== 0) {
+        return { ok: false, error: 'Solo se pueden solicitar paquetes de ' + OWCOINS_PAQUETE + ' OW Coins (' + OWCOINS_PAQUETE + ', ' + (OWCOINS_PAQUETE * 2) + ', ' + (OWCOINS_PAQUETE * 3) + '...).' };
+      }
+      if (monto > disponible) {
+        return { ok: false, error: 'No puedes solicitar más de tu saldo disponible (' + disponible + ').' };
+      }
+      return { ok: true, monto: monto };
+    }
+
+    // Paquetes válidos de 500 OW Coins que caben en el disponible actual,
+    // para el <select> del modal -- nunca se ofrece un paquete que supere
+    // el saldo.
+    function paquetesOwcoinsDisponibles(disponible) {
+      var paquetes = [];
+      for (var m = OWCOINS_PAQUETE; m <= disponible; m += OWCOINS_PAQUETE) {
+        paquetes.push(m);
+      }
+      return paquetes;
+    }
+
+    // Una moneda solo es solicitable si el disponible alcanza para al menos
+    // una unidad canjeable: para la mayoría eso es "> 0", pero OWCOINS solo
+    // se entrega en paquetes de 500, así que con menos de 500 disponibles
+    // no hay nada que se pueda solicitar todavía (el saldo se queda
+    // acumulando hasta llegar al siguiente paquete).
+    function puedeSolicitarMoneda(cur, disponible) {
+      if (cur.code === 'OWCOINS') return disponible >= OWCOINS_PAQUETE;
+      return disponible > 0;
+    }
+
     // Decide el p_amount final y valida los campos específicos de VBUCKS
-    // (monto + Epic Games Display Name) ANTES de llamar a
-    // request_redemption. Función pura (sin tocar el DOM) para poder
-    // testearla igual que validarMontoVbucks() -- copiándola literal en el
-    // archivo de pruebas. Para las demás monedas es un paso vacío: monto =
-    // disponible, sin validaciones nuevas, byte a byte igual que antes de
-    // este cambio.
-    function construirSolicitudRedencion(cur, disponible, montoRawVbucks, accountTrim) {
-      if (cur.code !== 'VBUCKS') {
-        return { ok: true, monto: disponible };
+    // (monto + Epic Games Display Name) y de OWCOINS (paquete de 500) ANTES
+    // de llamar a request_redemption. Función pura (sin tocar el DOM) para
+    // poder testearla igual que validarMontoVbucks()/validarMontoOwcoins()
+    // -- copiándola literal en el archivo de pruebas. Para PAYPAL_USD y
+    // TWITCH_SUB sigue siendo un paso vacío: monto = disponible, sin
+    // validaciones nuevas, byte a byte igual que antes de este cambio.
+    function construirSolicitudRedencion(cur, disponible, montoRawVbucks, accountTrim, montoRawOwcoins) {
+      if (cur.code === 'VBUCKS') {
+        var validacionMonto = validarMontoVbucks(montoRawVbucks, disponible);
+        if (!validacionMonto.ok) return validacionMonto;
+        if (accountTrim.length < 3 || accountTrim.length > 16) {
+          return { ok: false, error: 'El Epic Games Display Name debe tener entre 3 y 16 caracteres.' };
+        }
+        return { ok: true, monto: validacionMonto.monto };
       }
-      var validacionMonto = validarMontoVbucks(montoRawVbucks, disponible);
-      if (!validacionMonto.ok) return validacionMonto;
-      if (accountTrim.length < 3 || accountTrim.length > 16) {
-        return { ok: false, error: 'El Epic Games Display Name debe tener entre 3 y 16 caracteres.' };
+      if (cur.code === 'OWCOINS') {
+        return validarMontoOwcoins(montoRawOwcoins, disponible);
       }
-      return { ok: true, monto: validacionMonto.monto };
+      return { ok: true, monto: disponible };
     }
 
     // El amount NO es libre para OWCOINS/PAYPAL_USD/TWITCH_SUB: se fija al
@@ -690,12 +1108,14 @@
 
       // Fortnite (VBUCKS): el campo de cuenta se muestra/valida distinto --
       // pide explícitamente el Epic Games Display Name, con su propio texto
-      // de ayuda y validación (trim, 3-16 caracteres). Las demás monedas
-      // (OWCOINS, PAYPAL_USD, TWITCH_SUB) conservan exactamente su label,
+      // de ayuda y validación (trim, 3-16 caracteres). OWCOINS tiene su
+      // propio formulario completo (sin nada de Fortnite/Epic/Skin), ver
+      // más abajo. PAYPAL_USD y TWITCH_SUB conservan exactamente su label,
       // placeholder y ausencia de validación de longitud de antes.
       var esVbucks = cur.code === 'VBUCKS';
-      var accountLabel = esVbucks ? 'Epic Games Display Name' : 'Tu usuario/cuenta para recibirlo';
-      var accountPlaceholder = esVbucks ? 'Tu Epic Games Display Name' : 'Ej: tu Epic username';
+      var esOwcoins = cur.code === 'OWCOINS';
+      var accountLabel = esVbucks ? 'Epic Games Display Name' : (esOwcoins ? 'BattleTag de Battle.net' : 'Tu usuario/cuenta para recibirlo');
+      var accountPlaceholder = esVbucks ? 'Tu Epic Games Display Name' : (esOwcoins ? 'Ej: Geo#1234' : 'Ej: tu Epic username');
       // La entrega final sigue usando el sistema oficial de regalos de
       // Fortnite (aunque ahora la compra acredita VBUCKS primero y la
       // solicitud del cosmético ocurre después, desde acá) -- por eso la
@@ -707,18 +1127,39 @@
         : '';
 
       // VBUCKS: el monto ya no es el disponible completo -- ver
-      // validarMontoVbucks() arriba. El párrafo de intro y el label del botón
-      // reflejan eso (sin comprometerse a un monto fijo todavía). Las demás
-      // monedas conservan EXACTAMENTE su texto/comportamiento de antes.
+      // validarMontoVbucks() arriba. OWCOINS: solo se puede elegir un
+      // paquete de 500 entre los que caben en el disponible -- ver
+      // validarMontoOwcoins()/paquetesOwcoinsDisponibles() arriba. El
+      // párrafo de intro y el label del botón reflejan eso en ambos casos
+      // (sin comprometerse a un monto fijo todavía). PAYPAL_USD y
+      // TWITCH_SUB conservan EXACTAMENTE su texto/comportamiento de antes.
       var introHtml = esVbucks
         ? '<p>Tienes <strong>' + formatWalletAmount(cur, disponible) + '</strong> disponibles. Indica el valor del cosmético que vas a pedir -- se reservará solo ese monto, no todo tu saldo.</p>'
-        : '<p>Vas a solicitar <strong>' + formatWalletAmount(cur, disponible) + '</strong>. Ese monto quedará reservado mientras se procesa tu solicitud.</p>';
+        : (esOwcoins
+            ? '<p>Tienes <strong>' + formatWalletAmount(cur, disponible) + '</strong> disponibles. Elige el paquete de OW Coins que quieres solicitar -- solo se reservará ese paquete, el resto se queda disponible en tu billetera para una próxima solicitud.</p>'
+            : '<p>Vas a solicitar <strong>' + formatWalletAmount(cur, disponible) + '</strong>. Ese monto quedará reservado mientras se procesa tu solicitud.</p>');
       var montoFieldHtml = esVbucks
         ? '<label style="font-size:13px; color:#a9bad6;">Valor del cosmético en V-Bucks' +
             '<input type="number" id="mgReqMonto" required min="1" step="1" inputmode="numeric" placeholder="Ej: 800" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
           '</label>'
-        : '';
-      var submitLabelBase = esVbucks ? 'Confirmar solicitud' : ('Confirmar solicitud (' + formatWalletAmount(cur, disponible) + ')');
+        : (esOwcoins
+            ? '<label style="font-size:13px; color:#a9bad6;">Paquete de OW Coins' +
+                '<select id="mgReqMontoOw" required style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
+                  paquetesOwcoinsDisponibles(disponible).map(function (m) {
+                    return '<option value="' + m + '" style="color:#111;background:#fff;">' + m.toLocaleString() + ' OW Coins</option>';
+                  }).join('') +
+                '</select>' +
+              '</label>'
+            : '');
+      // OWCOINS no pregunta "¿qué estás solicitando?" -- siempre son OW
+      // Coins, nunca un ítem libre inventado por el usuario (ver
+      // itemFieldHtml más abajo, que para esta moneda queda vacío).
+      var submitLabelBase = (esVbucks || esOwcoins) ? 'Confirmar solicitud' : ('Confirmar solicitud (' + formatWalletAmount(cur, disponible) + ')');
+      var itemFieldHtml = esOwcoins
+        ? ''
+        : '<label style="font-size:13px; color:#a9bad6;">¿Qué estás solicitando?' +
+            '<input type="text" id="mgReqItem" required maxlength="200" placeholder="Ej: Skin Fortnite de prueba" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
+          '</label>';
 
       var overlay = document.createElement('div');
       overlay.className = 'ga-modal-overlay';
@@ -729,9 +1170,7 @@
           '<h3>Solicitar recompensa — ' + esc(cur.label) + '</h3>' +
           introHtml +
           '<form id="mgRedeemForm" style="text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:10px;">' +
-            '<label style="font-size:13px; color:#a9bad6;">¿Qué estás solicitando?' +
-              '<input type="text" id="mgReqItem" required maxlength="200" placeholder="Ej: Skin Fortnite de prueba" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
-            '</label>' +
+            itemFieldHtml +
             montoFieldHtml +
             '<label style="font-size:13px; color:#a9bad6;">' + esc(accountLabel) +
               '<input type="text" id="mgReqAccount" required maxlength="200" placeholder="' + esc(accountPlaceholder) + '" style="width:100%; margin-top:4px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.05); color:#eaf2ff; box-sizing:border-box;">' +
@@ -760,17 +1199,22 @@
         submitBtn.disabled = true;
         submitBtn.textContent = 'Enviando…';
 
-        var item = document.getElementById('mgReqItem').value.trim();
+        var itemEl = document.getElementById('mgReqItem');
+        var item = itemEl ? itemEl.value.trim() : '';
         var account = document.getElementById('mgReqAccount').value.trim();
         var notes = document.getElementById('mgReqNotes').value.trim();
 
         // VBUCKS: el monto YA NO es el disponible completo -- se valida el
         // campo #mgReqMonto (número entero, mayor que 0, sin superar el
         // disponible) y el Epic Games Display Name juntos, en la misma
-        // función pura usada en las pruebas. Las demás monedas siguen
-        // mandando el disponible completo, sin ninguna validación nueva.
+        // función pura usada en las pruebas. OWCOINS: el monto sale del
+        // <select> de paquetes de 500 (#mgReqMontoOw), validado contra el
+        // disponible real por la misma función pura. PAYPAL_USD y
+        // TWITCH_SUB siguen mandando el disponible completo, sin ninguna
+        // validación nueva.
         var montoRawParaVbucks = esVbucks ? document.getElementById('mgReqMonto').value : null;
-        var decision = construirSolicitudRedencion(cur, disponible, montoRawParaVbucks, account);
+        var montoRawParaOwcoins = esOwcoins ? document.getElementById('mgReqMontoOw').value : null;
+        var decision = construirSolicitudRedencion(cur, disponible, montoRawParaVbucks, account, montoRawParaOwcoins);
         if (!decision.ok) {
           errEl.textContent = decision.error;
           submitBtn.disabled = false;
@@ -779,12 +1223,18 @@
           return;
         }
 
+        // OWCOINS nunca manda un ítem inventado por el usuario (no hay
+        // campo #mgReqItem para esta moneda) -- en su lugar se manda una
+        // descripción fija y exacta del paquete reservado, para que quede
+        // claro en el panel de admin y en "Mis solicitudes" qué se pidió.
+        var requestedItemFinal = esOwcoins ? (decision.monto.toLocaleString() + ' OW Coins') : (item || null);
+
         try {
           var res = await sb.rpc('request_redemption', {
             p_currency_code: cur.code,
             p_amount: decision.monto,
             p_request_key: requestKey,
-            p_requested_item: item || null,
+            p_requested_item: requestedItemFinal,
             p_account_identifier: account || null,
             p_user_notes: notes || null
           });
@@ -1031,16 +1481,28 @@
     }
 
     async function loadDashboard(sb) {
+      // Fase 1A: generación de esta carga. MgTabs.sync() solo acepta la más reciente.
+      var mgGen = window.MgTabs ? window.MgTabs.beginLoad() : 0;
       var loggedOutEl = document.getElementById('mgLoggedOut');
       var dashEl = document.getElementById('mgDashboard');
       try {
         var sessionRes = await sb.auth.getSession();
+        if (window.MgTabs && !window.MgTabs.isCurrent(mgGen)) return; // Fase 1A: carga antigua, la más reciente se encarga
         var session = sessionRes.data && sessionRes.data.session;
-        if (!session) { loggedOutEl.hidden = false; dashEl.hidden = true; return; }
+        if (!session) { if (window.MgTabs) window.MgTabs.setUser(null); loggedOutEl.hidden = false; dashEl.hidden = true; return; }
 
         var profRes = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-        if (profRes.error || !profRes.data) { loggedOutEl.hidden = false; dashEl.hidden = true; return; }
+        if (window.MgTabs && !window.MgTabs.isCurrent(mgGen)) return; // Fase 1A
+        if (profRes.error || !profRes.data) { if (window.MgTabs) window.MgTabs.setUser(null); loggedOutEl.hidden = false; dashEl.hidden = true; return; }
         var profile = profRes.data;
+        // Fase 1A: si cambió la cuenta (o se cerró sesión), se limpian los datos visibles de la anterior
+        // antes de pintar los de esta. No consulta nada; los datos los siguen escribiendo las funciones originales.
+        if (window.MgTabs) window.MgTabs.setUser(session.user.id);
+        // Cosméticos (marco VIP): solo presentación, no bloquea la carga. Se pinta si el proveedor autoriza ESTA cuenta y esta carga sigue vigente.
+        try { if (window.GeoArmyCosmetics) window.GeoArmyCosmetics.showIdentityFor(session.user.id, function () { return !window.MgTabs || window.MgTabs.isCurrent(mgGen); }); } catch (e) {}
+        // Fase 1A: lecturas de Supabase protegidas por identidad: si la sesión cambia mientras una está en
+        // vuelo (aunque tarde minutos), se descarta y la función original no escribe nada. Mismas RPC/consultas.
+        var sbg = window.MgTabs ? window.MgTabs.guard(sb) : sb;
 
         loggedOutEl.hidden = true;
         dashEl.hidden = false;
@@ -1058,13 +1520,22 @@
         renderCountryDisplay(currentCountryCode);
 
         await refreshSaldo(sb, session);
-        await loadWallets(sb, session.user.id);
-        await loadMyRequests(sb, session.user.id);
+        if (window.MgTabs && !window.MgTabs.isCurrent(mgGen)) return; // Fase 1A
+        await loadWallets(sbg, session.user.id);
+        if (window.MgTabs && !window.MgTabs.isCurrent(mgGen)) return; // Fase 1A
+        await loadMyRequests(sbg, session.user.id);
+        if (window.MgTabs && !window.MgTabs.isCurrent(mgGen)) return; // Fase 1A
 
-        loadRankSummary(sb);
-        loadRankCard(sb);
-        loadXAccount(sb, session.user.id);
+        // Fase 1A: refreshSaldo/wallets/solicitudes ya terminaron (await de arriba); aquí se
+        // espera también a las dos cargas de rango y recién entonces se sincronizan los espejos
+        // de presentación. Solo copia datos ya cargados: no consulta nada.
+        var mgUid = session.user.id;
+        Promise.allSettled([loadRankSummary(sbg), loadRankCard(sbg)]).then(function () {
+          if (window.MgTabs) window.MgTabs.sync(mgGen, mgUid);
+        });
+        loadXAccount(sbg, session.user.id);
       } catch (e) {
+        if (window.MgTabs && !window.MgTabs.isCurrent(mgGen)) return; // Fase 1A: un fallo de una carga antigua no toca la UI
         console.warn('[mi-geoarmy] error cargando el dashboard (¿falta configurar Supabase en js/geoarmy-account.js?)', e);
         loggedOutEl.hidden = false;
         dashEl.hidden = true;
@@ -1252,8 +1723,25 @@
         }
       });
 
-      sb.auth.onAuthStateChange(function () { loadDashboard(sb); });
+      sb.auth.onAuthStateChange(function (event, authSession) {
+        // Fase 1A: con el uid que trae el propio evento (sin consultar nada), un cierre de sesión o cambio de
+        // cuenta oculta y limpia de inmediato los datos privados; TOKEN_REFRESHED del mismo usuario no recarga.
+        if (window.MgTabs && window.MgTabs.authEvent(event, authSession && authSession.user ? authSession.user.id : null) === 'skip') return;
+        loadDashboard(sb);
+      });
       loadDashboard(sb);
+      // Sincronización de perfil de Twitch: al aplicarse un cambio real, se vuelve a leer
+      // el perfil (misma lectura de siempre: avatar, nombre y espejos de la pestaña Cuenta).
+      // Solo si la cuenta con sesión AHORA es la del aviso: tras un cierre de sesión o un
+      // cambio de cuenta, el aviso de la cuenta anterior se ignora.
+      document.addEventListener('geoarmy:profile-synced', function (e) {
+        var syncedUid = e && e.detail && e.detail.uid ? String(e.detail.uid) : null;
+        if (!syncedUid) return;
+        sb.auth.getSession().then(function (r) {
+          var cur = r && r.data && r.data.session && r.data.session.user ? String(r.data.session.user.id) : null;
+          if (cur === syncedUid) loadDashboard(sb);
+        }, function () { /* sin sesión confirmada: no se recarga */ });
+      });
     });
   })();
   </script>

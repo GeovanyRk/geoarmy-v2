@@ -21,14 +21,184 @@
   <!-- Tema V3 (espacial/holográfico) — antes vivía inline aquí, ahora es un archivo
        compartido para poder reusarlo en mi-geoarmy.html y páginas nuevas -->
   <link rel="stylesheet" href="css/v3-theme.css"/>
-  <!-- ===== HALLOWEEN 2026 — Mundo 02, producción (PASADA FINAL TEST ->
-       PRODUCCIÓN, 2026-09-26). Solo estiliza los 3 pins circulares sobre
-       el planeta (Batalla/Rol/Contratos) -- este archivo NO carga
-       js/halloween-2026.js: los pins son <a href> simples, el
-       bloqueado/desbloqueado se resuelve en puro CSS reutilizando la
-       misma clase "is-unlocked" que ya agrega el countdown real de más
-       abajo. Ver css/halloween-2026.css. ===== -->
-  <link rel="stylesheet" href="css/halloween-2026.css"/>
+  <link rel="stylesheet" href="css/geoarmy-guide.css?v=3"/>
+  <link rel="stylesheet" href="css/index-racha.css?v=1"/>
+
+  <style>
+    /* Correcciones móviles del inicio */
+    html.panels-ready .panel-tabs{ display:none !important; }
+    @media (max-width:760px){
+      .ga-dropdown{ right:auto; left:0; max-width:min(260px, calc(100vw - 32px)); }
+    }
+
+    /* Pin de Streamer vs Viewer */
+    .v3-planet-nav a.svv-pin .svv-pin-icon,
+    .v3-planet-nav a.svv-pin:hover .svv-pin-icon,
+    .v3-planet-nav a.svv-pin:focus-visible .svv-pin-icon{
+      background:none; border:0; box-shadow:none; border-radius:0;
+    }
+    .v3-planet-nav a.svv-pin:hover .svv-pin-icon,
+    .v3-planet-nav a.svv-pin:focus-visible .svv-pin-icon{ transform:scale(1.18); }
+    .v3-planet-nav a.svv-pin .v3-marker-label{
+      color:#fff1d6; border-color:rgba(255,122,26,.65);
+      background:linear-gradient(90deg, rgba(40,12,4,.94), rgba(20,8,34,.94));
+    }
+    .v3-planet-nav a.svv-pin .svv-pin-icon{
+      width:72px; height:63px; flex:none; margin-bottom:-8px;
+      overflow:visible; padding:0;
+    }
+    .v3-planet-nav a.svv-pin .svv-pin-vs{
+      display:block; width:100%; height:100%; max-width:none; object-fit:contain;
+    }
+    @media (max-width:560px){
+      .v3-planet-nav a.svv-pin .svv-pin-icon{
+        width:58px; height:51px; margin-bottom:-6px;
+      }
+    }
+
+    /* Mundo 02: el teaser solo se sustituye al llegar el 3 nov 2026, 19:00 ET.
+       La apertura económica REAL sigue controlada por Supabase. */
+    .v3-world-slide-02 .world-02-coming-soon{
+      position:relative;
+      overflow:hidden;
+    }
+    .v3-world-slide-02 .world-02-coming-soon > .world-02-teaser{
+      display:block;
+      width:100%;
+      height:auto;
+      filter:brightness(.78) saturate(.88);
+    }
+    .v3-world-slide-02 .world-02-coming-soon.is-unlocked > .world-02-teaser{
+      display:none;
+    }
+    /* Misma flotación que Mundo 01 y Mundo 03 (v3Float del tema V3).
+       El desbloqueo quita .v3-world-locked; restauramos solo su animación. */
+    .v3-world-slide-02 .world-02-coming-soon.is-unlocked{
+      animation: v3Float 6s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce){
+      .v3-world-slide-02 .world-02-coming-soon.is-unlocked{
+        animation:none;
+      }
+    }
+    .v3-world-slide-02 .world-02-coming-soon .world-02-open[hidden]{display:none!important;}
+    .v3-world-slide-02 .world-02-coming-soon .world-02-open{
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      min-height:0;
+      width:100%;
+      padding:0 4px 10px;
+      text-align:center;
+      text-decoration:none;
+      color:#fbe8b7;
+      border:0;
+      border-radius:0;
+      background:none;
+      box-shadow:none;
+      transition:transform .2s ease;
+    }
+    .v3-world-slide-02 .world-02-coming-soon .world-02-open:hover,
+    .v3-world-slide-02 .world-02-coming-soon .world-02-open:focus-visible{
+      box-shadow:none;
+    }
+    .v3-world-slide-02 .world-02-coming-soon .world-02-open:focus-visible{
+      outline:3px solid #fbd285;
+      outline-offset:-3px;
+    }
+    .v3-world-slide-02 .world-02-coming-soon .world-02-open > img{
+      display:block;
+      width:100%;
+      height:auto;
+      max-width:480px;
+      max-height:340px;
+      object-fit:contain;
+      filter:none;
+    }
+    .world-02-open-title{
+      display:block;
+      margin-top:2px;
+      font-family:'Space Grotesk',Inter,sans-serif;
+      font-weight:700;
+      font-size:clamp(19px,2.4vw,27px);
+      letter-spacing:.075em;
+      color:#ffdc8b;
+    }
+    .world-02-open-sub{
+      display:block;
+      font-family:Inter,system-ui,sans-serif;
+      font-size:13px;
+      font-weight:600;
+      margin-top:7px;
+      color:#f7eddd;
+    }
+    @media (max-width:560px){
+      .v3-world-slide-02 .world-02-coming-soon .world-02-open{min-height:0;}
+      .v3-world-slide-02 .world-02-coming-soon .world-02-open > img{max-height:260px;}
+    }
+
+
+    /* GEO ARMY: pin de Comunidad sin flecha, tallo ni aviso antiguo. */
+    .v3-planet-nav a.ga-welcome-pin .ga-welcome-pin__label {
+      color:#f9dba0; background:rgba(18,13,23,.93);
+      border:1px solid rgba(235,179,91,.65); font-weight:800;
+      box-shadow:0 4px 14px rgba(0,0,0,.3);
+    }
+    .v3-planet-nav a.ga-welcome-pin .ga-welcome-pin__label::before,
+    .v3-planet-nav a.ga-welcome-pin .ga-welcome-pin__label::after {
+      display:none!important; content:none!important;
+    }
+    .v3-planet-nav a.ga-welcome-pin .ga-welcome-pin__symbol {
+      background:linear-gradient(150deg,#4c3119,#1c1426)!important;
+      border:1px solid #d8a657!important; color:#ffe4ac;
+      box-shadow:0 0 0 3px rgba(226,166,71,.13),0 7px 25px rgba(0,0,0,.35);
+      font-size:22px; line-height:1;
+    }
+    .v3-planet-nav a.ga-welcome-pin:hover .ga-welcome-pin__symbol,
+    .v3-planet-nav a.ga-welcome-pin:focus-visible .ga-welcome-pin__symbol{
+      box-shadow:0 0 0 4px rgba(255,193,101,.26),0 8px 28px rgba(0,0,0,.4);
+    }
+
+    /* Invitación para visitantes nuevos. No altera el CSS global. */
+    .ga-welcome-dialog {width:min(440px,calc(100vw - 28px));max-width:none;max-height:min(92dvh,760px);
+      margin:auto;padding:0;border:1px solid rgba(239,190,109,.65);border-radius:22px;
+      background:#120d18;color:#fff;overflow:auto;
+      box-shadow:0 32px 110px rgba(0,0,0,.72);font-family:Inter,system-ui,sans-serif;}
+    .ga-welcome-dialog::backdrop {background:rgba(3,4,14,.78);backdrop-filter:blur(9px);}
+    .ga-welcome-dialog *{box-sizing:border-box;}
+    .ga-welcome-top {position:relative;text-align:center;padding:29px 29px 32px;
+      background:radial-gradient(ellipse at 50% 5%,rgba(240,176,81,.32),transparent 64%),
+       linear-gradient(160deg,#3d271c 0%,#1b1423 56%,#110e19 100%);}
+    .ga-welcome-close{position:absolute;right:13px;top:13px;width:33px;height:33px;border-radius:50%;
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.17);color:#fff;
+      font-size:23px;cursor:pointer;display:grid;place-items:center;line-height:1;}
+    .ga-welcome-close:hover{background:rgba(255,255,255,.22)}
+    .ga-welcome-crown{display:block;font-size:37px;color:#f6c777;filter:drop-shadow(0 5px 14px #efac5c80);}
+    .ga-welcome-eyebrow{display:inline-block;margin:12px auto 15px;padding:6px 13px;
+      font-weight:900;font-size:10px;letter-spacing:.16em;color:#f7d28e;
+      border:1px dashed rgba(244,194,110,.6);border-radius:50px;}
+    .ga-welcome-title{font-family:'Space Grotesk',Inter,sans-serif;font-size:clamp(28px,6vw,38px);
+      line-height:1.04;letter-spacing:-.045em;text-transform:uppercase;color:#fff;margin:0 0 13px;}
+    .ga-welcome-title em{color:#f5c174;font-style:normal;}
+    .ga-welcome-top p{margin:0 auto;max-width:320px;line-height:1.55;font-size:13px;color:#ddd0de;}
+    .ga-welcome-bottom{padding:25px 26px 20px;text-align:center;background:#130e1b;}
+    .ga-welcome-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:25px;}
+    .ga-welcome-step{min-width:0;font-weight:800;font-size:11px;color:#eadfea;}
+    .ga-welcome-step span{display:block;font-size:25px;margin-bottom:8px;}
+    .ga-welcome-cta{display:flex;align-items:center;justify-content:center;gap:12px;min-height:53px;
+      border-radius:12px;padding:10px 14px;text-decoration:none!important;
+      background:linear-gradient(110deg,#ffdc92,#e8ad53);color:#25131c!important;
+      font-weight:900;font-size:13px;letter-spacing:.01em;
+      box-shadow:0 6px 24px rgba(218,149,57,.29);}
+    .ga-welcome-cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+    .ga-welcome-later{margin:16px auto 0;border:0;background:none;color:#bbaebd;
+      text-decoration:underline;text-underline-offset:4px;font-size:12px;cursor:pointer;padding:8px;}
+    .ga-welcome-dialog :focus-visible{outline:3px solid #ffdb91;outline-offset:3px;}
+    @media(prefers-reduced-motion:reduce){.ga-welcome-cta{transition:none!important}}
+  </style>
+
   <script>
   !function(b,e,t,r){
     b[t]=b[t]||function(...args){(b[t].q=b[t].q||[]).push(args)};
@@ -39,10 +209,10 @@
   }(window,document,'betterstack','7K7evcpjhiCjpoR65gxKSPhW');
   betterstack('init', { environment: 'production' });
 </script>
+  <link rel="stylesheet" href="css/plus-pin.css"/>
 </head>
 <body>
-
-  <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
+<div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
   <!-- Tema V3: ver css/v3-theme.css (antes este bloque estaba embebido aquí) -->
 
@@ -62,6 +232,7 @@
         </a>
         <div class="v3-auth">
           <div id="geoAccountWidget"></div>
+          <a href="guia.html" class="v3-join-btn" style="white-space:nowrap;color:#ffdc92" aria-label="Guía del aventurero: empieza aquí">📖 Guía</a>
           <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
         </div>
       </div>
@@ -74,7 +245,7 @@
       <a href="tienda.html">Tienda</a>
       <a href="ganadores.html">Ganadores</a>
       <a href="puntos.html">Puntos</a>
-      <a href="#alcancia-proximamente" aria-disabled="true">Alcancía (Próximamente)</a>
+      <a href="/geoarmy-v2/streamer-vs-viewer/">Streamer vs Viewer</a>
     </div>
 
     <!-- Tabs de navegación para móvil -->
@@ -83,6 +254,28 @@
     <!-- HERO / GEO ARMY (inicio) -->
     <section class="hero v3-hero-stage panel" id="inicio" style="border-bottom:none;padding:26px 1.5rem 10px;">
       <h1 class="v3-h1-sr">Geo Army</h1>
+
+      <!-- Racha diaria: solo lectura (js/index-racha.js). Oculta hasta tener una lectura válida de la cuenta con sesión.
+           El botón es un enlace a Mi Geo Army: el registro NUNCA se hace desde el home. No es un pin del planeta. -->
+      <aside class="ga-racha" id="gaRacha" aria-label="Racha diaria" hidden>
+        <svg class="ga-racha-flame" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="gaRfl1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff5a1f"/><stop offset=".55" stop-color="#ff9a2e"/><stop offset="1" stop-color="#ffd978"/></linearGradient>
+            <linearGradient id="gaRfl2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffb84a"/><stop offset="1" stop-color="#fff2c4"/></linearGradient>
+          </defs>
+          <path fill="url(#gaRfl1)" d="M33 3c2 11-7 16-7 27 0 6 4 10 8 10 5 0 9-4 9-11 0-4-1-7-3-10 8 5 12 13 12 22 0 13-9 22-20 22S11 54 11 41C11 29 23 22 27 9c1-3 3-5 6-6z"/>
+          <path fill="url(#gaRfl2)" d="M32 30c1 5-4 8-4 13 0 4 3 7 6 7s6-3 6-7c0-3-1-5-2-7 4 2 6 6 6 10 0 8-5 11-10 11s-10-4-10-11c0-5 5-8 8-16z" opacity=".95"/>
+        </svg>
+        <div class="ga-racha-body">
+          <p class="ga-racha-kicker">Racha diaria</p>
+          <p class="ga-racha-count"><span class="ga-racha-n">0</span><span class="ga-racha-u">días</span></p>
+        </div>
+        <p class="ga-racha-status">
+          <svg class="ga-racha-ic" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="10"/><path d="M5.5 10.5l3 3 6-6.5"/></svg>
+          <span class="ga-racha-status-text"></span>
+        </p>
+        <a class="ga-racha-cta" href="mi-geoarmy.html#racha">Ver racha</a>
+      </aside>
 
       <div class="v3-world-header">
         <span class="v3-now-line"></span>
@@ -123,24 +316,45 @@
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <a href="puntos.html" style="--mx:70.6%; --my:66.6%;">
-            <span class="v3-marker-label">Puntos</span>
-            <span class="v3-marker-icon">⭐</span>
+          <a href="puntos.html" style="--mx:70.6%; --my:66.6%;" aria-label="Ruleta de Subs">
+            <span class="v3-marker-label">Ruleta de Subs</span>
+            <span class="v3-marker-icon">
+              <svg width="32" height="32" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="subs-pin-gold" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#fff1ba"/>
+                    <stop offset=".3" stop-color="#e3b35a"/>
+                    <stop offset=".57" stop-color="#916018"/>
+                    <stop offset=".8" stop-color="#f7dc91"/>
+                    <stop offset="1" stop-color="#a66e20"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="24" cy="25" r="17" fill="#0c1017" stroke="url(#subs-pin-gold)" stroke-width="2.5"/>
+                <g fill="url(#subs-pin-gold)">
+                  <path d="M24 25V9.8a15.2 15.2 0 0 1 10.75 4.45Z"/>
+                  <path d="M24 25h15.2a15.2 15.2 0 0 1-4.45 10.75Z"/>
+                  <path d="M24 25v15.2a15.2 15.2 0 0 1-10.75-4.45Z"/>
+                  <path d="M24 25H8.8a15.2 15.2 0 0 1 4.45-10.75Z"/>
+                </g>
+                <circle cx="24" cy="25" r="15.2" fill="none" stroke="#f9db8c" stroke-opacity=".7" stroke-width=".8"/>
+                <circle cx="24" cy="25" r="3" fill="#16120d" stroke="#f4d88d" stroke-width="1.4"/>
+                <path d="M20.4 3.5h7.2L24 10.3Z" fill="url(#subs-pin-gold)" stroke="#ffe6a3" stroke-width=".65" stroke-linejoin="round"/>
+              </svg>
+            </span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
-          <!-- Alcancía: función pospuesta para más adelante. El pin se
-               conserva visible, en su misma posición/icono, pero queda
-               bloqueado (aria-disabled + preventDefault en el script de más
-               abajo, sin popup/alert) y muestra "Próximamente" bajo el
-               nombre. No se toca alcancia.html ni su backend, solo deja de
-               ser accesible desde la navegación. -->
-          <a href="#alcancia-proximamente" style="--mx:34.5%; --my:76.7%;" aria-disabled="true">
-            <span class="v3-marker-label v3-marker-label-soon">
-              <span class="v3-marker-soon-name">Alcancía</span>
-              <span class="v3-marker-soon-tag">Próximamente</span>
+          <!-- Streamer vs Viewer (La Arena): ocupa el lugar del antiguo pin de
+               Alcancía (proyecto cancelado), misma posición --mx/--my y mismo
+               tamaño que el resto de pines. El VS es la imagen aportada por el
+               organizador (assets/streamer-vs-viewer/vs-pin.webp), estilizada en el bloque <style> de arriba
+               (.svv-pin). Navega a /streamer-vs-viewer/. alcancia.html y su
+               backend no se tocan, solo deja de estar enlazada desde aquí. -->
+          <a href="/geoarmy-v2/streamer-vs-viewer/" class="svv-pin" style="--mx:34.5%; --my:67.0%;" aria-label="Streamer vs Viewer">
+            <span class="v3-marker-label">Streamer vs Viewer</span>
+            <span class="v3-marker-icon svv-pin-icon">
+              <img class="svv-pin-vs" src="assets/streamer-vs-viewer/vs-pin.webp" alt="" width="340" height="300" decoding="async"/>
             </span>
-            <span class="v3-marker-icon v3-marker-icon-soon">🐷</span>
             <span class="v3-marker-stem"></span>
             <span class="v3-marker-ring"></span>
           </a>
@@ -166,11 +380,19 @@
                imagen (zona de tierra, sin overlap con el texto "GEO ARMY" ni
                con los demás pins). No se tocó la posición al hacer la
                separación. -->
-          <a href="comunidad.html" style="--mx:75.0%; --my:45.5%;">
-            <span class="v3-marker-label v3-marker-label-community"><span>¿Eres nuevo?</span><strong>Entra acá</strong></span>
-            <span class="v3-marker-icon">💬</span>
-            <span class="v3-marker-stem"></span>
-            <span class="v3-marker-ring"></span>
+          <a href="comunidad.html" class="ga-welcome-pin" id="gaWelcomePin" style="--mx:75.0%; --my:45.5%;" aria-label="Conoce la comunidad Geo Army">
+            <span class="v3-marker-label ga-welcome-pin__label">Comunidad</span>
+            <span class="v3-marker-icon ga-welcome-pin__symbol" aria-hidden="true">✦</span>
+          </a>
+          <!-- Geo Army Plus: acceso FUERA del planeta, en el espacio libre arriba-izquierda (entre One Piece y el globo). Sus --mx/--my se miden sobre
+               el mismo recuadro del globo que los demás pins, así que escala con él en escritorio y móvil. Va con `hidden` y solo se muestra con GEOARMY_PLUS_PAGE_ENABLED = true
+               (js/geoarmy-plus-pin.js). El estado (abierto / bloqueado) lo decide el servidor; este HTML no autoriza nada. -->
+          <a href="plus.html" class="ga-plus-pin" id="gaPlusPin" hidden style="--mx:7.6%; --my:18.1%;" aria-label="Geo Army Plus">
+            <span class="v3-marker-label ga-plus-pin__label">Geo Army Plus</span>
+            <span class="v3-marker-icon ga-plus-pin__gem" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none"><path d="M16 2.5 28 12 16 29.5 4 12Z" fill="url(#gaPlusG)" stroke="#7dffc6" stroke-width="1.4" stroke-linejoin="round"/><path d="M4 12h24M11 12 16 2.5 21 12M11 12l5 17.5L21 12" stroke="#c9ffe6" stroke-opacity=".7" stroke-width="1" stroke-linejoin="round"/><defs><linearGradient id="gaPlusG" x1="6" y1="3" x2="26" y2="29"><stop stop-color="#5cffb8"/><stop offset="1" stop-color="#0a8f5c"/></linearGradient></defs></svg>
+              <span class="ga-plus-pin__lock"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.6" fill="currentColor"/><path d="M5.2 7V5.2a2.8 2.8 0 0 1 5.6 0V7" stroke="currentColor" stroke-width="1.5"/></svg></span>
+            </span>
           </a>
         </div>
         </div>
@@ -183,101 +405,27 @@
         </div>
         </div>
 
-        <!-- Mundo 02: Halloween, bloqueado hasta el 1 de octubre 2026, 7:00
-             PM ET (America/New_York) -- coincide con el inicio real de la
-             batalla. Overlay/candado/texto/countdown son HTML+CSS reales
-             (no quemados en la imagen) -- ver css/v3-theme.css (clases
-             v3-wl-*) y el script "v3-wl-countdown" al final del body. No
-             se tocó Mundo 01, Mundo 03, pines, fondo ni backend.
-
-             PASADA FINAL TEST -> PRODUCCIÓN (2026-09-26): se promovieron
-             ÚNICAMENTE los 3 pins de Mundo 02 (Batalla/Rol/Contratos)
-             desde index-halloween-test.html, y data-unlock-iso pasó de
-             00:00:00 a 19:00:00 para coincidir con la hora real de inicio
-             de la batalla. Sin pins de Efectos/Crónicas, sin
-             ?hw_unlock=1 ni ninguna otra lógica que fuerce el desbloqueo
-             visual -- el planeta SOLO se desbloquea cuando esta fecha
-             real ya pasó. -->
+        <!-- Mundo 02: se abre visualmente el 3 de noviembre de 2026 a las 7 PM ET
+             (después del cambio a horario estándar, UTC-05:00). El servidor
+             mantiene independiente el control de compras, misiones y premios. -->
         <div class="v3-world-slide v3-world-slide-02">
-        <div class="v3-world-locked v3-wl-halloween" data-reveal data-unlock-iso="2026-10-01T19:00:00-04:00" id="wlHalloween">
-          <div class="v3-wl-orb">
-            <img src="world-02-halloween-v2.png" alt="Mundo 02 — Halloween" class="v3-world-planet-img v3-wl-img" loading="lazy"/>
-            <span class="v3-wl-tint" aria-hidden="true"></span>
-            <span class="v3-wl-lockbadge" aria-hidden="true">🔒</span>
-
-            <!-- 4 pins de producción sobre el planeta -- mismo lenguaje
-                 visual que .v3-planet-nav/.v3-marker-* de Mundo 01 (círculo
-                 + glow + icono + tooltip en hover + posición absoluta en %),
-                 en paleta violeta/roja. <a href> simples a las páginas
-                 dedicadas halloween/*.html -- NO cargan js/halloween-2026.js
-                 aquí, el índice no muestra datos dinámicos de la RPC, solo
-                 navega. El bloqueo/atenuado de Rol/Contratos/Registro de
-                 Puntos antes del 1 de octubre es puro CSS: reutiliza la
-                 misma clase ".is-unlocked" que el countdown de abajo ya
-                 agrega a #wlHalloween -- ver css/halloween-2026.css.
-                 BATALLA se deja siempre clickeable (para mostrar el estado
-                 "scheduled" de la página), con una insignia "Programada"
-                 que desaparece sola al desbloquear.
-
-                 RECOMPOSICIÓN (pedido explícito): antes eran 3 pines --
-                 Batalla arriba/centro, Rol y Contratos a los lados, ambos a
-                 --my:44%, dejando el tercio inferior del planeta vacío.
-                 Ahora Rol se renombra a "Elige tu Rol" (misma página,
-                 halloween/rol.html, mismo ícono ⚔) y baja a --my:56%, junto
-                 con Contratos (mismo --mx, también a --my:56%), para abrir
-                 espacio a un 4to pin nuevo -- Registro de Puntos -- en la
-                 zona inferior-central (--mx:50%; --my:79%), que en la
-                 imagen real (world-02-halloween-v2.png, verificada antes de
-                 elegir estas coordenadas) es roca oscura despejada, sin
-                 tapar el castillo ni el cementerio. Los 3 secundarios
-                 (Rol/Contratos/Registro de Puntos) quedan bloqueados con el
-                 mismo candadito hasta el desbloqueo; Batalla no cambia de
-                 posición ni de comportamiento. Sin pines de Efectos/
-                 Crónicas: ese producto quedó reducido a Batalla/Rol/
-                 Contratos/Registro de Puntos. -->
-            <div class="hw26-planet-pins" id="hw26PlanetPins">
-              <a href="halloween/batalla.html" class="hw26-planet-pin hw26-pin-batalla" style="--mx:50%; --my:16%;">
-                <span class="hw26-pin-badge">Programada</span>
-                <span class="hw26-pin-label">Batalla</span>
-                <span class="hw26-pin-icon"><img src="assets/halloween/pin-batalla.webp" alt="" class="hw26-pin-icon-img"/></span>
-              </a>
-              <a href="halloween/rol.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:22%; --my:56%;">
-                <span class="hw26-pin-label">Elige tu Rol</span>
-                <span class="hw26-pin-icon">⚔<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
-              </a>
-              <a href="halloween/contratos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:78%; --my:56%;">
-                <span class="hw26-pin-label">Contratos</span>
-                <span class="hw26-pin-icon">📜<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
-              </a>
-              <!-- NUEVO -- Registro de Puntos. halloween/registro-puntos.html
-                   es un placeholder estático (sin RPC, sin
-                   js/halloween-2026.js): título, "PRÓXIMAMENTE" y una vista
-                   previa marcada como ejemplo, nada de datos reales. Cuando
-                   exista la lógica real de puntos gastados, esa página se
-                   actualiza aparte; este pin no cambia. Bloqueado igual que
-                   Rol/Contratos: mismo candadito, mismo desbloqueo por
-                   .is-unlocked, ninguna lógica de datos nueva acá. -->
-              <a href="halloween/registro-puntos.html" class="hw26-planet-pin hw26-pin-locked" style="--mx:50%; --my:79%;">
-                <span class="hw26-pin-label">Registro de Puntos</span>
-                <span class="hw26-pin-icon">📖<span class="hw26-pin-lock" aria-hidden="true">🔒</span></span>
-              </a>
-            </div>
-            <!-- ===== fin pins Halloween 2026 ===== -->
-          </div>
-          <div class="v3-wl-eyebrow">Mundo 02</div>
-          <div class="v3-wl-title">Halloween</div>
-          <div class="v3-wl-sub">Se desbloquea el 1 de octubre</div>
-          <div class="v3-wl-countdown" id="wlHalloweenCountdown" aria-live="polite">
-            <span class="v3-wl-seg"><b id="wlD">--</b><i>D</i></span>
-            <span class="v3-wl-colon">:</span>
-            <span class="v3-wl-seg"><b id="wlH">--</b><i>H</i></span>
-            <span class="v3-wl-colon">:</span>
-            <span class="v3-wl-seg"><b id="wlM">--</b><i>M</i></span>
-            <span class="v3-wl-colon">:</span>
-            <span class="v3-wl-seg"><b id="wlS">--</b><i>S</i></span>
+          <div class="v3-world-locked world-02-coming-soon" data-reveal
+               data-unlock-iso="2026-11-03T19:00:00-05:00"
+               id="wlOnePieceWorld" aria-label="Mundo 02 — Próximamente">
+            <img src="world-02-proximamente.png"
+                 alt="Mundo 02 — Próximamente · Transmisión bloqueada"
+                 class="v3-world-planet-img world-02-teaser"
+                 loading="lazy"/>
+            <a id="wlOnePieceOpen" class="world-02-open" href="onepiece.html"
+               aria-label="Entrar al Mundo 02 de One Piece" tabindex="-1" hidden>
+              <img src="assets/onepiece/planeta-diez-islas-720.webp"
+                   alt="Mapa del mundo One Piece con las diez islas" loading="lazy"/>
+              <span class="world-02-open-title">MUNDO 02 · ONE PIECE</span>
+              <span class="world-02-open-sub">Explorar el mundo pirata →</span>
+            </a>
           </div>
         </div>
-        </div>
+
 
         <!-- Mundo 03: bloqueado, próximo evento (decorativo por ahora) -->
         <div class="v3-world-slide v3-world-slide-03">
@@ -431,58 +579,101 @@
     </div>
   </footer>
 
+
+  <!-- Invitación de bienvenida: solo visitante nuevo y solo una vez por navegador. -->
+  <dialog class="ga-welcome-dialog" id="gaWelcomeDialog" aria-labelledby="gaWelcomeTitle" aria-describedby="gaWelcomeDesc">
+    <div class="ga-welcome-top">
+      <button type="button" class="ga-welcome-close" id="gaWelcomeClose" aria-label="Cerrar invitación">×</button>
+      <span class="ga-welcome-crown" aria-hidden="true">♛</span>
+      <span class="ga-welcome-eyebrow">✦ INVITACIÓN ESPECIAL ✦</span>
+      <h2 class="ga-welcome-title" id="gaWelcomeTitle">¡BIENVENIDO A <em>GEO ARMY!</em></h2>
+      <p id="gaWelcomeDesc">Fortnite, Overwatch y una comunidad donde no solo miras: participas.</p>
+    </div>
+    <div class="ga-welcome-bottom">
+      <div class="ga-welcome-steps" aria-label="Descubre Geo Army">
+        <div class="ga-welcome-step"><span aria-hidden="true">🎮</span>Juega</div>
+        <div class="ga-welcome-step"><span aria-hidden="true">💬</span>Participa</div>
+        <div class="ga-welcome-step"><span aria-hidden="true">🏆</span>Progresa</div>
+      </div>
+      <a href="comunidad.html" class="ga-welcome-cta" id="gaWelcomeExplore">DESCUBRIR GEO ARMY <span aria-hidden="true">➜</span></a>
+      <button type="button" class="ga-welcome-later" id="gaWelcomeLater">Ahora no, gracias</button>
+    </div>
+  </dialog>
+
+
+  <!-- Invitación discreta: una vez al día; sin solicitudes a la IA hasta que el usuario escriba. -->
+  <aside class="ga-guide-nudge" id="ga-guide-nudge" hidden aria-label="Invitación de Geovany">
+    <button class="ga-guide-nudge-dismiss" id="ga-guide-nudge-dismiss" type="button" aria-label="Cerrar invitación">×</button>
+    <button class="ga-guide-nudge-open" id="ga-guide-nudge-open" type="button" aria-label="Abrir chat de Geovany">
+      <span class="ga-guide-nudge-eyebrow">👋 GEO TE AYUDA</span>
+      <strong id="ga-guide-nudge-message">¿Sabes cómo conseguir PaVos de Fortnite?</strong>
+      <span class="ga-guide-nudge-sub">Pregúntame sobre G-Coins, la Tienda y tus premios.</span>
+    </button>
+  </aside>
+
+  <!-- GEO ARMY Assistant: chatbot de IA conectado al VPS mediante HTTPS. -->
+  <button type="button" id="ga-guide-launcher" aria-controls="ga-guide-panel" aria-expanded="false" aria-label="Abrir asistente de Geovany">
+    <span class="ga-guide-launcher-icon" aria-hidden="true"><img src="assets/geovany-avatar.webp" alt="" width="40" height="40" loading="lazy" /></span>
+    <span><span class="ga-guide-launcher-caption">¿Tienes dudas?</span><span class="ga-guide-launcher-title">Habla con Geo</span></span>
+  </button>
+  <section id="ga-guide-panel" role="dialog" aria-modal="false" aria-labelledby="ga-guide-title" aria-describedby="ga-guide-subtitle" hidden>
+    <header class="ga-guide-head">
+      <span class="ga-guide-avatar" aria-hidden="true"><img src="assets/geovany-avatar.webp" alt="" width="44" height="44" /></span>
+      <span class="ga-guide-head-title"><strong id="ga-guide-title">Geovany · Tu streamer</strong><small id="ga-guide-subtitle"><span class="ga-guide-dot" aria-hidden="true"></span> Asistente virtual con IA</small></span>
+      <button class="ga-guide-close" id="ga-guide-close" type="button" aria-label="Cerrar asistente">×</button>
+    </header>
+    <div id="ga-guide-feed" class="ga-guide-feed" aria-live="polite" aria-relevant="additions text" aria-label="Conversación"></div>
+    <div class="ga-guide-quick" aria-label="Preguntas frecuentes">
+      <button type="button" data-ga-guide-topic="horario">📺 Horarios</button>
+      <button type="button" data-ga-guide-topic="misiones">🎯 Misiones</button>
+      <button type="button" data-ga-guide-topic="puntos">⭐ Rangos</button>
+      <button type="button" data-ga-guide-topic="tienda">🪙 G-Coins</button>
+      <button type="button" data-ga-guide-topic="pavos">🎮 PaVos</button>
+      <button type="button" data-ga-guide-topic="comunidad">👥 Unirme</button>
+    </div>
+    <form id="ga-guide-form" class="ga-guide-compose">
+      <input id="ga-guide-input" class="ga-guide-input" maxlength="280" autocomplete="off" placeholder="Escribe tu pregunta..." aria-label="Escribe tu pregunta" />
+      <button class="ga-guide-send" type="submit" aria-label="Enviar pregunta"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
+    </form>
+    <small class="ga-guide-disclaimer">Respuestas generadas por IA. No compartas contraseñas ni datos privados.</small>
+  </section>
+
+  <script>
+  /* Mundo 02: cambio visual automático y seguro; sin escrituras ni premios.
+     Date.parse con UTC-05:00 evita el error por cambio de horario de EE. UU. */
+  (function () {
+    'use strict';
+    var world = document.getElementById('wlOnePieceWorld');
+    var link = document.getElementById('wlOnePieceOpen');
+    if (!world || !link) return;
+    var unlockAt = Date.parse(world.getAttribute('data-unlock-iso'));
+    if (!Number.isFinite(unlockAt)) return;
+    var timer = null;
+    function update() {
+      var opened = Date.now() >= unlockAt;
+      world.classList.toggle('is-unlocked', opened);
+      world.classList.toggle('v3-world-locked', !opened);
+      world.setAttribute('aria-label', opened ? 'Mundo 02 — One Piece disponible' : 'Mundo 02 — Próximamente');
+      link.hidden = !opened;
+      link.tabIndex = opened ? 0 : -1;
+      if (opened && timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+    update();
+    if (!world.classList.contains('is-unlocked')) timer = setInterval(update, 1000);
+    document.addEventListener('visibilitychange', update);
+  })();
+  </script>
+
   <script src="js/premium.js"></script>
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
-  <script>
-  // ===== V3: countdown real de Mundo 02 (Halloween) hasta el 1 de octubre,
-  // calculado en el navegador contra la fecha ISO en data-unlock-iso (ya
-  // trae el offset -04:00 de America/New_York, así que Date.now() -- que es
-  // UTC -- se compara correctamente sin importar la zona horaria del
-  // visitante). Envuelto en try/catch, no toca nada más de la página. =====
-  (function () {
-    try {
-      var wrap = document.getElementById('wlHalloween');
-      if (!wrap) return;
-      var unlockAt = new Date(wrap.getAttribute('data-unlock-iso')).getTime();
-      if (isNaN(unlockAt)) return;
-
-      var box = document.getElementById('wlHalloweenCountdown');
-      var dEl = document.getElementById('wlD');
-      var hEl = document.getElementById('wlH');
-      var mEl = document.getElementById('wlM');
-      var sEl = document.getElementById('wlS');
-
-      function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-      var timer = null;
-      function tick() {
-        var diff = unlockAt - Date.now();
-        if (diff <= 0) {
-          if (box) box.innerHTML = '<span class="v3-wl-available">¡Disponible!</span>';
-          // Preparado: agregar esta clase es lo único que hace falta para
-          // que el CSS (ver .v3-wl-halloween.is-unlocked en v3-theme.css)
-          // quite visualmente el tinte oscuro y el candado.
-          wrap.classList.add('is-unlocked');
-          if (timer) clearInterval(timer);
-          return;
-        }
-        var s = Math.floor(diff / 1000);
-        var d = Math.floor(s / 86400); s -= d * 86400;
-        var h = Math.floor(s / 3600); s -= h * 3600;
-        var m = Math.floor(s / 60); s -= m * 60;
-        if (dEl) dEl.textContent = pad(d);
-        if (hEl) hEl.textContent = pad(h);
-        if (mEl) mEl.textContent = pad(m);
-        if (sEl) sEl.textContent = pad(s);
-      }
-      tick();
-      timer = setInterval(tick, 1000);
-    } catch (e) { console.warn('[v3-wl-countdown]', e); }
-  })();
-  </script>
-  <script>
+  <script src="js/index-racha.js?v=1"></script>
+  <script src="js/geoarmy-plus-pin.js"></script>
+<script>
   // ===== V3: conecta los marcadores del planeta con el sistema de paneles =====
   // (el nav real .nav-links está oculto y sigue funcionando para móvil/JS;
   // este bloque solo replica "activar panel" para los marcadores visibles)
@@ -505,22 +696,57 @@
     } catch (e) { console.warn('[v3-planet-nav]', e); }
   })();
   </script>
+
   <script>
-  // ===== V3: Alcancía pospuesta -- pin/enlace visible pero no navegable =====
-  // Cubre el pin del planeta Y el link oculto de .nav-links (y su clon en la
-  // tira de tabs de móvil, que hereda aria-disabled al clonarse). Sin popup,
-  // sin alert: simplemente no navega. No toca alcancia.html ni su backend.
-  (function () {
-    try {
-      var soonLinks = document.querySelectorAll('a[aria-disabled="true"]');
-      soonLinks.forEach(function (a) {
-        a.addEventListener('click', function (e) { e.preventDefault(); });
-        a.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') e.preventDefault();
-        });
-      });
-    } catch (e) { console.warn('[v3-soon-links]', e); }
+  /* Invitación local al primer visitante: sin consultas ni escrituras a Supabase. */
+  (function(){
+    'use strict';
+    var pin = document.getElementById('gaWelcomePin');
+    var dialog = document.getElementById('gaWelcomeDialog');
+    var closeBtn = document.getElementById('gaWelcomeClose');
+    var laterBtn = document.getElementById('gaWelcomeLater');
+    var explore = document.getElementById('gaWelcomeExplore');
+    var key = 'geoarmy:welcome-v1-seen';
+    if (!pin || !dialog || !dialog.showModal) return;
+
+    function markSeen(){
+      try { localStorage.setItem(key,'1'); } catch(e) { /* navegación normal */ }
+    }
+    function dismiss(){markSeen();if(dialog.open) dialog.close();}
+    function open(){if(!dialog.open)dialog.showModal();}
+    pin.addEventListener('click',function(e){e.preventDefault();open();});
+    closeBtn.addEventListener('click',dismiss);
+    laterBtn.addEventListener('click',dismiss);
+    explore.addEventListener('click',markSeen);
+    dialog.addEventListener('cancel',markSeen);
+    dialog.addEventListener('click',function(e){if(e.target===dialog)dismiss();});
+
+    function shouldInvite(){
+      try {
+        if (localStorage.getItem(key)) return false;
+        // Cuentas Twitch/Supabase existentes: evita mostrar publicidad a veteranos.
+        // No se leen valores de sesión ni se contacta al servidor.
+        for (var i=0;i<localStorage.length;i++) {
+          var k = localStorage.key(i) || '';
+          if (/^sb-.+-auth-token$/.test(k)) return false;
+        }
+        var widget = document.getElementById('geoAccountWidget');
+        if (widget && (
+          widget.querySelector('[data-authenticated="true"], [data-logged-in="true"], .ga-user-avatar, .ga-account-avatar') ||
+          /cerrar sesi[oó]n|desconectar|logout/i.test(widget.textContent || '')
+        )) return false;
+        return true;
+      } catch(e) {
+        // Si la memoria del navegador está bloqueada, no mostramos automáticamente.
+        return false;
+      }
+    }
+    window.setTimeout(function(){
+      if (document.visibilityState==='visible' && shouldInvite()) open();
+    },5000);
   })();
   </script>
+
+  <script src="js/geoarmy-guide.js?v=3"></script>
 </body>
 </html>

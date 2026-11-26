@@ -174,6 +174,58 @@
     .ti-comprar-avisos { max-width: 640px; margin: 1.6rem auto 0; text-align: center; }
     .ti-comprar-aviso { color: var(--text2); font-size: .85rem; line-height: 1.6; margin: 0 0 6px; }
     .ti-comprar-seguro { color: var(--text3); font-size: .78rem; margin: 0; }
+
+    /* Estado temporal de compra de G-Coins.
+       Los links originales se conservan en data-payment-url y solo se
+       restauran cuando GCOIN_PAYMENT_LINKS_ENABLED = true. */
+    .ti-comprar-lock-banner {
+      max-width: 720px;
+      margin: 0 auto 1.35rem;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      text-align: left;
+      border: 1px solid rgba(255,180,84,.34);
+      background: rgba(255,180,84,.07);
+      border-radius: 14px;
+      color: #ffd8a6;
+    }
+    .ti-comprar-lock-banner strong {
+      display: block;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .95rem;
+      margin-bottom: 2px;
+    }
+    .ti-comprar-lock-banner span:last-child {
+      display: block;
+      color: var(--text2);
+      font-size: .82rem;
+      line-height: 1.45;
+    }
+    .ti-comprar-lock-icon { font-size: 1.25rem; flex-shrink: 0; }
+
+    .ti-comprar[data-payments-enabled="false"] .ti-comprar-card {
+      opacity: .72;
+      filter: saturate(.48);
+      border-color: rgba(255,255,255,.10);
+      box-shadow: none;
+    }
+    .ti-comprar[data-payments-enabled="false"] .ti-comprar-card:hover {
+      transform: none;
+    }
+    .ti-comprar .ti-comprar-btn.is-disabled {
+      pointer-events: none;
+      cursor: not-allowed;
+      background: rgba(255,255,255,.09);
+      color: rgba(255,255,255,.68);
+      box-shadow: none;
+      opacity: 1;
+    }
+    .ti-comprar .ti-comprar-btn.is-disabled::before { display: none; }
+    .ti-comprar .ti-comprar-btn.is-disabled:hover { transform: none; }
     @media (max-width: 560px) {
       .ti-comprar-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -243,6 +295,767 @@
     }
 
     /* ---------- GRID + CARDS DE PRODUCTO ---------- */
+
+    /* ===== PESTAÑAS DE TIENDA ===== */
+    .shop-tabs-shell {
+      position: relative;
+      z-index: 3;
+      max-width: 1240px;
+      margin: 1.5rem auto 0;
+      padding: 0 1.25rem;
+    }
+    .shop-tabs {
+      display: inline-flex;
+      gap: 6px;
+      padding: 5px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.035);
+      backdrop-filter: blur(12px);
+    }
+    .shop-tab-btn {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 15px;
+      background: transparent;
+      color: var(--text2);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .82rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .shop-tab-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,.055);
+    }
+    .shop-tab-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, #7c3aed, #22d3ee);
+      box-shadow: 0 8px 24px rgba(79,70,229,.22);
+    }
+    .shop-tab-panel[hidden] {
+      display: none !important;
+    }
+
+    /* ===== FORTNITE SHOP DINÁMICA ===== */
+    .fn-shop {
+      position: relative;
+      z-index: 2;
+      max-width: 1240px;
+      margin: 2.2rem auto 0;
+      padding: 0 1.25rem;
+    }
+    .fn-shop-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .fn-shop-title-wrap h2 {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -.03em;
+    }
+    .fn-shop-title-wrap p {
+      margin: .35rem 0 0;
+      color: var(--text2);
+      font-size: .9rem;
+      line-height: 1.55;
+    }
+    .fn-shop-countdown {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(85,214,255,.34);
+      background: rgba(85,214,255,.07);
+      color: #dff8ff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .86rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .fn-shop-countdown strong {
+      color: #7ee7ff;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: .04em;
+    }
+    .fn-shop-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      margin: 0 0 1rem;
+    }
+    .fn-shop-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.11);
+      background: rgba(255,255,255,.045);
+      color: var(--text2);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .fn-shop-pill strong { color: #fff; }
+    .fn-vbucks-pill {
+      gap: .42rem;
+    }
+    .fn-vbucks-icon {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+      flex: 0 0 18px;
+      filter: drop-shadow(0 0 5px rgba(64,230,255,.28));
+    }
+
+    .fn-creator-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: fit-content;
+      max-width: 100%;
+      margin: .9rem 0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.96);
+      color: #111;
+      border: 1px solid rgba(255,255,255,.65);
+      box-shadow: 0 12px 30px rgba(0,0,0,.20);
+    }
+    .fn-creator-card::after { display: none; }
+    .fn-creator-eyebrow {
+      display: none;
+    }
+    .fn-creator-title {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .76rem;
+      font-weight: 900;
+      color: #5b5b66;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+    .fn-creator-code {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      color: #111;
+      white-space: nowrap;
+    }
+    .fn-copy-btn {
+      position: relative;
+      z-index: 1;
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: #111;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .72rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .fn-copy-btn:disabled { opacity: .45; cursor: default; }
+
+    .fn-gift-panel {
+      margin: 1rem 0 1.7rem;
+      padding: 18px;
+      border: 1px solid rgba(168,85,247,.25);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(34,16,57,.72), rgba(10,7,18,.82));
+    }
+    .fn-gift-panel h3 {
+      margin: 0 0 .35rem;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+    .fn-gift-panel p {
+      margin: 0;
+      color: var(--text2);
+      font-size: .8rem;
+      line-height: 1.5;
+    }
+    .fn-gift-accounts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      margin-top: .9rem;
+    }
+    .fn-gift-account {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      border: 1px dashed rgba(255,255,255,.26);
+      background: rgba(255,255,255,.035);
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 800;
+      font-size: .82rem;
+      cursor: pointer;
+    }
+    .fn-gift-empty {
+      color: var(--text3);
+      font-size: .8rem;
+      font-style: italic;
+    }
+    .fn-shop-status {
+      display: none;
+      margin: .8rem 0 1.2rem;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text2);
+      font-size: .82rem;
+    }
+    .fn-shop-status.show { display: block; }
+
+    .fn-section {
+      margin: 0 0 2rem;
+    }
+    .fn-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      margin: 0 0 .7rem;
+    }
+    .fn-section-title {
+      margin: 0;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.12rem;
+      font-weight: 900;
+    }
+    .fn-section-count {
+      color: var(--text3);
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .fn-row {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(205px, 245px);
+      gap: .8rem;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: inline proximity;
+      padding: 2px 2px 12px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(145,71,255,.75) rgba(255,255,255,.05);
+    }
+    .fn-card {
+      --fn-bg1: 432a78;
+      --fn-bg3: 160d2d;
+      position: relative;
+      min-height: 330px;
+      border-radius: 17px;
+      overflow: hidden;
+      scroll-snap-align: start;
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(circle at 50% 20%, rgba(255,255,255,.12), transparent 32%),
+        linear-gradient(160deg, #var(--fn-bg1), #var(--fn-bg3));
+      background: linear-gradient(160deg, var(--fn-color1, #432a78), var(--fn-color3, #160d2d));
+      box-shadow: 0 16px 40px rgba(0,0,0,.24);
+    }
+    .fn-card-image {
+      position: relative;
+      height: 225px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(to bottom, rgba(255,255,255,.02), rgba(0,0,0,.12));
+    }
+    .fn-card-image::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 48%;
+      background: linear-gradient(to top, rgba(7,5,14,.88), transparent);
+      pointer-events: none;
+    }
+    .fn-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      filter: drop-shadow(0 12px 15px rgba(0,0,0,.3));
+      transition: transform .22s ease;
+    }
+    .fn-card:hover .fn-card-image img { transform: scale(1.035); }
+    /* Composición exclusiva del lote Widowmaker + Kiriko cuando falta portada. */
+    .fn-card-image.fn-card-image-composite::after {
+      height: 17%;
+    }
+    .fn-card-image .fn-bundle-composition {
+      position: absolute;
+      inset: 34px 5px 5px;
+      overflow: hidden;
+    }
+    .fn-bundle-extras {
+      position: absolute;
+      z-index: 1;
+      inset: 6px auto 12px 0;
+      width: 34%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(4, minmax(0, 1fr));
+      gap: 2px;
+    }
+    .fn-bundle-characters {
+      position: absolute;
+      inset: 0;
+    }
+    .fn-card-image .fn-bundle-composition img {
+      display: block;
+      min-width: 0;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,.32));
+    }
+    .fn-card-image .fn-bundle-extras img {
+      transform: scale(1.35);
+    }
+    .fn-card-image .fn-bundle-characters img {
+      position: absolute;
+      bottom: 0;
+      left: 8%;
+      width: 88%;
+      height: 100%;
+      object-position: center bottom;
+      transform: scale(1.08);
+      transform-origin: center bottom;
+    }
+    .fn-card-image .fn-bundle-characters img + img {
+      left: 35%;
+    }
+    .fn-card-badge {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      left: 10px;
+      max-width: calc(100% - 20px);
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #7c3aed, #22d3ee);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 1000;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .fn-card-badge.last-day { background: #ff5e6c; color: #fff; }
+    .fn-card-body {
+      position: relative;
+      z-index: 3;
+      margin-top: -10px;
+      padding: 0 12px 12px;
+    }
+    .fn-card-name {
+      margin: 0;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .92rem;
+      font-weight: 900;
+      line-height: 1.12;
+      min-height: 2.05em;
+    }
+    .fn-card-type {
+      margin: .25rem 0 .5rem;
+      color: rgba(255,255,255,.62);
+      font-size: .68rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fn-card-price {
+      display: flex;
+      align-items: baseline;
+      gap: .45rem;
+      flex-wrap: wrap;
+      margin-top: .45rem;
+    }
+    .fn-price-current {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      background: rgba(0,0,0,.90);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: .92rem;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: .01em;
+      box-shadow: 0 4px 12px rgba(0,0,0,.22);
+    }
+    .fn-price-old {
+      color: rgba(255,255,255,.45);
+      text-decoration: line-through;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .fn-card-btn {
+      width: 100%;
+      margin-top: .72rem;
+      min-height: 38px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ff7c45, #a733e9);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fn-card-btn:disabled {
+      cursor: not-allowed;
+      background: rgba(255,255,255,.09);
+      color: rgba(255,255,255,.55);
+    }
+    .fn-card.not-giftable { filter: saturate(.65); }
+    .fn-card.not-giftable .fn-card-image img { opacity: .78; }
+
+    .fn-community {
+      margin: 2.2rem 0 0;
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.09);
+      background:
+        radial-gradient(circle at top right, rgba(34,211,238,.07), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(124,58,237,.09), transparent 38%),
+        rgba(255,255,255,.025);
+    }
+    .fn-community-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.4rem;
+    }
+    .fn-community-kicker {
+      color: #7ee7ff;
+      font-size: .68rem;
+      font-weight: 1000;
+      letter-spacing: .13em;
+      margin-bottom: .3rem;
+    }
+    .fn-community-head h3,
+    .fn-community-block h4,
+    .fn-review-composer h4 {
+      margin: 0;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900;
+    }
+    .fn-community-head h3 { font-size: 1.25rem; }
+    .fn-community-head p,
+    .fn-review-composer p {
+      margin: .35rem 0 0;
+      color: var(--text2);
+      font-size: .8rem;
+      line-height: 1.55;
+    }
+    .fn-community-block + .fn-community-block {
+      margin-top: 1.7rem;
+    }
+    .fn-community-block-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      margin-bottom: .75rem;
+    }
+    .fn-community-block h4 { font-size: .98rem; }
+    .fn-community-note {
+      color: var(--text3);
+      font-size: .7rem;
+      font-weight: 700;
+    }
+    .fn-community-empty {
+      width: 100%;
+      min-height: 82px;
+      display: grid;
+      place-items: center;
+      padding: 14px;
+      box-sizing: border-box;
+      border: 1px dashed rgba(255,255,255,.12);
+      border-radius: 13px;
+      color: var(--text3);
+      font-size: .78rem;
+      text-align: center;
+      background: rgba(0,0,0,.12);
+    }
+    .fn-deliveries-row {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(210px, 250px);
+      gap: .8rem;
+      overflow-x: auto;
+      padding: 2px 2px 10px;
+      scroll-snap-type: inline proximity;
+    }
+    .fn-delivery-card {
+      scroll-snap-align: start;
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      align-items: center;
+      gap: 10px;
+      min-height: 92px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.035);
+    }
+    .fn-delivery-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 11px;
+      object-fit: contain;
+      background: linear-gradient(145deg, rgba(124,58,237,.23), rgba(34,211,238,.12));
+    }
+    .fn-delivery-name {
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .fn-delivery-user {
+      margin-top: .3rem;
+      color: var(--text2);
+      font-size: .72rem;
+    }
+    .fn-delivery-date {
+      margin-top: .35rem;
+      color: #7ee7ff;
+      font-size: .64rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .fn-review-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: .8rem;
+    }
+    .fn-review-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 180px;
+      padding: 14px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: linear-gradient(150deg, rgba(124,58,237,.10), rgba(255,255,255,.025));
+    }
+    .fn-review-card-top {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .fn-review-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(126,231,255,.3);
+    }
+    .fn-review-user {
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .fn-review-login {
+      color: var(--text3);
+      font-size: .66rem;
+    }
+    .fn-review-stars-display {
+      margin: .75rem 0 .5rem;
+      color: #7ee7ff;
+      letter-spacing: .08em;
+      font-size: .92rem;
+    }
+    .fn-review-copy {
+      color: #eef6ff;
+      font-size: .8rem;
+      line-height: 1.55;
+    }
+    .fn-review-product {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: .9rem;
+      padding-top: .75rem;
+      border-top: 1px solid rgba(255,255,255,.07);
+      color: var(--text2);
+      font-size: .68rem;
+    }
+    .fn-review-product img {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: rgba(255,255,255,.04);
+    }
+    .fn-verified-chip {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(34,211,238,.10);
+      border: 1px solid rgba(34,211,238,.25);
+      color: #7ee7ff;
+      font-size: .62rem;
+      font-weight: 1000;
+      letter-spacing: .06em;
+    }
+    .fn-review-composer {
+      margin-top: 1.7rem;
+      display: grid;
+      grid-template-columns: minmax(190px,.8fr) minmax(280px,1.4fr);
+      gap: 1rem;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(126,231,255,.16);
+      background: rgba(4,11,19,.55);
+    }
+    .fn-review-composer-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .fn-review-form label {
+      display: block;
+      margin: 0 0 .35rem;
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 900;
+    }
+    .fn-review-input {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid rgba(255,255,255,.13);
+      background: rgba(0,0,0,.22);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 11px;
+      margin-bottom: .8rem;
+      font: inherit;
+      font-size: .78rem;
+      outline: none;
+    }
+    .fn-review-input:focus {
+      border-color: rgba(126,231,255,.55);
+      box-shadow: 0 0 0 3px rgba(34,211,238,.07);
+    }
+    .fn-review-textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+    .fn-review-stars {
+      display: flex;
+      gap: 3px;
+      margin: -.1rem 0 .75rem;
+    }
+    .fn-review-stars button {
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.20);
+      font-size: 1.35rem;
+      line-height: 1;
+      padding: 3px;
+      cursor: pointer;
+    }
+    .fn-review-stars button.active {
+      color: #7ee7ff;
+      text-shadow: 0 0 10px rgba(126,231,255,.25);
+    }
+    .fn-review-form-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+    }
+    .fn-review-form-msg {
+      color: var(--text2);
+      font-size: .7rem;
+      line-height: 1.4;
+    }
+    .fn-review-submit {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 13px;
+      background: linear-gradient(135deg, #7c3aed, #22d3ee);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: .74rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fn-review-submit:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+    .fn-review-status-only {
+      margin-top: 1.3rem;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      color: var(--text2);
+      font-size: .76rem;
+    }
+
+    @media (max-width: 680px) {
+      .fn-shop { padding: 0 .9rem; }
+      .fn-creator-card {
+        width: 100%;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+      }
+      .fn-copy-btn { width: auto; }
+      .fn-row { grid-auto-columns: minmax(175px, 72vw); }
+      .fn-card { min-height: 305px; }
+      .fn-card-image { height: 205px; }
+      .fn-community { padding: 15px; }
+      .fn-community-block-head { align-items: flex-start; flex-direction: column; gap: .2rem; }
+      .fn-deliveries-row { grid-auto-columns: minmax(220px, 82vw); }
+      .fn-review-grid { grid-template-columns: 1fr; }
+      .fn-review-composer { grid-template-columns: 1fr; }
+      .fn-review-form-bottom { align-items: stretch; flex-direction: column; }
+      .fn-review-submit { width: 100%; }
+    }
+
     .ti-grid {
       max-width: 1140px; margin: 2.2rem auto 0; padding: 0 1.5rem 4.5rem;
       display: grid; grid-template-columns: repeat(auto-fill, minmax(252px, 1fr)); gap: 1.3rem;
@@ -292,6 +1105,86 @@
 
     .ti-card2-nombre { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; text-align: center; color: #fff; }
     .ti-card2-desc { color: var(--text2); font-size: .87rem; line-height: 1.5; text-align: center; flex-grow: 1; }
+    .ti-card2-desc-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-grow: 1; }
+    .ti-card2-desc-wrap .ti-card2-desc { flex-grow: 0; margin: 0; }
+    .ti-card2-desc-clamped {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+    .ti-details-btn {
+      appearance: none; border: 0; background: transparent; cursor: pointer;
+      color: #9ed8ff; font: 700 11px/1.2 'Orbitron', sans-serif;
+      letter-spacing: .04em; padding: 3px 6px; border-radius: 6px;
+      transition: color .2s ease, background .2s ease;
+    }
+    .ti-details-btn:hover, .ti-details-btn:focus-visible { color: #fff; background: rgba(158,216,255,.1); outline: none; }
+
+    .ti-card2-rank, .ti-feat-rank, .ti-modal-rank {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: fit-content; max-width: 100%; margin: 0 auto;
+      font-size: 11.5px; font-weight: 700; line-height: 1.25; text-align: center;
+      padding: 6px 10px; border-radius: 100px;
+      color: #d6c6ff; background: rgba(145,71,255,.09); border: 1px solid rgba(145,71,255,.28);
+    }
+    .ti-card2-rank-ok, .ti-feat-rank-ok, .ti-modal-rank-ok {
+      color: #9be8bd; background: rgba(61,220,132,.08); border-color: rgba(61,220,132,.28);
+    }
+    .ti-card2-rank-blocked, .ti-feat-rank-blocked, .ti-modal-rank-blocked {
+      color: #ffc078; background: rgba(255,154,64,.08); border-color: rgba(255,154,64,.3);
+    }
+    .ti-feat-rank { margin: -2px 0 0; font-size: 10.5px; }
+    .ti-card2[data-state="rank"] { border-color: rgba(255,154,64,.24); }
+    .ti-card2[data-state="rank"] .ti-card2-btn { opacity: .52; }
+
+    .ti-modal[hidden] { display: none !important; }
+    .ti-modal {
+      position: fixed; inset: 0; z-index: 1200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .ti-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(4,3,10,.82);
+      backdrop-filter: blur(8px);
+    }
+    .ti-modal-dialog {
+      position: relative; z-index: 1;
+      width: min(520px, 100%); max-height: min(82vh, 720px); overflow: auto;
+      padding: 28px 24px 24px;
+      background: linear-gradient(160deg, rgba(35,22,52,.98), rgba(10,9,20,.99));
+      border: 1px solid rgba(145,71,255,.34);
+      border-radius: 22px;
+      box-shadow: 0 28px 80px rgba(0,0,0,.55), 0 0 40px rgba(145,71,255,.12);
+    }
+    .ti-modal-close {
+      position: absolute; top: 12px; right: 12px;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05);
+      color: #fff; font-size: 24px; line-height: 1; cursor: pointer;
+    }
+    .ti-modal-close:hover, .ti-modal-close:focus-visible { background: rgba(255,255,255,.1); outline: 2px solid rgba(158,216,255,.45); }
+    .ti-modal-product { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+    .ti-modal-icon {
+      width: 132px; height: 132px; display: flex; align-items: center; justify-content: center;
+      border-radius: 24px; background: radial-gradient(circle at 40% 30%, rgba(145,71,255,.28), transparent 72%);
+      border: 1px solid rgba(145,71,255,.3);
+    }
+    .ti-modal-icon img { width: 106px; height: 106px; object-fit: contain; filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); }
+    .ti-modal-icon .emoji { font-size: 2.6rem; }
+    .ti-modal-title { margin: 0; color: #fff; font: 700 1.35rem/1.2 'Space Grotesk', sans-serif; }
+    .ti-modal-desc { margin: 0; color: var(--text2); font-size: .92rem; line-height: 1.7; white-space: pre-line; }
+    .ti-modal-price {
+      display: flex; align-items: center; gap: 7px;
+      color: #ffd23f; font: 800 1.25rem/1 'Space Grotesk', sans-serif;
+    }
+    body.ti-modal-open { overflow: hidden; }
+    body.hw-halloween .ti-modal-dialog {
+      background: linear-gradient(160deg, rgba(48,20,54,.99), rgba(18,9,20,.99));
+      border-color: rgba(255,140,0,.28);
+      box-shadow: 0 28px 80px rgba(0,0,0,.58), 0 0 42px rgba(176,67,255,.14);
+    }
     .ti-card2-divider { border: none; border-top: 1px solid rgba(255,255,255,.08); margin: 2px 0; }
     .ti-card2-costo {
       display: flex; align-items: center; justify-content: center; gap: 7px;
@@ -374,95 +1267,8 @@
 
   </style>
 
-  <!-- ================================================================
-       Tematica de Halloween — SOLO colores/decoración para esta página.
-       Todo scopeado bajo "body.hw-halloween" (clase agregada únicamente
-       al <body> de ESTE archivo) para no tocar css/v3-theme.css ni
-       css/style.css ni ninguna otra página. No cambia ningún ID/clase
-       leído por el script (tiSaldoValor, tiLoginBtn, tiUsuarioTag,
-       tiUsuarioNombre, tiGrid, tiMsg, .ti-filtro-btn+data-cat, --c2-accent
-       dinámico por categoría) -- solo fondo, bordes/sombras genéricos y
-       elementos decorativos nuevos con pointer-events:none. -->
-  <style>
-    body.hw-halloween{
-      background:
-        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(255,122,26,.14), transparent 60%),
-        radial-gradient(ellipse 60% 40% at 88% 12%, rgba(151,71,255,.15), transparent 60%);
-      background-color:#0a0612;
-    }
-    body.hw-halloween .v3-stars{ opacity:.5; filter:hue-rotate(15deg) saturate(1.2); }
-    body.hw-halloween .v3-nebula{ opacity:.5; filter:hue-rotate(20deg); }
-
-    body.hw-halloween .v3-nav{
-      background:linear-gradient(180deg, rgba(20,10,26,.92), rgba(12,7,16,.88));
-      border-bottom:1px solid rgba(255,122,26,.28);
-    }
-    body.hw-halloween .v3-wordmark{ color:#ffb347; text-shadow:0 0 10px rgba(255,140,0,.55); }
-    body.hw-halloween .v3-join-btn{ background:linear-gradient(135deg,#ff7a1a,#b043ff); border:none; }
-
-    body.hw-halloween .ti-eyebrow{ color:#ff9d3d; }
-    body.hw-halloween .ti-title-new{
-      background:linear-gradient(90deg,#ff8a2b,#ffb347 35%,#b784ff 70%,#7c4dff);
-      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
-    }
-    body.hw-halloween .ti-sub{ color:#cbb8e6; }
-    body.hw-halloween .ti-crest{ color:#ff9d3d; }
-
-    body.hw-halloween .ti-wallet-card,
-    body.hw-halloween .ti-comprar-card,
-    body.hw-halloween .ti-feat-card{
-      background:linear-gradient(160deg, rgba(38,18,46,.55), rgba(18,10,20,.65));
-      border:1px solid rgba(255,140,0,.22);
-      box-shadow:0 8px 24px rgba(60,10,80,.25);
-    }
-    body.hw-halloween .ti-login-btn,
-    body.hw-halloween .ti-comprar-btn{
-      background:linear-gradient(135deg,#ff7a1a,#b043ff); border:none; color:#fff;
-    }
-    body.hw-halloween .ti-filtro-btn.active{
-      background:linear-gradient(135deg,#ff7a1a,#b043ff); border-color:transparent;
-    }
-    body.hw-halloween .ti-feat-price{ color:#ffb347; text-shadow:0 0 12px rgba(255,140,0,.4); }
-    body.hw-halloween .ti-section-title{ color:#ffb347; }
-    body.hw-halloween .ti-line{ background:linear-gradient(90deg,transparent,#ff7a1a,transparent); }
-
-    /* ---- Decoraciones flotantes (puramente visuales) ---- */
-    .hw-decor{ position:fixed; inset:0; pointer-events:none; z-index:2; overflow:hidden; }
-    .hw-decor span{ position:absolute; opacity:.5; filter:drop-shadow(0 0 6px rgba(255,140,0,.35)); }
-    .hw-decor .hw-bat{ font-size:22px; animation:hwFly 16s linear infinite; }
-    .hw-decor .hw-bat2{ font-size:16px; animation:hwFly 22s linear infinite reverse; opacity:.4; }
-    .hw-decor .hw-pumpkin{ font-size:26px; opacity:.5; animation:hwBob 6s ease-in-out infinite; }
-    .hw-decor .hw-ghost{ font-size:20px; opacity:.35; animation:hwBob 8s ease-in-out infinite; }
-    .hw-decor .hw-web{ font-size:34px; opacity:.28; }
-
-    @keyframes hwFly{
-      0%{ transform:translate(-10vw,10vh) rotate(0deg); }
-      50%{ transform:translate(55vw,4vh) rotate(6deg); }
-      100%{ transform:translate(110vw,14vh) rotate(-4deg); }
-    }
-    @keyframes hwBob{
-      0%,100%{ transform:translateY(0); }
-      50%{ transform:translateY(-10px); }
-    }
-    @media (max-width:700px){
-      .hw-decor .hw-pumpkin, .hw-decor .hw-ghost{ font-size:18px; }
-      .hw-decor .hw-web{ font-size:24px; }
-    }
-  </style>
 </head>
-<body class="hw-halloween">
-
-  <div class="hw-decor" aria-hidden="true">
-    <span class="hw-bat" style="top:8%;">🦇</span>
-    <span class="hw-bat2" style="top:22%;">🦇</span>
-    <span class="hw-bat" style="top:40%; animation-delay:-6s;">🦇</span>
-    <span class="hw-pumpkin" style="left:3%; top:14%;">🎃</span>
-    <span class="hw-pumpkin" style="right:4%; top:60%; animation-delay:-3s;">🎃</span>
-    <span class="hw-ghost" style="left:8%; top:78%; animation-delay:-2s;">👻</span>
-    <span class="hw-ghost" style="right:10%; top:30%; animation-delay:-5s;">👻</span>
-    <span class="hw-web" style="left:-4px; top:-4px;">🕸️</span>
-    <span class="hw-web" style="right:-4px; top:-4px; transform:scaleX(-1);">🕸️</span>
-  </div>
+<body>
 
   <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
@@ -485,6 +1291,7 @@
           <span class="v3-wordmark">GEO ARMY</span>
         </a>
         <div class="v3-auth">
+          <div id="geoAccountWidget"></div>
           <a href="https://twitch.tv/geovannyrk" target="_blank" class="v3-join-btn">Únete a Geo Army</a>
         </div>
       </div>
@@ -533,54 +1340,186 @@
   </section>
   </div>
 
-  <!-- COMPRAR G-COINS: compra manual vía Square Payment Links. Sección
-       estática, sin selector de cantidad ni precio personalizado -- 5
-       paquetes fijos, cada botón abre en pestaña nueva el Payment Link
-       público correspondiente. Square procesa el checkout completo; aquí
-       no hay formulario de tarjeta, API, SDK, clave ni token de Square, ni
-       ningún fetch. La acreditación de G-Coins es MANUAL (no instantánea)
-       -- ver aviso debajo de los paquetes. No modifica saldo/tiSaldoValor,
-       no llama a /api/*, no toca el catálogo ni el sistema de canjes. -->
-  <section class="ti-comprar">
+
+  <div class="shop-tabs-shell">
+    <div class="shop-tabs" role="tablist" aria-label="Secciones de la tienda">
+      <button type="button" class="shop-tab-btn active" id="shopTabBtnFortnite"
+              role="tab" aria-selected="true" aria-controls="shopTabFortnite">
+        Fortnite Shop
+      </button>
+      <button type="button" class="shop-tab-btn" id="shopTabBtnClassic"
+              role="tab" aria-selected="false" aria-controls="shopTabClassic">
+        Tienda clásica
+      </button>
+    </div>
+  </div>
+
+  <div id="shopTabFortnite" class="shop-tab-panel" role="tabpanel" aria-labelledby="shopTabBtnFortnite">
+  <!-- ===== FORTNITE SHOP DINÁMICA ===== -->
+  <section class="fn-shop" id="fnShopSection">
+    <div class="fn-shop-head">
+      <div class="fn-shop-title-wrap">
+        <h2>Fortnite Shop</h2>
+        <p>La tienda se actualiza con la rotación real de Fortnite. Los precios de Geo Army se muestran únicamente en G-Coins.</p>
+      </div>
+      <div class="fn-shop-countdown">
+        <span>◷ Cambia en</span>
+        <strong id="fnCountdown">--:--:--</strong>
+      </div>
+    </div>
+
+    <div class="fn-shop-meta">
+      <span class="fn-shop-pill fn-vbucks-pill"><img src="assets/store/vbucks-logo.png" alt="V-Bucks" class="fn-vbucks-icon"><strong>100 V-Bucks = 200 G-Coins</strong></span>
+      <span class="fn-shop-pill">🔄 Rotación automática</span>
+      <span class="fn-shop-pill" id="fnOfferCount">Cargando tienda…</span>
+    </div>
+
+    <!-- Tarjeta blanca solicitada para el código del creador.
+         Configura FORTNITE_CREATOR_CODE en el JS; no se inventa un código. -->
+    <div class="fn-creator-card">
+      <div>
+        <div class="fn-creator-eyebrow">Apoya a Geo Army</div>
+        <div class="fn-creator-title">Código de Fortnite</div>
+        <div class="fn-creator-code" id="fnCreatorCode">CÓDIGO EN PREPARACIÓN</div>
+      </div>
+      <button type="button" class="fn-copy-btn" id="fnCopyCreator" disabled>📋 Copiar código</button>
+    </div>
+
+    <!-- Cuentas de regalo: la estructura queda lista; no inventamos nombres. -->
+    <div class="fn-gift-panel">
+      <h3>🎁 Cuentas de regalos (agrégalas en Fortnite)</h3>
+      <p>Agrega una de las cuentas oficiales de Geo Army antes de solicitar un regalo. La disponibilidad y tiempos de amistad dependen de Fortnite.</p>
+      <div class="fn-gift-accounts" id="fnGiftAccounts">
+        <span class="fn-gift-empty">Cuentas oficiales por configurar.</span>
+      </div>
+
+    </div>
+
+    <div class="fn-shop-status" id="fnShopStatus">Cargando tienda de Fortnite…</div>
+    <div id="fnShopSections"></div>
+
+    <section class="fn-community" aria-labelledby="fnCommunityTitle">
+      <div class="fn-community-head">
+        <div>
+          <div class="fn-community-kicker">COMUNIDAD GEO ARMY</div>
+          <h3 id="fnCommunityTitle">Entregas y reseñas verificadas</h3>
+          <p>Solo mostramos entregas reales de Fortnite y reseñas vinculadas a un canje marcado como entregado.</p>
+        </div>
+      </div>
+
+      <div class="fn-community-block">
+        <div class="fn-community-block-head">
+          <h4>🎁 Entregas recientes</h4>
+          <span class="fn-community-note">Canjes entregados por Geo Army</span>
+        </div>
+        <div id="fnRecentDeliveries" class="fn-deliveries-row">
+          <div class="fn-community-empty">Todavía no hay entregas públicas para mostrar.</div>
+        </div>
+      </div>
+
+      <div class="fn-community-block">
+        <div class="fn-community-block-head">
+          <h4>⭐ Lo que dice la Geo Army</h4>
+          <span class="fn-community-note">Reseñas con canje verificado</span>
+        </div>
+        <div id="fnVerifiedReviews" class="fn-review-grid">
+          <div class="fn-community-empty">Todavía no hay reseñas aprobadas.</div>
+        </div>
+      </div>
+
+      <div id="fnReviewComposer" class="fn-review-composer" hidden>
+        <div class="fn-review-composer-copy">
+          <span class="fn-verified-chip">✓ CANJE VERIFICADO</span>
+          <h4>¿Ya recibiste tu regalo?</h4>
+          <p>Deja una reseña sobre tu entrega. Se publicará después de ser aprobada.</p>
+        </div>
+
+        <div class="fn-review-form">
+          <label for="fnReviewFulfillment">Regalo recibido</label>
+          <select id="fnReviewFulfillment" class="fn-review-input"></select>
+
+          <label>Calificación</label>
+          <div id="fnReviewStars" class="fn-review-stars" role="radiogroup" aria-label="Calificación">
+            <button type="button" data-rating="1" aria-label="1 estrella">★</button>
+            <button type="button" data-rating="2" aria-label="2 estrellas">★</button>
+            <button type="button" data-rating="3" aria-label="3 estrellas">★</button>
+            <button type="button" data-rating="4" aria-label="4 estrellas">★</button>
+            <button type="button" data-rating="5" aria-label="5 estrellas">★</button>
+          </div>
+
+          <label for="fnReviewText">Tu reseña</label>
+          <textarea id="fnReviewText" class="fn-review-input fn-review-textarea"
+                    maxlength="500" placeholder="Cuéntanos cómo fue tu entrega..."></textarea>
+
+          <div class="fn-review-form-bottom">
+            <span id="fnReviewFormMsg" class="fn-review-form-msg"></span>
+            <button type="button" id="fnReviewSubmit" class="fn-review-submit">Enviar reseña</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="fnReviewStatusOnly" class="fn-review-status-only" hidden></div>
+    </section>
+  </section>
+  <!-- ===== FIN FORTNITE SHOP DINÁMICA ===== -->
+  </div>
+
+  <div id="shopTabClassic" class="shop-tab-panel" role="tabpanel"
+       aria-labelledby="shopTabBtnClassic" hidden>
+
+  <!-- COMPRAR G-COINS: temporalmente pausado.
+       Los enlaces de Square se conservan en data-payment-url, pero NO son
+       navegables mientras GCOIN_PAYMENT_LINKS_ENABLED = false. Esto no toca
+       el saldo GCOIN, /api/canjear, Supabase ni el resto de la tienda. -->
+  <section class="ti-comprar" id="tiComprarGcoins" data-payments-enabled="false">
     <div class="ti-section-title"><span class="ti-line"></span>Comprar G-Coins<span class="ti-line"></span></div>
-    <p class="ti-comprar-sub">Compra G-Coins directamente con tarjeta. El pago se procesa fuera de Geo Army, en Square.</p>
+
+    <div id="tiComprarLockBanner" class="ti-comprar-lock-banner">
+      <span class="ti-comprar-lock-icon" aria-hidden="true">🔒</span>
+      <div>
+        <strong>Compras de G-Coins temporalmente bloqueadas</strong>
+        <span>Solo está pausada la compra de nuevos G-Coins. Puedes seguir usando tu saldo actual en la tienda.</span>
+      </div>
+    </div>
+
+    <p id="tiComprarSub" class="ti-comprar-sub">Estamos restaurando el método de pago. Los paquetes volverán a estar disponibles en cuanto se reactive.</p>
 
     <div class="ti-comprar-grid">
       <div class="ti-comprar-card">
         <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
         <div class="ti-comprar-cantidad">1,800 <span>G-Coins</span></div>
         <div class="ti-comprar-precio">$5</div>
-        <a class="ti-comprar-btn" href="https://square.link/u/JFqxuMiT" target="_blank" rel="noopener noreferrer">Comprar</a>
+        <a class="ti-comprar-btn is-disabled" data-payment-url="https://square.link/u/JFqxuMiT" aria-disabled="true" tabindex="-1">🔒 Bloqueado</a>
       </div>
       <div class="ti-comprar-card">
         <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
         <div class="ti-comprar-cantidad">3,750 <span>G-Coins</span></div>
         <div class="ti-comprar-precio">$10</div>
-        <a class="ti-comprar-btn" href="https://square.link/u/0SlHiuHd" target="_blank" rel="noopener noreferrer">Comprar</a>
+        <a class="ti-comprar-btn is-disabled" data-payment-url="https://square.link/u/0SlHiuHd" aria-disabled="true" tabindex="-1">🔒 Bloqueado</a>
       </div>
       <div class="ti-comprar-card">
         <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
         <div class="ti-comprar-cantidad">7,500 <span>G-Coins</span></div>
         <div class="ti-comprar-precio">$20</div>
-        <a class="ti-comprar-btn" href="https://square.link/u/sASLLECJ" target="_blank" rel="noopener noreferrer">Comprar</a>
+        <a class="ti-comprar-btn is-disabled" data-payment-url="https://square.link/u/sASLLECJ" aria-disabled="true" tabindex="-1">🔒 Bloqueado</a>
       </div>
       <div class="ti-comprar-card">
         <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
         <div class="ti-comprar-cantidad">18,750 <span>G-Coins</span></div>
         <div class="ti-comprar-precio">$50</div>
-        <a class="ti-comprar-btn" href="https://square.link/u/Oou5LtP1" target="_blank" rel="noopener noreferrer">Comprar</a>
+        <a class="ti-comprar-btn is-disabled" data-payment-url="https://square.link/u/Oou5LtP1" aria-disabled="true" tabindex="-1">🔒 Bloqueado</a>
       </div>
       <div class="ti-comprar-card">
         <img src="gcoin-icon.png" class="ti-comprar-coin" alt="G-coin"/>
         <div class="ti-comprar-cantidad">37,500 <span>G-Coins</span></div>
         <div class="ti-comprar-precio">$100</div>
-        <a class="ti-comprar-btn" href="https://square.link/u/JBAkg248" target="_blank" rel="noopener noreferrer">Comprar</a>
+        <a class="ti-comprar-btn is-disabled" data-payment-url="https://square.link/u/JBAkg248" aria-disabled="true" tabindex="-1">🔒 Bloqueado</a>
       </div>
     </div>
 
     <div class="ti-comprar-avisos">
-      <p class="ti-comprar-aviso">⚠️ Ingresa correctamente tu Twitch username durante el pago. Los G-Coins se acreditan después de verificar el pago.</p>
-      <p class="ti-comprar-seguro">🔒 Pago seguro procesado por Square.</p>
+      <p id="tiComprarAviso" class="ti-comprar-aviso">⚠️ No realices pagos mediante enlaces anteriores mientras aparezca este aviso.</p>
+      <p id="tiComprarSeguro" class="ti-comprar-seguro">Los paquetes y precios se mantienen visibles solo como referencia.</p>
     </div>
   </section>
 
@@ -605,6 +1544,16 @@
 
   <div id="tiGrid" class="ti-grid"></div>
   <p id="tiMsg" class="ti-msg"></p>
+  </div>
+
+  <!-- Modal informativo: solo muestra detalles; nunca inicia canjes ni genera clientRequestId. -->
+  <div id="tiDetailsModal" class="ti-modal" hidden aria-hidden="true">
+    <div class="ti-modal-backdrop" data-ti-modal-close></div>
+    <div class="ti-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="tiDetailsTitle">
+      <button id="tiDetailsClose" class="ti-modal-close" type="button" aria-label="Cerrar detalles">×</button>
+      <div id="tiDetailsBody"></div>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -627,6 +1576,16 @@
     // Debe coincidir exactamente con un Redirect URI registrado en tu app de Twitch
     const TWITCH_CLIENT_ID = "3spb0xbi38qc8ng1zwcoz5081lp524";
     const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+    // INTERRUPTOR TEMPORAL — compra de G-Coins por links externos.
+    // false = paquetes visibles pero bloqueados / sin enlace navegable.
+    // true  = restaura automáticamente los links y botones "Comprar".
+    const GCOIN_PAYMENT_LINKS_ENABLED = false;
+
+    // Fortnite Shop dinámica.
+    // NO inventamos valores personales: completa estos datos cuando correspondan.
+    const FORTNITE_CREATOR_CODE = 'SORTEOSRK';
+    const FORTNITE_GIFT_ACCOUNTS = ['passesrk'];
     // ================================
 
     const $ = (id) => document.getElementById(id);
@@ -637,6 +1596,9 @@
 
     let usuario = null; // { login, display_name }
     let saldo = 0;
+    let rankCode = null;
+    let rankName = null;
+    let rankSortOrder = null;
     let twitchAccessToken = null;
     let filtroActivo = 'todos';
 
@@ -647,6 +1609,589 @@
       clashroyale:  { label: 'Clash Royale',  accent: '#ffd23f' },
       brawlstars:   { label: 'Brawl Stars',   accent: '#9147ff' },
     };
+
+
+    let fortniteShopData = null;
+    let fortniteCountdownTimer = null;
+
+    function activarPestanaTienda(tab) {
+      const isFortnite = tab !== 'classic';
+
+      const fnBtn = $('shopTabBtnFortnite');
+      const classicBtn = $('shopTabBtnClassic');
+      const fnPanel = $('shopTabFortnite');
+      const classicPanel = $('shopTabClassic');
+
+      fnBtn.classList.toggle('active', isFortnite);
+      classicBtn.classList.toggle('active', !isFortnite);
+
+      fnBtn.setAttribute('aria-selected', isFortnite ? 'true' : 'false');
+      classicBtn.setAttribute('aria-selected', isFortnite ? 'false' : 'true');
+
+      fnPanel.hidden = !isFortnite;
+      classicPanel.hidden = isFortnite;
+
+      try {
+        sessionStorage.setItem(
+          'geoarmy-store-tab',
+          isFortnite ? 'fortnite' : 'classic'
+        );
+      } catch {}
+    }
+
+    function configurarPestanasTienda() {
+      $('shopTabBtnFortnite').addEventListener('click', () => {
+        activarPestanaTienda('fortnite');
+      });
+
+      $('shopTabBtnClassic').addEventListener('click', () => {
+        activarPestanaTienda('classic');
+      });
+
+      let saved = 'fortnite';
+      try {
+        saved = sessionStorage.getItem('geoarmy-store-tab') || 'fortnite';
+      } catch {}
+
+      activarPestanaTienda(saved);
+    }
+
+    function escaparHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function fnColor(value, fallback) {
+      const raw = String(value || '').replace('#', '').trim();
+      if (!/^[0-9a-fA-F]{8}$/.test(raw) && !/^[0-9a-fA-F]{6}$/.test(raw)) {
+        return fallback;
+      }
+      return `#${raw.slice(0, 6)}`;
+    }
+
+    function fnEsUltimoDia(outDate) {
+      if (!outDate) return false;
+      const end = new Date(outDate).getTime();
+      if (!Number.isFinite(end)) return false;
+      const diff = end - Date.now();
+      return diff > 0 && diff <= 24 * 60 * 60 * 1000;
+    }
+
+    function fnFormatearTiempo(ms) {
+      if (!Number.isFinite(ms) || ms <= 0) return '00:00:00';
+      const total = Math.floor(ms / 1000);
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+    }
+
+    function iniciarCountdownFortnite(nextRotationAt) {
+      if (fortniteCountdownTimer) clearInterval(fortniteCountdownTimer);
+
+      const el = $('fnCountdown');
+      const target = new Date(nextRotationAt).getTime();
+
+      const tick = () => {
+        const remaining = target - Date.now();
+
+        if (!Number.isFinite(target)) {
+          el.textContent = '--:--:--';
+          return;
+        }
+
+        if (remaining <= 0) {
+          el.textContent = '00:00:00';
+          clearInterval(fortniteCountdownTimer);
+          fortniteCountdownTimer = null;
+
+          // Al llegar la rotación, invalidamos la copia local visual y
+          // pedimos la tienda otra vez. El backend tiene su propia caché.
+          setTimeout(() => cargarFortniteShop(true), 2500);
+          return;
+        }
+
+        el.textContent = fnFormatearTiempo(remaining);
+      };
+
+      tick();
+      fortniteCountdownTimer = setInterval(tick, 1000);
+    }
+
+    function configurarFortniteIdentidad() {
+      const codeEl = $('fnCreatorCode');
+      const copyBtn = $('fnCopyCreator');
+
+      if (FORTNITE_CREATOR_CODE) {
+        codeEl.textContent = FORTNITE_CREATOR_CODE;
+        copyBtn.disabled = false;
+      } else {
+        codeEl.textContent = 'CÓDIGO EN PREPARACIÓN';
+        copyBtn.disabled = true;
+      }
+
+      copyBtn.addEventListener('click', async () => {
+        if (!FORTNITE_CREATOR_CODE) return;
+        try {
+          await navigator.clipboard.writeText(FORTNITE_CREATOR_CODE);
+          const old = copyBtn.textContent;
+          copyBtn.textContent = '✓ Copiado';
+          setTimeout(() => { copyBtn.textContent = old; }, 1400);
+        } catch {
+          copyBtn.textContent = 'No se pudo copiar';
+        }
+      });
+
+      const accounts = $('fnGiftAccounts');
+      if (!Array.isArray(FORTNITE_GIFT_ACCOUNTS) || !FORTNITE_GIFT_ACCOUNTS.length) {
+        accounts.innerHTML = '<span class="fn-gift-empty">Cuentas oficiales por configurar.</span>';
+        return;
+      }
+
+      accounts.innerHTML = '';
+      FORTNITE_GIFT_ACCOUNTS.forEach((account) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'fn-gift-account';
+        btn.innerHTML = `📋 ${escaparHtml(account)}`;
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(account);
+            const old = btn.innerHTML;
+            btn.textContent = '✓ Copiado';
+            setTimeout(() => { btn.innerHTML = old; }, 1200);
+          } catch {
+            btn.textContent = account;
+          }
+        });
+        accounts.appendChild(btn);
+      });
+    }
+
+
+    function claveFortniteClientRequestIdPendiente(offerId) {
+      return `geoarmy-fortnite-shop-pending:${offerId}`;
+    }
+
+    function obtenerOCrearFortniteClientRequestId(offerId) {
+      const clave = claveFortniteClientRequestIdPendiente(offerId);
+      let id;
+
+      try {
+        id = sessionStorage.getItem(clave);
+      } catch {
+        throw new Error('No se pudo leer sessionStorage');
+      }
+
+      if (!id) {
+        id = crypto.randomUUID();
+        try {
+          sessionStorage.setItem(clave, id);
+        } catch {
+          throw new Error('No se pudo guardar sessionStorage');
+        }
+      }
+
+      return id;
+    }
+
+    function borrarFortniteClientRequestIdPendiente(offerId) {
+      try {
+        sessionStorage.removeItem(claveFortniteClientRequestIdPendiente(offerId));
+      } catch {
+        // Nada que hacer.
+      }
+    }
+
+    async function canjearFortniteOffer(offer, button) {
+      if (!usuario || !twitchAccessToken) {
+        msg.textContent = 'Inicia sesión con Twitch para canjear artículos de Fortnite.';
+        return;
+      }
+
+      if (!fortniteShopData || fortniteShopData.purchaseReady !== true || !offer.purchase) {
+        msg.textContent = 'La tienda de Fortnite todavía se está preparando para canjes. Recarga e intenta nuevamente.';
+        return;
+      }
+
+      let epicDisplayName = '';
+      try {
+        epicDisplayName = (localStorage.getItem('geoarmy-fortnite-epic-display-name') || '').trim();
+      } catch {}
+
+      epicDisplayName = window.prompt(
+        'Escribe exactamente tu Epic Display Name para recibir este regalo:',
+        epicDisplayName
+      );
+
+      if (epicDisplayName === null) return;
+
+      epicDisplayName = epicDisplayName.trim();
+
+      if (!epicDisplayName || epicDisplayName.length > 64) {
+        msg.textContent = 'Epic Display Name inválido.';
+        return;
+      }
+
+      try {
+        localStorage.setItem('geoarmy-fortnite-epic-display-name', epicDisplayName);
+      } catch {}
+
+      const costo = Number(offer.finalPriceGcoins);
+
+      if (!Number.isFinite(costo) || costo <= 0) {
+        msg.textContent = 'El precio de esta oferta no es válido.';
+        return;
+      }
+
+      if (saldo < costo) {
+        msg.textContent = `Necesitas ${costo.toLocaleString()} G-Coins para este artículo.`;
+        return;
+      }
+
+      if (!confirm(`¿Canjear "${offer.name}" por ${costo.toLocaleString()} G-Coins?`)) {
+        return;
+      }
+
+      let clientRequestId;
+
+      try {
+        clientRequestId = obtenerOCrearFortniteClientRequestId(offer.offerId);
+      } catch {
+        msg.textContent = 'No se puede iniciar un canje seguro en este navegador. Recarga la página e intenta de nuevo.';
+        return;
+      }
+
+      const textoOriginal = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Procesando…';
+      msg.textContent = `Procesando "${offer.name}"…`;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/fortnite-shop/canjear`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+          },
+          body: JSON.stringify({
+            offerId: offer.offerId,
+            shopHash: fortniteShopData.shopHash,
+            clientRequestId,
+            expectedGcoins: costo,
+            epicDisplayName,
+          }),
+        });
+
+        let data = null;
+        try {
+          data = await res.json();
+        } catch {
+          data = {};
+        }
+
+        if (res.ok && data && data.ok === true) {
+          borrarFortniteClientRequestIdPendiente(offer.offerId);
+
+          saldo = Number(data.saldoRestante);
+          $('tiSaldoValor').textContent = saldo;
+
+          msg.textContent =
+            `¡Listo! Canjeaste "${offer.name}" por ${costo.toLocaleString()} G-Coins. ` +
+            `Entrega pendiente para Epic: ${epicDisplayName}.`;
+
+          button.textContent = '✓ Canje solicitado';
+          button.disabled = true;
+
+          // Actualiza el resto de botones según el nuevo saldo.
+          renderFortniteShop(fortniteShopData);
+          return;
+        }
+
+        const code = data && data.code ? String(data.code) : '';
+
+        // Estos estados significan que ESTA compra no ocurrió.
+        const seSabeQueNoOcurrio =
+          res.status === 400 ||
+          res.status === 401 ||
+          res.status === 404 ||
+          res.status === 429 ||
+          code === 'fortnite_shop_refresh_required' ||
+          code === 'fortnite_shop_changed' ||
+          code === 'fortnite_price_changed' ||
+          code === 'fortnite_offer_not_found' ||
+          code === 'fortnite_offer_not_giftable' ||
+          code === 'fortnite_offer_changed' ||
+          code === 'request_conflict';
+
+        if (seSabeQueNoOcurrio) {
+          borrarFortniteClientRequestIdPendiente(offer.offerId);
+        }
+
+        msg.textContent =
+          (data && data.error) ||
+          'No se pudo completar el canje. Intenta nuevamente.';
+
+        // Si cambió la rotación/precio, refrescamos visualmente.
+        if (
+          code === 'fortnite_shop_refresh_required' ||
+          code === 'fortnite_shop_changed' ||
+          code === 'fortnite_price_changed' ||
+          code === 'fortnite_offer_changed'
+        ) {
+          await cargarFortniteShop(true);
+        }
+      } catch {
+        // Error de red: conservamos el MISMO clientRequestId.
+        // Un retry será replay seguro si el backend alcanzó a procesar.
+        msg.textContent =
+          'No pudimos confirmar el resultado del canje. Intenta nuevamente; se reutilizará el mismo intento para evitar un doble cobro.';
+      } finally {
+        if (button.textContent !== '✓ Canje solicitado') {
+          button.disabled = false;
+          button.textContent = textoOriginal;
+
+          if (fortniteShopData) {
+            renderFortniteShop(fortniteShopData);
+          }
+        }
+      }
+    }
+
+    function renderWidowmakerBundleArt(offer) {
+      const items = Array.isArray(offer.items) ? offer.items : [];
+      if (Number(offer.itemCount) !== 9 || items.length !== 9) return '';
+      const hasItem = (item, id) =>
+        String(item.id || '').toLowerCase() === id ||
+        String(item.image || '').toLowerCase().includes('/' + id + '/');
+      const widow = items.find(item => hasItem(item, 'character_shonestays'));
+      const kiriko = items.find(item => hasItem(item, 'character_danderclay'));
+      // Si la API agrega una portada conjunta, se conserva esa portada.
+      if (!widow || !kiriko || offer.image !== items[0].image ||
+          !items.every(item => typeof item.image === 'string' && /^https:\/\//i.test(item.image))) return '';
+      const extras = items.filter(item => item !== widow && item !== kiriko);
+      const itemImage = item =>
+        `<img src="${escaparHtml(item.image)}" alt="${escaparHtml(item.name || '')}" title="${escaparHtml(item.name || '')}" loading="lazy">`;
+      return `<div class="fn-bundle-composition">
+        <div class="fn-bundle-extras">${extras.map(itemImage).join('')}</div>
+        <div class="fn-bundle-characters">${[widow, kiriko].map(itemImage).join('')}</div>
+      </div>`;
+    }
+
+    function renderFortniteOfferCard(offer) {
+      const card = document.createElement('article');
+      card.className = `fn-card${offer.giftable ? '' : ' not-giftable'}`;
+
+      const color1 = fnColor(offer.colors && offer.colors.color1, '#432a78');
+      const color3 = fnColor(offer.colors && offer.colors.color3, '#160d2d');
+      card.style.setProperty('--fn-color1', color1);
+      card.style.setProperty('--fn-color3', color3);
+
+      const discounted =
+        Number(offer.discountGcoins) > 0 &&
+        Number(offer.regularPriceGcoins) > Number(offer.finalPriceGcoins);
+
+      const lastDay = fnEsUltimoDia(offer.outDate);
+
+      let badge = '';
+      if (discounted) {
+        badge = `<span class="fn-card-badge">${Number(offer.discountGcoins).toLocaleString()} G DE DESCUENTO</span>`;
+      } else if (lastDay) {
+        badge = '<span class="fn-card-badge last-day">ÚLTIMO DÍA</span>';
+      }
+
+      const image = offer.image
+        ? escaparHtml(offer.image)
+        : 'assets/store/fortnite-battle-pass.webp';
+
+      const compositeArt = renderWidowmakerBundleArt(offer);
+
+      const typeLabel = offer.itemCount > 1
+        ? `${offer.itemCount} artículos`
+        : (offer.type || offer.rarity || 'Fortnite');
+
+      const oldPrice = discounted
+        ? `<span class="fn-price-old">${Number(offer.regularPriceGcoins).toLocaleString()} G</span>`
+        : '';
+
+      const costo = Number(offer.finalPriceGcoins);
+      const preparado =
+        fortniteShopData &&
+        fortniteShopData.purchaseReady === true &&
+        offer.purchase &&
+        offer.purchase.productCode &&
+        offer.purchase.priceId;
+
+      let btnText = 'Canjear';
+      let btnDisabled = false;
+
+      if (offer.giftable !== true) {
+        btnText = 'No disponible para regalo';
+        btnDisabled = true;
+      } else if (!preparado) {
+        btnText = 'Preparando canje…';
+        btnDisabled = true;
+      } else if (!usuario) {
+        btnText = '🔒 Inicia sesión';
+        btnDisabled = true;
+      } else if (!Number.isFinite(costo) || saldo < costo) {
+        btnText = 'Saldo insuficiente';
+        btnDisabled = true;
+      }
+
+      card.innerHTML = `
+        <div class="fn-card-image${compositeArt ? ' fn-card-image-composite' : ''}">
+          ${badge}
+          ${compositeArt || `<img src="${image}" alt="${escaparHtml(offer.name)}" loading="lazy"
+               onerror="this.src='assets/store/fortnite-battle-pass.webp'">`}
+        </div>
+        <div class="fn-card-body">
+          <p class="fn-card-name">${escaparHtml(offer.name)}</p>
+          <p class="fn-card-type">${escaparHtml(typeLabel)}</p>
+          <div class="fn-card-price">
+            ${oldPrice}
+            <span class="fn-price-current">${Number(offer.finalPriceGcoins).toLocaleString()} G</span>
+          </div>
+          <button type="button" class="fn-card-btn"${btnDisabled ? ' disabled' : ''}>${btnText}</button>
+        </div>
+      `;
+
+      const buyButton = card.querySelector('.fn-card-btn');
+
+      if (!btnDisabled) {
+        buyButton.addEventListener('click', () => {
+          canjearFortniteOffer(offer, buyButton);
+        });
+      }
+
+      return card;
+    }
+
+    function renderFortniteShop(data) {
+      fortniteShopData = data;
+
+      const root = $('fnShopSections');
+      const count = $('fnOfferCount');
+      const status = $('fnShopStatus');
+
+      count.textContent = `${Number(data.totalOffers || 0).toLocaleString()} ofertas hoy`;
+      status.classList.remove('show');
+      status.textContent = '';
+
+      root.innerHTML = '';
+
+      const sections = Array.isArray(data.sections) ? data.sections : [];
+
+      sections.forEach((section) => {
+        const offers = Array.isArray(section.offers) ? section.offers : [];
+        if (!offers.length) return;
+
+        const sectionEl = document.createElement('section');
+        sectionEl.className = 'fn-section';
+
+        const head = document.createElement('div');
+        head.className = 'fn-section-head';
+        head.innerHTML = `
+          <h3 class="fn-section-title">${escaparHtml(section.name || 'Fortnite')}</h3>
+          <span class="fn-section-count">${offers.length} oferta${offers.length === 1 ? '' : 's'}</span>
+        `;
+
+        const row = document.createElement('div');
+        row.className = 'fn-row';
+
+        offers.forEach((offer) => {
+          row.appendChild(renderFortniteOfferCard(offer));
+        });
+
+        sectionEl.appendChild(head);
+        sectionEl.appendChild(row);
+        root.appendChild(sectionEl);
+      });
+
+      iniciarCountdownFortnite(data.nextRotationAt);
+    }
+
+    async function cargarFortniteShop(force = false) {
+      const status = $('fnShopStatus');
+      status.textContent = 'Cargando tienda de Fortnite…';
+      status.classList.add('show');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/fortnite-shop${force ? `?t=${Date.now()}` : ''}`, {
+          cache: 'no-store',
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data || data.ok !== true) {
+          throw new Error(data && data.error ? data.error : 'No se pudo cargar la tienda');
+        }
+
+        renderFortniteShop(data);
+      } catch (e) {
+        status.textContent = 'La tienda de Fortnite no pudo cargarse en este momento. El resto de Geo Army sigue disponible.';
+        status.classList.add('show');
+      }
+    }
+
+    function aplicarEstadoCompraGcoins() {
+      const section = $('tiComprarGcoins');
+      if (!section) return;
+
+      const habilitado = GCOIN_PAYMENT_LINKS_ENABLED === true;
+      section.dataset.paymentsEnabled = habilitado ? 'true' : 'false';
+
+      const banner = $('tiComprarLockBanner');
+      const sub = $('tiComprarSub');
+      const aviso = $('tiComprarAviso');
+      const seguro = $('tiComprarSeguro');
+
+      if (banner) banner.hidden = habilitado;
+
+      if (sub) {
+        sub.textContent = habilitado
+          ? 'Compra G-Coins directamente con tarjeta. El pago se procesa fuera de Geo Army, en Square.'
+          : 'Estamos restaurando el método de pago. Los paquetes volverán a estar disponibles en cuanto se reactive.';
+      }
+
+      if (aviso) {
+        aviso.textContent = habilitado
+          ? '⚠️ Ingresa correctamente tu Twitch username durante el pago. Los G-Coins se acreditan después de verificar el pago.'
+          : '⚠️ No realices pagos mediante enlaces anteriores mientras aparezca este aviso.';
+      }
+
+      if (seguro) {
+        seguro.textContent = habilitado
+          ? '🔒 Pago seguro procesado por Square.'
+          : 'Los paquetes y precios se mantienen visibles solo como referencia.';
+      }
+
+      section.querySelectorAll('.ti-comprar-btn[data-payment-url]').forEach((btn) => {
+        const url = btn.dataset.paymentUrl;
+
+        if (habilitado) {
+          btn.href = url;
+          btn.target = '_blank';
+          btn.rel = 'noopener noreferrer';
+          btn.textContent = 'Comprar';
+          btn.classList.remove('is-disabled');
+          btn.removeAttribute('aria-disabled');
+          btn.removeAttribute('tabindex');
+        } else {
+          btn.removeAttribute('href');
+          btn.removeAttribute('target');
+          btn.removeAttribute('rel');
+          btn.textContent = '🔒 Bloqueado';
+          btn.classList.add('is-disabled');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.setAttribute('tabindex', '-1');
+        }
+      });
+    }
 
     function authHeaders() {
       return { Authorization: `Bearer ${twitchAccessToken}` };
@@ -677,8 +2222,13 @@
       const res = await fetch(`${API_BASE}/api/saldo`, { headers: authHeaders() });
       const data = await res.json();
       saldo = data.oro;
+      rankCode = data.rankCode ?? null;
+      rankName = data.rankName ?? null;
+      const rankSortOrderNumero = data.rankSortOrder == null ? NaN : Number(data.rankSortOrder);
+      rankSortOrder = Number.isFinite(rankSortOrderNumero) ? rankSortOrderNumero : null;
       $('tiSaldoValor').textContent = saldo;
       renderCatalogo();
+      if (fortniteShopData) renderFortniteShop(fortniteShopData);
     }
 
     async function cargarCatalogo() {
@@ -726,6 +2276,81 @@
       return `<img src="${ruta}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='';"><span class="emoji" style="display:none;">${fallback}</span>`;
     }
 
+    function minRankSortOrderValido(item) {
+      if (!item || item.minRankSortOrder == null || !item.minRankName) return null;
+      const n = Number(item.minRankSortOrder);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function estadoRequisitoRango(item) {
+      const requerido = minRankSortOrderValido(item);
+      if (requerido === null) return null;
+      if (!usuario) return 'neutral';
+      if (!Number.isFinite(rankSortOrder)) return 'blocked';
+      return rankSortOrder >= requerido ? 'ok' : 'blocked';
+    }
+
+    function requisitoRangoHtml(item, contexto = 'card') {
+      const estado = estadoRequisitoRango(item);
+      if (!estado) return '';
+      const base = contexto === 'featured'
+        ? 'ti-feat-rank'
+        : contexto === 'modal'
+          ? 'ti-modal-rank'
+          : 'ti-card2-rank';
+      return `<p class="${base} ${base}-${estado}">🔒 Requiere ${item.minRankName}</p>`;
+    }
+
+    function descripcionCardHtml(item) {
+      const descripcion = item.descripcion || '';
+      const esFortniteGift = typeof item.id === 'string' && item.id.startsWith('fortnite-gift-');
+      if (!esFortniteGift) {
+        return `<p class="ti-card2-desc">${descripcion}</p>`;
+      }
+      return `
+        <div class="ti-card2-desc-wrap">
+          <p class="ti-card2-desc ti-card2-desc-clamped">${descripcion}</p>
+          <button type="button" class="ti-details-btn">Ver detalles</button>
+        </div>
+      `;
+    }
+
+    let ultimoFocoDetalles = null;
+
+    function abrirDetalles(item) {
+      const modal = $('tiDetailsModal');
+      const body = $('tiDetailsBody');
+      if (!modal || !body) return;
+
+      ultimoFocoDetalles = document.activeElement;
+      body.innerHTML = `
+        <div class="ti-modal-product">
+          <div class="ti-modal-icon">${iconoHtml(item)}</div>
+          <h2 id="tiDetailsTitle" class="ti-modal-title">${item.nombre}</h2>
+          ${requisitoRangoHtml(item, 'modal')}
+          <p class="ti-modal-desc">${item.descripcion || ''}</p>
+          <div class="ti-modal-price"><img src="gcoin-icon.png" class="ti-coin-icon" alt="G-coin"/> ${item.costo.toLocaleString()} G</div>
+        </div>
+      `;
+
+      modal.hidden = false;
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('ti-modal-open');
+      $('tiDetailsClose')?.focus();
+    }
+
+    function cerrarDetalles() {
+      const modal = $('tiDetailsModal');
+      if (!modal || modal.hidden) return;
+      modal.hidden = true;
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('ti-modal-open');
+      if (ultimoFocoDetalles && typeof ultimoFocoDetalles.focus === 'function') {
+        ultimoFocoDetalles.focus();
+      }
+      ultimoFocoDetalles = null;
+    }
+
     // Destacados: vitrina editorial de hasta 3 productos "popular", puramente
     // informativa (no repite la lógica de habilitado/saldo/stock -- el
     // canje real de cada producto sigue viviendo únicamente en su card del
@@ -755,6 +2380,7 @@
               </div>
             </div>
             <p class="ti-feat-desc">${item.descripcion || ''}</p>
+            ${requisitoRangoHtml(item, 'featured')}
             <div class="ti-feat-bottom">
               <span class="ti-feat-price"><img src="gcoin-icon.png" class="ti-coin-icon" alt="G-coin"/> ${item.costo.toLocaleString()} G</span>
               <a class="ti-feat-link" href="#tiGrid">Ver en catálogo ↓</a>
@@ -791,8 +2417,13 @@
         // sería un cupo global que ya no existe. Solo el stock (dato
         // global real) puede deshabilitar la card desde el frontend.
         const agotadoStock = item.stock === 0;
-        const puedeCanjear = usuario && saldo >= item.costo && !agotadoStock;
-        const saldoInsuficiente = !!usuario && !agotadoStock && saldo < item.costo;
+        const rangoMinimo = minRankSortOrderValido(item);
+        const requiereRango = rangoMinimo !== null;
+        const rangoNoDisponible = !!usuario && requiereRango && !Number.isFinite(rankSortOrder);
+        const rangoInsuficiente = !!usuario && requiereRango && Number.isFinite(rankSortOrder) && rankSortOrder < rangoMinimo;
+        const bloqueadoPorRango = rangoNoDisponible || rangoInsuficiente;
+        const puedeCanjear = !!usuario && !agotadoStock && !bloqueadoPorRango && saldo >= item.costo;
+        const saldoInsuficiente = !!usuario && !agotadoStock && !bloqueadoPorRango && saldo < item.costo;
         const esMensual = item.limiteMensualPorUsuario === true || item.limiteMensual != null;
         const cat = CATEGORIAS[item.categoria] || { label: item.categoria || '', accent: '#9147ff' };
         const accent = item.popular ? '#ffd23f' : cat.accent;
@@ -808,6 +2439,10 @@
         let btnTexto = 'Canjear';
         if (!usuario) { estado = 'login'; btnTexto = '🔒 Inicia sesión'; }
         else if (agotadoStock) { estado = 'soon'; btnTexto = 'Agotado'; }
+        else if (bloqueadoPorRango) {
+          estado = 'rank';
+          btnTexto = rangoNoDisponible ? 'Rango requerido' : '🔒 Rango insuficiente';
+        }
         else if (saldoInsuficiente) { estado = 'low'; btnTexto = 'Saldo insuficiente'; }
 
         const card = document.createElement('div');
@@ -821,13 +2456,19 @@
           </div>
           <div class="ti-card2-iconwrap">${iconoHtml(item)}</div>
           <p class="ti-card2-nombre">${item.nombre}</p>
-          <p class="ti-card2-desc">${item.descripcion || ''}</p>
+          ${descripcionCardHtml(item)}
+          ${requisitoRangoHtml(item)}
           <hr class="ti-card2-divider">
           <div class="ti-card2-costo"><img src="gcoin-icon.png" class="ti-coin-icon" alt="G-coin"/> ${item.costo.toLocaleString()} G</div>
           ${disponibilidad ? `<p class="ti-card2-disponible"><span class="dot"></span>${disponibilidad}</p>` : ''}
           <button class="ti-card2-btn" ${puedeCanjear ? '' : 'disabled'}>${btnTexto}</button>
         `;
-        card.querySelector('button').addEventListener('click', () => canjear(item));
+        const canjearBtn = card.querySelector('.ti-card2-btn');
+        if (canjearBtn) canjearBtn.addEventListener('click', () => canjear(item));
+
+        const detallesBtn = card.querySelector('.ti-details-btn');
+        if (detallesBtn) detallesBtn.addEventListener('click', () => abrirDetalles(item));
+
         grid.appendChild(card);
       });
     }
@@ -925,6 +2566,16 @@
       }
     }
 
+    $('tiDetailsClose')?.addEventListener('click', cerrarDetalles);
+    $('tiDetailsModal')?.addEventListener('click', (event) => {
+      if (event.target && event.target.hasAttribute('data-ti-modal-close')) {
+        cerrarDetalles();
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') cerrarDetalles();
+    });
+
     document.querySelectorAll('.ti-filtro-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.ti-filtro-btn').forEach((b) => b.classList.remove('active'));
@@ -934,7 +2585,292 @@
       });
     });
 
+
+    let fnReviewRating = 5;
+    let fnReviewClient = null;
+    let fnEligibleReviews = [];
+
+    function fnCommunityEsc(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function fnCommunityDate(value) {
+      if (!value) return '';
+      try {
+        return new Date(value).toLocaleDateString('es-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      } catch {
+        return '';
+      }
+    }
+
+    function renderFortniteDeliveries(rows) {
+      const root = $('fnRecentDeliveries');
+      if (!root) return;
+
+      if (!Array.isArray(rows) || !rows.length) {
+        root.innerHTML = '<div class="fn-community-empty">Todavía no hay entregas públicas para mostrar.</div>';
+        return;
+      }
+
+      root.innerHTML = rows.map((row) => {
+        const image = row.product_image
+          ? fnCommunityEsc(row.product_image)
+          : 'assets/store/fortnite-battle-pass.webp';
+
+        const user = row.display_name || row.twitch_login || 'Miembro';
+
+        return `
+          <article class="fn-delivery-card">
+            <img class="fn-delivery-img" src="${image}" alt="" loading="lazy"
+                 onerror="this.src='assets/store/fortnite-battle-pass.webp'">
+            <div>
+              <div class="fn-delivery-name">${fnCommunityEsc(row.product_name || 'Regalo Fortnite')}</div>
+              <div class="fn-delivery-user">Entregado a ${fnCommunityEsc(user)}</div>
+              <div class="fn-delivery-date">✓ Entregado · ${fnCommunityEsc(fnCommunityDate(row.delivered_at))}</div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderFortniteReviews(rows) {
+      const root = $('fnVerifiedReviews');
+      if (!root) return;
+
+      if (!Array.isArray(rows) || !rows.length) {
+        root.innerHTML = '<div class="fn-community-empty">Todavía no hay reseñas aprobadas.</div>';
+        return;
+      }
+
+      root.innerHTML = rows.map((row) => {
+        const rating = Math.max(1, Math.min(5, Number(row.rating) || 5));
+        const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+        const avatar = row.avatar_url
+          ? fnCommunityEsc(row.avatar_url)
+          : 'logo.png';
+        const productImage = row.product_image
+          ? fnCommunityEsc(row.product_image)
+          : 'assets/store/fortnite-battle-pass.webp';
+
+        return `
+          <article class="fn-review-card">
+            <div class="fn-review-card-top">
+              <img class="fn-review-avatar" src="${avatar}" alt="" loading="lazy"
+                   onerror="this.src='logo.png'">
+              <div>
+                <div class="fn-review-user">${fnCommunityEsc(row.display_name || row.twitch_login || 'Miembro')}</div>
+                <div class="fn-review-login">${row.twitch_login ? '@' + fnCommunityEsc(row.twitch_login) : ''}</div>
+              </div>
+            </div>
+
+            <div class="fn-review-stars-display" aria-label="${rating} de 5 estrellas">${stars}</div>
+            <div class="fn-review-copy">“${fnCommunityEsc(row.review_text || '')}”</div>
+
+            <div class="fn-review-product">
+              <img src="${productImage}" alt="" loading="lazy"
+                   onerror="this.src='assets/store/fortnite-battle-pass.webp'">
+              <div>
+                <div>${fnCommunityEsc(row.product_name || 'Regalo Fortnite')}</div>
+                <span class="fn-verified-chip" style="margin-top:5px;">✓ CANJE VERIFICADO</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function setFnReviewStars(rating) {
+      fnReviewRating = Math.max(1, Math.min(5, Number(rating) || 5));
+      document.querySelectorAll('#fnReviewStars button').forEach((btn) => {
+        btn.classList.toggle(
+          'active',
+          Number(btn.dataset.rating) <= fnReviewRating
+        );
+      });
+    }
+
+    function renderFnReviewEligibility(rows) {
+      fnEligibleReviews = Array.isArray(rows) ? rows : [];
+
+      const composer = $('fnReviewComposer');
+      const statusOnly = $('fnReviewStatusOnly');
+      const select = $('fnReviewFulfillment');
+
+      if (!composer || !statusOnly || !select) return;
+
+      const canSubmit = fnEligibleReviews.filter((row) =>
+        !row.existing_review_status ||
+        row.existing_review_status === 'rejected'
+      );
+
+      const pending = fnEligibleReviews.filter((row) =>
+        row.existing_review_status === 'pending'
+      );
+
+      const approved = fnEligibleReviews.filter((row) =>
+        row.existing_review_status === 'approved'
+      );
+
+      if (canSubmit.length) {
+        select.innerHTML = canSubmit.map((row) => `
+          <option value="${fnCommunityEsc(row.fulfillment_id)}">
+            ${fnCommunityEsc(row.product_name || 'Regalo Fortnite')}
+          </option>
+        `).join('');
+
+        composer.hidden = false;
+        statusOnly.hidden = true;
+        setFnReviewStars(5);
+        return;
+      }
+
+      composer.hidden = true;
+
+      if (pending.length) {
+        statusOnly.textContent = 'Tu reseña está en revisión. Cuando sea aprobada aparecerá públicamente aquí.';
+        statusOnly.hidden = false;
+        return;
+      }
+
+      if (approved.length) {
+        statusOnly.textContent = 'Gracias por tu reseña. Tu canje verificado ya forma parte de la comunidad Geo Army.';
+        statusOnly.hidden = false;
+        return;
+      }
+
+      statusOnly.hidden = true;
+    }
+
+    async function cargarComunidadFortnite() {
+      const client =
+        window.GeoArmyAccount &&
+        window.GeoArmyAccount.client
+          ? window.GeoArmyAccount.client
+          : null;
+
+      if (!client) return;
+      fnReviewClient = client;
+
+      try {
+        const [deliveriesRes, reviewsRes] = await Promise.all([
+          client.rpc('public_fortnite_deliveries_v1', { p_limit: 8 }),
+          client.rpc('public_fortnite_reviews_v1', { p_limit: 12 }),
+        ]);
+
+        if (!deliveriesRes.error) {
+          renderFortniteDeliveries(deliveriesRes.data || []);
+        }
+
+        if (!reviewsRes.error) {
+          renderFortniteReviews(reviewsRes.data || []);
+        }
+      } catch (e) {
+        console.warn('[FORTNITE COMMUNITY] No se pudo cargar contenido público', e);
+      }
+
+      try {
+        const sessionRes = await client.auth.getSession();
+        const session =
+          sessionRes &&
+          sessionRes.data &&
+          sessionRes.data.session;
+
+        if (!session) {
+          renderFnReviewEligibility([]);
+          return;
+        }
+
+        const eligibleRes = await client.rpc('my_eligible_fortnite_reviews_v1');
+
+        if (eligibleRes.error) {
+          console.warn('[FORTNITE REVIEWS] No se pudo cargar elegibilidad', eligibleRes.error);
+          return;
+        }
+
+        renderFnReviewEligibility(eligibleRes.data || []);
+      } catch (e) {
+        console.warn('[FORTNITE REVIEWS] Error cargando elegibilidad', e);
+      }
+    }
+
+    async function enviarResenaFortnite() {
+      const submit = $('fnReviewSubmit');
+      const select = $('fnReviewFulfillment');
+      const text = $('fnReviewText');
+      const formMsg = $('fnReviewFormMsg');
+
+      if (!fnReviewClient || !submit || !select || !text || !formMsg) return;
+
+      const fulfillmentId = select.value;
+      const reviewText = text.value.trim();
+
+      if (!fulfillmentId) {
+        formMsg.textContent = 'Selecciona un regalo entregado.';
+        return;
+      }
+
+      if (reviewText.length < 3 || reviewText.length > 500) {
+        formMsg.textContent = 'La reseña debe tener entre 3 y 500 caracteres.';
+        return;
+      }
+
+      submit.disabled = true;
+      formMsg.textContent = 'Enviando reseña…';
+
+      try {
+        const res = await fnReviewClient.rpc('submit_my_fortnite_review_v1', {
+          p_fulfillment_id: fulfillmentId,
+          p_rating: fnReviewRating,
+          p_review_text: reviewText,
+        });
+
+        if (res.error) {
+          console.warn('[FORTNITE REVIEWS] Error enviando reseña', res.error);
+          formMsg.textContent = 'No se pudo enviar la reseña. Intenta nuevamente.';
+          return;
+        }
+
+        text.value = '';
+        formMsg.textContent = '✓ Reseña enviada. Está pendiente de aprobación.';
+        await cargarComunidadFortnite();
+      } catch (e) {
+        console.warn('[FORTNITE REVIEWS] Excepción enviando reseña', e);
+        formMsg.textContent = 'No se pudo enviar la reseña. Intenta nuevamente.';
+      } finally {
+        submit.disabled = false;
+      }
+    }
+
+    function configurarResenasFortnite() {
+      document.querySelectorAll('#fnReviewStars button').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          setFnReviewStars(Number(btn.dataset.rating));
+        });
+      });
+
+      $('fnReviewSubmit')?.addEventListener('click', enviarResenaFortnite);
+
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(cargarComunidadFortnite, 0);
+      });
+    }
+
+    configurarResenasFortnite();
+
     async function init() {
+      aplicarEstadoCompraGcoins();
+      configurarPestanasTienda();
+      configurarFortniteIdentidad();
+      cargarFortniteShop();
       loginBtn.addEventListener('click', pedirLogin);
 
       // Revisar si venimos de regreso del login (token en el hash de la URL)
@@ -960,6 +2896,10 @@
     init();
   })();
   </script>
+  <script src="lib/supabase.min.js"></script>
+  <script src="js/geoarmy-config.js"></script>
   <script src="js/premium.js"></script>
+  <script src="js/geoarmy-ranks.js"></script>
+  <script src="js/geoarmy-account.js"></script>
 </body>
 </html>
