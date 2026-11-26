@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Viaje de Santa | GEO ARMY</title>
+<meta name="description" content="El recorrido mundial de Santa por los países de la comunidad GeoArmy.">
+<link rel="preload" href="assets/fonts/cinzel-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/navidad-viaje.css?v=1">
+</head><body>
+<!-- Recursos gráficos vectoriales reutilizables -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+ <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".5" stop-color="#f0bf5a"/><stop offset="1" stop-color="#b97d22"/></linearGradient>
+ <linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0434f"/><stop offset="1" stop-color="#8e1428"/></linearGradient>
+ <linearGradient id="gFur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e2ee"/></linearGradient>
+ <radialGradient id="gGlow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+ <symbol id="ic-flake" viewBox="0 0 40 40"><g stroke="#ffe6a8" stroke-width="2.600" stroke-linecap="round" fill="none"><path d="M20 3v34M5.300 11.500l29.400 17M5.300 28.500l29.400-17"/><path d="M15 6l5 5 5-5M15 34l5-5 5 5M4 17l7 2-2 7M36 23l-7-2 2-7M4 23l7-2-2-7M36 17l-7 2 2 7" stroke-width="2"/></g></symbol>
+ <symbol id="ic-tree" viewBox="0 0 24 24"><path d="M12 2l-5 7h3l-5 7h4l-4 5h14l-4-5h4l-5-7h3z" fill="currentColor"/></symbol>
+ <symbol id="ic-hammer" viewBox="0 0 24 24"><path d="M14 3l7 7-3 3-2-2-9 9-3-3 9-9-2-2z" fill="currentColor"/></symbol>
+ <symbol id="ic-mail" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 7l9 7 9-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-scroll" viewBox="0 0 24 24"><path d="M6 3h12v15a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1h3V6a3 3 0 0 1-1-3zm3 5h6M9 11h6M9 14h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-sleigh" viewBox="0 0 28 24"><path d="M3 9h5l1 7h13l1-5h-4l2-5h3v2h-1l-1.4 3H25l-1 6.5c-.3 1-1 1.500-2 1.500H9.500L8.500 18H4V9z" fill="currentColor"/><path d="M2 21q8 2 20 0q4-1 3-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+ <symbol id="ic-gift" viewBox="0 0 24 24"><path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-3-5-8-3-5 0M12 7c3-5 8-3 5 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.500 7-12a7 7 0 0 0-14 0c0 5.500 7 12 7 12z" fill="currentColor"/><circle cx="12" cy="10" r="2.800" fill="#14070a"/></symbol>
+ <symbol id="ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c1-5 4-7 8-7s7 2 8 7z" fill="currentColor"/></symbol>
+ <symbol id="ic-check" viewBox="0 0 24 24"><path d="M5 12.500l4.500 4.500L19 7.500" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ <symbol id="ic-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 5h14l-3 4 3 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+ <symbol id="ic-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2"/><path d="M7 13h2v2H7zM11 13h2v2h-2zM15 13h2v2h-2z" fill="currentColor"/></symbol>
+ <symbol id="ic-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="currentColor" stroke-width="1.800"/></symbol>
+ <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+ <symbol id="ic-next" viewBox="0 0 24 24"><path d="M4 5l7 7-7 7zM12 5l7 7-7 7z" fill="currentColor"/></symbol>
+ <symbol id="ic-group" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.500" fill="currentColor"/><circle cx="17" cy="9" r="2.800" fill="currentColor"/><path d="M2 20c.5-4.500 3-6.500 7-6.500s6.500 2 7 6.500zM15 14.500c4 0 6 1.500 7 5.500h-5" fill="currentColor"/></symbol>
+ <symbol id="ic-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" fill="currentColor"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+ <!-- Reno (mira a la derecha) -->
+ <symbol id="rd" viewBox="0 0 90 70">
+  <path d="M30 40l-5 22M38 41l-2 22M56 40l7 20M64 38l11 16" stroke="#3a2214" stroke-width="4.500" stroke-linecap="round" fill="none"/>
+  <path d="M33 41l-6 17M60 40l9 16" stroke="#5b371f" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M14 34c-4 2-8 0-10-3 3 0 6-1 8-3z" fill="#5b371f"/>
+  <ellipse cx="38" cy="33" rx="25" ry="11.500" fill="#7a4a29"/><ellipse cx="38" cy="38" rx="22" ry="6" fill="#a9754a" opacity=".55"/>
+  <path d="M52 28c6-4 10-10 12-16l9 3c-1 8-6 14-12 20z" fill="#7a4a29"/>
+  <path d="M60 33c6-2 10-5 11-10" stroke="#f0bf5a" stroke-width="2.500" fill="none"/><path d="M34 22c8 0 14 3 18 8" stroke="#d73a4a" stroke-width="2.600" fill="none"/>
+  <ellipse cx="73" cy="14" rx="9" ry="6.500" fill="#8a5632" transform="rotate(20 73 14)"/><circle cx="81.500" cy="17" r="2.800" fill="#2a1710"/><circle cx="77" cy="11.500" r="1.600" fill="#f6ecd6"/>
+  <path d="M68 9l-3-6 4 3z" fill="#7a4a29"/>
+  <path d="M69 8c-1-5-3-8-4-9M65.500-1l-4 1M66.500 3l-5 1M72 7c1-6 4-9 6-10M75.500-3l4-1" stroke="#d9b078" stroke-width="2" stroke-linecap="round" fill="none" transform="translate(0 6)"/>
+ </symbol>
+</defs></svg>
+
+<canvas id="v-snow" aria-hidden="true"></canvas>
+<div class="v-preview" id="v-preview" hidden role="note"></div>
+
+<div class="v-page" id="v-page">
+ <div class="v-sky" aria-hidden="true"><i class="v-stars"></i><i class="v-stars v-stars--b"></i><i class="v-aurora a1"></i><i class="v-aurora a2"></i><i class="v-aurora a3"></i></div>
+
+ <nav class="v-nav" aria-label="Evento de Navidad">
+  <a class="v-brand" href="index.html" aria-label="GeoArmy, volver al mundo">
+   <svg viewBox="0 0 64 44" aria-hidden="true"><path d="M6 36L2 12l14 12L32 4l16 20L62 12l-4 24z" fill="url(#gGold)" stroke="#7a4d12" stroke-width="2" stroke-linejoin="round"/><rect x="6" y="36" width="52" height="6" rx="2" fill="url(#gGold)" stroke="#7a4d12" stroke-width="2"/><circle cx="32" cy="22" r="4" fill="#d6304a"/></svg>
+   <span><b>GeoArmy</b><small>Evento de Navidad</small></span></a>
+  <ul class="v-menu">
+   <li><a href="navidad-arbol.html"><svg><use href="#ic-tree"/></svg><span>Árbol de<br>Navidad</span></a></li>
+   <li><a href="navidad-taller.html"><svg><use href="#ic-hammer"/></svg><span>Taller<br>de Santa</span></a></li>
+   <li><a href="navidad-cartas.html"><svg><use href="#ic-mail"/></svg><span>Oficina<br>de Correos</span></a></li>
+   <li><a href="navidad-lista.html"><svg><use href="#ic-scroll"/></svg><span>Lista<br>de Santa</span></a></li>
+   <li class="is-current"><a href="navidad-viaje.html" aria-current="page"><svg viewBox="0 0 28 24"><use href="#ic-sleigh"/></svg><span>Viaje<br>de Santa</span></a></li>
+   <li class="is-soon"><span class="v-soon" aria-disabled="true" title="Próximamente"><svg><use href="#ic-gift"/></svg><span>Mi regalo<br>de Navidad</span></span></li>
+  </ul>
+  <a class="v-account" href="mi-geoarmy.html"><svg><use href="#ic-user"/></svg><span>Mi cuenta</span></a>
+ </nav>
+
+ <header class="v-hero">
+  <svg class="v-santa" viewBox="0 0 420 330" aria-hidden="true" focusable="false">
+   <defs><radialGradient id="sFace" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ffd9b8"/><stop offset="1" stop-color="#e3a67f"/></radialGradient>
+   <linearGradient id="sCoat" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8303f"/><stop offset="1" stop-color="#7d1224"/></linearGradient></defs>
+   <path d="M-10 330V250q60-50 150-52l60 28 70 6 30 60v40z" fill="url(#sCoat)"/><path d="M-10 262q80-40 160-44l50 18" fill="none" stroke="url(#gFur)" stroke-width="22" stroke-linecap="round"/>
+   <path d="M120 120q-10 110 60 150q40 20 90 0q60-40 50-150z" fill="url(#gFur)"/>
+   <path d="M118 150q-18 70 30 118q22 22 52 22q40 0 70-30q44-50 24-130q-30 40-60 38q-40 4-62-26q-26 20-54 8z" fill="#fff"/>
+   <path d="M150 188q28 30 62 14q34-16 50 0q-10 30-56 34q-40 0-56-48z" fill="#e6edf6"/>
+   <ellipse cx="200" cy="128" rx="68" ry="66" fill="url(#sFace)"/>
+   <path d="M132 110q12-30 40-28q-6 22-40 28zM268 110q-12-30-40-28q6 22 40 28z" fill="#fff"/>
+   <ellipse cx="156" cy="146" rx="15" ry="10" fill="#ee8a7b" opacity=".6"/><ellipse cx="246" cy="146" rx="15" ry="10" fill="#ee8a7b" opacity=".6"/>
+   <g fill="none" stroke="#8a5b2b" stroke-width="4"><circle cx="170" cy="122" r="19"/><circle cx="230" cy="122" r="19"/><path d="M189 122q11-6 22 0"/></g>
+   <circle cx="170" cy="124" r="5" fill="#1b2a44"/><circle cx="230" cy="124" r="5" fill="#1b2a44"/><path d="M148 100q20-12 40-2M214 98q20-10 40 2" stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none"/>
+   <path d="M196 132q-6 22 4 28q10-6 4-28z" fill="#d9926a"/>
+   <path d="M142 164q30-16 58 2q28-18 58-2q-18 26-58 20q-40 6-58-20z" fill="#fff"/><path d="M178 190q22 20 44 0q-22 10-44 0z" fill="#9c3a3a"/>
+   <path d="M120 100q-6-70 80-84q86 14 80 84q-40-24-80-22q-40-2-80 22z" fill="url(#gRed)"/>
+   <path d="M110 108q50-34 90-30q40-4 90 30q4 22-8 26q-40-26-82-24q-42-2-82 24q-12-4-8-26z" fill="url(#gFur)"/>
+   <path d="M262 30q50 4 66 62q-20-18-52-14z" fill="url(#gRed)"/><circle cx="328" cy="96" r="18" fill="url(#gFur)"/>
+  </svg>
+  <svg class="v-village" viewBox="0 0 360 260" aria-hidden="true" focusable="false">
+   <defs><linearGradient id="vWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a35"/><stop offset="1" stop-color="#4b2c18"/></linearGradient></defs>
+   <circle cx="200" cy="150" r="120" fill="url(#gGlow)" opacity=".35"/>
+   <path d="M-10 262V200q60-30 130-22q50 4 110-8t140 10v82z" fill="#eaf1fa"/><path d="M-10 230q80-22 160-14t200 4v42z" fill="#cfdcec"/>
+   <g><rect x="150" y="120" width="120" height="86" fill="url(#vWall)" stroke="#2a170b" stroke-width="3"/><path d="M138 124l72-70 72 70z" fill="#5a2a1a" stroke="#2a170b" stroke-width="3"/><path d="M136 128q38-14 74-22q36 8 74 22l-6-10q-34-14-68-34q-34 20-68 34z" fill="#f6f9ff"/>
+    <rect x="168" y="138" width="26" height="30" fill="#ffd27a"/><rect x="226" y="138" width="26" height="30" fill="#ffd27a"/><path d="M181 138v30M168 153h26M239 138v30M226 153h26" stroke="#5a3a1a" stroke-width="3"/><rect x="198" y="168" width="24" height="38" rx="3" fill="#3a1d0e"/>
+    <rect x="232" y="46" width="18" height="30" fill="#5a2a1a" stroke="#2a170b" stroke-width="2"/><rect x="228" y="40" width="26" height="9" fill="#f6f9ff"/></g>
+   <g><rect x="70" y="150" width="62" height="56" fill="url(#vWall)" stroke="#2a170b" stroke-width="3"/><path d="M62 154l39-40 39 40z" fill="#6a3020" stroke="#2a170b" stroke-width="3"/><path d="M60 158q22-8 41-18q19 10 41 18l-4-7q-18-8-37-24q-19 16-37 24z" fill="#f6f9ff"/><rect x="88" y="166" width="22" height="22" fill="#ffd27a"/></g>
+   <g><path d="M300 210V168q0-14 10-14t10 14" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M300 210V168q0-14 10-14t10 14" stroke="#d6304a" stroke-width="9" stroke-dasharray="8 8" fill="none"/></g>
+   <g><path d="M30 214l22-58 22 58z" fill="#17483a"/><path d="M36 190l16-40 16 40z" fill="#1d5a48"/><path d="M30 214q22-10 44 0l-4-9q-18-6-36 0z" fill="#f6f9ff"/></g>
+   <g fill="#ffd27a"><circle cx="152" cy="118" r="2.500"/><circle cx="170" cy="112" r="2.500"/><circle cx="190" cy="108" r="2.500"/><circle cx="226" cy="108" r="2.500"/><circle cx="246" cy="112" r="2.500"/><circle cx="262" cy="118" r="2.500"/></g>
+  </svg>
+  <div class="v-hero-text">
+   <h1><svg class="v-flake" aria-hidden="true"><use href="#ic-flake"/></svg>Viaje de Santa<svg class="v-flake" aria-hidden="true"><use href="#ic-flake"/></svg></h1>
+   <p class="v-ribbon"><span>El recorrido mundial de Santa</span></p>
+   <p class="v-lead">Santa se prepara para recorrer el mundo y visitar los países de la comunidad GeoArmy.</p>
+  </div>
+  <div class="v-polesign" aria-hidden="true">Polo Norte</div>
+ </header>
+
+ <ol class="v-steps" id="v-steps" aria-label="Fases del viaje">
+  <li data-step="0"><svg><use href="#ic-check"/></svg><div><b>Preparación del viaje</b><small></small></div></li>
+  <li data-step="1"><svg viewBox="0 0 28 24"><use href="#ic-sleigh"/></svg><div><b>Ruta navideña</b><small></small></div></li>
+  <li data-step="2"><svg><use href="#ic-gift"/></svg><div><b>Llegada a destinos</b><small></small></div></li>
+  <li data-step="3"><svg><use href="#ic-flag"/></svg><div><b>Entrega completada</b><small></small></div></li>
+ </ol>
+
+ <main class="v-stage" id="v-stage">
+  <div class="v-mapcol">
+   <p class="v-count" id="v-count" role="timer" aria-live="off" hidden></p>
+   <div class="v-mapscroll" id="v-mapscroll">
+    <div class="v-map" id="v-map">
+     <svg class="v-svg" id="v-svg" viewBox="0 0 1440 694" aria-hidden="true" focusable="false">
+      <defs><filter id="fBlur" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.600"/></filter>
+       <radialGradient id="gOcean" cx=".45" cy=".35" r=".85"><stop offset="0" stop-color="#16356a"/><stop offset=".6" stop-color="#0a1a3a"/><stop offset="1" stop-color="#050b1c"/></radialGradient>
+       <linearGradient id="gLand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a3560"/><stop offset="1" stop-color="#0d1f40"/></linearGradient></defs>
+      <rect width="1440" height="694" fill="url(#gOcean)"/>
+      <g id="v-grat" class="v-grat"></g>
+      <path id="v-land-glow" class="v-land-glow"/>
+      <path id="v-land" class="v-land"/>
+      <path id="v-borders" class="v-borders"/>
+      <g id="v-cn"></g>
+      <g class="v-city-glow" filter="url(#fBlur)"><path id="v-cb-g" class="cb"/><path id="v-cm-g" class="cm"/></g>
+      <g class="v-city"><path id="v-cm" class="cm"/><path id="v-cb" class="cb"/></g>
+      <g id="v-route"></g>
+      <g id="v-lines"></g>
+     </svg>
+     <canvas id="v-fx" class="v-fx" aria-hidden="true"></canvas>
+     <div id="v-pins" class="v-pins"></div>
+     <div class="v-sleigh" id="v-sleigh" aria-hidden="true">
+      <svg viewBox="0 0 330 120" focusable="false">
+       <ellipse cx="150" cy="70" rx="150" ry="46" fill="url(#gGlow)" opacity=".45"/>
+       <g class="sl-bob">
+        <path d="M130 70h58" stroke="#f0bf5a" stroke-width="2.500"/>
+        <use href="#rd" x="222" y="14" width="96" height="75"/><use href="#rd" x="170" y="22" width="90" height="70"/><use href="#rd" x="122" y="30" width="86" height="66"/>
+        <path d="M120 58C140 40 170 38 226 40" stroke="#f0bf5a" stroke-width="1.600" fill="none" opacity=".9"/>
+        <path d="M6 96Q60 108 116 94q14-4 14-20" fill="none" stroke="url(#gGold)" stroke-width="5" stroke-linecap="round"/><path d="M130 74q6-10-2-20" fill="none" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M22 98v-14M62 100v-16M104 98v-14" stroke="#f0bf5a" stroke-width="3.500"/>
+        <path d="M10 64Q8 44 24 40H92Q108 42 112 56L124 74Q90 90 30 88Q12 86 10 64z" fill="url(#gRed)" stroke="#5a0f1a" stroke-width="2"/>
+        <path d="M14 72Q70 84 120 72" fill="none" stroke="url(#gGold)" stroke-width="4"/>
+        <ellipse cx="30" cy="38" rx="20" ry="17" fill="#8a5a33"/><path d="M18 30q12-14 26 0" fill="#a8743f"/><rect x="22" y="22" width="14" height="14" rx="2" fill="#d6304a"/><path d="M29 22v14" stroke="#f0bf5a" stroke-width="2.500"/>
+        <circle cx="66" cy="44" r="19" fill="url(#gRed)" stroke="#5a0f1a" stroke-width="1.500"/><path d="M52 48q14 20 28 0" fill="url(#gFur)"/>
+        <circle cx="70" cy="22" r="11" fill="#ffd9b8"/><path d="M58 28q12 18 24 0q-4 14-12 14t-12-14z" fill="url(#gFur)"/><path d="M58 22q2-18 14-18q10 2 10 18z" fill="url(#gRed)"/><rect x="57" y="20" width="26" height="6" rx="3" fill="url(#gFur)"/><circle cx="82" cy="6" r="5" fill="#fff"/>
+        <path d="M84 48l30 4" stroke="#f0bf5a" stroke-width="2.500" stroke-linecap="round"/>
+       </g>
+      </svg>
+     </div>
+     <div class="v-pop" id="v-pop" role="dialog" aria-live="polite" hidden></div>
+    </div>
+   </div>
+   <p class="v-hint" id="v-hint">Desliza el mapa para ver todo el recorrido</p>
+   <ul class="v-chips" id="v-chips" aria-label="Destinos"></ul>
+   <div class="v-sign" aria-hidden="false">
+    <svg class="v-compass" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="56" fill="#3a2a16" stroke="#c99a55" stroke-width="5"/><circle cx="60" cy="60" r="44" fill="#d9c08a" stroke="#7a5a2a" stroke-width="2"/><path d="M60 14l10 46-10 46-10-46z" fill="url(#gGold)" stroke="#7a4d12" stroke-width="2"/><path d="M14 60l46-10 46 10-46 10z" fill="#b97d22" opacity=".7"/><circle cx="60" cy="60" r="6" fill="#f6e3a8"/></svg>
+    <div class="v-wood"><p><svg><use href="#ic-cal"/></svg><span><small>Fecha del recorrido:</small><b>24 de diciembre</b></span></p><p><svg><use href="#ic-globe"/></svg><span><small>Destinos en la ruta:</small><b id="v-ncount">15 países</b></span></p></div>
+   </div>
+   <button class="v-cta" id="v-cta" type="button"><svg viewBox="0 0 120 110" aria-hidden="true"><use href="#ic-gift" /></svg><span><b>Sigue el viaje de Santa</b><small id="v-cta-sub">y descubre cuándo llegará a tu país.</small></span></button>
+  </div>
+
+  <div class="v-side">
+   <aside class="v-panel" id="p-trip" aria-labelledby="h-trip">
+    <h2 id="h-trip"><svg><use href="#ic-pin"/></svg>Estado del viaje</h2>
+    <div class="v-now"><img id="t-flag" alt="" width="64" height="48" hidden><span class="v-now-pole" id="t-pole" hidden><svg><use href="#ic-sleigh"/></svg></span><div><small id="t-now-l">Santa está ahora en:</small><b id="t-now">—</b></div></div>
+    <dl class="v-rows">
+     <div><dt><svg><use href="#ic-next"/></svg>Próximo destino:</dt><dd id="t-next">—</dd></div>
+     <div><dt><svg><use href="#ic-group"/></svg>Destinos visitados:</dt><dd id="t-visited">—</dd></div>
+     <div><dt><svg><use href="#ic-clock"/></svg><span id="t-time-l">Tiempo restante:</span></dt><dd id="t-time">—</dd></div>
+     <div><dt><svg><use href="#ic-sleigh" viewBox="0 0 28 24"/></svg>Estado del viaje:</dt><dd><span class="v-pill" id="t-state">—</span></dd></div>
+    </dl>
+    <p class="v-note" id="t-note" hidden></p>
+   </aside>
+   <aside class="v-panel" id="p-me" aria-labelledby="h-me">
+    <h2 id="h-me"><svg><use href="#ic-user"/></svg>Tu estado navideño</h2>
+    <dl class="v-rows">
+     <div><dt><img id="m-flag" alt="" width="38" height="28" hidden><svg id="m-flag-ic"><use href="#ic-flag"/></svg>Tu país registrado:</dt><dd id="m-country">—</dd></div>
+     <div><dt><svg><use href="#ic-check"/></svg>Elegibilidad:</dt><dd id="m-elig">—</dd></div>
+     <div><dt><svg><use href="#ic-sleigh" viewBox="0 0 28 24"/></svg>Santa pasará por:</dt><dd id="m-route">—</dd></div>
+     <div><dt><svg><use href="#ic-clock"/></svg>Estado:</dt><dd id="m-state">—</dd></div>
+    </dl>
+    <p class="v-gift" id="m-note"><svg><use href="#ic-gift"/></svg><span>El resultado final de tu regalo se revelará cuando Santa complete su recorrido.</span></p>
+    <button class="v-login" id="v-login" type="button" hidden>Iniciar sesión con Twitch</button>
+   </aside>
+  </div>
+ </main>
+
+ <div class="v-ground" aria-hidden="true"><svg class="v-pine v-pine--l" viewBox="0 0 220 360"><use href="#pine"/></svg><svg class="v-pine v-pine--r" viewBox="0 0 220 360"><use href="#pine"/></svg><span class="v-snowbank"></span></div>
+ <footer class="v-foot">GEO ARMY · Navidad 2026 · El recorrido no entrega ni revela premios.</footer>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <symbol id="pine" viewBox="0 0 220 360"><rect x="100" y="320" width="20" height="40" fill="#3a2412"/>
+  <path d="M110 20L40 120h30L20 200h40L10 290h200L160 200h40L150 120h30z" fill="#0f3a2f"/><path d="M110 20L70 120h20L50 200h30L40 290h60z" fill="#165244"/>
+  <path d="M110 20l-30 50q30 10 60 0zM60 130q50 16 100 0l-10-10h-80zM38 210q72 20 144 0l-12-12h-120zM20 296q90 22 180 0l-10-14H30z" fill="#f4f8ff"/>
+  <g fill="#ffd27a"><circle cx="86" cy="110" r="3"/><circle cx="130" cy="150" r="3"/><circle cx="70" cy="190" r="3"/><circle cx="150" cy="226" r="3"/><circle cx="96" cy="262" r="3"/></g><g fill="#e0344f"><circle cx="124" cy="104" r="3.500"/><circle cx="90" cy="162" r="3.500"/><circle cx="140" cy="200" r="3.500"/><circle cx="60" cy="250" r="3.500"/></g></symbol>
+</defs></svg>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js"></script>
+<script src="js/geoarmy-config.js"></script>
+<script src="js/navidad-viaje-geo.js?v=1"></script>
+<script src="js/navidad-viaje.js?v=1"></script>
+</body></html>
