@@ -51,6 +51,13 @@
   var host = document.getElementById('gxTop');
   if (!host) { host = document.createElement('div'); host.id = 'gxTop'; document.body.insertBefore(host, document.body.firstChild); }
   host.className = 'gxm-top'; host.innerHTML = html;
+  // Adornos navideños del perfil (módulo existente, el mismo que cargan las demás páginas vía geoarmy-season.js): solo visual.
+  try {
+    var me = document.currentScript || document.querySelector('script[src*="navidad-nav.js"]');
+    if (me && me.src && !document.querySelector('script[src*="navidad-perfiles-2026.js"]')) {
+      var ps = document.createElement('script'); ps.src = me.src.replace(/js\/navidad-nav\.js.*$/, '') + 'js/navidad-perfiles-2026.js?v=3'; ps.async = true; document.head.appendChild(ps);
+    }
+  } catch (e) { /* el adorno nunca debe impedir el uso de la página */ }
   // la pestaña activa queda visible en el desplazamiento horizontal (sin mover la página)
   var list = host.querySelector('.gxn-tabs'), act = host.querySelector('.is-current');
   function center() { if (list && act) list.scrollLeft = Math.max(0, act.offsetLeft - (list.clientWidth - act.offsetWidth) / 2); }
