@@ -40,7 +40,10 @@
 .phases{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:18px}.phase{border:1px solid var(--line);border-radius:9px;padding:12px;background:#151721;color:#c8b49c;font-size:12px;min-width:0}.phase b{display:block;color:#e1c49b;font-size:13px}.phase.current{border-color:#e5bd77;background:#4b3328}.phase span{display:block;font-size:11px}.section{margin-top:18px}.leaders{margin:0;padding:0;list-style:none}.leaders li{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);gap:8px}.leaders li:last-child{border:0}.leaders strong{color:var(--gold)}.leaders .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.empty{font-size:12px;color:var(--muted)}footer{text-align:center;padding:20px;border-top:1px solid var(--line);color:#b8a38f;font-size:12px}[hidden]{display:none!important}
 @media(max-width:760px){main{padding:16px 13px 30px}header{padding:12px 13px}.layout{grid-template-columns:minmax(0,1fr)}.phases{grid-template-columns:repeat(2,1fr)}.panel{padding:17px}.w-scene{aspect-ratio:auto;height:172px}.w-table{padding:12px 10px 16px}.opt{min-width:88px;min-height:100px}.opt svg{width:54px;height:54px}.w-focus{width:160px;height:126px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important}}
-</style></head><body>
+</style><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/navidad-perfil.css?v=1">
+<link rel="stylesheet" href="css/navidad-nav.css?v=2">
+</head><body>
 <!-- Recursos gráficos reutilizables (SVG vectorial, sin imágenes externas ni emojis) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
  <linearGradient id="g-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a12"/><stop offset=".55" stop-color="#4b2d1c"/><stop offset="1" stop-color="#5d3922"/></linearGradient>
@@ -66,7 +69,7 @@
  <symbol id="pc-lamp" viewBox="8 52 36 32"><rect x="26" y="74" width="14" height="6" fill="#8a6a20"/><circle cx="24" cy="66" r="12" fill="#ffe08a" stroke="#f0c04f" stroke-width="3"/><circle cx="24" cy="66" r="5" fill="#fffbe0"/></symbol>
 </defs></svg>
 
-<header><a href="index.html"><img src="logo.png" alt="">GEO ARMY</a><a href="index.html"><span>← Volver al mundo</span></a></header>
+<div id="gxTop" class="gxm-top"></div><script src="js/navidad-nav.js?v=2"></script>
 <main><div class="intro"><div class="eyebrow">Mundo 02 · Navidad 2026</div><h1>Taller de Santa</h1><p>Entra al taller y ayuda a los duendes. Cada colaboración cuenta para la lista de Santa.</p></div>
 <div class="layout"><div>
 <section class="workshop" id="factory" aria-label="Interior del taller de Santa">
@@ -126,6 +129,7 @@
 <aside class="panel"><span class="status" id="status">Conectando…</span><div><h2>Tu tarea de hoy</h2><p id="task">Consultando la actividad del taller.</p></div><button class="action" id="login" type="button" hidden>Iniciar sesión con Twitch</button><p class="sub" id="message" role="status">Una colaboración por día, sin coste.</p><button class="refresh" id="refresh" type="button">Actualizar estado</button><div class="metric-grid"><div class="metric"><small>Tus colaboraciones</small><strong id="my-total">—</strong></div><div class="metric"><small>Posición del taller</small><strong id="my-rank">—</strong></div><div class="metric"><small>Colaboraciones totales</small><strong id="total">—</strong></div><div class="metric"><small>Participantes</small><strong id="members">—</strong></div></div><p class="sub">La participación ayuda a mejorar tu posición en la lista de Santa. No otorga XP, G-Coins ni V-Bucks directamente y no garantiza un regalo.</p></aside></div>
 <section class="panel section"><h2>Colaboradores del taller</h2><p class="sub">Top 10 por días de colaboración.</p><ol class="leaders" id="leaders"><li class="empty">Consultando actividad…</li></ol></section></main><footer>GEO ARMY · Navidad 2026</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js"></script><script src="js/geoarmy-config.js"></script>
+<script src="js/geoarmy-ranks.js"></script><script src="js/geoarmy-account.js"></script>
 <script>
 (function(){
  const $=id=>document.getElementById(id),login=$('login'),refresh=$('refresh'),factory=$('factory'),choicesEl=$('choices'),focusEl=$('focus');

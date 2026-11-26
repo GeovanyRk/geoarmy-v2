@@ -1,0 +1,36 @@
+/* GEO ARMY · Navegación navideña compartida (js/navidad-nav.js)
+   Se usa en: navidad-arbol / taller / cartas / lista / viaje. Prefijo gxn- / gxm- para no chocar con los estilos de cada página.
+   La barra original con el perfil real vive arriba (css/navidad-perfil.css + js/geoarmy-account.js). */
+.gxm-top{position:relative;z-index:30;width:100%;max-width:100vw;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4;color:#f6f6f8;text-align:left;
+  --gxn-gold:#f2c35c;--gxn-gold-l:#ffe9a8;--gxn-line:#8a6024}
+/* Barra original GEO ARMY: mismo layout (.v3-nav) sobre fondo oscuro neutro para que se lea igual en las 5 páginas */
+.gxm-top .v3-nav{background:#08080a;border-bottom:1px solid rgba(255,255,255,.07)}
+.gxm-top .v3-nav-inner{padding-bottom:12px}
+.gxm-top .v3-wordmark,.gxm-top .v3-page-links a{letter-spacing:.12em}
+.gxm-top .v3-page-links a{letter-spacing:normal}
+
+/* Barra de navegación del evento */
+.gxn{position:relative;display:flex;align-items:center;gap:10px;min-height:62px;padding:0 22px;background:linear-gradient(#3a0f1c,#1c0911 70%,#12060c);border-bottom:2px solid var(--gxn-line);box-shadow:0 8px 24px #0009}
+.gxn-back{flex:none;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 10px;border-radius:99px;border:1px solid #f2c35c88;background:#ffffff0d;color:var(--gxn-gold-l);font:700 12.5px/1 system-ui,sans-serif;white-space:nowrap;transition:background .2s,border-color .2s}
+.gxn-back:hover{background:#f2c35c22;border-color:#f2c35c}
+.gxn-back svg{width:16px;height:16px;flex:none}
+.gxn-tabs{position:relative;list-style:none;margin:0;padding:0;display:flex;flex:1;justify-content:center;gap:6px;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.gxn-tabs::-webkit-scrollbar{display:none}
+.gxn-tabs li{flex:none}
+.gxn-tabs a,.gxn-soon{display:flex;align-items:center;gap:9px;padding:8px 18px;height:54px;color:#fbe6b8;font:600 13px/1.15 system-ui,sans-serif;border-left:1px solid #ffffff14;transition:background .2s;white-space:nowrap}
+.gxn-tabs svg{width:28px;height:26px;color:#f2c35c;flex:none}
+.gxn-tabs a:hover{background:#ffffff10}
+.gxn-tabs .is-current a{background:linear-gradient(#a8222f,#6a0f1e);border:2px solid #f0c36a;border-radius:0 0 12px 12px;height:62px;margin-top:-4px;padding-top:6px;color:#fff3d4;box-shadow:0 0 22px #e0344f66,inset 0 0 12px #0006}
+.gxn-soon{opacity:.5;cursor:default}
+.gxn a:focus-visible,.gxm-top .v3-nav a:focus-visible{outline:2px solid #fff2bd;outline-offset:3px;border-radius:6px}
+
+@media (max-width:760px){
+  .gxn{padding:0 10px;gap:6px;min-height:56px}
+  .gxn-back{height:36px;padding:0 11px 0 8px;font-size:12px}
+  .gxn-back .t-long{display:none}
+  .gxn-tabs{justify-content:flex-start;scroll-snap-type:x proximity}
+  .gxn-tabs li{scroll-snap-align:center}
+  .gxn-tabs a,.gxn-soon{padding:6px 13px;height:48px;font-size:12px}
+  .gxn-tabs svg{width:22px;height:22px}
+  .gxn-tabs .is-current a{height:56px;margin-top:-4px;padding-top:4px}
+}
