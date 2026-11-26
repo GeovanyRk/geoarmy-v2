@@ -30,7 +30,7 @@ Deno.serve(async (req: Request) => {
     if (typeof user.id !== "string") return reply({status:"login_required"},401);
     // Solo acepta un número de regalo. Nunca acepta user_id, reward, amount o fecha del cliente.
     const body = await req.json().catch(()=>null);
-    if (!body || !Number.isInteger(body.gift) || body.gift<1 || body.gift>5) return reply({status:"invalid_gift"},400);
+    if (!body || !Number.isInteger(body.gift) || body.gift<1 || body.gift>24) return reply({status:"invalid_gift"},400);
     const rpc = await fetch(base+"/rest/v1/rpc/christmas_tree_claim_v1",{
       method:"POST",headers:{apikey:service,Authorization:"Bearer "+service,"Content-Type":"application/json"},
       body:JSON.stringify({p_profile:user.id,p_gift:body.gift}),
