@@ -1,17 +1,97 @@
-/* Apariencias navideñas 2026. Solo presentación; los adornos nunca reciben clics. */
-html[data-ga-profile-christmas="on"] .ga-logged-in { position: relative; isolation: isolate; }
-html[data-ga-profile-christmas="on"] .ga-logged-in::after {
-  content: ""; position: absolute; inset: -18% -4%; z-index: 3; pointer-events: none;
-  background: url('../assets/navidad/perfiles/normal.webp') center / 100% 100% no-repeat;
+/* Apariencias navideñas 2026 (Normal gris · Plus esmeralda · VIP violeta).
+   Solo presentación. Los adornos nunca reciben clics y NUNCA sustituyen estilos existentes:
+   - Barra: el marco va DETRÁS del contenido (z-index:-1 dentro de la barra, que ya aísla su pila), así que corona, placa VIP,
+     foto, punto de conexión, nombre, bandera, rango y racha quedan siempre por encima. Se conservan el borde y el brillo propios.
+   - Tarjeta de Mi Geo Army, podio y filas: los adornos son pseudo-elementos hijos o sombras SUMADAS a las originales; no se
+     reescribe el fondo, el borde ni el brillo de Plus/VIP (css/cosmetics/*.css).
+   Se activa con <html data-ga-profile-christmas="on"> (ver js/navidad-perfiles-2026.js). */
+
+html[data-ga-profile-christmas="on"] {
+  --gnp-snow: #eef5fb;            /* Normal: nieve plateada */
+  --gnp-frost: rgba(226, 239, 246, .55);
 }
-html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-plus::after { background-image: url('../assets/navidad/perfiles/plus.webp'); }
-html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-vip::after { background-image: url('../assets/navidad/perfiles/vip.webp'); }
-html[data-ga-profile-christmas="on"] .ga-logged-in:not(.gcos-vip):not(.gcos-plus) { border-color: #87929d; box-shadow: 0 0 12px rgba(209,226,239,.15); }
-/* Las filas ya usan ::before y ::after: se conserva su geometría y sus capas. */
-html[data-ga-profile-christmas="on"] .rk-row { box-shadow: inset 0 2px 0 rgba(226,239,246,.72); }
-html[data-ga-profile-christmas="on"] .rk-row.gcos-plus { box-shadow: inset 0 2px 0 rgba(137,249,190,.9); }
-html[data-ga-profile-christmas="on"] .rk-row.gcos-vip { box-shadow: inset 0 2px 0 rgba(215,191,255,.9); }
-html[data-ga-profile-christmas="on"] .rk-top-ped { box-shadow: inset 0 3px 0 rgba(240,249,255,.85); }
-html[data-ga-profile-christmas="on"] .mgt-id { box-shadow: inset 0 3px 0 rgba(237,247,255,.75), 0 0 14px rgba(209,226,239,.12); }
-html[data-ga-profile-christmas="on"] .mgt-id.gcos-plus { box-shadow: inset 0 3px 0 rgba(166,255,204,.9), 0 0 16px rgba(45,230,140,.16); }
-html[data-ga-profile-christmas="on"] .mgt-id.gcos-vip { box-shadow: inset 0 3px 0 rgba(230,211,255,.9), 0 0 16px rgba(162,100,255,.18); }
+
+/* ======================= 1) BARRA SUPERIOR (todas las páginas con barra) ======================= */
+html[data-ga-profile-christmas="on"] .ga-logged-in {
+  position: relative; isolation: isolate;
+  --gnp-t: -40%; --gnp-b: -20%; --gnp-l: -6%; --gnp-r: -5%;
+  --gnp-art: url('../assets/navidad/perfiles/normal.webp');
+}
+html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-plus { --gnp-t: -34%; --gnp-b: -28%; --gnp-l: -6%; --gnp-r: -6%; --gnp-art: url('../assets/navidad/perfiles/plus.webp'); }
+html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-vip  { --gnp-t: -44%; --gnp-b: -26%; --gnp-l: -6%; --gnp-r: -6%; --gnp-art: url('../assets/navidad/perfiles/vip.webp'); }
+@media (max-width: 560px) {
+  html[data-ga-profile-christmas="on"] .ga-logged-in { --gnp-t: -34%; }
+  html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-plus { --gnp-t: -30%; }
+  html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-vip { --gnp-t: -34%; }
+}
+@media (max-width: 339px) {   /* la barra pasa a una segunda fila justo debajo del logo: el marco no debe subir hasta él */
+  html[data-ga-profile-christmas="on"] .ga-logged-in,
+  html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-plus,
+  html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-vip { --gnp-t: -18%; }
+}
+html[data-ga-profile-christmas="on"] .ga-logged-in::after {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  top: var(--gnp-t); bottom: var(--gnp-b); left: var(--gnp-l); right: var(--gnp-r);
+  background: var(--gnp-art) center / 100% 100% no-repeat;
+}
+/* Normal: solo el color del borde pasa al gris plata; el brillo original se conserva. Plus/VIP no tocan su borde. */
+html[data-ga-profile-christmas="on"] .ga-logged-in:not(.gcos-vip):not(.gcos-plus) { border-color: #87929d; }
+
+/* ======================= 2) PODIO (ranking): nieve sobre los pedestales ======================= */
+html[data-ga-profile-christmas="on"] .rk-top-card { --gnp-snow: #eef5fb; }
+html[data-ga-profile-christmas="on"] .rk-top-card.gcos-plus { --gnp-snow: #f1fbf6; }
+html[data-ga-profile-christmas="on"] .rk-top-card.gcos-vip { --gnp-snow: #f3eeff; }
+html[data-ga-profile-christmas="on"] .rk-top-ped::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; pointer-events: none; z-index: 1;
+  background:
+    radial-gradient(11px 7px at 11px 0, var(--gnp-snow) 0 62%, transparent 68%) 0 0 / 27px 10px repeat-x,
+    radial-gradient(8px 5px at 7px 0, var(--gnp-snow) 0 62%, transparent 68%) 9px 0 / 19px 8px repeat-x,
+    linear-gradient(var(--gnp-snow), var(--gnp-snow)) 0 0 / 100% 2px no-repeat;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .3));
+}
+/* Brillo de color de la apariencia en la nieve (sutil) */
+html[data-ga-profile-christmas="on"] .rk-top-card.gcos-plus .rk-top-ped::before { filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .3)) drop-shadow(0 0 4px rgba(60, 240, 160, .35)); }
+html[data-ga-profile-christmas="on"] .rk-top-card.gcos-vip .rk-top-ped::before { filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .3)) drop-shadow(0 0 4px rgba(170, 100, 255, .4)); }
+
+/* ======================= 3) FILAS DEL RANKING ======================= */
+/* Línea de nieve en el borde superior. Las sombras ORIGINALES de Plus/VIP (hilos y barra lateral de css/cosmetics/*.css) se repiten
+   aquí a continuación de la línea nueva, para sumarse y no reemplazarlas. Si cambian allí, actualizar aquí. */
+html[data-ga-profile-christmas="on"] .rk-row { box-shadow: inset 0 1px 0 rgba(226, 239, 246, .22); }
+html[data-ga-profile-christmas="on"] .rk-row--elite { box-shadow: inset 0 2px 0 rgba(226, 239, 246, .42); }
+html[data-ga-profile-christmas="on"] .rk-row.gcos-plus:not(.rk-row--elite) {
+  box-shadow: inset 0 2px 0 rgba(205, 255, 232, .62), inset 0 1px 0 rgba(60, 240, 160, .5), inset 0 -1px 0 rgba(60, 240, 160, .5), inset 3px 0 0 #19d98b;
+}
+html[data-ga-profile-christmas="on"] .rk-row.gcos-vip:not(.rk-row--elite) {
+  box-shadow: inset 0 2px 0 rgba(226, 208, 255, .62), inset 0 1px 0 rgba(170, 100, 255, .55), inset 0 -1px 0 rgba(170, 100, 255, .55), inset 3px 0 0 rgb(155, 60, 255);
+}
+html[data-ga-profile-christmas="on"] .rk-row.gcos-plus.rk-row--elite { box-shadow: inset 0 2px 0 rgba(205, 255, 232, .62); }
+html[data-ga-profile-christmas="on"] .rk-row.gcos-vip.rk-row--elite { box-shadow: inset 0 2px 0 rgba(226, 208, 255, .62); }
+
+/* ======================= 4) TARJETA DE MI GEO ARMY ======================= */
+/* Franja decorativa en el borde superior de la tarjeta (queda por encima del contenido: ≥ 23 px libres): nieve + (Plus) luces cálidas + (VIP) destellos de cristal.
+   Es hija de .mgt-id-top, así que no toca el fondo, el borde ni los brillos de la tarjeta (los pseudo-elementos de la tarjeta se conservan). */
+html[data-ga-profile-christmas="on"] .mgt-id-top { position: relative; }
+html[data-ga-profile-christmas="on"] .mgt-id-top::before {
+  content: ""; position: absolute; left: -17px; right: -17px; top: -35px; height: 20px; pointer-events: none; z-index: 2;   /* -35 = relleno 18 + borde 1 + separación 16 hasta .mgt-id-top */
+  background:
+    radial-gradient(15px 10px at 15px 0, #eef5fb 0 62%, transparent 68%) 0 0 / 37px 16px repeat-x,
+    radial-gradient(9px 6px at 8px 0, #eef5fb 0 62%, transparent 68%) 12px 0 / 23px 11px repeat-x,
+    linear-gradient(#eef5fb, #eef5fb) 0 0 / 100% 3px no-repeat;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .35));
+  -webkit-mask: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+          mask: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+html[data-ga-profile-christmas="on"] .mgt-id.gcos-plus .mgt-id-top::before {
+  background:
+    radial-gradient(circle at 5px 5px, #fff6cf 0 1.3px, #ffc860 2.2px, rgba(255, 190, 70, .38) 3.6px, transparent 6px) 8px 9px / 44px 13px repeat-x,
+    radial-gradient(15px 10px at 15px 0, #f1fbf6 0 62%, transparent 68%) 0 0 / 37px 16px repeat-x,
+    radial-gradient(9px 6px at 8px 0, #f1fbf6 0 62%, transparent 68%) 12px 0 / 23px 11px repeat-x,
+    linear-gradient(#f1fbf6, #f1fbf6) 0 0 / 100% 3px no-repeat;
+}
+html[data-ga-profile-christmas="on"] .mgt-id.gcos-vip .mgt-id-top::before {
+  background:
+    radial-gradient(circle at 3px 3px, #fff 0 1px, #cba8ff 1.8px, rgba(170, 100, 255, .35) 3.4px, transparent 5.5px) 20px 9px / 61px 11px repeat-x,
+    radial-gradient(15px 10px at 15px 0, #f3eeff 0 62%, transparent 68%) 0 0 / 37px 16px repeat-x,
+    radial-gradient(9px 6px at 8px 0, #f3eeff 0 62%, transparent 68%) 12px 0 / 23px 11px repeat-x,
+    linear-gradient(#f3eeff, #f3eeff) 0 0 / 100% 3px no-repeat;
+}
