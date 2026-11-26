@@ -5,7 +5,7 @@
    Debe ejecutarse ANTES de js/geoarmy-account.js. Solo presentación. */
 (function () {
   'use strict';
-  var REGALO_URL = null;   // lanzamiento público de "Mi regalo de Navidad": poner aquí 'navidad-regalo.html' y se habilita en todas las páginas
+  var REGALO_URL = 'navidad-regalo.html';   // lanzamiento público de "Mi regalo de Navidad": poner aquí 'navidad-regalo.html' y se habilita en todas las páginas
   var REGALO_PAGE = 'navidad-regalo.html';   // dentro de su propia página (revisión privada) la pestaña aparece resaltada
   var TABS = [
     { id: 'arbol',  href: 'navidad-arbol.html',  icon: 'tree',   label: 'Árbol de<br>Navidad' },
