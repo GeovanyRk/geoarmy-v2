@@ -143,11 +143,11 @@
     else if (result) lead.textContent = T.leadDone;
     else lead.textContent = v === 'disponible' ? T.leadReady : v === 'espera' ? T.leadWait : T.leadSync;
     if (!result && ui.phase !== 'opening') {
-      if (v === 'sync') { status.textContent = model.error ? T.err : T.sync; }
-      else if (v === 'espera') status.textContent = T.wait;
+      if (v === 'sync') { status.textContent = model.member.loggedIn === false ? 'Inicia sesión con Twitch desde tu perfil para consultar tu regalo.' : model.gift.state === 'unavailable' ? 'Tu cuenta no dispone de un regalo navideño.' : model.error ? T.err : T.sync; }
+      else if (v === 'espera') status.textContent = model.gift.availableAt ? T.wait : 'Santa todavía está confirmando la lista definitiva.';
       else if (!status.dataset.err) status.textContent = '';
     }
-    btn.disabled = !(v === 'disponible' && ui.phase === 'closed' && !ui.busy && (PV || openHandler));
+    btn.disabled = !(v === 'disponible' && ui.phase === 'closed' && !ui.busy && !model.error && (PV || openHandler));
     btn.setAttribute('aria-disabled', btn.disabled ? 'true' : 'false');
     count.hidden = !(v === 'espera' && model.gift.availableAt);
     tick();
@@ -342,8 +342,54 @@
     snapshot: function () { return JSON.parse(JSON.stringify({ view: view(), mode: page.dataset.mode, model: model })); }
   };
 
+
+  function connectServer(){
+    const api=window.GeoArmyRegalo, base=window.GEOARMY_SUPABASE_URL, key=window.GEOARMY_SUPABASE_ANON_KEY;
+    if(!window.supabase||!base||!key){api.setConnectionError(true);return;}
+    const sb=window.supabase.createClient(base,key);
+    let uid, seq=0, opening=false, syncing=false;
+    async function call(action){
+      const {data:s,error:e}=await sb.auth.getSession();
+      if(e)throw e;
+      if(!s.session)return null;
+      const expected=s.session.user.id;
+      const res=await fetch(base+'/functions/v1/christmas-gift',{method:'POST',headers:{apikey:key,Authorization:'Bearer '+s.session.access_token,'Content-Type':'application/json'},body:JSON.stringify({action}),cache:'no-store'});
+      const data=await res.json();
+      const {data:latest}=await sb.auth.getSession();
+      if(latest.session?.user.id!==expected||!res.ok||!data?.serverNow||!data?.gift)throw Error('gift_unavailable');
+      return data;
+    }
+    async function refresh(){
+      if(opening||syncing||ui.busy)return;
+      const turn=++seq;syncing=true;
+      try{
+        const {data:s,error}=await sb.auth.getSession();if(error)throw error;
+        const next=s.session?.user.id||null;
+        if(uid!==undefined&&uid!==next){location.reload();return;}uid=next;
+        if(!next){api.setOpenHandler(null);api.applyServerData({member:{loggedIn:false,displayName:null,country:null},gift:{state:'unavailable',availableAt:null},result:null,credit:null,opened:null,message:null,journey:{}});return;}
+        const data=await call('status');if(turn!==seq||opening||!data)return;
+        api.applyServerData(data);api.setOpenHandler(openGift);
+      }catch(_){if(turn===seq){api.setOpenHandler(null);api.setConnectionError(true);}}
+      finally{syncing=false;}
+    }
+    async function openGift(){
+      if(opening)throw Error('busy');opening=true;++seq;
+      try{const data=await call('open');if(!data)throw Error('login_required');return data;}
+      catch(e){setTimeout(refresh,400);throw e;}
+      finally{opening=false;}
+    }
+    sb.auth.onAuthStateChange((event,session)=>{
+      const next=session?.user.id||null;
+      if(uid!==undefined&&uid!==next){++seq;api.setOpenHandler(null);location.reload();return;}
+      if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT')setTimeout(refresh,0);
+    });
+    document.addEventListener('geoarmy:regalo-refresh',()=>setTimeout(refresh,0));
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+    setInterval(refresh,60000);refresh();
+  }
+
   /* ---------- Arranque ---------- */
-  if (PV) setupPreview(); else render();
+  if (PV) setupPreview(); else { render(); connectServer(); }
   setInterval(tick, 1000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
 })();
