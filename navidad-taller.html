@@ -1,41 +1,264 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Taller de Santa | GEO ARMY</title>
 <style>
-:root{color-scheme:dark;--gold:#e8c58a;--muted:#ccb8a4;--line:#bc925b55}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 20%,#35241e,#16151d 55%,#0a111e);color:#f5e8d7;min-height:100dvh;font:15px/1.5 system-ui,sans-serif}a{color:inherit}header{max-width:1200px;margin:auto;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}header a{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700}header img{width:35px;height:35px;object-fit:contain}header span,.eyebrow{color:var(--gold);font-size:11px;letter-spacing:.15em;text-transform:uppercase}main{max-width:1200px;margin:auto;padding:24px 22px 40px}.intro{text-align:center;margin:8px 0 28px}h1,h2{font-family:Georgia,serif;font-weight:400;color:#f4d9a5}h1{font-size:clamp(35px,6vw,58px);margin:4px 0;line-height:1.1}h2{font-size:24px;margin:0 0 9px}p{margin:6px 0;color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(290px,1fr);gap:18px;align-items:start}.panel,.factory{border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#48211e,#21171c 70%);box-shadow:0 12px 28px #0006;overflow:hidden}.panel{padding:21px;display:grid;gap:15px}.factory{position:relative;background:radial-gradient(ellipse at 50% 50%,#2c3b45,#172334 70%);min-height:400px;display:flex;flex-direction:column;justify-content:end;isolation:isolate}.factory:before{content:"";position:absolute;inset:0 0 55px;background:url('assets/navidad/planeta-santa-fase-01.webp') center 42%/contain no-repeat;z-index:-1}.factory:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,#171318 0%,transparent 36%,transparent 85%,#131a2980)}.phase-sign{position:absolute;left:16px;top:16px;max-width:calc(100% - 32px);padding:8px 12px;background:#151721e8;color:#f0d6a2;border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:700}.belt-area{background:linear-gradient(0deg,#251916,#3c2b24e8);border-top:1px solid #bc925b70;padding:12px 18px 18px}.belt{height:69px;position:relative;border:2px solid #795d47;border-radius:12px;background:repeating-linear-gradient(90deg,#251f20 0 14px,#363030 14px 28px);box-shadow:inset 0 0 8px #000;overflow:hidden}.belt-line{display:flex;align-items:center;gap:56px;width:max-content;height:100%;padding-left:12px;animation:move 9s linear infinite;animation-play-state:paused}.factory.working .belt-line{animation-play-state:running}.belt-item{display:block;font-size:33px;filter:drop-shadow(0 4px 2px #0008);width:40px;text-align:center}.factory.working .belt{animation:rollers 2s linear infinite}@keyframes move{to{transform:translateX(-384px)}}@keyframes rollers{to{background-position:56px 0}}.belt-caption{font-size:11px;color:#e6cda7;text-align:center;margin:0 0 8px}.status{color:var(--gold);font-size:12px;border:1px solid var(--line);border-radius:99px;justify-self:start;padding:5px 10px}.action{background:linear-gradient(#ac4036,#79251f);border:1px solid #e1b56d;border-radius:9px;padding:13px 8px;color:#fff1d3;font:700 15px system-ui;cursor:pointer}.action:disabled{opacity:.45;cursor:default}.action:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid #fff2bd;outline-offset:3px}.refresh{background:transparent;border:0;padding:0;color:#d1b99a;justify-self:start;text-decoration:underline;cursor:pointer;font:12px system-ui}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.metric{padding:12px;border:1px solid var(--line);background:#17161d77;border-radius:9px}.metric small{color:var(--muted);display:block}.metric strong{font-size:28px;color:#f3dbaf;display:block;font-variant-numeric:tabular-nums}.sub{font-size:12px}.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:18px}.phase{border:1px solid var(--line);border-radius:9px;padding:12px;background:#151721;color:#c8b49c;font-size:12px;min-width:0}.phase b{display:block;color:#e1c49b;font-size:13px}.phase.current{border-color:#e5bd77;background:#4b3328}.phase span{display:block;font-size:11px}.section{margin-top:18px}.leaders{margin:0;padding:0;list-style:none}.leaders li{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);gap:8px}.leaders li:last-child{border:0}.leaders strong{color:var(--gold)}.leaders .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.empty{font-size:12px;color:var(--muted)}footer{text-align:center;padding:20px;border-top:1px solid var(--line);color:#b8a38f;font-size:12px}[hidden]{display:none!important}@media(max-width:760px){main{padding:16px 13px 30px}header{padding:12px 13px}.layout{grid-template-columns:1fr}.factory{min-height:340px}.phases{grid-template-columns:repeat(2,1fr)}.panel{padding:17px}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+:root{color-scheme:dark;--gold:#e8c58a;--muted:#ccb8a4;--line:#bc925b55}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 20%,#35241e,#16151d 55%,#0a111e);color:#f5e8d7;min-height:100dvh;font:15px/1.5 system-ui,sans-serif}a{color:inherit}header{max-width:1200px;margin:auto;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}header a{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700}header img{width:35px;height:35px;object-fit:contain}header span,.eyebrow{color:var(--gold);font-size:11px;letter-spacing:.15em;text-transform:uppercase}main{max-width:1200px;margin:auto;padding:24px 22px 40px}.intro{text-align:center;margin:8px 0 28px}h1,h2{font-family:Georgia,serif;font-weight:400;color:#f4d9a5}h1{font-size:clamp(35px,6vw,58px);margin:4px 0;line-height:1.1}h2{font-size:24px;margin:0 0 9px}p{margin:6px 0;color:var(--muted)}
+.layout>*{min-width:0}.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(290px,1fr);gap:18px;align-items:start}.panel{border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#48211e,#21171c 70%);box-shadow:0 12px 28px #0006;overflow:hidden;padding:21px;display:grid;gap:15px}
+/* ====== Taller (interior) ====== */
+.workshop{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#1b110c;box-shadow:0 12px 28px #0006;isolation:isolate}
+.w-scene{position:relative;aspect-ratio:1200/430;overflow:hidden}
+.w-back{position:absolute;inset:0;width:100%;height:100%;display:block}
+.w-scene:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 55%,#0007 100%)}
+.phase-sign{position:absolute;left:14px;top:14px;z-index:2;max-width:calc(100% - 28px);padding:7px 12px;background:#2a1a10ec;color:#f6dca8;border:1px solid #c99a5588;border-radius:7px;font-size:12px;font-weight:700;box-shadow:0 3px 10px #0008}
+.bulb{animation:tw 2.6s ease-in-out infinite}.bulb.b{animation-delay:1.3s}@keyframes tw{50%{opacity:.45}}
+.elf{transform-box:fill-box;transform-origin:50% 100%;animation:bob 2.8s ease-in-out infinite alternate}.elf.e2{animation-delay:-.9s}.elf.e3{animation-delay:-1.8s}@keyframes bob{from{transform:rotate(-1.4deg) translateY(0)}to{transform:rotate(1.4deg) translateY(-3px)}}
+.wsnow{animation:wfall 5s linear infinite}@keyframes wfall{from{transform:translateY(-10px)}to{transform:translateY(95px)}}
+.belt-area{position:relative;background:linear-gradient(#2a1a10,#1d1210);border-top:2px solid #9c6a3c;padding:9px 14px 10px;z-index:1}
+.belt-caption{font-size:11px;color:#e6cda7;text-align:center;margin:0 0 6px}
+.belt{height:58px;position:relative;border:2px solid #795d47;border-radius:10px;background:repeating-linear-gradient(90deg,#251f20 0 14px,#363030 14px 28px);box-shadow:inset 0 0 8px #000;overflow:hidden}
+.belt-line{display:flex;align-items:center;gap:56px;width:max-content;height:100%;padding-left:12px;animation:move 8s linear infinite;animation-play-state:paused}
+.workshop.working .belt-line{animation-play-state:running}.workshop.working .belt{animation:rollers 2s linear infinite}
+.belt-item{display:block;flex:none;width:40px;height:40px;filter:drop-shadow(0 4px 2px #0009)}
+@keyframes move{to{transform:translateX(-192px)}}@keyframes rollers{to{background-position:56px 0}}
+.w-table{position:relative;padding:14px 14px 18px;background:repeating-linear-gradient(0deg,#0000 0 46px,#0003 46px 48px),linear-gradient(#6a4328,#4c2f1c);border-top:3px solid #8b5a34;box-shadow:inset 0 10px 16px #0006;display:grid;gap:12px;z-index:1}
+.w-ask{display:flex;align-items:center;gap:10px;justify-content:center;text-align:center;color:#fbe9c6;font-weight:700;font-size:15px;min-height:38px}
+.w-ask small{display:block;font-weight:400;color:#e5cfa9;font-size:12px}
+.w-ask .dot{flex:none;width:34px;height:34px}
+.w-task{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap}
+.w-focus{flex:0 0 auto;width:190px;height:150px;position:relative}.w-focus[hidden]{display:none}
+.w-focus svg{width:100%;height:100%;display:block;overflow:visible}
+.ghost{fill:#ffd77a22;stroke:#ffd77a;stroke-width:2.5;stroke-dasharray:6 5;animation:gpulse 1.4s ease-in-out infinite}.ghost.hide,.part.hide{display:none}@keyframes gpulse{50%{fill:#ffd77a55}}
+.choices{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.opt{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:96px;min-height:108px;padding:8px 10px;border:2px solid #9c6a3c;border-radius:12px;background:linear-gradient(#5d3c26,#3a2417);color:#f6e6c8;font:700 13px system-ui;cursor:pointer;box-shadow:0 4px 0 #1d110a,0 8px 14px #0007;transition:transform .12s}
+.opt svg{width:62px;height:62px;display:block;overflow:visible}.opt:hover:not(:disabled){transform:translateY(-2px)}.opt:active:not(:disabled){transform:translateY(1px)}
+.opt:disabled{opacity:.5;cursor:default}
+.opt.req{border-color:#ffd77a;box-shadow:0 4px 0 #1d110a,0 0 0 3px #ffd77a44,0 0 20px #ffb84a99;animation:rq 1.6s ease-in-out infinite}.opt.req:after{content:"Pedido de hoy";position:absolute;top:-9px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#ffd77a;color:#3a2210;border-radius:99px;padding:1px 8px;font:800 10px system-ui}
+@keyframes rq{50%{box-shadow:0 4px 0 #1d110a,0 0 0 4px #ffd77a66,0 0 28px #ffb84acc}}
+.opt.nope{animation:shake .38s}@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.opt.chosen{border-color:#7ee2a0;box-shadow:0 0 0 3px #7ee2a055,0 0 18px #7ee2a088}
+.w-done{display:none;text-align:center;color:#c6f5d4;font-weight:700}.workshop.is-done .w-done{display:block}.workshop.is-done .choices{opacity:.45}
+.status{color:var(--gold);font-size:12px;border:1px solid var(--line);border-radius:99px;justify-self:start;padding:5px 10px}.action{background:linear-gradient(#ac4036,#79251f);border:1px solid #e1b56d;border-radius:9px;padding:13px 8px;color:#fff1d3;font:700 15px system-ui;cursor:pointer}.action:disabled{opacity:.45;cursor:default}.action:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid #fff2bd;outline-offset:3px}.refresh{background:transparent;border:0;padding:0;color:#d1b99a;justify-self:start;text-decoration:underline;cursor:pointer;font:12px system-ui}.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.metric{padding:12px;border:1px solid var(--line);background:#17161d77;border-radius:9px}.metric small{color:var(--muted);display:block}.metric strong{font-size:28px;color:#f3dbaf;display:block;font-variant-numeric:tabular-nums}.sub{font-size:12px}
+.phases{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:18px}.phase{border:1px solid var(--line);border-radius:9px;padding:12px;background:#151721;color:#c8b49c;font-size:12px;min-width:0}.phase b{display:block;color:#e1c49b;font-size:13px}.phase.current{border-color:#e5bd77;background:#4b3328}.phase span{display:block;font-size:11px}.section{margin-top:18px}.leaders{margin:0;padding:0;list-style:none}.leaders li{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);gap:8px}.leaders li:last-child{border:0}.leaders strong{color:var(--gold)}.leaders .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.empty{font-size:12px;color:var(--muted)}footer{text-align:center;padding:20px;border-top:1px solid var(--line);color:#b8a38f;font-size:12px}[hidden]{display:none!important}
+@media(max-width:760px){main{padding:16px 13px 30px}header{padding:12px 13px}.layout{grid-template-columns:minmax(0,1fr)}.phases{grid-template-columns:repeat(2,1fr)}.panel{padding:17px}.w-scene{aspect-ratio:auto;height:172px}.w-table{padding:12px 10px 16px}.opt{min-width:88px;min-height:100px}.opt svg{width:54px;height:54px}.w-focus{width:160px;height:126px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
 </style></head><body>
+<!-- Recursos gráficos reutilizables (SVG vectorial, sin imágenes externas ni emojis) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+ <linearGradient id="g-wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a12"/><stop offset=".55" stop-color="#4b2d1c"/><stop offset="1" stop-color="#5d3922"/></linearGradient>
+ <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#091a35"/><stop offset="1" stop-color="#27507f"/></linearGradient>
+ <radialGradient id="g-glow"><stop offset="0" stop-color="#ffcf7a" stop-opacity=".6"/><stop offset="1" stop-color="#ffcf7a" stop-opacity="0"/></radialGradient>
+ <linearGradient id="g-bench" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a06a3c"/><stop offset="1" stop-color="#6a4226"/></linearGradient>
+ <linearGradient id="g-front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b3720"/><stop offset="1" stop-color="#34200f"/></linearGradient>
+ <linearGradient id="g-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34200f"/><stop offset="1" stop-color="#170d08"/></linearGradient>
+ <symbol id="elf" viewBox="0 -14 80 124"><g><path d="M19 42C32 37 48 37 61 42L65 112H15Z" fill="var(--tunic,#2f9e5b)" stroke="#0006"/><path d="M26 47L10 78" stroke="var(--tunic,#2f9e5b)" stroke-width="10" stroke-linecap="round"/><path d="M54 47L70 78" stroke="var(--tunic,#2f9e5b)" stroke-width="10" stroke-linecap="round"/><circle cx="9" cy="80" r="5.5" fill="#f4cfa9"/><circle cx="71" cy="80" r="5.5" fill="#f4cfa9"/><rect x="16" y="72" width="48" height="8" fill="#47281a"/><rect x="34" y="70" width="12" height="12" rx="2" fill="#f0c04f" stroke="#8a6a20"/><path d="M33 42L40 54L47 42" fill="#f6f1e4"/>
+ <path d="M26 27L12 20L27 36Z" fill="#f4cfa9" stroke="#0004"/><path d="M54 27L68 20L53 36Z" fill="#f4cfa9" stroke="#0004"/><ellipse cx="40" cy="28" rx="15" ry="16.5" fill="#f6d3ae" stroke="#0004"/><circle cx="34" cy="28" r="2" fill="#2a1a12"/><circle cx="46" cy="28" r="2" fill="#2a1a12"/><circle cx="31" cy="34" r="3" fill="#e98b7a" opacity=".6"/><circle cx="49" cy="34" r="3" fill="#e98b7a" opacity=".6"/><path d="M34 36Q40 41 46 36" stroke="#6a2f22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+ <path d="M23 21C26 8 36 2 56 -8C52 4 57 14 58 21C46 16 34 16 23 21Z" fill="var(--hat,#d8403f)" stroke="#0005"/><path d="M23 21C34 16 46 16 58 21L57 25C46 20 34 20 24 25Z" fill="#f6f1e4"/><circle cx="56" cy="-8" r="6.5" fill="#fffaf0" stroke="#0003"/></g></symbol>
+ <symbol id="i-wood" viewBox="0 0 48 48"><rect x="5" y="12" width="38" height="9" rx="2" fill="#bd8a54" stroke="#5b3a1f"/><rect x="5" y="23" width="38" height="9" rx="2" fill="#a7733f" stroke="#5b3a1f"/><rect x="9" y="34" width="30" height="8" rx="2" fill="#cb9a62" stroke="#5b3a1f"/><path d="M10 16.5h26M12 27.5h22M14 38h18" stroke="#7a4f27" stroke-width="1"/></symbol>
+ <symbol id="i-cloth" viewBox="0 0 48 48"><rect x="6" y="12" width="32" height="26" rx="3" fill="#c23a45" stroke="#5a1620"/><ellipse cx="38" cy="25" rx="5" ry="13" fill="#e56b73" stroke="#5a1620"/><ellipse cx="38" cy="25" rx="2" ry="5" fill="#7a2230"/><path d="M12 12v26M20 12v26M28 12v26" stroke="#f2d7a0" stroke-width="2" opacity=".55"/></symbol>
+ <symbol id="i-paint" viewBox="0 0 48 48"><path d="M10 16h28l-2 26H12Z" fill="#aab4bd" stroke="#47525c"/><path d="M11 28h26l-.8 10H11.8Z" fill="#d6304a"/><ellipse cx="24" cy="16" rx="14" ry="4" fill="#dfe5ea" stroke="#47525c"/><ellipse cx="24" cy="16" rx="11" ry="2.8" fill="#d6304a"/><path d="M19 17c0 6 1 8 1 8" stroke="#d6304a" stroke-width="3" stroke-linecap="round"/></symbol>
+ <symbol id="i-toy" viewBox="0 0 48 48"><rect x="3" y="30" width="42" height="5" rx="2" fill="#6b3f22" stroke="#3a2112"/><rect x="5" y="19" width="25" height="12" rx="5" fill="#c23a45" stroke="#5a1620"/><rect x="29" y="12" width="14" height="19" rx="2" fill="#2f7a4a" stroke="#143a22"/><rect x="32" y="16" width="8" height="7" rx="1" fill="#ffd98a"/><rect x="9" y="11" width="7" height="9" fill="#2a2430"/><rect x="8" y="9" width="9" height="3" rx="1" fill="#f0c04f"/><circle cx="14" cy="37" r="6" fill="#3a2a22" stroke="#f0c04f"/><circle cx="34" cy="37" r="6" fill="#3a2a22" stroke="#f0c04f"/></symbol>
+ <symbol id="i-gift" viewBox="0 0 48 48"><rect x="7" y="21" width="34" height="21" rx="2" fill="var(--g1,#c23a45)" stroke="#0007"/><rect x="5" y="15" width="38" height="8" rx="2" fill="var(--g1,#c23a45)" stroke="#0007"/><rect x="21" y="15" width="6" height="27" fill="var(--g2,#f3d27a)"/><path d="M24 15C18 5 10 9 15 15ZM24 15C30 5 38 9 33 15Z" fill="var(--g2,#f3d27a)" stroke="#8a6a20" stroke-width=".8"/></symbol>
+ <symbol id="i-roll" viewBox="0 0 48 48"><rect x="6" y="12" width="32" height="26" rx="3" fill="var(--r1,#c23a45)" stroke="#0007"/><ellipse cx="38" cy="25" rx="5" ry="13" fill="var(--r2,#e56b73)" stroke="#0007"/><ellipse cx="38" cy="25" rx="2" ry="5" fill="#3a2a22"/><path d="M13 12v26M25 12v26" stroke="#f3d27a" stroke-width="3" opacity=".75"/></symbol>
+ <symbol id="i-bow" viewBox="0 0 48 48"><path d="M24 24C10 9 3 22 14 29c5 2 8 0 10-5ZM24 24C38 9 45 22 34 29c-5 2-8 0-10-5Z" fill="#f0c04f" stroke="#8a6a20"/><path d="M24 27L15 44L24 38L33 44Z" fill="#d8a73a" stroke="#8a6a20"/><circle cx="24" cy="25" r="5" fill="#ffd978" stroke="#8a6a20"/></symbol>
+ <!-- Piezas del juguete (coordenadas del juguete completo, 220×150) -->
+ <symbol id="pc-chimney" viewBox="40 18 36 40"><path d="M44 56L48 30H68L72 56Z" fill="#2a2430" stroke="#0008"/><rect x="43" y="22" width="30" height="9" rx="3" fill="#f0c04f" stroke="#8a6a20"/></symbol>
+ <symbol id="pc-wheel" viewBox="40 88 48 48"><circle cx="64" cy="112" r="23" fill="#3a2a22" stroke="#f0c04f" stroke-width="3"/><circle cx="64" cy="112" r="7" fill="#f0c04f"/><path d="M64 92v40M44 112h40M50 98l28 28M78 98L50 126" stroke="#f0c04f" stroke-width="2" opacity=".7"/></symbol>
+ <symbol id="pc-roof" viewBox="114 24 94 26"><path d="M118 46L130 28H190L204 46Z" fill="#7d2420" stroke="#3a0f0d" stroke-width="2"/><rect x="132" y="30" width="56" height="4" rx="2" fill="#f0c04f"/></symbol>
+ <symbol id="pc-lamp" viewBox="8 52 36 32"><rect x="26" y="74" width="14" height="6" fill="#8a6a20"/><circle cx="24" cy="66" r="12" fill="#ffe08a" stroke="#f0c04f" stroke-width="3"/><circle cx="24" cy="66" r="5" fill="#fffbe0"/></symbol>
+</defs></svg>
+
 <header><a href="index.html"><img src="logo.png" alt="">GEO ARMY</a><a href="index.html"><span>← Volver al mundo</span></a></header>
-<main><div class="intro"><div class="eyebrow">Mundo 02 · Navidad 2026</div><h1>Taller de Santa</h1><p>Ayuda a preparar la Navidad. Cada colaboración cuenta para la lista de Santa.</p></div>
-<div class="layout"><div><section class="factory" id="factory" aria-label="Representación del taller y cinta transportadora"><div class="phase-sign" id="phase-sign">Preparando el taller</div><div class="belt-area"><p class="belt-caption" id="belt-caption">Cinta de producción · representación visual</p><div class="belt" aria-hidden="true"><div class="belt-line" id="belt-line"><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span><span class="belt-item">🪵</span></div></div></div></section>
+<main><div class="intro"><div class="eyebrow">Mundo 02 · Navidad 2026</div><h1>Taller de Santa</h1><p>Entra al taller y ayuda a los duendes. Cada colaboración cuenta para la lista de Santa.</p></div>
+<div class="layout"><div>
+<section class="workshop" id="factory" aria-label="Interior del taller de Santa">
+ <div class="w-scene">
+  <svg class="w-back" viewBox="0 0 1200 430" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+   <rect width="1200" height="430" fill="url(#g-wall)"/>
+   <g stroke="#1a0e08" stroke-opacity=".35" stroke-width="2"><path d="M60 0V400M120 0V400M180 0V400M240 0V400M300 0V400M360 0V400M420 0V400M480 0V400M540 0V400M600 0V400M660 0V400M720 0V400M780 0V400M840 0V400M900 0V400M960 0V400M1020 0V400M1080 0V400M1140 0V400"/></g>
+   <rect y="395" width="1200" height="35" fill="url(#g-floor)"/>
+   <!-- ventana nevada -->
+   <path d="M500 255V140a100 100 0 0 1 200 0V255Z" fill="url(#g-sky)"/>
+   <g clip-path="url(#c-win)"><circle cx="648" cy="96" r="30" fill="#f4efd8" opacity=".12"/><circle cx="648" cy="96" r="13" fill="#f6f1de"/><g fill="#fff" opacity=".8"><circle cx="530" cy="70" r="1.4"/><circle cx="575" cy="58" r="1.2"/><circle cx="690" cy="140" r="1.3"/><circle cx="545" cy="120" r="1.2"/></g>
+    <path d="M500 222Q545 196 585 212T665 205T700 214V260H500Z" fill="#e3ecf5"/><path d="M530 168l-17 40h34zM530 186l-21 38h42zM670 160l-15 38h30zM670 178l-19 36h38z" fill="#0f2c2b"/>
+    <g fill="#fff" class="wsn"><circle class="wsnow" cx="520" cy="60" r="2"/><circle class="wsnow" style="animation-delay:-1.6s" cx="560" cy="40" r="1.6"/><circle class="wsnow" style="animation-delay:-3s" cx="610" cy="50" r="2.2"/><circle class="wsnow" style="animation-delay:-.8s" cx="650" cy="30" r="1.8"/><circle class="wsnow" style="animation-delay:-2.4s" cx="685" cy="55" r="1.6"/><circle class="wsnow" style="animation-delay:-4s" cx="590" cy="75" r="1.5"/></g></g>
+   <path d="M600 40V255M500 150H700" stroke="#4b2d1c" stroke-width="6"/><path d="M500 255V140a100 100 0 0 1 200 0V255Z" fill="none" stroke="#c99a55" stroke-width="9"/><rect x="486" y="253" width="228" height="13" rx="3" fill="#7a4d2a"/><path d="M490 253q30-12 60-4t70-3 80 4 14 3v3H490Z" fill="#f2f6fb"/>
+   <circle cx="600" cy="46" r="21" fill="none" stroke="#2f7a45" stroke-width="9"/><circle cx="600" cy="46" r="21" fill="none" stroke="#5fbf7c" stroke-width="2" stroke-dasharray="3 6"/><path d="M600 66l-9 14 9-4 9 4z" fill="#d6304a"/><circle cx="600" cy="66" r="4.5" fill="#d6304a"/>
+   <defs><clipPath id="c-win"><path d="M500 255V140a100 100 0 0 1 200 0V255Z"/></clipPath></defs>
+   <!-- luces colgantes -->
+   <rect width="1200" height="36" fill="#2b190f"/><rect y="30" width="1200" height="6" fill="#4a2c1b"/>
+   <path d="M0 38Q150 94 300 38Q450 94 600 38Q750 94 900 38Q1050 94 1200 38" fill="none" stroke="#1a1410" stroke-width="2"/><g id="bulbs"></g>
+   <!-- farolillos -->
+   <g><path d="M335 36V104M870 36V104" stroke="#1a1410" stroke-width="2"/><circle cx="335" cy="124" r="62" fill="url(#g-glow)"/><circle cx="870" cy="124" r="62" fill="url(#g-glow)"/><rect x="323" y="104" width="24" height="34" rx="4" fill="#ffd98a" stroke="#8a6a20" stroke-width="3"/><rect x="858" y="104" width="24" height="34" rx="4" fill="#ffd98a" stroke="#8a6a20" stroke-width="3"/><rect x="320" y="100" width="30" height="6" fill="#8a6a20"/><rect x="855" y="100" width="30" height="6" fill="#8a6a20"/></g>
+   <!-- panel de herramientas -->
+   <g><rect x="80" y="76" width="210" height="150" rx="6" fill="#3a2314" stroke="#7a4d2a" stroke-width="4"/><g fill="#27170c" opacity=".7"><circle cx="100" cy="96" r="2"/><circle cx="140" cy="96" r="2"/><circle cx="180" cy="96" r="2"/><circle cx="220" cy="96" r="2"/><circle cx="260" cy="96" r="2"/></g>
+    <rect x="104" y="108" width="8" height="44" rx="3" fill="#a06a3c"/><rect x="92" y="104" width="32" height="14" rx="3" fill="#8e98a2" stroke="#4a525a"/>
+    <path d="M150 110h68l8 14h-76z" fill="#aeb8c2" stroke="#4a525a"/><path d="M150 124l5 6 5-6 5 6 5-6 5 6 5-6 5 6 5-6 5 6 5-6 5 6 5-6" stroke="#4a525a" fill="#aeb8c2"/><rect x="146" y="106" width="10" height="26" rx="3" fill="#a06a3c"/>
+    <path d="M246 108a14 14 0 1 0 20 20l-10-4-6-10z" fill="#9aa4ae" stroke="#4a525a"/><rect x="226" y="132" width="10" height="42" rx="4" fill="#a06a3c" transform="rotate(-24 231 153)"/>
+    <circle cx="116" cy="188" r="18" fill="#e0b050" stroke="#8a6a20" stroke-width="3"/><circle cx="116" cy="188" r="7" fill="#3a2314"/><rect x="150" y="170" width="70" height="8" rx="2" fill="#c8cfd6" stroke="#4a525a"/><rect x="150" y="186" width="54" height="8" rx="2" fill="#c8cfd6" stroke="#4a525a"/></g>
+   <!-- estantería con juguetes -->
+   <g><rect x="920" y="152" width="230" height="9" rx="2" fill="#8a5a33"/><rect x="920" y="238" width="230" height="9" rx="2" fill="#8a5a33"/><path d="M936 161v34M1134 161v34M936 247v20M1134 247v20" stroke="#6a4226" stroke-width="6"/>
+    <ellipse cx="962" cy="132" rx="15" ry="18" fill="#a8703c" stroke="#4b2d1c"/><circle cx="962" cy="106" r="12" fill="#b8804a" stroke="#4b2d1c"/><circle cx="953" cy="96" r="5" fill="#a8703c"/><circle cx="971" cy="96" r="5" fill="#a8703c"/><ellipse cx="962" cy="110" rx="6" ry="4.5" fill="#e0b88a"/><circle cx="959" cy="104" r="1.5" fill="#2a1a12"/><circle cx="965" cy="104" r="1.5" fill="#2a1a12"/><path d="M956 118l12 0-6 6z" fill="#d6304a"/>
+    <rect x="1004" y="120" width="34" height="32" rx="3" fill="#c0303f" stroke="#5a1620"/><rect x="1004" y="124" width="34" height="5" fill="#f0c04f"/><rect x="1004" y="143" width="34" height="5" fill="#f0c04f"/><path d="M1008 130l5 12 5-12 5 12 5-12 5 12" stroke="#fff" stroke-width="1.5" fill="none"/>
+    <rect x="1066" y="136" width="16" height="16" fill="#2f7ab8" stroke="#143a58"/><rect x="1084" y="136" width="16" height="16" fill="#d6304a" stroke="#5a1620"/><rect x="1075" y="120" width="16" height="16" fill="#e0b050" stroke="#6a4a10"/>
+    <rect x="1112" y="116" width="16" height="36" rx="2" fill="#2f5fb0" stroke="#10204a"/><circle cx="1120" cy="108" r="8" fill="#f4cfa9" stroke="#4b2d1c"/><rect x="1112" y="88" width="16" height="18" rx="2" fill="#c0303f"/><rect x="1112" y="126" width="16" height="4" fill="#f0c04f"/>
+    <use href="#i-toy" x="950" y="200" width="56" height="56"/><use href="#i-gift" x="1020" y="204" width="48" height="48" style="--g1:#2f9e5b;--g2:#f3d27a"/><use href="#i-gift" x="1074" y="206" width="46" height="46" style="--g1:#2f7ab8;--g2:#f3d27a"/></g>
+   <!-- duendes -->
+   <use class="elf e1" href="#elf" x="182" y="190" width="96" height="149" style="--hat:#d8403f;--tunic:#2f9e5b"/>
+   <use class="elf e2" href="#elf" x="552" y="196" width="96" height="149" style="--hat:#2f9e5b;--tunic:#c23a45"/>
+   <use class="elf e3" href="#elf" x="912" y="190" width="96" height="149" style="--hat:#e0a63a;--tunic:#c23a45"/>
+   <!-- mesas de trabajo -->
+   <g><rect x="40" y="304" width="400" height="22" rx="4" fill="url(#g-bench)"/><rect x="48" y="326" width="384" height="70" fill="url(#g-front)"/><path d="M48 326h384" stroke="#f0c04f" stroke-opacity=".5" stroke-width="2"/><rect x="62" y="338" width="170" height="48" rx="3" fill="#2a190d" opacity=".55"/><rect x="248" y="338" width="170" height="48" rx="3" fill="#2a190d" opacity=".55"/>
+    <use href="#i-wood" x="62" y="260" width="58" height="58"/><use href="#i-wood" x="116" y="268" width="50" height="50"/><use href="#i-cloth" x="320" y="262" width="56" height="56"/><use href="#i-cloth" x="372" y="270" width="48" height="48" style="filter:hue-rotate(95deg)"/></g>
+   <g><rect x="452" y="318" width="296" height="20" rx="4" fill="url(#g-bench)"/><rect x="460" y="338" width="280" height="58" fill="url(#g-front)"/><path d="M460 338h280" stroke="#f0c04f" stroke-opacity=".5" stroke-width="2"/><use href="#i-paint" x="470" y="276" width="46" height="46"/><use href="#i-paint" x="690" y="278" width="44" height="44" style="filter:hue-rotate(110deg)"/></g>
+   <g><rect x="760" y="304" width="400" height="22" rx="4" fill="url(#g-bench)"/><rect x="768" y="326" width="384" height="70" fill="url(#g-front)"/><path d="M768 326h384" stroke="#f0c04f" stroke-opacity=".5" stroke-width="2"/><rect x="782" y="338" width="170" height="48" rx="3" fill="#2a190d" opacity=".55"/><rect x="968" y="338" width="170" height="48" rx="3" fill="#2a190d" opacity=".55"/>
+    <use href="#i-gift" x="790" y="262" width="58" height="58" style="--g1:#c23a45;--g2:#f3d27a"/><use href="#i-gift" x="842" y="270" width="48" height="48" style="--g1:#2f9e5b;--g2:#f0e4c0"/><use href="#i-roll" x="1060" y="262" width="56" height="56" style="--r1:#2f9e5b;--r2:#5fbf7c"/><use href="#i-roll" x="1100" y="270" width="48" height="48" style="--r1:#c23a45;--r2:#e56b73"/></g>
+   <rect width="1200" height="430" fill="url(#g-glow)" opacity=".12"/>
+  </svg>
+  <div class="phase-sign" id="phase-sign">Preparando el taller</div>
+ </div>
+ <div class="belt-area"><p class="belt-caption" id="belt-caption">Cinta de producción</p><div class="belt" aria-hidden="true"><div class="belt-line" id="belt-line"></div></div></div>
+ <div class="w-table">
+  <div class="w-ask" id="ask" role="status" aria-live="polite"><svg class="dot" viewBox="0 0 80 64" aria-hidden="true"><use href="#elf" x="0" y="0" width="80" height="124" style="--hat:#d8403f;--tunic:#2f9e5b"/></svg><div><span id="ask-text">Consultando el taller…</span><small id="ask-sub"></small></div></div>
+  <div class="w-task"><div class="w-focus" id="focus" hidden></div><div class="choices" id="choices" role="group" aria-label="Elige en el taller"></div></div>
+  <div class="w-done" id="done">¡Listo! Tu colaboración de hoy ya cuenta.</div>
+ </div>
+</section>
 <div class="phases" aria-label="Fases de diciembre"><div class="phase" data-phase="materials"><b>Materiales</b><span>1–9 dic.</span><span data-count="materials">—</span></div><div class="phase" data-phase="toys"><b>Fabricación</b><span>10–17 dic.</span><span data-count="toys">—</span></div><div class="phase" data-phase="packing"><b>Empaque</b><span>18–23 dic.</span><span data-count="packing">—</span></div><div class="phase" data-phase="sleigh"><b>Trineo</b><span>24 dic.</span><span data-count="sleigh">—</span></div></div></div>
-<aside class="panel"><span class="status" id="status">Conectando…</span><div><h2>Tu tarea de hoy</h2><p id="task">Consultando la actividad del taller.</p></div><button class="action" id="help" type="button" disabled>Colaborar</button><button class="action" id="login" type="button" hidden>Iniciar sesión con Twitch</button><p class="sub" id="message" role="status">Una colaboración por día, sin coste.</p><button class="refresh" id="refresh" type="button">Actualizar estado</button><div class="metric-grid"><div class="metric"><small>Tus colaboraciones</small><strong id="my-total">—</strong></div><div class="metric"><small>Posición del taller</small><strong id="my-rank">—</strong></div><div class="metric"><small>Colaboraciones totales</small><strong id="total">—</strong></div><div class="metric"><small>Participantes</small><strong id="members">—</strong></div></div><p class="sub">La participación ayuda a mejorar tu posición en la lista de Santa. No otorga XP, G-Coins ni V-Bucks directamente y no garantiza un regalo.</p></aside></div>
+<aside class="panel"><span class="status" id="status">Conectando…</span><div><h2>Tu tarea de hoy</h2><p id="task">Consultando la actividad del taller.</p></div><button class="action" id="login" type="button" hidden>Iniciar sesión con Twitch</button><p class="sub" id="message" role="status">Una colaboración por día, sin coste.</p><button class="refresh" id="refresh" type="button">Actualizar estado</button><div class="metric-grid"><div class="metric"><small>Tus colaboraciones</small><strong id="my-total">—</strong></div><div class="metric"><small>Posición del taller</small><strong id="my-rank">—</strong></div><div class="metric"><small>Colaboraciones totales</small><strong id="total">—</strong></div><div class="metric"><small>Participantes</small><strong id="members">—</strong></div></div><p class="sub">La participación ayuda a mejorar tu posición en la lista de Santa. No otorga XP, G-Coins ni V-Bucks directamente y no garantiza un regalo.</p></aside></div>
 <section class="panel section"><h2>Colaboradores del taller</h2><p class="sub">Top 10 por días de colaboración.</p><ol class="leaders" id="leaders"><li class="empty">Consultando actividad…</li></ol></section></main><footer>GEO ARMY · Navidad 2026</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.min.js"></script><script src="js/geoarmy-config.js"></script>
 <script>
 (function(){
- const $=id=>document.getElementById(id),help=$('help'),login=$('login'),refresh=$('refresh'),factory=$('factory');
- const phases={materials:{title:'Recolectar materiales',task:'Prepara madera y tela para los juguetes.',item:'🪵',button:'Preparar materiales'},toys:{title:'Fabricar juguetes',task:'Ayuda a ensamblar un juguete para Santa.',item:'🧸',button:'Fabricar juguete'},packing:{title:'Empaquetar regalos',task:'Prepara un regalo para la entrega.',item:'🎁',button:'Empaquetar regalo'},sleigh:{title:'Cargar el trineo',task:'Ayuda a cargar los regalos antes del viaje.',item:'🎁',button:'Cargar regalo'},closed:{title:'Taller cerrado',task:'La preparación de Navidad ha terminado.',item:'🎁',button:'Taller cerrado'}};
+ const $=id=>document.getElementById(id),login=$('login'),refresh=$('refresh'),factory=$('factory'),choicesEl=$('choices'),focusEl=$('focus');
+ const NS='http://www.w3.org/2000/svg';
+
+ /* ---------- Luces del techo (decoración) ---------- */
+ (function(){const g=document.getElementById('bulbs'),cols=['#e0344f','#ffcf6b','#2f9e5b','#8fd0ff'];let n=0;
+  for(let seg=0;seg<4;seg++)for(const t of [.12,.3,.5,.7,.88]){const x=seg*300+300*t,y=38+112*t*(1-t)+6;const c=document.createElementNS(NS,'circle');c.setAttribute('cx',x.toFixed(1));c.setAttribute('cy',y.toFixed(1));c.setAttribute('r','5');c.setAttribute('fill',cols[n%4]);c.setAttribute('class','bulb '+(n%2?'b':'a'));g.appendChild(c);n++;}
+ })();
+
+ /* ---------- Contenido por fase ---------- */
+ const sv=(id,w,h,style)=>'<svg viewBox="0 0 '+(w||48)+' '+(h||48)+'" aria-hidden="true"'+(style?' style="'+style+'"':'')+'><use href="#'+id+'" width="'+(w||48)+'" height="'+(h||48)+'"/></svg>';
+ const TOY_PARTS={chimney:{name:'Chimenea',box:[40,20,36,36],g:'pc-chimney'},wheel:{name:'Rueda',box:[40,88,48,48],g:'pc-wheel'},roof:{name:'Techo',box:[114,24,94,26],g:'pc-roof'},lamp:{name:'Farol',box:[10,54,32,28],g:'pc-lamp'}};
+ const toyFocus=missing=>{const part=(k,x,y,w,h)=>'<g class="part" data-p="'+k+'"><use href="#'+TOY_PARTS[k].g+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"/></g><rect class="ghost hide" data-g="'+k+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6"/>';
+  return '<svg viewBox="0 0 220 150" aria-hidden="true"><rect x="20" y="92" width="182" height="18" rx="4" fill="#6b3f22" stroke="#3a2112"/><rect x="28" y="52" width="96" height="44" rx="18" fill="#b5382f" stroke="#5a1620"/><rect x="60" y="52" width="8" height="44" fill="#e8c58a"/><rect x="96" y="52" width="8" height="44" fill="#e8c58a"/><rect x="128" y="40" width="64" height="56" rx="5" fill="#2f6b43" stroke="#143a22"/><rect x="142" y="54" width="36" height="22" rx="3" fill="#ffd98a" stroke="#8a6a20"/><circle cx="150" cy="112" r="23" fill="#3a2a22" stroke="#f0c04f" stroke-width="3"/><circle cx="150" cy="112" r="7" fill="#f0c04f"/>'+
+  part('chimney',40,20,36,36)+part('wheel',40,88,48,48)+part('roof',114,24,94,26)+part('lamp',10,54,32,28)+'</svg>';};
+ const boxFocus='<svg viewBox="0 0 200 150" aria-hidden="true"><ellipse cx="100" cy="136" rx="78" ry="9" fill="#0005"/><rect id="bx-body" x="40" y="62" width="120" height="70" rx="4" fill="#b98a58" stroke="#5b3a1f" stroke-width="2"/><rect id="bx-lid" x="34" y="48" width="132" height="22" rx="4" fill="#c99a66" stroke="#5b3a1f" stroke-width="2"/><rect id="bx-rib" x="94" y="48" width="12" height="84" fill="#f0c04f" opacity="0" /><use id="bx-bow" href="#i-bow" x="68" y="14" width="64" height="64" style="display:none"/><rect class="ghost hide" data-g="bow" x="68" y="14" width="64" height="40" rx="8"/></svg>';
+ const sleighFocus='<svg viewBox="0 0 220 150" aria-hidden="true"><path d="M20 112h180" stroke="#e8c58a" stroke-width="6" stroke-linecap="round"/><path d="M14 98q-8 14 8 14" stroke="#e8c58a" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M34 112V62q0-12 14-12h112l32 18v44z" fill="#b5382f" stroke="#5a1620" stroke-width="2"/><path d="M34 72h158" stroke="#f0c04f" stroke-width="5"/><path d="M52 112v18M170 112v18" stroke="#e8c58a" stroke-width="5"/><g id="sl-load"></g><path d="M34 62q0-12 14-12h112l32 18" fill="none" stroke="#f0c04f" stroke-width="3"/></svg>';
+ const GIFT_COLORS=[['#c23a45','#f3d27a','Regalo rojo'],['#2f9e5b','#f0e4c0','Regalo verde'],['#2f7ab8','#f3d27a','Regalo azul'],['#e0a63a','#c23a45','Regalo dorado']];
+ const PH={
+  materials:{title:'Recolectar materiales',task:'Elige el material que pide el duende.',belt:{ico:'i-wood'},opts:[{k:'wood',n:'Madera',ico:'i-wood',ask:'¡Necesito madera!'},{k:'cloth',n:'Tela',ico:'i-cloth',ask:'¡Necesito tela!'},{k:'paint',n:'Pintura',ico:'i-paint',ask:'¡Necesito pintura!'}],start:1,end:9,sub:'Toca el material resaltado y súbelo a la cinta.'},
+  toys:{title:'Fabricar juguetes',task:'Completa el juguete con la pieza que le falta.',belt:{ico:'i-toy'},keys:['chimney','wheel','roof','lamp'],start:10,end:17,sub:'Toca la pieza que encaja en el hueco brillante.'},
+  packing:{title:'Empaquetar regalos',task:'Envuelve el regalo o colócale el moño.',belt:{ico:'i-gift'},opts:[{k:'red',n:'Papel rojo',ico:'i-roll',st:'--r1:#c23a45;--r2:#e56b73',ask:'¡Necesito papel rojo!',c:'#c23a45'},{k:'green',n:'Papel verde',ico:'i-roll',st:'--r1:#2f9e5b;--r2:#5fbf7c',ask:'¡Necesito papel verde!',c:'#2f9e5b'},{k:'bow',n:'Moño dorado',ico:'i-bow',ask:'¡Falta el moño dorado!'}],start:18,end:23,sub:'Toca el envoltorio resaltado para terminar el regalo.'},
+  sleigh:{title:'Cargar el trineo',task:'Elige un regalo y colócalo en el trineo.',belt:{ico:'i-gift'},any:true,start:24,end:24,sub:'Toca cualquier regalo para cargarlo en el trineo.'},
+  closed:{title:'Taller cerrado',task:'La preparación de Navidad ha terminado.',belt:{ico:'i-gift'},closed:true}
+ };
  const states={upcoming:'Comienza el 1 de diciembre',active:'Taller abierto',ended:'Taller cerrado',disabled:'Taller no disponible',profile_required:'Completa tu perfil',login_required:'Inicia sesión con Twitch',error:'No se pudo conectar',loading:'Conectando…'};
- let sb=null,busy=false,epoch=0,uid=null,data=null,state='loading';
+ let sb=null,busy=false,epoch=0,uid=null,data=null,state='loading',interactionDone=false,completing=false,builtFor='';
+
+ /* Día de diciembre solo para ELEGIR qué pide el duende hoy (efecto visual). La fase, la fecha válida y la
+    colaboración diaria las decide siempre el servidor (RPC). Si la RPC envía una fecha se usa esa. */
+ function etDay(){let v=data&&(data.server_date||data.today||data.date);let m=typeof v==='string'&&/^(\d{4})-(\d{2})-(\d{2})/.exec(v);
+  if(m)return +m[3];try{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());return +p.find(x=>x.type==='day').value;}catch{return 1;}}
+ function dayIndex(ph){const c=PH[ph];if(!c||c.start==null)return 0;const d=etDay();return d>=c.start&&d<=c.end?d-c.start:0;}
+
+ function opts(phase){const c=PH[phase];
+  if(phase==='toys')return c.keys.map(k=>({k,n:TOY_PARTS[k].name,pc:TOY_PARTS[k],ask:'¡Falta la pieza: '+TOY_PARTS[k].name.toLowerCase()+'!'}));
+  if(phase==='sleigh')return GIFT_COLORS.map((g,i)=>({k:'g'+i,n:g[2],st:'--g1:'+g[0]+';--g2:'+g[1],ico:'i-gift'}));
+  return c.opts||[];}
+ function requested(phase){const o=opts(phase),c=PH[phase];if(!o.length||c.any||c.closed)return null;return o[dayIndex(phase)%o.length].k;}
+
+ function optHtml(o){const ico=o.pc?'<svg viewBox="'+o.pc.box.join(' ')+'" aria-hidden="true"><use href="#'+o.pc.g+'" x="'+o.pc.box[0]+'" y="'+o.pc.box[1]+'" width="'+o.pc.box[2]+'" height="'+o.pc.box[3]+'"/></svg>':sv(o.ico,48,48,o.st);return ico+'<span>'+o.n+'</span>';}
+
+ function build(phase){ /* dibuja los elementos de la fase (solo presentación) */
+  const key=phase+'|'+(requested(phase)||''); if(builtFor===key)return; builtFor=key;
+  const c=PH[phase]||PH.materials,req=requested(phase);
+  const belt=document.getElementById('belt-line');belt.replaceChildren();
+  for(let i=0;i<12;i++){const s=document.createElementNS(NS,'svg');s.setAttribute('class','belt-item');s.setAttribute('viewBox','0 0 48 48');s.setAttribute('aria-hidden','true');
+   if(c.belt.ico==='i-gift'){const g=GIFT_COLORS[i%2?1:0];s.setAttribute('style','--g1:'+g[0]+';--g2:'+g[1]);}
+   const u=document.createElementNS(NS,'use');u.setAttribute('href','#'+c.belt.ico);u.setAttribute('width','48');u.setAttribute('height','48');s.appendChild(u);belt.appendChild(s);}
+  const o=opts(phase);
+  if(phase==='toys'){focusEl.hidden=false;focusEl.innerHTML=toyFocus(req);focusEl.querySelectorAll('[data-p],[data-g]').forEach(el=>{const k=el.dataset.p||el.dataset.g;if(k===req){if(el.dataset.p)el.classList.add('hide');else el.classList.remove('hide');}});}
+  else if(phase==='packing'){focusEl.hidden=false;focusEl.innerHTML=boxFocus;if(req==='bow'){focusEl.querySelector('[data-g="bow"]').classList.remove('hide');}}
+  else if(phase==='sleigh'){focusEl.hidden=false;focusEl.innerHTML=sleighFocus;}
+  else{focusEl.hidden=true;focusEl.replaceChildren();}
+  choicesEl.replaceChildren();
+  for(const x of o){const b=document.createElement('button');b.type='button';b.className='opt'+(x.k===req?' req':'');b.dataset.k=x.k;b.setAttribute('aria-label',x.n+(x.k===req?' (pedido de hoy)':''));b.innerHTML=optHtml(x);choicesEl.appendChild(b);}
+ }
+
+ /* Estado visual de la escena según la respuesta REAL del servidor */
+ function paintAsk(phase,req){const c=PH[phase]||PH.materials,o=opts(phase).find(x=>x.k===req);
+  let t,s='';
+  if(state!=='active'){t=states[state]||states.error;if(state==='upcoming')s='El taller abre el 1 de diciembre.';}
+  else if(data?.contributed_today){t='¡Gracias por ayudar hoy!';s='Vuelve mañana para la siguiente colaboración.';}
+  else{t=o&&o.ask?o.ask:(c.any?'¡Elige un regalo para el trineo!':c.task);s=c.sub||'';}
+  $('ask-text').textContent=t;$('ask-sub').textContent=s;}
+
+ function renderScene(){
+  const phase=PH[data?.phase]?data.phase:'materials',c=PH[phase];build(phase);
+  const done=state==='active'&&!!data?.contributed_today,live=state==='active'&&!done&&!busy&&!completing;
+  paintAsk(phase,requested(phase));
+  factory.classList.toggle('is-done',done);
+  choicesEl.querySelectorAll('.opt').forEach(b=>{b.disabled=!live;});
+  if(done)showDone(phase);
+ }
+ function showDone(phase){ /* aspecto del objeto ya completado (sin animación) */
+  const k=requested(phase)||(phase==='sleigh'?'g0':null);if(k)applyResult(phase,k);
+ }
+
  function render(){
   $('status').textContent=states[state]||states.error;login.hidden=state!=='login_required';
-  const ph=phases[data?.phase]||phases.materials;$('phase-sign').textContent=ph.title;$('task').textContent=state==='active'?ph.task:states[state]||states.error;
-  help.disabled=busy||state!=='active'||!!data?.contributed_today;help.textContent=data?.contributed_today?'Colaboración completada hoy':busy?'Procesando…':ph.button;refresh.disabled=busy;login.disabled=busy;
-  factory.classList.toggle('working',state==='active');document.querySelectorAll('.belt-item').forEach(el=>el.textContent=ph.item);
+  const ph=PH[data?.phase]||PH.materials;$('phase-sign').textContent=ph.title;$('task').textContent=state==='active'?ph.task:states[state]||states.error;
+  refresh.disabled=busy||completing;login.disabled=busy;
+  factory.classList.toggle('working',state==='active');
   $('my-total').textContent=data?.my_total??'—';$('my-rank').textContent=data?.my_position?'#'+data.my_position:'—';$('total').textContent=data?.community?.total??'—';$('members').textContent=data?.community?.members??'—';
   document.querySelectorAll('[data-phase]').forEach(el=>el.classList.toggle('current',data?.phase===el.dataset.phase));document.querySelectorAll('[data-count]').forEach(el=>el.textContent=data?.community?String(data.community[el.dataset.count]??0)+' colaboraciones':'—');
   const list=$('leaders');list.replaceChildren();if(!data?.leaders?.length){const li=document.createElement('li');li.className='empty';li.textContent=data?'Todavía no hay colaboraciones.':'Inicia sesión para consultar el ranking.';list.append(li);}else for(const x of data.leaders){const li=document.createElement('li'),pos=document.createElement('strong'),name=document.createElement('span'),count=document.createElement('span');pos.textContent='#'+x.position;name.className='name';name.textContent=x.name;count.textContent=x.total+' días';li.append(pos,name,count);list.append(li);}
+  renderScene();
  }
+
+ /* ---------- Llamada al servidor (contrato de christmas_workshop_v1 sin cambios) ----------
+    La colaboración (p_contribute=true) solo se pide al terminar la interacción visual: es el flujo de la
+    interfaz, NO una medida de seguridad. El servidor sigue siendo quien valida fecha, sesión y límite diario. */
  async function request(contribute){
+  if(contribute){if(!interactionDone)return;interactionDone=false;}
   if(busy||!sb)return;const turn=++epoch;busy=true;render();
   try{const {data:s}=await sb.auth.getSession();if(turn!==epoch)return;if(!s.session){data=null;uid=null;state='login_required';$('message').textContent='Tus colaboraciones se guardan en tu perfil.';return;}
    if(uid!==s.session.user.id){uid=s.session.user.id;data=null;}
    const {data:r,error}=await sb.rpc('christmas_workshop_v1',{p_contribute:contribute});if(turn!==epoch)return;if(error||!r||!Object.hasOwn(states,r.status))throw Error('rpc');
    data=r;state=r.status;$('message').textContent=r.added?'¡Colaboración registrada!':r.contributed_today?'Ya colaboraste hoy. Regresa mañana.':state==='upcoming'?'Abre el 1 de diciembre, a medianoche ET.':'Una colaboración diaria, sin coste.';
   }catch{if(turn===epoch){data=null;state='error';$('message').textContent='No se confirmó la operación. Actualiza el estado.';}}
-  finally{if(turn===epoch){busy=false;render();}}
+  finally{if(turn===epoch){busy=false;completing=false;if(contribute&&!data?.contributed_today)builtFor='';render();}}
  }
- help.addEventListener('click',()=>{if(!busy&&state==='active'&&!data?.contributed_today)request(true);});refresh.addEventListener('click',()=>request(false));login.addEventListener('click',async()=>{if(!sb||busy)return;try{sessionStorage.setItem('geoarmy_return_to_v1',location.pathname+location.hash);const {error}=await sb.auth.signInWithOAuth({provider:'twitch',options:{redirectTo:location.origin+window.GEOARMY_SITE_BASE+'auth/callback/',scopes:'user:read:email'}});if(error)throw error;}catch{$('message').textContent='No se pudo iniciar sesión.';}});
+
+ /* ---------- Interacción (clic o toque) ---------- */
+ const reduce=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+ function fly(btn,target,ms){return new Promise(res=>{if(reduce()||!btn||!target||!btn.animate){res();return;}
+  const a=btn.getBoundingClientRect(),b=target.getBoundingClientRect(),dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2);
+  const clone=btn.querySelector('svg').cloneNode(true);clone.style.cssText='position:fixed;left:'+a.left+'px;top:'+a.top+'px;width:'+a.width+'px;height:'+a.height+'px;z-index:50;pointer-events:none;'+(btn.querySelector('svg').getAttribute('style')||'');document.body.appendChild(clone);
+  const an=clone.animate([{transform:'translate(0,0) scale(1)'},{transform:'translate(0,-26px) scale(1.12)',offset:.3},{transform:'translate('+dx+'px,'+dy+'px) scale(.55)',opacity:.9}],{duration:ms,easing:'cubic-bezier(.3,.7,.3,1)',fill:'forwards'});
+  an.onfinish=()=>{clone.remove();res();};an.oncancel=()=>{clone.remove();res();};});}
+ function applyResult(phase,k,btn){ /* lo que se ve en el objeto al acertar */
+  if(phase==='toys'){const p=focusEl.querySelector('[data-p="'+k+'"]'),g=focusEl.querySelector('[data-g="'+k+'"]');if(p)p.classList.remove('hide');if(g)g.classList.add('hide');}
+  else if(phase==='packing'){const body=focusEl.querySelector('#bx-body'),lid=focusEl.querySelector('#bx-lid'),rib=focusEl.querySelector('#bx-rib');
+   if(k==='bow'){focusEl.querySelector('#bx-bow').style.display='';focusEl.querySelector('[data-g="bow"]').classList.add('hide');}
+   else{const col=k==='red'?'#c23a45':'#2f9e5b';body.setAttribute('fill',col);lid.setAttribute('fill',col);rib.setAttribute('opacity','1');}}
+  else if(phase==='sleigh'){const l=focusEl.querySelector('#sl-load'),i=GIFT_COLORS[+k.slice(1)];if(l)l.innerHTML='<use href="#i-gift" x="82" y="22" width="52" height="52" style="--g1:'+i[0]+';--g2:'+i[1]+'"/>';}
+ }
+ async function pick(btn){
+  const phase=PH[data?.phase]?data.phase:'materials',k=btn.dataset.k,req=requested(phase);
+  if(busy||completing||state!=='active'||data?.contributed_today)return;
+  if(req&&k!==req){btn.classList.remove('nope');void btn.offsetWidth;btn.classList.add('nope');$('ask-sub').textContent='Ese no es el que pide el duende. Prueba con el resaltado.';return;}
+  completing=true;choicesEl.querySelectorAll('.opt').forEach(b=>b.disabled=true);btn.classList.add('chosen');
+  const target=phase==='materials'?document.querySelector('.belt'):focusEl.querySelector('svg');
+  await fly(btn,target,reduce()?0:650);
+  applyResult(phase,k,btn);
+  setTimeout(()=>{interactionDone=true;request(true);},reduce()?0:350);
+ }
+ choicesEl.addEventListener('click',e=>{const b=e.target.closest('.opt');if(b&&!b.disabled)pick(b);});
+ refresh.addEventListener('click',()=>request(false));
+ login.addEventListener('click',async()=>{if(!sb||busy)return;try{sessionStorage.setItem('geoarmy_return_to_v1',location.pathname+location.hash);const {error}=await sb.auth.signInWithOAuth({provider:'twitch',options:{redirectTo:location.origin+window.GEOARMY_SITE_BASE+'auth/callback/',scopes:'user:read:email'}});if(error)throw error;}catch{$('message').textContent='No se pudo iniciar sesión.';}});
+ render();
  if(!window.supabase||!window.GEOARMY_SUPABASE_URL||!window.GEOARMY_SUPABASE_ANON_KEY){state='error';render();return;}
- sb=window.supabase.createClient(window.GEOARMY_SUPABASE_URL,window.GEOARMY_SUPABASE_ANON_KEY);sb.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||(uid&&session?.user?.id!==uid)){epoch++;busy=false;uid=null;data=null;state='login_required';render();}if(event==='SIGNED_IN'||event==='SIGNED_OUT')setTimeout(()=>request(false),0);});document.addEventListener('visibilitychange',()=>{if(!document.hidden)request(false);});request(false);
+ sb=window.supabase.createClient(window.GEOARMY_SUPABASE_URL,window.GEOARMY_SUPABASE_ANON_KEY);sb.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||(uid&&session?.user?.id!==uid)){epoch++;busy=false;completing=false;interactionDone=false;uid=null;data=null;state='login_required';render();}if(event==='SIGNED_IN'||event==='SIGNED_OUT')setTimeout(()=>request(false),0);});document.addEventListener('visibilitychange',()=>{if(!document.hidden)request(false);});request(false);
 })();
 </script></body></html>
