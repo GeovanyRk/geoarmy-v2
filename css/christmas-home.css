@@ -271,3 +271,24 @@
   .ga-theme-christmas .footer-inner { justify-content: center; gap: 4px 10px; text-align: center; }
   .ga-theme-christmas .footer-code { margin-left: 0; }
 }
+
+/* V4 — La portada llena la ventana; el asistente flota sobre el fondo existente. */
+body.ga-theme-christmas {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #050d18;
+}
+body.ga-theme-christmas > .v3-page { flex: 1 0 auto; }
+body.ga-theme-christmas > .footer { flex: 0 0 auto; }
+body.ga-theme-christmas::before { display: none; }
+/* El lanzador y su invitación ya son fixed; no reservan espacio de layout. */
+@media (min-width: 761px) {
+  .ga-theme-christmas #ga-guide-launcher {
+    bottom: max(57px, calc(48px + env(safe-area-inset-bottom)));
+  }
+  .ga-theme-christmas #ga-guide-nudge {
+    bottom: max(138px, calc(129px + env(safe-area-inset-bottom)));
+  }
+}
