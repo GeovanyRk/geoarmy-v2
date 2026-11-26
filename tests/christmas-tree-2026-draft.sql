@@ -20,7 +20,7 @@ create table christmas_2026.tree_claims (
   profile_id uuid not null references public.profiles(id),
   twitch_id text not null,
   claim_day date not null,
-  gift smallint not null check(gift between 1 and 5),
+  gift smallint not null check(gift between 1 and 24 and gift=extract(day from claim_day)),
   reward text not null check(reward in ('XP','GCOIN','VBUCKS','SOUVENIR')),
   amount int not null,
   idempotency_key text not null unique,
@@ -50,12 +50,13 @@ declare
   k text; applied boolean; result jsonb;
 begin
   if coalesce(auth.role(),'') <> 'service_role' then raise exception 'forbidden' using errcode='42501'; end if;
-  if p_profile is null or p_gift is null or p_gift not between 1 and 5 then raise exception 'invalid_request'; end if;
+  if p_profile is null or p_gift is null or p_gift not between 1 and 24 then raise exception 'invalid_request'; end if;
   -- Serializa todas las aperturas: inventario, topes y créditos quedan en la misma transacción.
   select * into c from christmas_2026.tree_config where id for update;
   if not found or not c.enabled then return jsonb_build_object('status','disabled'); end if;
   d := (clock_timestamp() at time zone 'America/New_York')::date;
   if d not between c.start_day and c.end_day then return jsonb_build_object('status','outside_window'); end if;
+  if p_gift <> extract(day from d)::int then return jsonb_build_object('status','gift_not_available'); end if;
   select p.twitch_id into twitch from public.profiles p where p.id=p_profile;
   if not found or twitch is null or btrim(twitch)='' then return jsonb_build_object('status','profile_required'); end if;
   select * into prior from christmas_2026.tree_claims where twitch_id=twitch and claim_day=d;
