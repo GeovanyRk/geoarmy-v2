@@ -60,7 +60,7 @@
   /* ---------- Estado ---------- */
   const q = new URLSearchParams(location.search);
   const PREVIEW = ['prep', 'ruta', 'fin'].includes(q.get('preview')) ? q.get('preview') : null;
-  const model = { codes: DEFAULT_CODES.slice(), arr: null, user: null, offset: 0, loggedIn: null, schedule: 'none' };
+  const model = { codes: DEFAULT_CODES.slice(), arr: null, user: null, offset: 0, officialNow: null, officialAt: 0, loggedIn: null, schedule: 'none', connectionError: false };
   let route = [];            // [{code, pt, label}] en orden de visita
   let legs = [];             // [{dim, glow, lit, len}] pole→d0, d0→d1 …
   let demo = null;           // { t0, L, frozen }
@@ -142,13 +142,14 @@
       if (demo.frozen != null) return demo.base + demo.frozen;
       const span = (n + 2.5) * demo.L; return demo.base + ((Date.now() - demo.t0) % span);
     }
-    return Date.now() + model.offset;
+    return model.officialNow === null ? Date.now() : model.officialNow + (performance.now() - model.officialAt);
   }
   function snapshot(now) {
     const n = route.length;
     let phase = PREVIEW === 'prep' ? 'prep' : PREVIEW === 'fin' ? 'fin' : (now < START ? 'prep' : now < END ? 'ruta' : 'fin');
     if (demo && PREVIEW === 'ruta') phase = 'ruta';
     const S = { phase, now, n, synced: false, cur: -1, next: n ? 0 : -1, travelling: false, frac: 0, visited: 0, toNext: null, toStart: Math.max(0, START - now), leg: 0 };
+    if (!PREVIEW && model.officialNow === null) { S.phase = 'prep'; S.toStart = null; return S; }
     if (phase === 'fin') { S.cur = -1; S.next = -1; S.visited = n; S.synced = true; S.done = true; return S; }
     if (phase === 'prep') return S;
     const arr = model.arr; if (!arr || !n) return S;       // recorrido real sin horario del servidor → "por sincronizar"
@@ -178,7 +179,7 @@
 
   function render(force) {
     const S = snapshot(clock()), n = route.length;
-    const sig = [S.phase, S.cur, S.next, S.visited, S.synced, S.travelling, model.user && model.user.country, model.loggedIn, model.schedule].join('|');
+    const sig = [S.phase, S.cur, S.next, S.visited, S.synced, S.travelling, model.user && model.user.country, model.loggedIn, model.schedule, model.connectionError, model.officialNow !== null].join('|');
     if (sig !== lastSig || force) {
       lastSig = sig;
       route.forEach((r, i) => {
@@ -192,7 +193,7 @@
   function tick(S) {   // partes que cambian cada segundo
     const cnt = $('v-count');
     if (S.phase === 'prep') {
-      cnt.hidden = false; cnt.innerHTML = 'Santa parte en <b>' + fmt(S.toStart, true) + '</b>'; $('t-time').textContent = fmt(S.toStart, true);
+      cnt.hidden = false; cnt.innerHTML = S.toStart === null ? 'Sincronizando hora oficial…' : 'Santa parte en <b>' + fmt(S.toStart, true) + '</b>'; $('t-time').textContent = S.toStart === null ? '—' : fmt(S.toStart, true);
     } else { cnt.hidden = true; $('t-time').textContent = S.phase === 'ruta' && S.synced && S.toNext != null ? fmt(S.toNext) : '—'; }
   }
   function steps(S) {
@@ -220,6 +221,7 @@
       next = S.next >= 0 ? longName(route[S.next].code) : '—'; vis = S.visited + ' de ' + n;
       if (S.cur < 0 && !S.travelling) { now = 'Último destino'; }
     }
+    if (!PREVIEW && model.officialNow === null) { now = 'Por sincronizar'; next = '—'; vis = '—'; pill = ['Sin conexión oficial', 'wait']; note.hidden = false; note.textContent = model.connectionError ? 'No se pudo consultar el servidor. Reintentaremos automáticamente.' : 'Consultando el horario oficial.'; }
     const lead = document.querySelector('.v-lead'); if (lead) lead.textContent = S.phase === 'fin' ? 'Santa completó su recorrido por los países de la comunidad GeoArmy.' : S.phase === 'ruta' ? 'Santa recorre el mundo visitando los países de la comunidad GeoArmy.' : 'Santa se prepara para recorrer el mundo y visitar los países de la comunidad GeoArmy.';
     $('t-now-l').textContent = nowL; $('t-now').textContent = now; $('t-next').textContent = next; $('t-visited').textContent = vis; $('t-time-l').textContent = tl;
     const pe = $('t-state'); pe.textContent = pill[0]; pe.className = 'v-pill ' + pill[1];
@@ -298,7 +300,7 @@
     if (!running) return; requestAnimationFrame(frame);
     const dt = Math.min(0.05, (ts - last) / 1000 || 0.016); last = ts;
     const S = render(), p = placeSleigh(S); lightRoute(S);
-    if (!reduce()) { emit(p, S, ts); drawFx(dt); }
+    if (!reduce() && ts - lastEmit >= 33) { lastEmit = ts; emit(p, S, ts); drawFx(Math.min(.1,dt*2)); }
   }
   function startLoop() { if (running || !visible || document.hidden) return; running = true; last = performance.now(); requestAnimationFrame(frame); }
   function stopLoop() { running = false; }
@@ -342,7 +344,30 @@
     if (!window.supabase || !window.GEOARMY_SUPABASE_URL || !window.GEOARMY_SUPABASE_ANON_KEY) return;
     try {
       const sb = window.supabase.createClient(window.GEOARMY_SUPABASE_URL, window.GEOARMY_SUPABASE_ANON_KEY);
-      sb.auth.getSession().then(({ data }) => { model.loggedIn = !!(data && data.session); render(true); }).catch(() => {});
+      let generation = 0;
+      async function sync() {
+        if (PREVIEW) return;
+        const turn = ++generation;
+        try {
+          const {data: auth, error: authError} = await sb.auth.getSession();
+          if (turn !== generation) return;
+          if (authError) throw authError;
+          model.loggedIn = !!auth?.session;
+          const {data, error} = await sb.rpc('christmas_travel_v1');
+          if (turn !== generation) return;
+          if (error || !data || !Array.isArray(data.destinations) || !Number.isFinite(Date.parse(data.serverNow))) throw Error('Invalid route');
+          model.connectionError = false;
+          window.GeoArmyViaje.applyServerData(data);
+        } catch (_) {
+          if (turn !== generation) return;
+          model.connectionError = true; render(true);
+        }
+      }
+      if (!PREVIEW) {
+        sb.auth.onAuthStateChange((event) => { if (event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION') { generation++; model.user = null; model.loggedIn = event === 'SIGNED_OUT' ? false : null; render(true); setTimeout(sync,0); } });
+        sync(); setInterval(sync,60000);
+        document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync();});
+      }
       $('v-login').addEventListener('click', async () => { try { sessionStorage.setItem('geoarmy_return_to_v1', location.pathname); await sb.auth.signInWithOAuth({ provider: 'twitch', options: { redirectTo: location.origin + window.GEOARMY_SITE_BASE + 'auth/callback/', scopes: 'user:read:email' } }); } catch (e) {} });
     } catch (e) {}
   }
@@ -351,9 +376,13 @@
   window.GeoArmyViaje = {
     applyServerData(d) {
       if (!d) return;
-      if (d.serverNow && !isNaN(Date.parse(d.serverNow))) model.offset = Date.parse(d.serverNow) - Date.now();
-      if (d.user !== undefined) model.user = d.user ? { country: d.user.country || null, eligible: d.user.eligible } : { country: null };
-      if (Array.isArray(d.destinations)) setDestinations(d.destinations); else render(true);
+      if (PREVIEW) return;
+      if (d.serverNow && !isNaN(Date.parse(d.serverNow))) { model.officialNow = Date.parse(d.serverNow); model.officialAt = performance.now(); }
+      if (d.user !== undefined) model.user = d.user ? { country: d.user.country || null, eligible: d.user.eligible } : null;
+      if (Array.isArray(d.destinations)) {
+        const signature = JSON.stringify(d.destinations.map(x=>[x.code,x.order,x.arrives_at]));
+        if (signature !== model.routeSignature) { model.routeSignature = signature; setDestinations(d.destinations); } else render(true);
+      } else render(true);
     },
     snapshot: () => snapshot(clock())
   };
@@ -373,7 +402,7 @@
   }
 
   /* ---------- Arranque ---------- */
-  buildBase(); setDestinations(DEFAULT_CODES.map((c) => ({ code: c }))); setupPreview(); render(true); sizeFx(); initAuth();
+  buildBase(); setDestinations(PREVIEW ? DEFAULT_CODES.map((c) => ({ code: c })) : []); setupPreview(); render(true); sizeFx(); initAuth();
   new ResizeObserver(() => sizeFx()).observe($('v-map'));
   new IntersectionObserver((e) => { visible = e[0].isIntersecting; visible ? startLoop() : stopLoop(); }, { threshold: 0 }).observe($('v-map'));
   document.addEventListener('visibilitychange', () => (document.hidden ? stopLoop() : startLoop()));
