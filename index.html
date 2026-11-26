@@ -140,6 +140,27 @@
       height:100%;
       object-fit:contain;
     }
+    .ga-santa-tree-pin{
+      position:absolute;left:72%;top:64%;transform:translate(-50%,-50%);
+      z-index:4;display:flex;align-items:center;flex-direction:column;
+      gap:3px;text-decoration:none;color:#fff3d5;white-space:nowrap;
+      pointer-events:auto;
+    }
+    .ga-santa-pin-icon{
+      display:grid;place-items:center;width:39px;height:39px;font-size:22px;
+      border:1px solid #e6c78a;border-radius:50%;background:#153d36;
+      box-shadow:0 3px 12px #0009,0 0 14px #e6c78a44;
+    }
+    .ga-santa-pin-label{
+      padding:3px 7px;border:1px solid #e6c78a80;border-radius:5px;
+      background:#111e2eeb;font:700 9px Inter,system-ui,sans-serif;
+      letter-spacing:.05em;
+    }
+    .ga-santa-tree-pin:hover .ga-santa-pin-icon,
+    .ga-santa-tree-pin:focus-visible .ga-santa-pin-icon{
+      background:#296b56;outline:2px solid #fff1c4;outline-offset:2px;
+    }
+    @media(max-width:560px){.ga-santa-pin-icon{width:34px;height:34px;font-size:18px}.ga-santa-pin-label{font-size:8px}}
     /* Los futuros pines usarán coordenadas porcentuales sobre este marco,
        no sobre el título ni sobre la ventana del navegador. */
     @media (max-width:1300px){
@@ -729,8 +750,15 @@
           var stage = document.createElement('span');
           stage.className = 'ga-santa-art';
           stage.id = 'gaSantaArt';
-          art.parentNode.insertBefore(stage, art);
+          // El marco es hermano del enlace original: evita enlaces anidados.
+          link.parentNode.insertBefore(stage, link);
           stage.appendChild(art);
+          var pin = document.createElement('a');
+          pin.className = 'ga-santa-tree-pin';
+          pin.href = 'navidad-arbol.html';
+          pin.setAttribute('aria-label', 'Árbol de Navidad — vista previa');
+          pin.innerHTML = '<span class="ga-santa-pin-icon" aria-hidden="true">🎄</span><span class="ga-santa-pin-label">ÁRBOL DE NAVIDAD</span>';
+          stage.appendChild(pin);
         }
         world.classList.add('ga-santa-world');
         art.src = preview.src;
