@@ -292,3 +292,24 @@ body.ga-theme-christmas::before { display: none; }
     bottom: max(138px, calc(129px + env(safe-area-inset-bottom)));
   }
 }
+
+/* V5 — Cabecera limpia: continuidad del cielo invernal y esquinas superiores discretas. */
+.ga-theme-christmas .v3-hero-stage::before { display: none; }
+.ga-theme-christmas .v3-nav { background: transparent; border-bottom: 0; }
+.ga-theme-christmas .ga-xmas-corner--tl,
+.ga-theme-christmas .ga-xmas-corner--tr {
+  width: min(245px, 16vw);
+  opacity: .85;
+}
+.ga-theme-christmas .ga-xmas-corner--tl { left: -15px; top: -12px; }
+.ga-theme-christmas .ga-xmas-corner--tr { right: -15px; top: -12px; }
+@media (max-width: 1300px) {
+  .ga-theme-christmas .ga-xmas-corner--tl,
+  .ga-theme-christmas .ga-xmas-corner--tr { width: min(145px, 12vw); opacity: .7; }
+}
+@media (max-width: 760px) {
+  .ga-theme-christmas .ga-xmas-corner--tl,
+  .ga-theme-christmas .ga-xmas-corner--tr { width: 76px; opacity: .48; top: -7px; }
+  .ga-theme-christmas .ga-xmas-corner--tl { left: -20px; }
+  .ga-theme-christmas .ga-xmas-corner--tr { right: -20px; }
+}
