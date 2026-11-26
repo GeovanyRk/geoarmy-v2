@@ -146,6 +146,9 @@
       gap:3px;text-decoration:none;color:#fff3d5;white-space:nowrap;
       pointer-events:auto;
     }
+    .ga-santa-tree-pin.ga-santa-workshop-pin{left:31%;top:32%;}
+    .ga-santa-workshop-pin .ga-santa-pin-icon{background:linear-gradient(150deg,#4f3024,#1b1820);width:49px;height:49px;border:1.5px solid #e6c78a;box-shadow:0 3px 0 #080c14,0 5px 12px #000c,0 0 0 2px #0b111d;}
+    @media(max-width:560px){.ga-santa-workshop-pin .ga-santa-pin-icon{width:40px;height:40px;}}
     .ga-santa-pin-icon{
       display:grid;place-items:center;width:39px;height:39px;font-size:22px;
       border:1px solid #e6c78a;border-radius:50%;background:#153d36;
@@ -762,6 +765,12 @@
           pin.setAttribute('aria-label', 'Árbol de Navidad — vista previa');
           pin.innerHTML = '<span class="ga-santa-pin-icon" aria-hidden="true">🎄</span><span class="ga-santa-pin-label">ÁRBOL DE NAVIDAD</span>';
           stage.appendChild(pin);
+          var workshopPin = document.createElement('a');
+          workshopPin.className = 'ga-santa-tree-pin ga-santa-workshop-pin';
+          workshopPin.href = 'navidad-taller.html';
+          workshopPin.setAttribute('aria-label', 'Entrar al Taller de Santa');
+          workshopPin.innerHTML = '<span class="ga-santa-pin-icon" aria-hidden="true">🛠️</span><span class="ga-santa-pin-label">TALLER DE SANTA</span>';
+          stage.appendChild(workshopPin);
           var iconArt = new Image();
           iconArt.alt = '';
           iconArt.className = 'ga-santa-pin-art';
