@@ -313,3 +313,17 @@ body.ga-theme-christmas::before { display: none; }
   .ga-theme-christmas .ga-xmas-corner--tl { left: -20px; }
   .ga-theme-christmas .ga-xmas-corner--tr { right: -20px; }
 }
+
+/* V6 — Sin corte horizontal: nav y hero comparten el mismo fondo de .v3-page.
+   La capa de resplandor local se desvanece antes de sus bordes. */
+.ga-theme-christmas .v3-nav,
+.ga-theme-christmas .v3-hero-stage {
+  background: transparent !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.ga-theme-christmas .v3-hero-stage::before { content: none !important; }
+.ga-theme-christmas .ga-xmas-glow {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 110px, #000 85%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 110px, #000 85%, transparent 100%);
+}
