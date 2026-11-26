@@ -119,6 +119,33 @@
       object-fit:contain;
       filter:none;
     }
+    /* Navidad: marco proporcional independiente para arte y futuros pines.
+       Solo se activa al cargar correctamente el planeta navideño. */
+    .v3-world-slide-02 .ga-santa-world{
+      width:min(480px, 33vw);
+      max-width:100%;
+    }
+    .ga-santa-art{
+      display:block;
+      position:relative;
+      width:min(468px, 100%);
+      aspect-ratio:720 / 600;
+      flex:none;
+    }
+    .ga-santa-art > img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+    /* Los futuros pines usarán coordenadas porcentuales sobre este marco,
+       no sobre el título ni sobre la ventana del navegador. */
+    @media (max-width:1300px){
+      .v3-world-slide-02 .ga-santa-world{width:min(480px, 88vw);}
+    }
+    @media (max-width:560px){
+      .ga-santa-art{width:min(336px, 100%);}
+    }
     .world-02-open-title{
       display:block;
       margin-top:2px;
@@ -696,6 +723,14 @@
       var preview = new Image();
       preview.onload = function () {
         if (!preview.naturalWidth) return;
+        if (!art.parentElement.classList.contains('ga-santa-art')) {
+          var stage = document.createElement('span');
+          stage.className = 'ga-santa-art';
+          stage.id = 'gaSantaArt';
+          art.parentNode.insertBefore(stage, art);
+          stage.appendChild(art);
+        }
+        world.classList.add('ga-santa-world');
         art.src = preview.src;
         art.alt = 'El Taller de Santa: fábrica navideña de juguetes';
         title.textContent = 'MUNDO 02 · EL TALLER DE SANTA';
