@@ -23,6 +23,8 @@
   <link rel="stylesheet" href="css/v3-theme.css"/>
   <link rel="stylesheet" href="css/geoarmy-guide.css?v=3"/>
   <link rel="stylesheet" href="css/index-racha.css?v=1"/>
+  <!-- Portada navideña V1 (solo pruebas): tema activado por la clase ga-theme-christmas en <body> -->
+  <link rel="stylesheet" href="css/christmas-home.css?v=1"/>
 
   <style>
     /* Correcciones móviles del inicio */
@@ -211,12 +213,17 @@
 </script>
   <link rel="stylesheet" href="css/plus-pin.css"/>
 </head>
-<body>
+<body class="ga-theme-christmas">
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
   <!-- Tema V3: ver css/v3-theme.css (antes este bloque estaba embebido aquí) -->
 
   <div class="v3-page">
+    <!-- Navidad V1: guirnalda superior + nieve (decorativo; ver css/christmas-home.css) -->
+    <div class="ga-xmas-fx" aria-hidden="true">
+      <div class="ga-xmas-snow"><i class="ga-sn-far"></i><i class="ga-sn-near"></i></div>
+      <div class="ga-xmas-garland"><i class="ga-gl-a"></i><i class="ga-gl-b"></i></div>
+    </div>
     <div class="v3-stars"></div>
     <img src="nebula-tl.webp" alt="" class="v3-nebula v3-nebula-tl"/>
     <img src="nebula-tr.webp" alt="" class="v3-nebula v3-nebula-tr"/>
@@ -254,6 +261,9 @@
     <!-- HERO / GEO ARMY (inicio) -->
     <section class="hero v3-hero-stage panel" id="inicio" style="border-bottom:none;padding:26px 1.5rem 10px;">
       <h1 class="v3-h1-sr">Geo Army</h1>
+
+      <!-- Navidad V1: resplandor y escarcha de "Elige tu mundo" (decorativo, detrás del contenido) -->
+      <div class="ga-xmas-glow" aria-hidden="true"><div class="ga-gw-aura"></div><div class="ga-gw-sparkle ga-gw-sp-a"></div><div class="ga-gw-sparkle ga-gw-sp-b"></div></div>
 
       <!-- Racha diaria: solo lectura (js/index-racha.js). Oculta hasta tener una lectura válida de la cuenta con sesión.
            El botón es un enlace a Mi Geo Army: el registro NUNCA se hace desde el home. No es un pin del planeta. -->

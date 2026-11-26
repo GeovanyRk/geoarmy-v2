@@ -1,0 +1,211 @@
+/* ==========================================================================
+   Portada navideña V1 — "Christmas premium sci-fi fantasy"  (SOLO index.html, SOLO geoarmy-v2)
+   --------------------------------------------------------------------------
+   Se activa únicamente con la clase  ga-theme-christmas  en <body>. Sin esa clase este archivo
+   no cambia nada. Es 100 % presentación: no toca lógica, cuentas, economía ni Supabase.
+   Capas (todas aria-hidden, pointer-events:none, detrás o sin tapar la interfaz):
+     .ga-xmas-fx     (en .v3-page)  guirnalda superior + nieve
+     .ga-xmas-glow   (en el hero)   resplandores de "Elige tu mundo" + escarcha
+   Extensible al resto de páginas: basta enlazar este CSS, poner la clase en <body> y (opcional)
+   copiar las dos capas; los bloques están separados por secciones numeradas.
+   ========================================================================== */
+
+.ga-theme-christmas {
+  --xm-red: #e0344f; --xm-red-soft: #ff6a7c; --xm-gold: #ffcf6b; --xm-gold-deep: #ffb347;
+  --xm-ice: #cfe4ff; --xm-violet: #9147ff; --xm-blue: #3aa0ff;
+}
+
+/* Las capas decorativas solo existen con el tema activo */
+.ga-xmas-fx, .ga-xmas-glow { display: none; }
+.ga-theme-christmas .ga-xmas-fx, .ga-theme-christmas .ga-xmas-glow { display: block; }
+
+/* ---------- 1) Capa de página: guirnalda + nieve ---------- */
+.ga-xmas-fx { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+
+/* Guirnalda: dos juegos de bombillas que se alternan; la cuerda solo se dibuja en el juego A.
+   Altura máxima ~17 px (escritorio) / ~12 px (móvil): queda por encima del logo y los botones, sin tocarlos. */
+.ga-xmas-garland {
+  position: absolute; top: 0; left: 0; right: 0; height: 20px; z-index: 4; pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+.ga-xmas-garland i { position: absolute; inset: 0; background-repeat: repeat-x; background-position: 0 0; background-size: 240px 20px; }
+.ga-xmas-garland .ga-gl-a { background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27240%27 height=%2720%27 viewBox=%270 0 240 20%27%3E%3Cdefs%3E%3CradialGradient id=%27hred%27%3E%3Cstop offset=%270%27 stop-color=%27%23ff5468%27 stop-opacity=%27.55%27/%3E%3Cstop offset=%271%27 stop-color=%27%23ff5468%27 stop-opacity=%270%27/%3E%3C/radialGradient%3E%3CradialGradient id=%27hgold%27%3E%3Cstop offset=%270%27 stop-color=%27%23ffcf6b%27 stop-opacity=%27.55%27/%3E%3Cstop offset=%271%27 stop-color=%27%23ffcf6b%27 stop-opacity=%270%27/%3E%3C/radialGradient%3E%3CradialGradient id=%27hice%27%3E%3Cstop offset=%270%27 stop-color=%27%238fc0ff%27 stop-opacity=%27.55%27/%3E%3Cstop offset=%271%27 stop-color=%27%238fc0ff%27 stop-opacity=%270%27/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d=%27M-2 2 Q120 18 242 2%27 fill=%27none%27 stroke=%27rgba(255,226,170,.5)%27 stroke-width=%271.1%27/%3E%3Ccircle cx=%2720%27 cy=%279.4%27 r=%279%27 fill=%27url(%23hred)%27/%3E%3Crect x=%2718.7%27 y=%272.8%27 width=%272.6%27 height=%272.6%27 rx=%27.6%27 fill=%27%237a6340%27/%3E%3Cellipse cx=%2720%27 cy=%279.4%27 rx=%272.7%27 ry=%274%27 fill=%27%23ff5468%27/%3E%3Cellipse cx=%2719.2%27 cy=%278.2%27 rx=%27.8%27 ry=%271.5%27 fill=%27%23ffb0b8%27 opacity=%27.75%27/%3E%3Ccircle cx=%27100%27 cy=%2712.1%27 r=%279%27 fill=%27url(%23hgold)%27/%3E%3Crect x=%2798.7%27 y=%275.5%27 width=%272.6%27 height=%272.6%27 rx=%27.6%27 fill=%27%237a6340%27/%3E%3Cellipse cx=%27100%27 cy=%2712.1%27 rx=%272.7%27 ry=%274%27 fill=%27%23ffcf6b%27/%3E%3Cellipse cx=%2799.2%27 cy=%2710.9%27 rx=%27.8%27 ry=%271.5%27 fill=%27%23fff1c4%27 opacity=%27.75%27/%3E%3Ccircle cx=%27180%27 cy=%2711.2%27 r=%279%27 fill=%27url(%23hice)%27/%3E%3Crect x=%27178.7%27 y=%274.6%27 width=%272.6%27 height=%272.6%27 rx=%27.6%27 fill=%27%237a6340%27/%3E%3Cellipse cx=%27180%27 cy=%2711.2%27 rx=%272.7%27 ry=%274%27 fill=%27%238fc0ff%27/%3E%3Cellipse cx=%27179.2%27 cy=%2710.0%27 rx=%27.8%27 ry=%271.5%27 fill=%27%23e3f0ff%27 opacity=%27.75%27/%3E%3C/svg%3E"); animation: ga-xm-blink-a 3.4s ease-in-out infinite; }
+.ga-xmas-garland .ga-gl-b { background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27240%27 height=%2720%27 viewBox=%270 0 240 20%27%3E%3Cdefs%3E%3CradialGradient id=%27hred%27%3E%3Cstop offset=%270%27 stop-color=%27%23ff5468%27 stop-opacity=%27.55%27/%3E%3Cstop offset=%271%27 stop-color=%27%23ff5468%27 stop-opacity=%270%27/%3E%3C/radialGradient%3E%3CradialGradient id=%27hgold%27%3E%3Cstop offset=%270%27 stop-color=%27%23ffcf6b%27 stop-opacity=%27.55%27/%3E%3Cstop offset=%271%27 stop-color=%27%23ffcf6b%27 stop-opacity=%270%27/%3E%3C/radialGradient%3E%3CradialGradient id=%27hice%27%3E%3Cstop offset=%270%27 stop-color=%27%238fc0ff%27 stop-opacity=%27.55%27/%3E%3Cstop offset=%271%27 stop-color=%27%238fc0ff%27 stop-opacity=%270%27/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2760%27 cy=%2711.2%27 r=%279%27 fill=%27url(%23hgold)%27/%3E%3Crect x=%2758.7%27 y=%274.6%27 width=%272.6%27 height=%272.6%27 rx=%27.6%27 fill=%27%237a6340%27/%3E%3Cellipse cx=%2760%27 cy=%2711.2%27 rx=%272.7%27 ry=%274%27 fill=%27%23ffcf6b%27/%3E%3Cellipse cx=%2759.2%27 cy=%2710.0%27 rx=%27.8%27 ry=%271.5%27 fill=%27%23fff1c4%27 opacity=%27.75%27/%3E%3Ccircle cx=%27140%27 cy=%2712.1%27 r=%279%27 fill=%27url(%23hice)%27/%3E%3Crect x=%27138.7%27 y=%275.5%27 width=%272.6%27 height=%272.6%27 rx=%27.6%27 fill=%27%237a6340%27/%3E%3Cellipse cx=%27140%27 cy=%2712.1%27 rx=%272.7%27 ry=%274%27 fill=%27%238fc0ff%27/%3E%3Cellipse cx=%27139.2%27 cy=%2710.9%27 rx=%27.8%27 ry=%271.5%27 fill=%27%23e3f0ff%27 opacity=%27.75%27/%3E%3Ccircle cx=%27220%27 cy=%279.4%27 r=%279%27 fill=%27url(%23hred)%27/%3E%3Crect x=%27218.7%27 y=%272.8%27 width=%272.6%27 height=%272.6%27 rx=%27.6%27 fill=%27%237a6340%27/%3E%3Cellipse cx=%27220%27 cy=%279.4%27 rx=%272.7%27 ry=%274%27 fill=%27%23ff5468%27/%3E%3Cellipse cx=%27219.2%27 cy=%278.2%27 rx=%27.8%27 ry=%271.5%27 fill=%27%23ffb0b8%27 opacity=%27.75%27/%3E%3C/svg%3E"); animation: ga-xm-blink-b 3.4s ease-in-out infinite; }
+@keyframes ga-xm-blink-a { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes ga-xm-blink-b { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (max-width: 760px) {
+  .ga-xmas-garland { height: 14px; }
+  .ga-xmas-garland i { background-size: 168px 14px; }
+}
+
+/* Nieve sutil: dos capas con distinta profundidad. Cada capa cae exactamente 1 tesela por ciclo (bucle sin salto)
+   y solo usa transform (barato en móvil). */
+.ga-xmas-snow { position: absolute; inset: 0; pointer-events: none; animation: ga-xm-sway 9s ease-in-out infinite alternate; }
+.ga-xmas-snow i { position: absolute; left: 0; right: 0; top: -760px; bottom: 0; will-change: transform; }
+.ga-xmas-snow .ga-sn-far {
+  opacity: .62; background-size: 420px 420px; animation: ga-xm-fall-far 46s linear infinite;
+  background-image:
+    radial-gradient(circle at 221px 152px, rgba(236,244,255,0.73) 0, rgba(236,244,255,0.40) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 15px 301px, rgba(236,244,255,0.55) 0, rgba(236,244,255,0.30) 1.1px, rgba(236,244,255,0) 2.0px),
+    radial-gradient(circle at 268px 60px, rgba(236,244,255,0.79) 0, rgba(236,244,255,0.44) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 162px 223px, rgba(236,244,255,0.78) 0, rgba(236,244,255,0.43) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 91px 254px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.35) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 366px 316px, rgba(236,244,255,0.77) 0, rgba(236,244,255,0.43) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 324px 255px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.1px, rgba(236,244,255,0) 2.1px),
+    radial-gradient(circle at 258px 145px, rgba(236,244,255,0.68) 0, rgba(236,244,255,0.38) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 173px 305px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 412px 56px, rgba(236,244,255,0.58) 0, rgba(236,244,255,0.32) 1.1px, rgba(236,244,255,0) 2.0px),
+    radial-gradient(circle at 241px 366px, rgba(236,244,255,0.57) 0, rgba(236,244,255,0.31) 1.0px, rgba(236,244,255,0) 1.7px),
+    radial-gradient(circle at 58px 243px, rgba(236,244,255,0.71) 0, rgba(236,244,255,0.39) 1.3px, rgba(236,244,255,0) 2.3px),
+    radial-gradient(circle at 193px 22px, rgba(236,244,255,0.60) 0, rgba(236,244,255,0.33) 1.2px, rgba(236,244,255,0) 2.2px),
+    radial-gradient(circle at 210px 165px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.2px, rgba(236,244,255,0) 2.2px),
+    radial-gradient(circle at 316px 316px, rgba(236,244,255,0.59) 0, rgba(236,244,255,0.33) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 285px 202px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.3px, rgba(236,244,255,0) 2.4px),
+    radial-gradient(circle at 206px 124px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.34) 1.3px, rgba(236,244,255,0) 2.3px),
+    radial-gradient(circle at 127px 137px, rgba(236,244,255,0.74) 0, rgba(236,244,255,0.41) 1.3px, rgba(236,244,255,0) 2.4px),
+    radial-gradient(circle at 388px 173px, rgba(236,244,255,0.64) 0, rgba(236,244,255,0.35) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 65px 316px, rgba(236,244,255,0.78) 0, rgba(236,244,255,0.43) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 208px 15px, rgba(236,244,255,0.69) 0, rgba(236,244,255,0.38) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 350px 157px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.1px, rgba(236,244,255,0) 1.9px),
+    radial-gradient(circle at 122px 218px, rgba(236,244,255,0.59) 0, rgba(236,244,255,0.33) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 71px 64px, rgba(236,244,255,0.60) 0, rgba(236,244,255,0.33) 1.1px, rgba(236,244,255,0) 2.1px),
+    radial-gradient(circle at 186px 219px, rgba(236,244,255,0.58) 0, rgba(236,244,255,0.32) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 163px 63px, rgba(236,244,255,0.56) 0, rgba(236,244,255,0.31) 1.0px, rgba(236,244,255,0) 1.8px);
+}
+.ga-xmas-snow .ga-sn-near {
+  opacity: .78; background-size: 760px 760px; animation: ga-xm-fall-near 30s linear infinite;
+  background-image:
+    radial-gradient(circle at 689px 26px, rgba(236,244,255,0.60) 0, rgba(236,244,255,0.33) 1.8px, rgba(236,244,255,0) 3.4px),
+    radial-gradient(circle at 14px 382px, rgba(236,244,255,0.76) 0, rgba(236,244,255,0.42) 1.7px, rgba(236,244,255,0) 3.1px),
+    radial-gradient(circle at 391px 68px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.7px, rgba(236,244,255,0) 3.0px),
+    radial-gradient(circle at 438px 393px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.35) 2.1px, rgba(236,244,255,0) 3.9px),
+    radial-gradient(circle at 408px 240px, rgba(236,244,255,0.74) 0, rgba(236,244,255,0.41) 2.2px, rgba(236,244,255,0) 3.9px),
+    radial-gradient(circle at 18px 8px, rgba(236,244,255,0.78) 0, rgba(236,244,255,0.43) 1.8px, rgba(236,244,255,0) 3.3px),
+    radial-gradient(circle at 286px 681px, rgba(236,244,255,0.65) 0, rgba(236,244,255,0.36) 1.9px, rgba(236,244,255,0) 3.5px),
+    radial-gradient(circle at 453px 439px, rgba(236,244,255,0.73) 0, rgba(236,244,255,0.40) 2.4px, rgba(236,244,255,0) 4.4px),
+    radial-gradient(circle at 31px 594px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.35) 1.7px, rgba(236,244,255,0) 3.2px),
+    radial-gradient(circle at 366px 379px, rgba(236,244,255,0.79) 0, rgba(236,244,255,0.43) 2.3px, rgba(236,244,255,0) 4.1px),
+    radial-gradient(circle at 428px 136px, rgba(236,244,255,0.70) 0, rgba(236,244,255,0.38) 1.9px, rgba(236,244,255,0) 3.4px),
+    radial-gradient(circle at 751px 117px, rgba(236,244,255,0.57) 0, rgba(236,244,255,0.31) 1.7px, rgba(236,244,255,0) 3.1px),
+    radial-gradient(circle at 405px 366px, rgba(236,244,255,0.73) 0, rgba(236,244,255,0.40) 2.0px, rgba(236,244,255,0) 3.6px),
+    radial-gradient(circle at 257px 178px, rgba(236,244,255,0.66) 0, rgba(236,244,255,0.36) 1.9px, rgba(236,244,255,0) 3.5px);
+}
+@keyframes ga-xm-fall-far  { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, 420px, 0); } }
+@keyframes ga-xm-fall-near { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, 760px, 0); } }
+@keyframes ga-xm-sway { from { transform: translateX(-10px); } to { transform: translateX(10px); } }
+@media (max-width: 760px) {
+  .ga-xmas-snow .ga-sn-far  { opacity: .42; }
+  .ga-xmas-snow .ga-sn-near { opacity: .5; }
+}
+
+/* ---------- 2) Cabecera "Elige tu mundo" ---------- */
+.ga-theme-christmas .v3-world-header { color: #fff3dc; text-shadow: 0 0 14px rgba(255, 190, 110, .35); }
+.ga-theme-christmas .v3-world-star { color: var(--xm-gold); text-shadow: 0 0 10px rgba(255, 190, 90, .85); }
+.ga-theme-christmas .v3-world-header .v3-now-line { background: linear-gradient(90deg, transparent, rgba(255, 207, 107, .75) 55%, rgba(207, 228, 255, .6)); }
+.ga-theme-christmas .v3-world-header .v3-now-line:last-child { background: linear-gradient(90deg, rgba(207, 228, 255, .6), rgba(255, 207, 107, .75) 45%, transparent); }
+
+/* ---------- 3) Zona de mundos: resplandor + escarcha (sin cajas ni bordes) ---------- */
+.ga-xmas-glow { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ga-xmas-glow .ga-gw-aura {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 30% 44% at 21% 50%, rgba(255, 130, 90, .24), rgba(255, 130, 90, 0) 72%),
+    radial-gradient(ellipse 32% 46% at 50% 50%, rgba(86, 140, 255, .27), rgba(86, 140, 255, 0) 72%),
+    radial-gradient(ellipse 26% 40% at 80% 48%, rgba(145, 71, 255, .23), rgba(145, 71, 255, 0) 72%),
+    radial-gradient(ellipse 58% 12% at 50% 0%, rgba(255, 214, 140, .14), rgba(255, 214, 140, 0) 80%);
+}
+.ga-xmas-glow .ga-gw-sparkle { position: absolute; inset: 0; background-repeat: no-repeat; }
+.ga-xmas-glow .ga-gw-sp-a { animation: ga-xm-twinkle-a 4.6s ease-in-out infinite;
+  background-image:
+    radial-gradient(circle at 64.0% 38.1%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 2.6px),
+    radial-gradient(circle at 87.2% 55.8%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.5px),
+    radial-gradient(circle at 62.9% 20.4%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 3.0px),
+    radial-gradient(circle at 62.2% 76.9%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 3.1px),
+    radial-gradient(circle at 24.8% 76.4%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 2.9px),
+    radial-gradient(circle at 72.3% 78.0%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.6px),
+    radial-gradient(circle at 75.9% 82.6%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 2.0px),
+    radial-gradient(circle at 27.6% 34.5%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 3.0px),
+    radial-gradient(circle at 50.3% 62.8%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.0px),
+    radial-gradient(circle at 70.7% 63.4%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.4px),
+    radial-gradient(circle at 12.3% 18.2%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.2px),
+    radial-gradient(circle at 86.8% 11.7%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.4px),
+    radial-gradient(circle at 58.2% 51.1%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 2.6px),
+    radial-gradient(circle at 87.3% 13.7%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 1.7px); }
+.ga-xmas-glow .ga-gw-sp-b { animation: ga-xm-twinkle-b 4.6s ease-in-out infinite;
+  background-image:
+    radial-gradient(circle at 10.7% 82.2%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 1.9px),
+    radial-gradient(circle at 96.4% 27.4%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 1.9px),
+    radial-gradient(circle at 21.6% 63.2%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 1.7px),
+    radial-gradient(circle at 32.4% 73.6%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 2.7px),
+    radial-gradient(circle at 73.1% 56.1%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 1.7px),
+    radial-gradient(circle at 33.8% 65.5%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.1px),
+    radial-gradient(circle at 18.1% 53.2%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 2.7px),
+    radial-gradient(circle at 61.2% 72.8%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 3.1px),
+    radial-gradient(circle at 9.0% 12.3%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.7px),
+    radial-gradient(circle at 94.1% 87.5%, rgba(255,255,255,.9) 0, rgba(255,255,255,0) 2.0px),
+    radial-gradient(circle at 40.4% 87.1%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 2.6px),
+    radial-gradient(circle at 80.2% 20.0%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 3.1px),
+    radial-gradient(circle at 89.8% 75.2%, rgba(210,232,255,.95) 0, rgba(255,255,255,0) 3.1px),
+    radial-gradient(circle at 41.2% 47.7%, rgba(255,236,190,.95) 0, rgba(255,255,255,0) 3.1px); }
+@keyframes ga-xm-twinkle-a { 0%, 100% { opacity: .85; } 50% { opacity: .2; } }
+@keyframes ga-xm-twinkle-b { 0%, 100% { opacity: .2; } 50% { opacity: .85; } }
+
+/* Tira deslizable (≤ 1300 px): un solo mundo visible, el resplandor se centra y mezcla cálido + azul */
+@media (max-width: 1300px) {
+  .ga-xmas-glow .ga-gw-aura {
+    background:
+      radial-gradient(ellipse 78% 34% at 50% 58%, rgba(86, 140, 255, .27), rgba(86, 140, 255, 0) 72%),
+      radial-gradient(ellipse 60% 26% at 22% 72%, rgba(255, 130, 90, .19), rgba(255, 130, 90, 0) 74%),
+      radial-gradient(ellipse 60% 26% at 80% 70%, rgba(145, 71, 255, .19), rgba(145, 71, 255, 0) 74%),
+      radial-gradient(ellipse 80% 10% at 50% 0%, rgba(255, 214, 140, .14), rgba(255, 214, 140, 0) 80%);
+  }
+}
+
+/* ---------- 4) Mundo 02 (Santa): solo se asegura el contraste, el planeta no se toca ---------- */
+.ga-theme-christmas .world-02-open-title { text-shadow: 0 2px 14px rgba(0, 0, 0, .75), 0 0 18px rgba(255, 190, 90, .22); }
+.ga-theme-christmas .world-02-open-sub { text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
+
+/* ---------- 5) Tarjeta "Racha diaria": versión navideña (solo apariencia) ---------- */
+.ga-theme-christmas .ga-racha {
+  --r-gold: #ffd27a; --r-orange: #ff7a4a;
+  border: 1.5px solid transparent;
+  background:
+    radial-gradient(1.2px 1.2px at 12% 20%, rgba(255, 255, 255, .55), transparent 60%) padding-box,
+    radial-gradient(1px 1px at 88% 14%, rgba(255, 214, 140, .7), transparent 60%) padding-box,
+    radial-gradient(1px 1px at 70% 82%, rgba(207, 228, 255, .6), transparent 60%) padding-box,
+    radial-gradient(280px 150px at 0% 0%, rgba(145, 71, 255, .28), transparent 70%) padding-box,
+    radial-gradient(260px 150px at 100% 100%, rgba(224, 52, 79, .22), transparent 70%) padding-box,
+    linear-gradient(160deg, #1d0e2b 0%, #0e0716 100%) padding-box,
+    linear-gradient(135deg, #ff6a7c 0%, #ffcf6b 38%, #cfe4ff 55%, #ffcf6b 72%, #e0344f 100%) border-box;
+  box-shadow: 0 0 0 1px rgba(255, 214, 140, .14), 0 12px 30px rgba(0, 0, 0, .5), 0 0 28px rgba(255, 150, 80, .26), 0 0 56px rgba(224, 52, 79, .12);
+}
+.ga-theme-christmas .ga-racha-flame { filter: drop-shadow(0 0 9px rgba(255, 140, 70, .75)); }
+.ga-theme-christmas .ga-racha-n { text-shadow: 0 0 14px rgba(255, 160, 80, .6); }
+.ga-theme-christmas .ga-racha[data-state="pending"] .ga-racha-cta,
+.ga-theme-christmas .ga-racha[data-state="new"] .ga-racha-cta {
+  background: linear-gradient(135deg, #ff6a5a 0%, #ff9a52 45%, #ffcf6b 100%);
+  box-shadow: 0 6px 18px -6px rgba(255, 110, 80, .8);
+}
+.ga-theme-christmas .ga-racha[data-state="done"] .ga-racha-cta { border-color: rgba(255, 207, 107, .6); }
+/* Capa de nieve en el borde superior + acebo en la esquina (decorativos, fuera del flujo de la rejilla) */
+.ga-theme-christmas .ga-racha::before {
+  content: ""; position: absolute; left: 24px; top: -12px; width: 120px; height: 14px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27120%27 height=%2714%27 viewBox=%270 0 120 14%27%3E%3Cdefs%3E%3ClinearGradient id=%27c%27 x1=%270%27 y1=%270%27 x2=%270%27 y2=%271%27%3E%3Cstop offset=%270%27 stop-color=%27%23ffffff%27/%3E%3Cstop offset=%271%27 stop-color=%27%23cfe0ff%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d=%27M0 13 C5 13 6 10 9 8 C12 5 16 6 19 5 C22 2 27 2 31 4 C34 1 41 1 45 4 C49 3 54 4 57 6 C61 4 68 4 72 7 C77 6 83 7 86 9 C90 8 97 9 100 11 C106 11 112 12 120 13 Z%27 fill=%27url(%23c)%27/%3E%3Cpath d=%27M9 8 C12 5 16 6 19 5 M31 4 C34 1 41 1 45 4%27 stroke=%27%23ffffff%27 stroke-width=%271%27 fill=%27none%27 opacity=%27.9%27/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 4px rgba(190, 220, 255, .65));
+}
+.ga-theme-christmas .ga-racha::after {
+  content: ""; position: absolute; top: -13px; right: -9px; width: 40px; height: 30px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2740%27 height=%2730%27 viewBox=%270 0 40 30%27%3E%3Cg stroke=%27%230d2a1c%27 stroke-width=%27.8%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M20 17 C14 8 5 8 2 12 C5 13 4 16 7 17 C6 20 10 22 11 21 C13 24 17 22 20 17Z%27 fill=%27%232f9e5b%27/%3E%3Cpath d=%27M20 17 C26 8 35 8 38 12 C35 13 36 16 33 17 C34 20 30 22 29 21 C27 24 23 22 20 17Z%27 fill=%27%233fb56c%27/%3E%3C/g%3E%3Cpath d=%27M20 17 L8 13 M20 17 L32 13%27 stroke=%27%2314502f%27 stroke-width=%27.7%27 fill=%27none%27/%3E%3Ccircle cx=%2717%27 cy=%2719%27 r=%273.3%27 fill=%27%23e0344f%27 stroke=%27%236e0f20%27 stroke-width=%27.7%27/%3E%3Ccircle cx=%2723.5%27 cy=%2719.5%27 r=%273.3%27 fill=%27%23ff4d63%27 stroke=%27%236e0f20%27 stroke-width=%27.7%27/%3E%3Ccircle cx=%2720.3%27 cy=%2723%27 r=%273.3%27 fill=%27%23e0344f%27 stroke=%27%236e0f20%27 stroke-width=%27.7%27/%3E%3Ccircle cx=%2716%27 cy=%2718%27 r=%27.9%27 fill=%27%23fff%27 opacity=%27.8%27/%3E%3Ccircle cx=%2722.6%27 cy=%2718.5%27 r=%27.9%27 fill=%27%23fff%27 opacity=%27.8%27/%3E%3Ccircle cx=%2719.3%27 cy=%2722%27 r=%27.9%27 fill=%27%23fff%27 opacity=%27.8%27/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .55));
+}
+@media (max-width: 459.98px) {
+  .ga-theme-christmas .ga-racha::after { width: 34px; height: 26px; right: -7px; top: -11px; }
+}
+
+/* ---------- 6) Accesibilidad / rendimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ga-xmas-garland i, .ga-xmas-snow, .ga-xmas-snow i, .ga-xmas-glow .ga-gw-sparkle { animation: none !important; }
+  .ga-xmas-garland .ga-gl-b { opacity: .8; }
+  .ga-xmas-snow i { top: 0; }
+}
