@@ -141,7 +141,7 @@
       object-fit:contain;
     }
     .ga-santa-tree-pin{
-      position:absolute;left:88%;top:46%;transform:translate(-50%,-50%);
+      position:absolute;left:59%;top:51%;transform:translate(-50%,-50%);
       z-index:4;display:flex;align-items:center;flex-direction:column;
       gap:3px;text-decoration:none;color:#fff3d5;white-space:nowrap;
       pointer-events:auto;
@@ -151,12 +151,12 @@
       border:1px solid #e6c78a;border-radius:50%;background:#153d36;
       box-shadow:0 3px 12px #0009,0 0 14px #e6c78a44;
     }
-    .ga-santa-pin-art{display:block;width:52px;height:60px;object-fit:contain;filter:drop-shadow(0 3px 5px #000) drop-shadow(0 0 7px #09111d);transition:transform .2s ease; background:radial-gradient(ellipse,#0b1423ee 25%,#0b142399 60%,transparent 76%);}
+    .ga-santa-pin-art{box-sizing:border-box;display:block;width:52px;height:52px;padding:5px;object-fit:contain;background:linear-gradient(150deg,#19283a,#0b111d);border:1.5px solid #e6c78a;border-radius:50%;box-shadow:0 3px 0 #080c14,0 5px 12px #000c,0 0 0 2px #0b111d;transition:transform .2s ease;}
     .ga-santa-tree-pin:hover .ga-santa-pin-art,.ga-santa-tree-pin:focus-visible .ga-santa-pin-art{transform:scale(1.1);}
-    @media(max-width:560px){.ga-santa-pin-art{width:40px;height:47px}}
+    @media(max-width:560px){.ga-santa-pin-art{width:42px;height:42px;padding:4px}}
     .ga-santa-pin-label{
-      padding:3px 7px;border:1px solid #e6c78a80;border-radius:5px;
-      background:#111e2eeb;font:700 9px Inter,system-ui,sans-serif;
+      padding:4px 8px;border:1px solid #e6c78a;border-radius:5px;
+      background:#0d1724;color:#fff3d5;box-shadow:0 2px 7px #000b;font:700 10px Inter,system-ui,sans-serif;
       letter-spacing:.05em;
     }
     .ga-santa-tree-pin:hover .ga-santa-pin-icon,
