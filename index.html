@@ -149,6 +149,10 @@
     .ga-santa-tree-pin.ga-santa-workshop-pin{left:31%;top:32%;}
     .ga-santa-tree-pin.ga-santa-post-pin{left:27%;top:70%;}
     .ga-santa-tree-pin.ga-santa-list-pin{left:68%;top:22%;}
+    .ga-santa-tree-pin.ga-santa-travel-pin{left:78%;top:72%;}
+    .ga-santa-travel-pin .ga-santa-pin-icon{background:linear-gradient(150deg,#65332c,#172337);width:49px;height:49px;border:1.5px solid #e6c78a;box-shadow:0 3px 0 #080c14,0 5px 12px #000c,0 0 0 2px #0b111d;}
+    @media(max-width:560px){.ga-santa-travel-pin .ga-santa-pin-icon{width:40px;height:40px;}.ga-santa-travel-pin .ga-santa-pin-label{font-size:8px;}}
+
     .ga-santa-list-pin .ga-santa-pin-icon{background:linear-gradient(150deg,#71522c,#211c22);width:49px;height:49px;border:1.5px solid #e6c78a;box-shadow:0 3px 0 #080c14,0 5px 12px #000c,0 0 0 2px #0b111d;}
     @media(max-width:560px){.ga-santa-list-pin .ga-santa-pin-icon{width:40px;height:40px;}.ga-santa-list-pin .ga-santa-pin-label{font-size:8px;}}
 
@@ -791,6 +795,12 @@
           listPin.setAttribute('aria-label', 'La Lista de Santa');
           listPin.innerHTML = '<span class="ga-santa-pin-icon" aria-hidden="true"><svg viewBox="0 0 36 36" width="28" height="28" fill="none"><rect x="8" y="4" width="21" height="28" rx="3" fill="#ecd6aa" stroke="#bb9156"/><path d="M13 10h10M13 15h10M13 20h7" stroke="#9b7047" stroke-width="1.5"/><circle cx="25" cy="26" r="6" fill="#a3342d" stroke="#e9b58e"/><path d="m22 26 2 2 4-5" stroke="#f7dfb7" stroke-width="1.5"/></svg></span><span class="ga-santa-pin-label">LISTA DE SANTA</span>';
           stage.appendChild(listPin);
+          var travelPin = document.createElement('a');
+          travelPin.className = 'ga-santa-tree-pin ga-santa-travel-pin';
+          travelPin.href = 'navidad-viaje.html';
+          travelPin.setAttribute('aria-label', 'Viaje de Santa');
+          travelPin.innerHTML = '<span class="ga-santa-pin-icon" aria-hidden="true"><svg viewBox="0 0 36 36" width="28" height="28" fill="none"><path d="M4 26h19c6 0 9-4 9-8M8 22l-3-9h7l3 5h10l2-7h5l-2 11H8Z" fill="#a83b32" stroke="#e9c184" stroke-width="1.7" stroke-linejoin="round"/><path d="m12 13 1-6h9l2 8" fill="#f0d8aa" stroke="#cc9f59"/><path d="M17 7v8M13 10h10M9 23v3m14-3v3" stroke="#d5ac68" stroke-width="1.5"/></svg></span><span class="ga-santa-pin-label">VIAJE DE SANTA</span>';
+          stage.appendChild(travelPin);
           var iconArt = new Image();
           iconArt.alt = '';
           iconArt.className = 'ga-santa-pin-art';
