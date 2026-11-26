@@ -151,6 +151,9 @@
       border:1px solid #e6c78a;border-radius:50%;background:#153d36;
       box-shadow:0 3px 12px #0009,0 0 14px #e6c78a44;
     }
+    .ga-santa-pin-art{display:block;width:48px;height:56px;object-fit:contain;filter:drop-shadow(0 3px 5px #000a);transition:transform .2s ease;}
+    .ga-santa-tree-pin:hover .ga-santa-pin-art,.ga-santa-tree-pin:focus-visible .ga-santa-pin-art{transform:scale(1.1);}
+    @media(max-width:560px){.ga-santa-pin-art{width:40px;height:47px}}
     .ga-santa-pin-label{
       padding:3px 7px;border:1px solid #e6c78a80;border-radius:5px;
       background:#111e2eeb;font:700 9px Inter,system-ui,sans-serif;
@@ -759,6 +762,14 @@
           pin.setAttribute('aria-label', 'Árbol de Navidad — vista previa');
           pin.innerHTML = '<span class="ga-santa-pin-icon" aria-hidden="true">🎄</span><span class="ga-santa-pin-label">ÁRBOL DE NAVIDAD</span>';
           stage.appendChild(pin);
+          var iconArt = new Image();
+          iconArt.alt = '';
+          iconArt.className = 'ga-santa-pin-art';
+          iconArt.onload = function () {
+            var oldIcon = pin.querySelector('.ga-santa-pin-icon');
+            if (oldIcon && iconArt.naturalWidth) oldIcon.replaceWith(iconArt);
+          };
+          iconArt.src = new URL('assets/navidad/pin-arbol-navidad.webp', document.baseURI).href;
         }
         world.classList.add('ga-santa-world');
         art.src = preview.src;
