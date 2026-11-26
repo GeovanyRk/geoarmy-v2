@@ -1,0 +1,17 @@
+/* Apariencias navideñas 2026. Solo presentación; los adornos nunca reciben clics. */
+html[data-ga-profile-christmas="on"] .ga-logged-in { position: relative; isolation: isolate; }
+html[data-ga-profile-christmas="on"] .ga-logged-in::after {
+  content: ""; position: absolute; inset: -18% -4%; z-index: 3; pointer-events: none;
+  background: url('../assets/navidad/perfiles/normal.webp') center / 100% 100% no-repeat;
+}
+html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-plus::after { background-image: url('../assets/navidad/perfiles/plus.webp'); }
+html[data-ga-profile-christmas="on"] .ga-logged-in.gcos-vip::after { background-image: url('../assets/navidad/perfiles/vip.webp'); }
+html[data-ga-profile-christmas="on"] .ga-logged-in:not(.gcos-vip):not(.gcos-plus) { border-color: #87929d; box-shadow: 0 0 12px rgba(209,226,239,.15); }
+/* Las filas ya usan ::before y ::after: se conserva su geometría y sus capas. */
+html[data-ga-profile-christmas="on"] .rk-row { box-shadow: inset 0 2px 0 rgba(226,239,246,.72); }
+html[data-ga-profile-christmas="on"] .rk-row.gcos-plus { box-shadow: inset 0 2px 0 rgba(137,249,190,.9); }
+html[data-ga-profile-christmas="on"] .rk-row.gcos-vip { box-shadow: inset 0 2px 0 rgba(215,191,255,.9); }
+html[data-ga-profile-christmas="on"] .rk-top-ped { box-shadow: inset 0 3px 0 rgba(240,249,255,.85); }
+html[data-ga-profile-christmas="on"] .mgt-id { box-shadow: inset 0 3px 0 rgba(237,247,255,.75), 0 0 14px rgba(209,226,239,.12); }
+html[data-ga-profile-christmas="on"] .mgt-id.gcos-plus { box-shadow: inset 0 3px 0 rgba(166,255,204,.9), 0 0 16px rgba(45,230,140,.16); }
+html[data-ga-profile-christmas="on"] .mgt-id.gcos-vip { box-shadow: inset 0 3px 0 rgba(230,211,255,.9), 0 0 16px rgba(162,100,255,.18); }
