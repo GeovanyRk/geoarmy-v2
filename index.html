@@ -667,6 +667,44 @@
   })();
   </script>
 
+  <!-- Vista previa de Navidad 2026: exclusivamente geoarmy-v2.
+       Si el recurso aún no existe, se conserva One Piece sin cambios. -->
+  <script>
+    (function () {
+      if (!location.pathname.startsWith('/geoarmy-v2/')) return;
+      var world = document.getElementById('wlOnePieceWorld');
+      var link = document.getElementById('wlOnePieceOpen');
+      if (!world || !link) return;
+      var art = link.querySelector('img');
+      var title = link.querySelector('.world-02-open-title');
+      var subtitle = link.querySelector('.world-02-open-sub');
+      if (!art || !title || !subtitle) return;
+      var preview = new Image();
+      preview.onload = function () {
+        if (!preview.naturalWidth) return;
+        art.src = preview.src;
+        art.alt = 'El Taller de Santa: fábrica navideña con Santa dando la bienvenida';
+        title.textContent = 'MUNDO 02 · EL TALLER DE SANTA';
+        subtitle.textContent = 'Vista previa · Próximamente';
+        world.classList.add('is-unlocked');
+        world.classList.remove('v3-world-locked');
+        world.setAttribute('aria-label', 'Mundo 02 — El Taller de Santa, vista previa');
+        link.hidden = false;
+        link.removeAttribute('href');
+        link.removeAttribute('tabindex');
+        link.setAttribute('aria-label', 'El Taller de Santa, vista previa');
+        link.style.cursor = 'default';
+        // El temporizador previo de One Piece vuelve a actualizar su etiqueta
+        // al recuperar visibilidad; restauramos únicamente la etiqueta visual.
+        document.addEventListener('visibilitychange', function () {
+          world.setAttribute('aria-label', 'Mundo 02 — El Taller de Santa, vista previa');
+          link.removeAttribute('tabindex');
+        });
+      };
+      preview.src = new URL('assets/navidad/planeta-santa-720.webp', document.baseURI).href;
+    })();
+  </script>
+
   <script src="js/premium.js"></script>
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
