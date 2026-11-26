@@ -1,0 +1,113 @@
+/* ==========================================================================
+   GEO ARMY — Temporadas · MAQUINARIA BASE (independiente de la temporada)
+   --------------------------------------------------------------------------
+   Lo carga js/geoarmy-season.js solo cuando hay una temporada activa distinta
+   de "original" y la página NO es la portada (la portada usa css/christmas-home.css).
+   Aquí NO hay colores ni arte de ninguna temporada: solo la mecánica de las capas
+   decorativas. Cada tema (css/seasons/<tema>.css) aporta sus recursos mediante
+   variables:
+     --gas-garland-a / --gas-garland-b   juegos de luces (imagen repetible 240x20)
+     --gas-snow-far / --gas-snow-near    teselas de nieve (listas de gradientes)
+     --gas-snow-far-size / -near-size    alto/ancho de cada tesela (px)
+     --gas-corner-top / --gas-corner-bottom   adornos de esquina (imagen)
+   Todo está acotado a  html[data-ga-season]  y a las clases  .ga-xmas-*  (capas
+   decorativas, aria-hidden, pointer-events:none). No toca ninguna otra regla.
+   ========================================================================== */
+
+/* Contenedor de capas: dentro de .v3-page (o body). Nunca recibe clics. */
+html[data-ga-season] .ga-xmas-fx {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+}
+html[data-ga-season] .ga-xmas-fx,
+html[data-ga-season] .ga-xmas-fx * {
+  pointer-events: none !important; -webkit-user-select: none; user-select: none;
+}
+
+/* ---------- Luces superiores (dos juegos que se alternan) ---------- */
+html[data-ga-season] .ga-xmas-garland {
+  position: absolute; top: 0; left: 0; right: 0; height: 20px; z-index: 4;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+html[data-ga-season] .ga-xmas-garland i {
+  position: absolute; inset: 0; background-repeat: repeat-x; background-position: 0 0; background-size: 240px 20px;
+}
+html[data-ga-season] .ga-xmas-garland .ga-gl-a { background-image: var(--gas-garland-a); animation: gas-blink-a 3.4s ease-in-out infinite; }
+html[data-ga-season] .ga-xmas-garland .ga-gl-b { background-image: var(--gas-garland-b); animation: gas-blink-b 3.4s ease-in-out infinite; }
+@keyframes gas-blink-a { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes gas-blink-b { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* ---------- Nieve: fija al visor (no crece con la altura de la página) ----------
+   Cada capa cae exactamente una tesela por ciclo (bucle sin salto) y solo usa transform. */
+html[data-ga-season] .ga-xmas-snow {
+  position: fixed; inset: 0; overflow: hidden; contain: strict;
+  animation: gas-sway 9s ease-in-out infinite alternate;
+}
+html[data-ga-season] .ga-xmas-snow i {
+  position: absolute; left: 0; right: 0; top: calc(var(--gas-snow-near-size, 760) * -1px); bottom: 0; will-change: transform;
+}
+html[data-ga-season] .ga-xmas-snow .ga-sn-far {
+  opacity: .5; background-image: var(--gas-snow-far);
+  background-size: calc(var(--gas-snow-far-size, 420) * 1px) calc(var(--gas-snow-far-size, 420) * 1px);
+  animation: gas-fall-far 46s linear infinite;
+}
+html[data-ga-season] .ga-xmas-snow .ga-sn-near {
+  opacity: .62; background-image: var(--gas-snow-near);
+  background-size: calc(var(--gas-snow-near-size, 760) * 1px) calc(var(--gas-snow-near-size, 760) * 1px);
+  animation: gas-fall-near 30s linear infinite;
+}
+@keyframes gas-fall-far  { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, calc(var(--gas-snow-far-size, 420) * 1px), 0); } }
+@keyframes gas-fall-near { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, calc(var(--gas-snow-near-size, 760) * 1px), 0); } }
+@keyframes gas-sway { from { transform: translateX(-10px); } to { transform: translateX(10px); } }
+
+/* ---------- Adornos de esquina ---------- */
+html[data-ga-season] .ga-xmas-corner {
+  position: absolute; width: min(245px, 16vw); aspect-ratio: 420 / 220;
+  background-size: contain; background-repeat: no-repeat; opacity: .85;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, .48));
+}
+html[data-ga-season] .ga-xmas-corner--tl,
+html[data-ga-season] .ga-xmas-corner--tr { top: -12px; background-image: var(--gas-corner-top); }
+html[data-ga-season] .ga-xmas-corner--bl,
+html[data-ga-season] .ga-xmas-corner--br { bottom: 0; width: min(280px, 17vw); background-image: var(--gas-corner-bottom); opacity: .8; }
+html[data-ga-season] .ga-xmas-corner--tl { left: -15px; }
+html[data-ga-season] .ga-xmas-corner--tr { right: -15px; transform: scaleX(-1); }
+html[data-ga-season] .ga-xmas-corner--bl { left: 0; }
+html[data-ga-season] .ga-xmas-corner--br { right: 0; transform: scaleX(-1); }
+@media (max-width: 1300px) {
+  html[data-ga-season] .ga-xmas-corner--tl,
+  html[data-ga-season] .ga-xmas-corner--tr { width: min(145px, 12vw); opacity: .7; }
+}
+@media (max-width: 899.98px) {
+  /* En tablet/móvil las esquinas inferiores se omiten para no invadir el contenido */
+  html[data-ga-season] .ga-xmas-corner--bl,
+  html[data-ga-season] .ga-xmas-corner--br { display: none; }
+}
+@media (max-width: 760px) {
+  html[data-ga-season] .ga-xmas-garland { height: 14px; }
+  html[data-ga-season] .ga-xmas-garland i { background-size: 168px 14px; }
+  html[data-ga-season] .ga-xmas-corner--tl,
+  html[data-ga-season] .ga-xmas-corner--tr { width: 76px; opacity: .48; top: -7px; }
+  html[data-ga-season] .ga-xmas-corner--tl { left: -20px; }
+  html[data-ga-season] .ga-xmas-corner--tr { right: -20px; }
+  html[data-ga-season] .ga-xmas-snow .ga-sn-far  { opacity: .42; }
+  html[data-ga-season] .ga-xmas-snow .ga-sn-near { opacity: .5; }
+}
+
+/* ---------- Ámbito "solo luces" (p. ej. Tienda): únicamente la guirnalda ---------- */
+html[data-ga-scope="lights"] .ga-xmas-snow,
+html[data-ga-scope="lights"] .ga-xmas-corner { display: none !important; }
+
+/* ---------- Movimiento reducido: todo queda estático ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html[data-ga-season] .ga-xmas-garland i,
+  html[data-ga-season] .ga-xmas-snow,
+  html[data-ga-season] .ga-xmas-snow i { animation: none !important; }
+  html[data-ga-season] .ga-xmas-garland .ga-gl-b { opacity: .8; }
+  html[data-ga-season] .ga-xmas-snow i { top: 0; }
+}
+
+/* Páginas sin contenedor .v3-page (Guía, Puntos): las capas cuelgan del <body>.
+   El body pasa a ser su contenedor y se recorta el desbordamiento lateral de las esquinas. */
+html[data-ga-season][data-ga-nov3] body { position: relative; }
+html[data-ga-season][data-ga-nov3] .ga-xmas-fx { overflow: hidden; }

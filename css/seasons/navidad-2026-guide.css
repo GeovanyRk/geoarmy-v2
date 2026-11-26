@@ -1,0 +1,60 @@
+/* ==========================================================================
+   GEO ARMY — Navidad 2026 · Asistente virtual (solo COLORES)
+   --------------------------------------------------------------------------
+   Cambia únicamente paleta, bordes y sombras del lanzador, la invitación y el panel
+   de css/geoarmy-guide.css. NO cambia posición, tamaño, z-index, estructura, textos
+   ni conexiones (la lógica vive en js/geoarmy-guide.js). Se activa por
+   html[data-ga-season="navidad-2026"]; sin él, el asistente se ve como siempre.
+   Paleta: azul noche, rojo festivo y dorado.
+   ========================================================================== */
+
+/* Lanzador flotante */
+html[data-ga-season="navidad-2026"] #ga-guide-launcher {
+  background: linear-gradient(135deg, #c93a4c, #8a1f37);
+  border-color: #f4cf84;
+  box-shadow: 0 15px 45px rgba(5, 13, 24, .66), 0 0 0 5px rgba(255, 207, 107, .13), 0 0 22px rgba(224, 52, 79, .28);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-launcher:hover {
+  box-shadow: 0 20px 54px rgba(5, 13, 24, .72), 0 0 0 6px rgba(255, 207, 107, .24), 0 0 28px rgba(224, 52, 79, .4);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-launcher .ga-guide-launcher-icon,
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-avatar {
+  background: #0b1a2c; border-color: #f4cf84; box-shadow: 0 0 0 2px rgba(255, 207, 107, .22);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-launcher .ga-guide-launcher-caption { color: #ffe9bd; }
+
+/* Invitación discreta */
+html[data-ga-season="navidad-2026"] #ga-guide-nudge {
+  border-color: rgba(244, 207, 132, .72);
+  background: linear-gradient(135deg, #17314d, #0b1829);
+  box-shadow: 0 13px 37px rgba(0, 0, 0, .58), 0 0 0 3px rgba(255, 207, 107, .1), 0 0 18px rgba(224, 52, 79, .16);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-nudge::after {
+  background: #0f2136; border-right-color: rgba(244, 207, 132, .72); border-bottom-color: rgba(244, 207, 132, .72);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-nudge .ga-guide-nudge-eyebrow { color: #ffd98a; }
+html[data-ga-season="navidad-2026"] #ga-guide-nudge .ga-guide-nudge-sub { color: #bcd0e6; }
+html[data-ga-season="navidad-2026"] #ga-guide-nudge .ga-guide-nudge-dismiss { color: #d6e4f2; }
+
+/* Panel de conversación */
+html[data-ga-season="navidad-2026"] #ga-guide-panel {
+  border-color: #3f6a93; background: #0d1a2b;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, .75), 0 0 0 2px rgba(255, 207, 107, .12), 0 0 30px rgba(224, 52, 79, .12);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-head {
+  background: linear-gradient(115deg, #b3263d, #7d1c36 55%, #17426b);
+  border-bottom-color: rgba(255, 224, 160, .28);
+}
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-head-title small { color: #ffeccf; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-feed { scrollbar-color: #3f6a93 transparent; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-bubble { background: #172a42; color: #eef5fc; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-bubble--user { background: #1f5f94; color: #fff; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-quick { background: #0d1a2b; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-quick button { border-color: #4d7aa3; background: #14283f; color: #eaf3fb; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-quick button:hover { background: #1d3c5c; border-color: #ffcf6b; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-compose { background: #102034; border-top-color: #2f557b; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-input { border-color: #3a5f85; background: #0a1626; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-input::placeholder { color: #8fa6bd; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-input:focus { border-color: #ffcf6b; }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-send { background: linear-gradient(135deg, #d8403f, #f0a23e); }
+html[data-ga-season="navidad-2026"] #ga-guide-panel .ga-guide-disclaimer { background: #102034; color: #8fa6bd; }

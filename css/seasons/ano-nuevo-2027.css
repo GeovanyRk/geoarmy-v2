@@ -1,0 +1,13 @@
+/* ==========================================================================
+   GEO ARMY — Tema estacional · AÑO NUEVO 2027  ·  RESERVADO (sin diseño todavía)
+   --------------------------------------------------------------------------
+   Entrada preparada en el sistema de temporadas (js/geoarmy-season.js → "ano-nuevo-2027",
+   ready:false). Mientras ready sea false el cargador NO aplica este tema y el sitio se ve con
+   su aspecto normal/Navidad según la configuración, así que este archivo es inerte.
+
+   Cuando se diseñe:
+     1) definir aquí, bajo  html[data-ga-season="ano-nuevo-2027"] , las variables de arte que usa
+        css/seasons/season-base.css (--gas-garland-a/b, --gas-snow-*, --gas-corner-*) y el lienzo/paleta;
+     2) añadir (si hace falta) css/seasons/ano-nuevo-2027-guide.css para el asistente;
+     3) poner ready:true en js/geoarmy-season.js.
+   ========================================================================== */

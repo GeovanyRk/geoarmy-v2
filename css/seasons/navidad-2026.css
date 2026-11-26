@@ -1,0 +1,118 @@
+/* ==========================================================================
+   GEO ARMY — Tema estacional  ·  NAVIDAD 2026  (páginas interiores)
+   --------------------------------------------------------------------------
+   Lo carga js/geoarmy-season.js junto con css/seasons/season-base.css cuando la
+   temporada activa es "navidad-2026". La portada (index) usa su propio
+   css/christmas-home.css (referencia visual) y NO carga este archivo.
+   100 % presentación: sin lógica, economía, cuentas ni Supabase.
+
+   Ámbitos (los fija el cargador en <html data-ga-scope="...">):
+     full     lienzo de fondo invernal + capas (luces, nieve, esquinas) + pie y cabecera integrados
+     overlay  solo capas decorativas, el fondo propio de la página se respeta
+     lights   solo la guirnalda superior (Tienda)
+   Para otra temporada: copiar este archivo, cambiar el selector html[data-ga-season="..."]
+   y las variables/arte; la mecánica no se duplica (vive en season-base.css).
+   ========================================================================== */
+
+html[data-ga-season="navidad-2026"] {
+  /* paleta */
+  --xm-night: #050d18; --xm-night-2: #080f19; --xm-sky: #1c3b58; --xm-sky-deep: #0b2035;
+  --xm-teal: rgba(18, 76, 70, .30); --xm-blue: rgba(28, 68, 102, .32); --xm-frost: rgba(97, 156, 185, .14);
+  --xm-red: #e0344f; --xm-gold: #ffcf6b; --xm-green: #2f9e5b; --xm-ice: #cfe4ff;
+  /* arte (recursos compartidos con la portada) */
+  --gas-garland-a: url("../../assets/navidad/luces-a.svg");
+  --gas-garland-b: url("../../assets/navidad/luces-b.svg");
+  --gas-corner-top: url("../../assets/navidad/esquina-superior.svg");
+  --gas-corner-bottom: url("../../assets/navidad/esquina-inferior.svg");
+  --gas-snow-far-size: 420; --gas-snow-near-size: 760;
+  --gas-snow-far:
+    radial-gradient(circle at 221px 152px, rgba(236,244,255,0.73) 0, rgba(236,244,255,0.40) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 15px 301px, rgba(236,244,255,0.55) 0, rgba(236,244,255,0.30) 1.1px, rgba(236,244,255,0) 2.0px),
+    radial-gradient(circle at 268px 60px, rgba(236,244,255,0.79) 0, rgba(236,244,255,0.44) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 162px 223px, rgba(236,244,255,0.78) 0, rgba(236,244,255,0.43) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 91px 254px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.35) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 366px 316px, rgba(236,244,255,0.77) 0, rgba(236,244,255,0.43) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 324px 255px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.1px, rgba(236,244,255,0) 2.1px),
+    radial-gradient(circle at 258px 145px, rgba(236,244,255,0.68) 0, rgba(236,244,255,0.38) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 173px 305px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 412px 56px, rgba(236,244,255,0.58) 0, rgba(236,244,255,0.32) 1.1px, rgba(236,244,255,0) 2.0px),
+    radial-gradient(circle at 241px 366px, rgba(236,244,255,0.57) 0, rgba(236,244,255,0.31) 1.0px, rgba(236,244,255,0) 1.7px),
+    radial-gradient(circle at 58px 243px, rgba(236,244,255,0.71) 0, rgba(236,244,255,0.39) 1.3px, rgba(236,244,255,0) 2.3px),
+    radial-gradient(circle at 193px 22px, rgba(236,244,255,0.60) 0, rgba(236,244,255,0.33) 1.2px, rgba(236,244,255,0) 2.2px),
+    radial-gradient(circle at 210px 165px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.2px, rgba(236,244,255,0) 2.2px),
+    radial-gradient(circle at 316px 316px, rgba(236,244,255,0.59) 0, rgba(236,244,255,0.33) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 285px 202px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.3px, rgba(236,244,255,0) 2.4px),
+    radial-gradient(circle at 206px 124px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.34) 1.3px, rgba(236,244,255,0) 2.3px),
+    radial-gradient(circle at 127px 137px, rgba(236,244,255,0.74) 0, rgba(236,244,255,0.41) 1.3px, rgba(236,244,255,0) 2.4px),
+    radial-gradient(circle at 388px 173px, rgba(236,244,255,0.64) 0, rgba(236,244,255,0.35) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 65px 316px, rgba(236,244,255,0.78) 0, rgba(236,244,255,0.43) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 208px 15px, rgba(236,244,255,0.69) 0, rgba(236,244,255,0.38) 1.4px, rgba(236,244,255,0) 2.6px),
+    radial-gradient(circle at 350px 157px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.1px, rgba(236,244,255,0) 1.9px),
+    radial-gradient(circle at 122px 218px, rgba(236,244,255,0.59) 0, rgba(236,244,255,0.33) 1.4px, rgba(236,244,255,0) 2.5px),
+    radial-gradient(circle at 71px 64px, rgba(236,244,255,0.60) 0, rgba(236,244,255,0.33) 1.1px, rgba(236,244,255,0) 2.1px),
+    radial-gradient(circle at 186px 219px, rgba(236,244,255,0.58) 0, rgba(236,244,255,0.32) 1.0px, rgba(236,244,255,0) 1.8px),
+    radial-gradient(circle at 163px 63px, rgba(236,244,255,0.56) 0, rgba(236,244,255,0.31) 1.0px, rgba(236,244,255,0) 1.8px);
+  --gas-snow-near:
+    radial-gradient(circle at 689px 26px, rgba(236,244,255,0.60) 0, rgba(236,244,255,0.33) 1.8px, rgba(236,244,255,0) 3.4px),
+    radial-gradient(circle at 14px 382px, rgba(236,244,255,0.76) 0, rgba(236,244,255,0.42) 1.7px, rgba(236,244,255,0) 3.1px),
+    radial-gradient(circle at 391px 68px, rgba(236,244,255,0.75) 0, rgba(236,244,255,0.41) 1.7px, rgba(236,244,255,0) 3.0px),
+    radial-gradient(circle at 438px 393px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.35) 2.1px, rgba(236,244,255,0) 3.9px),
+    radial-gradient(circle at 408px 240px, rgba(236,244,255,0.74) 0, rgba(236,244,255,0.41) 2.2px, rgba(236,244,255,0) 3.9px),
+    radial-gradient(circle at 18px 8px, rgba(236,244,255,0.78) 0, rgba(236,244,255,0.43) 1.8px, rgba(236,244,255,0) 3.3px),
+    radial-gradient(circle at 286px 681px, rgba(236,244,255,0.65) 0, rgba(236,244,255,0.36) 1.9px, rgba(236,244,255,0) 3.5px),
+    radial-gradient(circle at 453px 439px, rgba(236,244,255,0.73) 0, rgba(236,244,255,0.40) 2.4px, rgba(236,244,255,0) 4.4px),
+    radial-gradient(circle at 31px 594px, rgba(236,244,255,0.63) 0, rgba(236,244,255,0.35) 1.7px, rgba(236,244,255,0) 3.2px),
+    radial-gradient(circle at 366px 379px, rgba(236,244,255,0.79) 0, rgba(236,244,255,0.43) 2.3px, rgba(236,244,255,0) 4.1px),
+    radial-gradient(circle at 428px 136px, rgba(236,244,255,0.70) 0, rgba(236,244,255,0.38) 1.9px, rgba(236,244,255,0) 3.4px),
+    radial-gradient(circle at 751px 117px, rgba(236,244,255,0.57) 0, rgba(236,244,255,0.31) 1.7px, rgba(236,244,255,0) 3.1px),
+    radial-gradient(circle at 405px 366px, rgba(236,244,255,0.73) 0, rgba(236,244,255,0.40) 2.0px, rgba(236,244,255,0) 3.6px),
+    radial-gradient(circle at 257px 178px, rgba(236,244,255,0.66) 0, rgba(236,244,255,0.36) 1.9px, rgba(236,244,255,0) 3.5px);
+}
+
+/* ---------- Lienzo de fondo (ámbito "full"): azul noche invernal continuo ----------
+   Las capas laterales se repiten cada 1500 px y se desvanecen antes de sus bordes, así que en páginas
+   largas no hay costuras ni cortes horizontales. !important solo aquí: cada página trae su propio
+   fondo (Halloween, obsidiana, etc.) con selectores más específicos. */
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] { background-color: var(--xm-night); }
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] body { background-color: var(--xm-night) !important; background-image: none !important; }
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] body::before { display: none !important; }
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] .v3-page {
+  background-color: var(--xm-night) !important;
+  background-image:
+    radial-gradient(ellipse 72% 100% at 50% 0%, rgba(42, 94, 130, .55) 0%, rgba(11, 32, 53, .38) 46%, transparent 76%),
+    radial-gradient(ellipse 60% 50% at 0% 50%, var(--xm-teal), transparent 72%),
+    radial-gradient(ellipse 60% 50% at 100% 50%, var(--xm-blue), transparent 72%),
+    radial-gradient(ellipse 74% 100% at 50% 100%, var(--xm-frost), transparent 80%) !important;
+  background-size: 100% 760px, 100% 1500px, 100% 1500px, 100% 320px !important;
+  background-repeat: no-repeat, repeat-y, repeat-y, no-repeat !important;
+  background-position: 50% 0, 0 0, 0 0, 50% 100% !important;
+}
+/* Páginas sin .v3-page (Guía, Puntos): el mismo cielo sobre el <body> */
+html[data-ga-season="navidad-2026"][data-ga-scope="full"][data-ga-nov3] body {
+  background-image:
+    radial-gradient(ellipse 72% 100% at 50% 0%, rgba(42, 94, 130, .55) 0%, rgba(11, 32, 53, .38) 46%, transparent 76%),
+    radial-gradient(ellipse 60% 50% at 0% 50%, var(--xm-teal), transparent 72%),
+    radial-gradient(ellipse 60% 50% at 100% 50%, var(--xm-blue), transparent 72%) !important;
+  background-size: 100% 760px, 100% 1500px, 100% 1500px !important;
+  background-repeat: no-repeat, repeat-y, repeat-y !important;
+  background-position: 50% 0, 0 0, 0 0 !important;
+}
+/* Cabecera y pie integrados en el mismo cielo (sin franjas ni cortes) */
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] .v3-nebula { display: none !important; }
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] .v3-nav {
+  background: transparent !important; border-bottom: 0 !important; box-shadow: none !important;
+}
+html[data-ga-season="navidad-2026"][data-ga-scope="full"] .footer {
+  background: var(--xm-night-2) !important; border-top: 1px solid rgba(200, 221, 239, .12) !important;
+}
+
+/* ---------- Decoración de la temporada anterior (Halloween): fuera mientras dure Navidad ----------
+   Solo capas decorativas aria-hidden (calabazas, murciélagos, telarañas); no afecta a datos ni lógica. */
+html[data-ga-season="navidad-2026"]:not([data-ga-scope="lights"]) .mg-hw-decor,
+html[data-ga-season="navidad-2026"]:not([data-ga-scope="lights"]) .mg-hw-web { display: none !important; }
+
+@media (max-width: 760px) {
+  html[data-ga-season="navidad-2026"][data-ga-scope="full"] .v3-page {
+    background-size: 100% 560px, 100% 1100px, 100% 1100px, 100% 240px !important;
+  }
+}
