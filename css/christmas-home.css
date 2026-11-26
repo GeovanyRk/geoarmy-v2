@@ -254,3 +254,20 @@
   .ga-theme-christmas .ga-xmas-corner--tl,
   .ga-theme-christmas .ga-xmas-corner--tr { opacity: .48; }
 }
+
+/* V3 — Pie de página compacto, solo portada navideña. */
+.ga-theme-christmas .footer {
+  padding: 9px 1.5rem;
+  background: #080f19;
+  border-top: 1px solid rgba(200, 221, 239, .12);
+}
+.ga-theme-christmas .footer-inner { gap: 6px 14px; }
+.ga-theme-christmas .footer-logo { font-size: 14px; }
+.ga-theme-christmas .footer-logo-img { width: 24px; height: 24px; }
+.ga-theme-christmas .footer-text { margin-left: 0; font-size: 12px; }
+.ga-theme-christmas .footer-code { font-size: 12px; }
+@media (max-width: 600px) {
+  .ga-theme-christmas .footer { padding: 8px 12px; }
+  .ga-theme-christmas .footer-inner { justify-content: center; gap: 4px 10px; text-align: center; }
+  .ga-theme-christmas .footer-code { margin-left: 0; }
+}
