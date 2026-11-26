@@ -12,7 +12,7 @@
   function update() {
     var now = Date.now();
     var active = preview || (now >= start && now < end);
-    if (active && !sheet) { sheet = document.createElement('link'); sheet.rel = 'stylesheet'; sheet.href = base + 'css/navidad-perfiles-2026.css?v=2'; document.head.appendChild(sheet); }
+    if (active && !sheet) { sheet = document.createElement('link'); sheet.rel = 'stylesheet'; sheet.href = base + 'css/navidad-perfiles-2026.css?v=3'; document.head.appendChild(sheet); }
     if (active) root.setAttribute('data-ga-profile-christmas', 'on');
     else root.removeAttribute('data-ga-profile-christmas');
   }
