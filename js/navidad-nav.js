@@ -5,7 +5,8 @@
    Debe ejecutarse ANTES de js/geoarmy-account.js. Solo presentación. */
 (function () {
   'use strict';
-  var REGALO_URL = null;   // cuando exista "Mi regalo de Navidad": poner aquí su página y se habilita sola
+  var REGALO_URL = null;   // lanzamiento público de "Mi regalo de Navidad": poner aquí 'navidad-regalo.html' y se habilita en todas las páginas
+  var REGALO_PAGE = 'navidad-regalo.html';   // dentro de su propia página (revisión privada) la pestaña aparece resaltada
   var TABS = [
     { id: 'arbol',  href: 'navidad-arbol.html',  icon: 'tree',   label: 'Árbol de<br>Navidad' },
     { id: 'taller', href: 'navidad-taller.html', icon: 'hammer', label: 'Taller<br>de Santa' },
@@ -26,6 +27,7 @@
     if (host && host.getAttribute('data-active')) return host.getAttribute('data-active');
     var f = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
     for (var i = 0; i < TABS.length; i++) if (f === TABS[i].href.replace(/\.html$/, '')) return TABS[i].id;
+    if (f === REGALO_PAGE.replace(/\.html$/, '')) return 'regalo';
     return '';
   }
   function icon(name, vb) { return '<svg viewBox="' + (vb || '0 0 24 24') + '" aria-hidden="true" focusable="false"><use href="#gxn-i-' + name + '"/></svg>'; }
@@ -34,8 +36,8 @@
     var on = t.id === cur;
     return '<li' + (on ? ' class="is-current"' : '') + '><a href="' + t.href + '"' + (on ? ' aria-current="page"' : '') + '>' + icon(t.icon, t.icon === 'sleigh' ? '0 0 28 24' : '') + '<span>' + t.label + '</span></a></li>';
   }).join('');
-  tabs += REGALO_URL
-    ? '<li><a href="' + REGALO_URL + '">' + icon('gift') + '<span>Mi regalo<br>de Navidad</span></a></li>'
+  tabs += (REGALO_URL || cur === 'regalo')
+    ? '<li' + (cur === 'regalo' ? ' class="is-current"' : '') + '><a href="' + (REGALO_URL || REGALO_PAGE) + '"' + (cur === 'regalo' ? ' aria-current="page"' : '') + '>' + icon('gift') + '<span>Mi regalo<br>de Navidad</span></a></li>'
     : '<li class="is-soon"><span class="gxn-soon" role="link" aria-disabled="true" title="Próximamente">' + icon('gift') + '<span>Mi regalo<br>de Navidad</span></span></li>';
   var html =
     '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' + Object.keys(ICONS).map(function (k) { return ICONS[k]; }).join('') + '</defs></svg>' +
