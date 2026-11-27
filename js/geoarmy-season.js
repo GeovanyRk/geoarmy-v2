@@ -29,7 +29,7 @@
   /* ===================== CONFIGURACIÓN (único punto de cambio) ===================== */
   var CONFIG = {
     mode: 'manual',          // 'manual' = usa "active" · 'auto' = elige por fechas (campos from/until de SEASONS)
-    active: 'navidad-2026',  // temporada activa en modo manual
+    active: 'ano-nuevo-2027', // temporada de trabajo en el laboratorio
     allowUrlPreview: true    // permite ?season=<id> para previsualizar (solo en esa pestaña)
   };
 
@@ -38,7 +38,7 @@
     'original':       { ready: true,  label: 'Tema original' },
     'navidad-2026':   { ready: true,  label: 'Navidad 2026',   bodyClass: 'ga-theme-christmas',
                         from: '2026-11-26T00:00:00-05:00', until: '2026-12-31T00:00:00-05:00' },
-    'ano-nuevo-2027': { ready: false, label: 'Año Nuevo 2027 (reservado, sin diseño)', bodyClass: 'ga-theme-newyear',
+    'ano-nuevo-2027': { ready: true, label: 'Año Nuevo 2027 (laboratorio)', bodyClass: 'ga-theme-newyear',
                         from: '2026-12-31T00:00:00-05:00', until: '2027-01-08T00:00:00-05:00' }
   };
 
@@ -53,7 +53,7 @@
       guide:  'css/seasons/navidad-2026-guide.css?v=1'
     },
     'ano-nuevo-2027': {
-      core:   ['css/seasons/season-base.css?v=1', 'css/seasons/ano-nuevo-2027.css?v=1'],
+      core:   [], // El arte definitivo se incorporará tras su aprobación.
       native: [],
       guide:  null
     }
@@ -108,6 +108,9 @@
         var saved = sessionStorage.getItem(KEY); if (saved) id = saved;
       } catch (e) { if (q && q[1] !== 'reset') id = q[1]; }
     }
+    // Año Nuevo se habilita exclusivamente en el repositorio de pruebas.
+    if (id === 'ano-nuevo-2027' && !/^\/geoarmy-v2(?:\/|$)/i.test(basePath)) id = 'navidad-2026';
+    if (profile === 'lights' && id === 'ano-nuevo-2027') return;
     var def = SEASONS[id];
     if (!def || !def.ready) {
       if (def && !def.ready) console.info(LOG + '"' + id + '" está reservada y aún no tiene diseño: se muestra el tema original.');
@@ -155,6 +158,7 @@
 
     function onReady() {
       var body = document.body; if (!body) return;
+      if (id !== 'navidad-2026') body.classList.remove('ga-theme-christmas');
       if (!active) {
         /* Tema original: la portada trae su tema navideño incrustado; se apaga sin tocar su lógica */
         if (profile === 'native') {
@@ -165,6 +169,8 @@
         return;
       }
       if (def.bodyClass) body.classList.add(def.bodyClass);
+      // No reutilizar nieve, guirnaldas ni esquinas navideñas en Año Nuevo.
+      if (id === 'ano-nuevo-2027') return;
       if (profile === 'native') {
         /* La portada ya enlaza su CSS; si faltara, se añade */
         (theme.native || []).forEach(function (h) {
@@ -189,11 +195,11 @@
   }
 })();
 
-/* Perfiles de Navidad: capa visual independiente del calendario de las páginas. */
+/* Perfiles de Navidad: cargar únicamente al previsualizar Navidad. */
 (function () {
   'use strict';
   try {
-    if (!window.GeoArmySeason || window.GeoArmySeason.profile === 'lights') return;
+    if (!window.GeoArmySeason || window.GeoArmySeason.profile === 'lights' || window.GeoArmySeason.id !== 'navidad-2026') return;
     var source = document.currentScript;
     if (!source || !source.src) return;
     var base = source.src.replace(/js\/geoarmy-season\.js.*$/, '');
