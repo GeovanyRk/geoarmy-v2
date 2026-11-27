@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#060507"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title>Geo Army Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Mínimo crítico: evita el destello blanco mientras llega css/command-center.css */
+    html, body { background: #060507; color: #f4ecda; margin: 0; }
+  </style>
+</head>
+<body class="cc">
+  <a class="cc-skip" href="#cc-main">Saltar al contenido</a>
+  <div id="cc-root">
+    <div class="cc-boot" role="status"><div><div class="cc-mark cc-mark--lg" aria-hidden="true"><b>G</b></div><p>Iniciando Command Center…</p></div></div>
+  </div>
+  <div class="cc-toasts" id="cc-toasts" role="status" aria-live="polite"></div>
+  <div id="cc-modal-root"></div>
+  <noscript><p style="padding:24px;font-family:sans-serif">El Command Center necesita JavaScript.</p></noscript>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ===== Carpeta base de este despliegue (valor LITERAL, como en admin/recompensas y admin/fulfillments) =====
+    // DEBE ser idéntico a GEOARMY_SITE_BASE de js/geoarmy-config.js. Al promover a producción
+    // (raíz del dominio) este es el ÚNICO valor de esta página que hay que cambiar: '/'.
+    var SITE_BASE_BOOTSTRAP = '/geoarmy-v2/';
+    var ASSET_REV = '1';
+
+    var params = new URLSearchParams(window.location.search);
+    // DEMO: solo si se pide EXPLÍCITAMENTE con ?demo=1. Nunca se activa por un fallo de la API.
+    var DEMO = params.get('demo') === '1';
+
+    window.GEOARMY_CC_BOOT = { siteBase: SITE_BASE_BOOTSTRAP, demo: DEMO };
+
+    function loadScript(src) {
+      return new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = src; s.onload = function () { resolve(); };
+        s.onerror = function () { reject(new Error('no se pudo cargar ' + src)); };
+        document.head.appendChild(s);
+      });
+    }
+    var css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = SITE_BASE_BOOTSTRAP + 'css/command-center.css?v=' + ASSET_REV;
+    document.head.appendChild(css);
+
+    var base = window.location.origin + SITE_BASE_BOOTSTRAP;
+    var chain = Promise.resolve();
+    if (!DEMO) {
+      // Sesión real: supabase-js fijado (copia local) + config compartida del sitio. Mismo almacenamiento
+      // de sesión que el resto del sitio → no se pide un segundo inicio de sesión.
+      chain = chain.then(function () { return loadScript(base + 'lib/supabase.min.js'); })
+                   .then(function () { return loadScript(base + 'js/geoarmy-config.js'); });
+    }
+    chain = chain.then(function () { return loadScript(base + 'js/command-center-core.js?v=' + ASSET_REV); });
+    if (DEMO) chain = chain.then(function () { return loadScript(base + 'js/command-center-demo.js?v=' + ASSET_REV); });
+    chain.then(function () { return loadScript(base + 'js/command-center-app.js?v=' + ASSET_REV); })
+      .catch(function (e) {
+        var root = document.getElementById('cc-root');
+        root.textContent = '';
+        var p = document.createElement('p');
+        p.style.cssText = 'padding:32px;font-family:sans-serif;color:#f0615c';
+        p.textContent = 'No se pudo iniciar el Command Center: ' + (e && e.message ? e.message : 'error de carga');
+        root.appendChild(p);
+      });
+  })();
+  </script>
+</body>
+</html>
