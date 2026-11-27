@@ -7,7 +7,7 @@
   <meta name="description" content="Cuartel general de la comunidad GeoArmy. Streams de Fortnite y Overwatch con Geovannyrk en Twitch."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <!-- Temporadas: tema estacional central (ver js/geoarmy-season.js) -->
-<script src="js/geoarmy-season.js?v=2"></script>
+<script src="js/geoarmy-season.js?v=3"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
   <!-- Google Analytics -->
@@ -121,6 +121,21 @@
       object-fit:contain;
       filter:none;
     }
+    /* Año Nuevo: soporte de laboratorio, no arte final. */
+    html:not([data-ga-season="navidad-2026"]) .ga-xmas-fx,
+    html:not([data-ga-season="navidad-2026"]) .ga-xmas-glow{display:none!important;}
+    #gaSeasonLab[hidden],#gaNewYearLab[hidden]{display:none!important;}
+    html[data-ga-season="ano-nuevo-2027"] #wlOnePieceWorld{display:none!important;}
+    #gaNewYearLab{box-sizing:border-box;width:min(420px,86vw);margin:0 auto;padding:24px 16px;text-align:center;border:1px solid #ae925b66;border-radius:20px;background:#101929;color:#f4e0ad;}
+    #gaNewYearLab h2{font-size:clamp(20px,5vw,34px);margin:8px 0;}
+    #gaNewYearLab p{font-size:13px;line-height:1.55;margin:8px 0;color:#d4d7dd;}
+    #gaNewYearLab .ga-ny-count{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:18px 0;font-variant-numeric:tabular-nums;}
+    #gaNewYearLab .ga-ny-count span{display:flex;flex-direction:column;gap:5px;background:#1c2536;padding:8px 3px;border-radius:8px;font-size:clamp(14px,4vw,24px);}
+    #gaNewYearLab .ga-ny-count small{font-size:9px;color:#c0b8a5;}
+    #gaNewYearLab .ga-ny-pins{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+    #gaNewYearLab .ga-ny-pins span{padding:8px 10px;border:1px solid #ae925b55;border-radius:8px;font-size:11px;}
+    #gaSeasonLab{text-align:center;font-size:12px;margin:12px auto;color:#d4d7dd;}
+    #gaSeasonLab select{color:#f4e0ad;background:#182031;border:1px solid #ae925b88;border-radius:6px;padding:7px;max-width:100%;margin-left:6px;}
     /* Navidad: marco proporcional independiente para arte y futuros pines.
        Solo se activa al cargar correctamente el planeta navideño. */
     .v3-world-slide-02 .ga-santa-world{
@@ -285,7 +300,7 @@
 </script>
   <link rel="stylesheet" href="css/plus-pin.css"/>
 </head>
-<body class="ga-theme-christmas">
+<body>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
 
   <!-- Tema V3: ver css/v3-theme.css (antes este bloque estaba embebido aquí) -->
@@ -510,6 +525,19 @@
               <span class="world-02-open-sub">Explorar el mundo pirata →</span>
             </a>
           </div>
+          <section id="gaNewYearLab" aria-label="Mundo 02 — Año Nuevo 2027, laboratorio" hidden>
+            <p>LABORATORIO · DISEÑO EN DESARROLLO</p>
+            <h2>AÑO NUEVO 2027</h2>
+            <p id="gaNyClockLabel">Cuenta regresiva · medianoche de Nueva York</p>
+            <div class="ga-ny-count" role="timer" aria-label="Tiempo restante hasta 2027">
+              <span><b data-ny-unit="d">--</b><small>DÍAS</small></span>
+              <span><b data-ny-unit="h">--</b><small>HORAS</small></span>
+              <span><b data-ny-unit="m">--</b><small>MIN</small></span>
+              <span><b data-ny-unit="s">--</b><small>SEG</small></span>
+            </div>
+            <div class="ga-ny-pins"><span>Awards 2026 · Pendiente</span><span>Cápsula 2027 · Pendiente</span></div>
+            <p>Vista técnica temporal. Sin votaciones, registros ni premios activos.</p>
+          </section>
         </div>
 
 
@@ -522,6 +550,9 @@
       </div>
 
       <div class="v3-world-hint">‹ Desliza para explorar ›</div>
+      <div id="gaSeasonLab" hidden><label for="gaSeasonSelect">Temporada de pruebas</label>
+        <select id="gaSeasonSelect"><option value="original">Original</option><option value="navidad-2026">Navidad 2026</option><option value="ano-nuevo-2027">Año Nuevo 2027</option></select>
+      </div>
     </section>
 
   </div>
@@ -758,6 +789,7 @@
   <script>
     (function () {
       if (!location.pathname.startsWith('/geoarmy-v2/')) return;
+      if (!window.GeoArmySeason || window.GeoArmySeason.id !== 'navidad-2026') return;
       var world = document.getElementById('wlOnePieceWorld');
       var link = document.getElementById('wlOnePieceOpen');
       if (!world || !link) return;
@@ -849,6 +881,36 @@
     })();
   </script>
 
+  <script>
+  (function(){
+    'use strict';
+    if (!/^\/geoarmy-v2(?:\/|$)/i.test(location.pathname) || !window.GeoArmySeason) return;
+    var season = window.GeoArmySeason.id;
+    var control = document.getElementById('gaSeasonLab');
+    var select = document.getElementById('gaSeasonSelect');
+    if(control && select){
+      select.value=season; control.hidden=false;
+      select.addEventListener('change',function(){
+        var url=new URL(location.href);url.searchParams.set('season',select.value);location.assign(url.href);
+      });
+    }
+    if(season!=='ano-nuevo-2027') return;
+    var lab=document.getElementById('gaNewYearLab');
+    if(!lab)return;
+    lab.hidden=false;
+    var target=Date.parse('2027-01-01T00:00:00-05:00');
+    var fields=['d','h','m','s'].map(function(k){return lab.querySelector('[data-ny-unit="'+k+'"]');});
+    var timer=null;
+    function update(){
+      var seconds=Math.max(0,Math.ceil((target-Date.now())/1000));
+      var values=[Math.floor(seconds/86400),Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60];
+      fields.forEach(function(el,i){if(el)el.textContent=String(values[i]).padStart(2,'0');});
+      if(seconds===0){document.getElementById('gaNyClockLabel').textContent='¡Bienvenido a 2027!';if(timer!==null){clearInterval(timer);timer=null;}}
+    }
+    update();if(Date.now()<target)timer=setInterval(update,1000);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)update();});
+  })();
+  </script>
   <script src="js/premium.js"></script>
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
