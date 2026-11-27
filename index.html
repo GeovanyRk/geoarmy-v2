@@ -35,6 +35,15 @@
       .ga-dropdown{ right:auto; left:0; max-width:min(260px, calc(100vw - 32px)); }
     }
 
+    /* Awards orbital: mismo tamaño que Plus, dorado, etiqueta siempre visible. */
+    .v3-planet-nav a.ga-awards-pin{z-index:5}
+    .v3-planet-nav a.ga-awards-pin .ga-awards-pin__cup{position:relative;background:radial-gradient(circle at 35% 28%,#694717,#160e08 75%)!important;border:1px solid #e6ba65!important;box-shadow:0 0 0 3px #e6ba6520,0 0 22px #e6ba6566,0 7px 22px #0006;animation:gaAwardsOrbit 3.2s ease-in-out infinite}
+    .v3-planet-nav a.ga-awards-pin .ga-awards-pin__cup svg{width:63%;height:63%;display:block;overflow:visible}
+    .v3-planet-nav a.ga-awards-pin .ga-awards-pin__label,.v3-planet-nav a.ga-awards-pin:hover .ga-awards-pin__label,.v3-planet-nav a.ga-awards-pin:focus-visible .ga-awards-pin__label{position:absolute;top:calc(100% + 5px);left:50%;margin:0;order:0;opacity:1;transform:translateX(-50%);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;color:#ffe5a6;background:#24190eeb;border:1px solid #e6ba6599;font-weight:800}
+    .v3-planet-nav a.ga-awards-pin:focus-visible{outline:2px solid #ffe5a6;outline-offset:4px;border-radius:12px}
+    @keyframes gaAwardsOrbit{0%,100%{box-shadow:0 0 0 3px #e6ba6520,0 0 17px #e6ba6566,0 7px 22px #0006}50%{box-shadow:0 0 0 5px #e6ba6518,0 0 30px #e6ba65ba,0 7px 22px #0006}}
+    @media(max-width:560px){.v3-planet-nav a.ga-awards-pin .ga-awards-pin__label,.v3-planet-nav a.ga-awards-pin:hover .ga-awards-pin__label,.v3-planet-nav a.ga-awards-pin:focus-visible .ga-awards-pin__label{font-size:0;padding:2px 5px;top:calc(100% + 3px)}.v3-planet-nav a.ga-awards-pin .ga-awards-pin__label:after{content:"AWARDS";font-size:8px;letter-spacing:.04em}}
+    @media(prefers-reduced-motion:reduce){.v3-planet-nav a.ga-awards-pin .ga-awards-pin__cup{animation:none}}
     /* Pin de Streamer vs Viewer */
     .v3-planet-nav a.svv-pin .svv-pin-icon,
     .v3-planet-nav a.svv-pin:hover .svv-pin-icon,
@@ -418,10 +427,10 @@
              para caer sobre zonas oscuras del planeta, con buen espacio
              entre pins y respecto al logo. Ya no son un octágono perfecto. -->
         <div class="v3-planet-nav" id="v3PlanetNav">
-          <a href="awards-2026.html" id="gaAwardsPin" style="--mx:52%; --my:17.5%;" hidden aria-label="GEO ARMY Awards 2026">
-            <span class="v3-marker-label">Awards 2026</span>
-            <span class="v3-marker-icon" style="color:#f4d38b">🏆</span>
-            <span class="v3-marker-stem"></span><span class="v3-marker-ring"></span>
+          <!-- Awards: acceso orbital independiente del planeta de temporada, espejo de Plus. -->
+          <a href="awards-2026.html" class="ga-awards-pin" id="gaAwardsPin" style="--mx:92.4%; --my:18.1%;" hidden aria-label="GEO ARMY Awards 2026">
+            <span class="v3-marker-label ga-awards-pin__label">Awards 2026</span>
+            <span class="v3-marker-icon ga-awards-pin__cup" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><defs><linearGradient id="gaAwardsGold" x1="4" y1="1" x2="26" y2="31" gradientUnits="userSpaceOnUse"><stop stop-color="#fff3b7"/><stop offset=".45" stop-color="#e5b95e"/><stop offset="1" stop-color="#96601c"/></linearGradient></defs><path d="M9 4h14v10c0 5-3 8-7 8s-7-3-7-8V4Z" fill="url(#gaAwardsGold)" stroke="#ffe5a0" stroke-width="1.1"/><path d="M9 7H4v4c0 5 3 7 6 7M23 7h5v4c0 5-3 7-6 7M16 22v5m-7 1h14" stroke="#edc477" stroke-width="2" stroke-linecap="round"/><path d="m16 7 1.2 3.3 3.5.2-2.7 2.2.9 3.4-2.9-1.9-2.9 1.9.9-3.4-2.7-2.2 3.5-.2Z" fill="#6d461a"/></svg></span>
           </a>
           <a href="ganadores.html" style="--mx:33.9%; --my:26.7%;">
             <span class="v3-marker-label">Ganadores</span>
@@ -963,7 +972,7 @@
     var awardsPin=document.getElementById('gaAwardsPin');
     if(awardsPin){
       // Solo laboratorio: el modo calendario respeta el 1 de diciembre.
-      awardsPin.hidden=window.GeoArmySeason.selection==='auto' && Date.now()<Date.parse('2026-12-01T00:00:00-05:00');
+      awardsPin.hidden=season==='ano-nuevo-2027' || (window.GeoArmySeason.selection==='auto' && Date.now()<Date.parse('2026-12-01T00:00:00-05:00'));
     }
     if(season!=='ano-nuevo-2027') return;
     var lab=document.getElementById('gaNewYearLab');
