@@ -124,7 +124,19 @@
     /* Año Nuevo: soporte de laboratorio, no arte final. */
     html:not([data-ga-season="navidad-2026"]) .ga-xmas-fx,
     html:not([data-ga-season="navidad-2026"]) .ga-xmas-glow{display:none!important;}
-    #gaSeasonLab[hidden],#gaNewYearLab[hidden]{display:none!important;}
+    #gaSeasonLab[hidden],#gaNewYearLab[hidden],#gaNewYearServices[hidden],#gaNyPlusLink[hidden]{display:none!important;}
+    /* Vista central del 31 de diciembre: laboratorio sin fecha; no copiar esta
+       activación a producción. Conserva DOM, rutas y funcionalidades originales. */
+    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow > .v3-world-slide-main,
+    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow > .v3-world-slide-03,
+    html[data-ga-season="ano-nuevo-2027"] .v3-world-hint{display:none!important;}
+    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow{justify-content:center;gap:0;overflow:visible;scroll-snap-type:none;}
+    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow > .v3-world-slide-02{width:100%;min-width:0;max-width:760px;align-items:center;scroll-snap-align:none;}
+    #gaNewYearServices{box-sizing:border-box;max-width:600px;margin:14px auto 0;text-align:center;font-size:13px;color:#d4d7dd;}
+    #gaNewYearServices summary{cursor:pointer;display:list-item;width:fit-content;margin:auto;padding:8px 14px;border:1px solid #ae925b66;border-radius:9px;color:#f4e0ad;background:#101929;}
+    #gaNewYearServices nav{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:12px 0 0;}
+    #gaNewYearServices nav a,#gaNewYearServices nav button{font:inherit;text-decoration:none;color:#f4e0ad;border:1px solid #ae925b55;border-radius:7px;background:#101929;padding:8px 12px;cursor:pointer;}
+    #gaNewYearServices :focus-visible{outline:2px solid #f4e0ad;outline-offset:3px;}
     html[data-ga-season="ano-nuevo-2027"] #wlOnePieceWorld{display:none!important;}
     #gaNewYearLab{box-sizing:border-box;width:min(420px,86vw);margin:0 auto;padding:24px 16px;text-align:center;border:1px solid #ae925b66;border-radius:20px;background:#101929;color:#f4e0ad;}
     #gaNewYearLab h2{font-size:clamp(20px,5vw,34px);margin:8px 0;}
@@ -550,6 +562,20 @@
       </div>
 
       <div class="v3-world-hint">‹ Desliza para explorar ›</div>
+      <details id="gaNewYearServices" hidden>
+        <summary>Servicios de GEO ARMY</summary>
+        <nav aria-label="Servicios durante Año Nuevo">
+          <a href="ganadores.html">Ganadores</a>
+          <a href="ranking.html">Ranking</a>
+          <a href="puntos.html">Ruleta de Subs</a>
+          <a href="/geoarmy-v2/streamer-vs-viewer/">Streamer vs Viewer</a>
+          <a href="tienda.html">Tienda</a>
+          <a href="misiones.html">Misiones</a>
+          <a href="comunidad.html">Comunidad</a>
+          <a href="mi-geoarmy.html">Mi Geo Army</a>
+          <button type="button" id="gaNyPlusLink" hidden>Geo Army Plus</button>
+        </nav>
+      </details>
       <div id="gaSeasonLab" hidden><label for="gaSeasonSelect">Temporada de pruebas</label>
         <select id="gaSeasonSelect"><option value="original">Original</option><option value="navidad-2026">Navidad 2026</option><option value="ano-nuevo-2027">Año Nuevo 2027</option></select>
       </div>
@@ -898,6 +924,22 @@
     var lab=document.getElementById('gaNewYearLab');
     if(!lab)return;
     lab.hidden=false;
+    var header=document.querySelector('.v3-world-header');
+    if(header){
+      Array.prototype.forEach.call(header.childNodes,function(node){
+        if(node.nodeType===3 && node.nodeValue.indexOf('Elige tu mundo')!==-1)node.nodeValue=' Año Nuevo 2027 ';
+      });
+    }
+    var services=document.getElementById('gaNewYearServices');
+    if(services)services.hidden=false;
+    // Plus conserva el interruptor y el flujo de acceso de su pin real.
+    var plusPin=document.getElementById('gaPlusPin'), plusLink=document.getElementById('gaNyPlusLink');
+    if(plusPin && plusLink){
+      var syncPlus=function(){plusLink.hidden=plusPin.hidden;};
+      syncPlus();
+      if(window.MutationObserver)new MutationObserver(syncPlus).observe(plusPin,{attributes:true,attributeFilter:['hidden']});
+      plusLink.addEventListener('click',function(){if(!plusPin.hidden)plusPin.click();});
+    }
     var target=Date.parse('2027-01-01T00:00:00-05:00');
     var fields=['d','h','m','s'].map(function(k){return lab.querySelector('[data-ny-unit="'+k+'"]');});
     var timer=null;
