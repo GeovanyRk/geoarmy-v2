@@ -95,12 +95,17 @@ html.ga-ny-paused #gaNewYearLab .ga-ny-art,html.ga-ny-paused #gaNewYearLab .ga-n
 #gaNyCelebration{position:fixed;z-index:71;left:50%;top:clamp(76px,12svh,130px);transform:translateX(-50%);width:min(90vw,480px);box-sizing:border-box;padding:15px 24px;text-align:center;border:1px solid #d1ad7188;border-radius:12px;background:linear-gradient(115deg,#0a1222f5,#1b1921f5,#0a1222f5);box-shadow:0 10px 50px #0008,0 0 32px #dcaa4c20;pointer-events:none;color:#f7e0b0}
 #gaNyCelebration strong{display:block;font:700 clamp(19px,4.6vw,31px)/1.2 'Space Grotesk',sans-serif;text-shadow:0 0 24px #d9a85e66}
 #gaNyCelebration small{display:block;font:500 11px/1.4 Inter,sans-serif;letter-spacing:.06em;margin:6px 0 0;color:#d4bf9b}
-#gaNyCelebration.ga-ny-celebration-on{animation:gaNyGreeting 6.5s ease both}
-html.ga-ny-showtime #gaNewYearLab .ga-ny-art:before{animation:gaNyCelebrationGlow 6.5s ease both}
+#gaNyCelebration.ga-ny-celebration-on{animation:gaNyGreeting 25s ease both}
+html.ga-ny-showtime #gaNewYearLab .ga-ny-art:before{animation:gaNyCelebrationGlow 25s ease both}
 #gaNewYearLab .ga-ny-ready .ga-ny-pin:before{content:"";position:absolute;inset:13%;border-radius:50%;box-shadow:0 0 18px #ffd78a66;opacity:0;pointer-events:none;animation:gaNyBeacon 7s ease-in-out infinite}
 #gaNewYearLab .ga-ny-pin-goals:before{animation-delay:2.6s!important}
 html.ga-ny-paused #gaNewYearLab .ga-ny-pin:before{animation-play-state:paused}
-@keyframes gaNyGreeting{0%{opacity:0;transform:translate(-50%,-12px)}8%,87%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-5px)}}
-@keyframes gaNyCelebrationGlow{0%,100%{opacity:.7;transform:scale(1)}24%,60%{opacity:1;transform:scale(1.16)}}
+@keyframes gaNyGreeting{0%{opacity:0;transform:translate(-50%,-12px)}3%,94%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-5px)}}
+@keyframes gaNyCelebrationGlow{0%,100%{opacity:.7;transform:scale(1)}10%,45%,80%{opacity:.88;transform:scale(1.09)}22%,60%,90%{opacity:1;transform:scale(1.25)}}
 @keyframes gaNyBeacon{0%,100%,60%{opacity:0;transform:scale(.93)}25%{opacity:.7;transform:scale(1.05)}}
 @media(prefers-reduced-motion:reduce){#gaNyCelebration.ga-ny-celebration-on,html.ga-ny-showtime #gaNewYearLab .ga-ny-art:before,#gaNewYearLab .ga-ny-pin:before{animation:none!important}}
+
+#gaNyCelebration{width:min(92vw,580px);padding:17px 40px;box-shadow:0 10px 50px #0008,0 0 45px #dcaa4c35}
+#gaNyCelebration strong{font-size:clamp(20px,4.6vw,36px)}
+#gaNyCelebrationClose{position:absolute;right:9px;top:9px;width:28px;height:28px;border:1px solid #c5a26b55;border-radius:50%;background:#131b29;color:#f7e0b0;font:400 20px/1 Inter,sans-serif;cursor:pointer;pointer-events:auto}
+#gaNyCelebrationClose:focus-visible{outline:2px solid #f7e0b0;outline-offset:3px}
