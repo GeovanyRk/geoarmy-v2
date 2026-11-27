@@ -311,6 +311,7 @@
   betterstack('init', { environment: 'production' });
 </script>
   <link rel="stylesheet" href="css/plus-pin.css"/>
+  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=1"/>
 </head>
 <body>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
@@ -538,8 +539,20 @@
             </a>
           </div>
           <section id="gaNewYearLab" aria-label="Mundo 02 — Año Nuevo 2027, laboratorio" hidden>
-            <p>LABORATORIO · DISEÑO EN DESARROLLO</p>
-            <h2>AÑO NUEVO 2027</h2>
+            <p class="ga-ny-kicker">GEO ARMY PRESENTA</p>
+            <h2 class="ga-ny-title">El comienzo de una nueva era</h2>
+            <div class="ga-ny-art" id="gaNyArt">
+              <div class="ga-ny-fallback" aria-hidden="true"><strong>2027</strong><small>ARTE EN PREPARACIÓN</small></div>
+              <img class="ga-ny-planet" id="gaNyPlanet" alt="Planeta de Año Nuevo con el palacio de los Awards, el reloj de medianoche y la cápsula de metas" width="1100" height="1100" decoding="async">
+              <button type="button" class="ga-ny-pin ga-ny-pin-awards" data-ny-pin="awards" aria-label="GEO ARMY Awards 2026">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v5c0 4-2 6-5 6s-5-2-5-6V3Zm0 2H3v2c0 3 2 4 5 4m9-6h4v2c0 3-2 4-5 4M12 14v5m-5 2h10m-8-2h6"/></svg>
+                <span class="ga-ny-pin-label">AWARDS 2026</span>
+              </button>
+              <button type="button" class="ga-ny-pin ga-ny-pin-goals" data-ny-pin="goals" aria-label="Cápsula 2027">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="m12 12 8-8m-4 0h4v4"/></svg>
+                <span class="ga-ny-pin-label">CÁPSULA 2027</span>
+              </button>
+            </div>
             <p id="gaNyClockLabel">Cuenta regresiva · medianoche de Nueva York</p>
             <div class="ga-ny-count" role="timer" aria-label="Tiempo restante hasta 2027">
               <span><b data-ny-unit="d">--</b><small>DÍAS</small></span>
@@ -547,8 +560,13 @@
               <span><b data-ny-unit="m">--</b><small>MIN</small></span>
               <span><b data-ny-unit="s">--</b><small>SEG</small></span>
             </div>
-            <div class="ga-ny-pins"><span>Awards 2026 · Pendiente</span><span>Cápsula 2027 · Pendiente</span></div>
-            <p>Vista técnica temporal. Sin votaciones, registros ni premios activos.</p>
+            <button type="button" class="ga-ny-demo" id="gaNyDemo">Probar fuegos artificiales</button>
+            <p class="ga-ny-note">Vista de pruebas · Las actividades todavía no están activas.</p>
+            <dialog id="gaNyDetails" aria-labelledby="gaNyDetailsTitle">
+              <h2 id="gaNyDetailsTitle"></h2><p id="gaNyDetailsText"></p>
+              <form method="dialog"><button>Cerrar</button></form>
+            </dialog>
+            <canvas id="gaNyFireworks" aria-hidden="true" hidden></canvas>
           </section>
         </div>
 
@@ -924,6 +942,66 @@
     var lab=document.getElementById('gaNewYearLab');
     if(!lab)return;
     lab.hidden=false;
+    var art=document.getElementById('gaNyArt'), planet=document.getElementById('gaNyPlanet');
+    if(art && planet){
+      planet.addEventListener('load',function(){art.classList.add('ga-ny-ready');});
+      planet.addEventListener('error',function(){art.classList.remove('ga-ny-ready');});
+      planet.src='assets/planeta-ano-nuevo-2027.webp';
+    }
+    var dialog=document.getElementById('gaNyDetails');
+    lab.querySelectorAll('[data-ny-pin]').forEach(function(pin){
+      pin.addEventListener('click',function(){
+        if(!dialog || typeof dialog.showModal!=='function')return;
+        var awards=pin.getAttribute('data-ny-pin')==='awards';
+        document.getElementById('gaNyDetailsTitle').textContent=awards?'GEO ARMY Awards 2026':'Cápsula 2027';
+        document.getElementById('gaNyDetailsText').textContent=awards?'El reconocimiento anual a nuestra comunidad. Votaciones y ceremonia en desarrollo.':'Tu espacio para registrar metas y seguir tu progreso durante todo 2027. En desarrollo; todavía no guarda datos.';
+        if(!dialog.open)dialog.showModal();
+      });
+    });
+    var canvas=document.getElementById('gaNyFireworks'), demo=document.getElementById('gaNyDemo');
+    var reduce=window.matchMedia('(prefers-reduced-motion: reduce)'), frame=0;
+    function stopFireworks(){
+      if(frame)cancelAnimationFrame(frame);
+      frame=0;if(canvas)canvas.hidden=true;if(demo)demo.disabled=false;
+    }
+    function fireworks(){
+      if(!canvas || !demo || reduce.matches || document.hidden || frame)return;
+      var ctx=canvas.getContext('2d');if(!ctx)return;
+      var w=window.innerWidth,h=window.innerHeight,dpr=Math.min(window.devicePixelRatio||1,1.5);
+      canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      canvas.hidden=false;demo.disabled=true;
+      var count=w<600?24:40, sparks=[],start=performance.now();
+      var colors=['#e9bc6f','#f7e1ac','#fff1d0','#c8a66c'];
+      [[.18,.25,0],[.82,.30,340],[.52,.13,690]].forEach(function(b,bi){
+        for(var i=0;i<count;i++){
+          var angle=i/count*Math.PI*2+Math.random()*.12, speed=(25+Math.random()*85)*(w<600?.65:1);
+          sparks.push({x:w*b[0],y:h*b[1],vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,delay:b[2],color:colors[(i+bi)%colors.length],size:1+Math.random()*1.3});
+        }
+      });
+      function draw(now){
+        var elapsed=now-start;if(elapsed>2600 || document.hidden || reduce.matches){stopFireworks();return;}
+        ctx.clearRect(0,0,w,h);
+        sparks.forEach(function(p){
+          var t=(elapsed-p.delay)/1000;if(t<0 || t>1.8)return;
+          var decay=Math.max(0,1-t/1.8),x=p.x+p.vx*t,y=p.y+p.vy*t+24*t*t;
+          ctx.globalAlpha=decay*.85;ctx.strokeStyle=p.color;ctx.lineWidth=p.size;
+          ctx.beginPath();ctx.moveTo(x-p.vx*.08,y-(p.vy+48*t)*.08);ctx.lineTo(x,y);ctx.stroke();
+        });
+        ctx.globalAlpha=1;frame=requestAnimationFrame(draw);
+      }
+      frame=requestAnimationFrame(draw);
+    }
+    if(demo){
+      demo.addEventListener('click',fireworks);
+      function syncMotion(){demo.disabled=reduce.matches || !!frame;if(reduce.matches){stopFireworks();demo.disabled=true;}}
+      if(reduce.addEventListener)reduce.addEventListener('change',syncMotion);syncMotion();
+    }
+    document.addEventListener('visibilitychange',function(){
+      document.documentElement.classList.toggle('ga-ny-paused',document.hidden);
+      if(document.hidden)stopFireworks();
+      if(demo && reduce.matches)demo.disabled=true;
+    });
     var header=document.querySelector('.v3-world-header');
     if(header){
       Array.prototype.forEach.call(header.childNodes,function(node){
@@ -942,12 +1020,13 @@
     }
     var target=Date.parse('2027-01-01T00:00:00-05:00');
     var fields=['d','h','m','s'].map(function(k){return lab.querySelector('[data-ny-unit="'+k+'"]');});
-    var timer=null;
+    var timer=null,previousSeconds=null;
     function update(){
       var seconds=Math.max(0,Math.ceil((target-Date.now())/1000));
       var values=[Math.floor(seconds/86400),Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60];
       fields.forEach(function(el,i){if(el)el.textContent=String(values[i]).padStart(2,'0');});
-      if(seconds===0){document.getElementById('gaNyClockLabel').textContent='¡Bienvenido a 2027!';if(timer!==null){clearInterval(timer);timer=null;}}
+      if(seconds===0){document.getElementById('gaNyClockLabel').textContent='¡Bienvenido a 2027!';if(previousSeconds!==null && previousSeconds>0 && Date.now()-target<10000)fireworks();if(timer!==null){clearInterval(timer);timer=null;}}
+      previousSeconds=seconds;
     }
     update();if(Date.now()<target)timer=setInterval(update,1000);
     document.addEventListener('visibilitychange',function(){if(!document.hidden)update();});
