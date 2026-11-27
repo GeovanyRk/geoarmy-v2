@@ -128,26 +128,33 @@
   function pendingCount() { return CC.countChanges(pendingPatch()); }
 
   /* ================================================================= red */
-  async function guarded(fn) {
+  // `my` = alcance (sesión) de la operación. Si la sesión cambió mientras tanto, la operación se descarta:
+  // ni se renueva el token de la sesión nueva ni se reintenta con el cliente de otra cuenta.
+  async function guarded(fn, my) {
     try { return await fn(); }
     catch (e) {
       // Un 401 puede ser solo un token vencido: se intenta UNA renovación de la sesión existente y se reintenta una vez.
       if (e && e.kind === 'http' && e.status === 401 && S.sb) {
+        if (my !== scope) throw CC.ApiError('aborted');
         var r = null;
         try { r = await S.sb.auth.refreshSession(); } catch (x) { r = null; }
+        if (my !== scope) throw CC.ApiError('aborted');
         if (r && r.data && r.data.session) return await fn();
       }
       throw e;
     }
   }
 
-  async function loadSlot(key, call) {
-    var my = scope, sl = S.data[key];
+  // `call(signal, api)` usa el cliente capturado al iniciar (nunca S.api en el momento de ejecución).
+  // `commit(out)` aplica efectos laterales (p. ej. el ETag) y SOLO se ejecuta si la sesión sigue siendo la misma.
+  async function loadSlot(key, call, commit) {
+    var my = scope, api = S.api, sl = S.data[key];
     sl.loading = true;
     requestRender();
     try {
-      var out = await guarded(function () { return call(my.signal); });
+      var out = await guarded(function () { return call(my.signal, api); }, my);
       if (my !== scope) return;
+      if (commit) out = commit(out);
       sl.data = out; sl.error = null; sl.loadedAt = Date.now();
     } catch (e) {
       if (my !== scope || (e && e.kind === 'aborted')) return;
@@ -158,17 +165,17 @@
   }
 
   var loaders = {
-    status: function () { return loadSlot('status', function (sg) { return S.api.status(sg); }); },
-    stats: function () { return loadSlot('stats', function (sg) { return S.api.stats(sg); }); },
-    commands: function () { return loadSlot('commands', function (sg) { return S.api.commands(sg); }); },
+    status: function () { return loadSlot('status', function (sg, api) { return api.status(sg); }); },
+    stats: function () { return loadSlot('stats', function (sg, api) { return api.stats(sg); }); },
+    commands: function () { return loadSlot('commands', function (sg, api) { return api.commands(sg); }); },
     audit: function () {
       S.ui.auditStale = false;
-      return loadSlot('audit', function (sg) { return S.api.audit(S.ui.auditLimit, sg); });
+      var limit = S.ui.auditLimit;
+      return loadSlot('audit', function (sg, api) { return api.audit(limit, sg); });
     },
     config: function () {
-      return loadSlot('config', function (sg) {
-        return S.api.config(sg).then(function (r) { S.etag = r.etag; return r.config; });
-      });
+      // El ETag viaja junto con la config y solo se guarda tras comprobar que la sesión sigue vigente.
+      return loadSlot('config', function (sg, api) { return api.config(sg); }, function (r) { S.etag = r.etag; return r.config; });
     }
   };
 
@@ -224,12 +231,17 @@
       S.demoSrv = window.GeoArmyCCDemo.create();
       S.api = CC.createApiClient({ fetch: S.demoSrv.fetch, getToken: function () { return Promise.resolve('demo'); } });
     } else {
+      var boundUid = S.user && S.user.id, sb = S.sb;
       S.api = CC.createApiClient({
         fetch: window.fetch.bind(window),
         // El token solo se lee aquí, en el momento de cada solicitud; no se guarda ni se imprime.
+        // Este cliente pertenece a UNA cuenta: si la sesión activa es de otra, la solicitud se cancela y no sale ningún token ajeno.
         getToken: async function () {
-          var r = await S.sb.auth.getSession();
-          return r && r.data && r.data.session ? r.data.session.access_token : null;
+          var r = await sb.auth.getSession();
+          var ses = r && r.data && r.data.session;
+          if (!ses) return null;
+          if (!ses.user || ses.user.id !== boundUid) throw CC.ApiError('aborted');
+          return ses.access_token;
         }
       });
     }
@@ -927,18 +939,18 @@
 
   async function doSave(patch, modal, saveBtn, errBox) {
     if (S.saving) return;
-    var c = confirmed(), oldConfirmed = c, oldEtag = S.etag, my = scope;
+    var c = confirmed(), oldConfirmed = c, oldEtag = S.etag, my = scope, api = S.api;
     S.saving = true; modal.lock(true);
     clear(errBox);
     saveBtn.disabled = true; clear(saveBtn); append(saveBtn, [h('span', { class: 'cc-spin' }), 'Guardando…']);
     renderChrome();
     try {
-      var res = await guarded(function () { return S.api.patchConfig(patch, oldEtag, my.signal); });
+      var res = await guarded(function () { return api.patchConfig(patch, oldEtag, my.signal); }, my);
       if (my !== scope) return;
       // Éxito solo con HTTP 200 real.
       if (res.status !== 200) throw CC.ApiError('invalid', res.status, null, 'La API respondió ' + res.status + ' en lugar de 200.');
       if (res.config && res.etag) { S.data.config.data = res.config; S.etag = res.etag; S.data.config.loadedAt = Date.now(); S.data.config.error = null; }
-      else { await reloadConfigSilently(); }                       // la respuesta no trajo config/ETag: se pide la real
+      else { await reloadConfigSilently(my, api); if (my !== scope) return; }   // la respuesta no trajo config/ETag: se pide la real
       S.draft = null; S.ui.cdText = {};
       S.saving = false; modal.lock(false); modal.close();
       toast('Configuración guardada y confirmada por el servidor.', 'ok');
@@ -960,17 +972,18 @@
     }
   }
 
-  async function reloadConfigSilently() {
-    var r = await guarded(function () { return S.api.config(scope.signal); });
+  async function reloadConfigSilently(my, api) {
+    var r = await guarded(function () { return api.config(my.signal); }, my);
+    if (my !== scope) throw CC.ApiError('aborted');
     S.data.config.data = r.config; S.etag = r.etag; S.data.config.loadedAt = Date.now(); S.data.config.error = null;
   }
 
   // Recarga la configuración conservando los cambios pendientes; nunca guarda nada por sí sola.
   async function reloadConfig() {
-    var old = confirmed(), my = scope;
+    var old = confirmed(), my = scope, api = S.api;
     S.data.config.loading = true; renderMain();
     try {
-      var r = await guarded(function () { return S.api.config(my.signal); });
+      var r = await guarded(function () { return api.config(my.signal); }, my);
       if (my !== scope) return;
       S.data.config.loading = false;
       if (S.draft && old) return applyRebase(old, r.config, r.etag, false);
@@ -984,9 +997,9 @@
   }
 
   async function handleStale(oldConfirmed) {
-    var my = scope;
+    var my = scope, api = S.api;
     try {
-      var r = await guarded(function () { return S.api.config(my.signal); });
+      var r = await guarded(function () { return api.config(my.signal); }, my);
       if (my !== scope) return;
       applyRebase(oldConfirmed, r.config, r.etag, true);
     } catch (e) {
