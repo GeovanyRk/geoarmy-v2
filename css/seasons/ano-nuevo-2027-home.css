@@ -1,0 +1,63 @@
+/* GEO ARMY — portada de Año Nuevo. Solo se aplica al tema de laboratorio. */
+html[data-ga-season="ano-nuevo-2027"] .v3-page{
+  min-height:100svh;
+  background:radial-gradient(ellipse 64% 50% at 50% 40%,#25304455,transparent 78%),
+    radial-gradient(ellipse 43% 48% at 7% 30%,#75552520,transparent 72%),
+    radial-gradient(ellipse 45% 50% at 95% 50%,#233c652f,transparent 72%),#050913;
+}
+html[data-ga-season="ano-nuevo-2027"] .v3-nebula{display:none}
+html[data-ga-season="ano-nuevo-2027"] .v3-stars{opacity:.4;animation:gaNyStars 9s ease-in-out infinite alternate}
+html[data-ga-season="ano-nuevo-2027"] .v3-world-header{color:#e9c98e;letter-spacing:.25em;margin:12px 0 0}
+html[data-ga-season="ano-nuevo-2027"] .v3-world-star{color:#dfbe79}
+html[data-ga-season="ano-nuevo-2027"] .v3-world-header .v3-now-line{background:linear-gradient(90deg,transparent,#c7a36d)}
+html[data-ga-season="ano-nuevo-2027"] .v3-world-header .v3-now-line:last-child{transform:scaleX(-1)}
+html[data-ga-season="ano-nuevo-2027"] #gaNewYearLab{
+  position:relative;isolation:isolate;box-sizing:border-box;width:100%;max-width:760px;
+  padding:14px 0 8px;background:none;border:0;border-radius:0;color:#f3d9a4
+}
+#gaNewYearLab .ga-ny-kicker{font:600 10px/1.5 Inter,sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#bfaa85;margin:0}
+#gaNewYearLab .ga-ny-title{font:700 clamp(22px,4.5vw,39px)/1.15 'Space Grotesk',sans-serif;letter-spacing:.055em;color:#f5dfb1;margin:6px 0;text-shadow:0 0 28px #c2974c44}
+#gaNewYearLab .ga-ny-art{position:relative;isolation:isolate;width:min(650px,100%,65svh);aspect-ratio:1;margin:0 auto;animation:gaNyFloat 7s ease-in-out infinite}
+#gaNewYearLab .ga-ny-art:before{content:"";position:absolute;inset:14%;border-radius:50%;background:#ba843228;filter:blur(36px);z-index:-1;animation:gaNyGlow 8s ease-in-out infinite alternate}
+#gaNewYearLab .ga-ny-planet{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .7s;mask-image:radial-gradient(ellipse closest-side,#000 82%,#000c 90%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse closest-side,#000 82%,#000c 90%,transparent 100%)}
+#gaNewYearLab .ga-ny-ready .ga-ny-planet{opacity:1}
+#gaNewYearLab .ga-ny-fallback{position:absolute;inset:10%;display:grid;place-content:center;border-radius:50%;border:1px solid #d8b87377;background:radial-gradient(circle at 36% 25%,#87643755,#17243b 38%,#070b15 75%);box-shadow:0 0 48px #cba45c22,inset 0 0 45px #cba45c22}
+#gaNewYearLab .ga-ny-fallback strong{font:700 clamp(40px,10vw,94px)/1 'Space Grotesk',sans-serif;color:#edcc87;text-shadow:0 0 22px #c28c55}
+#gaNewYearLab .ga-ny-fallback small{font-size:11px;color:#c9b994;letter-spacing:.12em}
+#gaNewYearLab .ga-ny-ready .ga-ny-fallback{display:none}
+#gaNewYearLab .ga-ny-pin{position:absolute;z-index:2;transform:translate(-50%,-50%);width:clamp(46px,9vw,80px);height:clamp(46px,9vw,80px);border:1px solid #d9b46d;border-radius:50%;background:#101624;color:#f3d9a4;cursor:pointer;display:grid;place-items:center;box-shadow:0 0 20px #d6ad6266;transition:box-shadow .2s,border-color .2s}
+#gaNewYearLab .ga-ny-pin svg{width:53%;height:53%;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#gaNewYearLab .ga-ny-pin-awards{left:23.5%;top:19.5%}
+#gaNewYearLab .ga-ny-pin-goals{left:79%;top:22.3%}
+#gaNewYearLab .ga-ny-ready .ga-ny-pin{background:transparent;border-color:transparent;box-shadow:none}
+#gaNewYearLab .ga-ny-ready .ga-ny-pin svg{opacity:0}
+#gaNewYearLab .ga-ny-pin:hover,#gaNewYearLab .ga-ny-pin:focus-visible{border-color:#ffdf91;box-shadow:0 0 23px #d6ad62aa;outline:0}
+#gaNewYearLab .ga-ny-pin-label{position:absolute;top:100%;left:50%;transform:translate(-50%,6px);white-space:nowrap;padding:5px 8px;border-radius:5px;border:1px solid #b9985b88;background:#090e1be8;color:#f5ddb0;font:600 clamp(9px,1.7vw,12px)/1.3 Inter,sans-serif}
+#gaNewYearLab .ga-ny-count{width:min(420px,100%);margin:8px auto 10px;gap:8px}
+#gaNewYearLab .ga-ny-count span{background:#0d1521bf;border:1px solid #c5a26b38;border-radius:9px;padding:9px 3px;color:#f4d69b;font-size:clamp(20px,4vw,29px);line-height:1.15}
+#gaNewYearLab .ga-ny-count small{font:500 9px/1.3 Inter,sans-serif;letter-spacing:.12em;color:#b6ad9e}
+#gaNewYearLab #gaNyClockLabel{font-size:11px;letter-spacing:.09em;color:#bdad91;margin:0}
+#gaNewYearLab .ga-ny-demo{background:transparent;border:1px solid #c5a26b55;border-radius:8px;color:#e9c98e;padding:8px 13px;font:500 12px Inter,sans-serif;cursor:pointer;margin:5px auto}
+#gaNewYearLab .ga-ny-demo:disabled{opacity:.55;cursor:default}
+#gaNewYearLab .ga-ny-note{font-size:11px;color:#a4a8b2}
+#gaNyFireworks{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#gaNyFireworks[hidden]{display:none!important}
+#gaNyDetails{color:#f2dfb8;background:#0e1522;border:1px solid #ad8b54;border-radius:16px;max-width:min(420px,90vw);padding:24px;box-sizing:border-box;text-align:left}
+#gaNyDetails::backdrop{background:#0009}
+#gaNyDetails h2{font:700 23px 'Space Grotesk',sans-serif;margin:0 0 10px;color:#f5d79f}
+#gaNyDetails p{font:400 14px/1.6 Inter,sans-serif;color:#cfd4df}
+#gaNyDetails button{display:block;margin:18px 0 0 auto;padding:8px 15px;border:1px solid #be9b60;border-radius:7px;background:#1c2331;color:#f3d9a4;cursor:pointer}
+@keyframes gaNyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes gaNyGlow{from{opacity:.65}to{opacity:1}}
+@keyframes gaNyStars{from{opacity:.28}to{opacity:.48}}
+html.ga-ny-paused #gaNewYearLab .ga-ny-art,html.ga-ny-paused #gaNewYearLab .ga-ny-art:before,html.ga-ny-paused .v3-stars{animation-play-state:paused}
+@media(max-width:560px){
+  #gaNewYearLab .ga-ny-art{width:min(100%,58svh)}
+  #gaNewYearLab .ga-ny-count{gap:5px}
+  #gaNewYearLab .ga-ny-pin-label{padding:4px 5px}
+  html[data-ga-season="ano-nuevo-2027"] .v3-world-header{font-size:10px;gap:7px}
+}
+@media(prefers-reduced-motion:reduce){
+  #gaNewYearLab .ga-ny-art,#gaNewYearLab .ga-ny-art:before,html[data-ga-season="ano-nuevo-2027"] .v3-stars{animation:none}
+  #gaNewYearLab .ga-ny-planet{transition:none}
+}
