@@ -37,9 +37,9 @@
   var SEASONS = {
     'original':       { ready: true,  label: 'Tema original' },
     'navidad-2026':   { ready: true,  label: 'Navidad 2026',   bodyClass: 'ga-theme-christmas',
-                        from: '2026-11-26T00:00:00-05:00', until: '2026-12-31T00:00:00-05:00' },
+                        from: '2026-12-01T00:00:00-05:00', until: '2026-12-26T00:00:00-05:00' },
     'ano-nuevo-2027': { ready: true, label: 'Año Nuevo 2027 (laboratorio)', bodyClass: 'ga-theme-newyear',
-                        from: '2026-12-31T00:00:00-05:00', until: '2027-01-08T00:00:00-05:00' }
+                        from: '2026-12-26T00:00:00-05:00', until: '2027-01-01T02:00:00-05:00' }
   };
 
   /* Archivos de cada tema (rutas relativas a la raíz del sitio).
@@ -91,23 +91,38 @@
     var profile = PAGES[page];
     if (!profile) return;                                   // fuera de la lista blanca: no hace nada
 
-    /* Temporada elegida */
-    var id = CONFIG.active;
-    if (CONFIG.mode === 'auto') {
-      var now = Date.now(), best = null;
-      Object.keys(SEASONS).forEach(function (k) {
-        var s = SEASONS[k]; if (!s.from || !s.until || !s.ready) return;
-        if (now >= Date.parse(s.from) && now < Date.parse(s.until)) best = k;
+    /* Calendario real y laboratorio se mantienen separados. */
+    var END = Date.parse(SEASONS['ano-nuevo-2027'].until);
+    var EXCLUSIVE = Date.parse('2026-12-31T00:00:00-05:00');
+    function officialAt(t) {
+      var best = 'original';
+      Object.keys(SEASONS).forEach(function(k){
+        var s=SEASONS[k];
+        if(s.ready && s.from && s.until && t>=Date.parse(s.from) && t<Date.parse(s.until))best=k;
       });
-      id = best || 'original';
+      return best;
     }
+    var choice = null;
     if (CONFIG.allowUrlPreview) {
       var q = /[?&]season=([a-z0-9-]+)/.exec(location.search);
       try {
-        if (q) { if (q[1] === 'reset') sessionStorage.removeItem(KEY); else sessionStorage.setItem(KEY, q[1]); }
-        var saved = sessionStorage.getItem(KEY); if (saved) id = saved;
-      } catch (e) { if (q && q[1] !== 'reset') id = q[1]; }
+        if(q){
+          if(q[1]==='reset')sessionStorage.removeItem(KEY);
+          else if(q[1]==='auto'||SEASONS[q[1]])sessionStorage.setItem(KEY,q[1]);
+        }
+        choice=sessionStorage.getItem(KEY);
+      }catch(e){if(q && (q[1]==='auto'||SEASONS[q[1]]))choice=q[1];}
+      if(choice!=='auto'&&!SEASONS[choice])choice=null;
     }
+    function selectionAt(t){
+      if(choice==='auto'||(!choice&&CONFIG.mode==='auto'))return officialAt(t);
+      if(choice&&SEASONS[choice])return choice;
+      // El laboratorio abre en Año Nuevo por defecto hasta el cierre.
+      return t>=END?'original':CONFIG.active;
+    }
+    var now=Date.now(),id=selectionAt(now);
+    var exclusive=id==='ano-nuevo-2027'&&(choice!=='auto'&&CONFIG.mode!=='auto'||choice==='ano-nuevo-2027'||now>=EXCLUSIVE);
+    if(exclusive)root.setAttribute('data-ga-ny-exclusive','1');
     // Año Nuevo se habilita exclusivamente en el repositorio de pruebas.
     if (id === 'ano-nuevo-2027' && !/^\/geoarmy-v2(?:\/|$)/i.test(basePath)) id = 'navidad-2026';
     if (profile === 'lights' && id === 'ano-nuevo-2027') return;
@@ -127,10 +142,23 @@
 
     /* API mínima para pruebas / consola */
     window.GeoArmySeason = {
-      id: id, page: page, profile: profile, active: active,
+      id: id, page: page, profile: profile, active: active, selection: choice || 'reset',
+      exclusive: exclusive, newYearEnd: END, officialAt: officialAt,
       seasons: Object.keys(SEASONS),
       preview: function (s) { try { sessionStorage.setItem(KEY, s); } catch (e) {} location.reload(); }
     };
+
+    // Las pestañas abiertas adoptan las transiciones de calendario sin F5.
+    // Las previsualizaciones explícitas quedan disponibles para el desarrollo.
+    if(!choice || choice==='auto'){
+      var check=function(){
+        var t=Date.now(),next=selectionAt(t);
+        var nextExclusive=next==='ano-nuevo-2027'&&(choice!=='auto'&&CONFIG.mode!=='auto'||t>=EXCLUSIVE);
+        if(next!==id||nextExclusive!==exclusive)location.reload();
+      };
+      setInterval(check,1000);
+      document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
+    }
 
     function linkTag(href) { return '<link rel="stylesheet" href="' + baseHref + href + '" data-ga-season-css>'; }
     function addLink(href) {
