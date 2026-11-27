@@ -8,7 +8,8 @@
   if(!canvas || !button)return;
   var banner=doc.getElementById('gaNyCelebration'), title=doc.getElementById('gaNyCelebrationTitle'), subtitle=doc.getElementById('gaNyCelebrationSubtitle');
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)');
-  var frame=0, timer=0, running=false;
+  var frame=0, timer=0, running=false, DURATION=25000;
+  var close=doc.getElementById('gaNyCelebrationClose');
   // Sacar el canvas de los ancestros con aislamiento, recorte o transform.
   doc.body.appendChild(canvas);
   function stop(){
@@ -29,7 +30,7 @@
       banner.classList.add('ga-ny-celebration-on');
     }
     doc.documentElement.classList.add('ga-ny-showtime');
-    timer=setTimeout(stop,6500);
+    timer=setTimeout(stop,DURATION);
     // El mensaje se conserva aunque el usuario desactive el movimiento.
     if(reduce.matches)return true;
     var ctx=canvas.getContext('2d');if(!ctx)return true;
@@ -38,35 +39,56 @@
     canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
     canvas.hidden=false;
-    var scale=Math.min(w,h),start=performance.now(),particles=[];
-    var palette=['#fff0cf','#f4ce85','#d5a653','#fff9e8'];
+    var scale=Math.min(w,h),start=performance.now();
+    var palette=['#fff2d3','#ffd68b','#eab454','#fff9ec','#f5e1bd'];
+    // Apertura, coronas, cascadas de oro y gran final. Las coordenadas
+    // dejan respirar el centro en escritorio, con una adaptación móvil.
     var bursts=[
-      {x:.17,y:.30,at:480,r:.13,c:0},
-      {x:.83,y:.32,at:900,r:.14,c:1},
-      {x:.29,y:.18,at:1780,r:.105,c:1},
-      {x:.72,y:.19,at:2300,r:.105,c:0},
-      {x:.12,y:.48,at:3120,r:.12,c:2},
-      {x:.88,y:.44,at:3500,r:.12,c:1}
-    ];
-    if(small){bursts=bursts.slice(0,4);bursts.forEach(function(b){b.r*=.8;});}
+      [.16,.26,650,.26,0,'peony'],[.84,.28,1250,.27,1,'peony'],
+      [.28,.16,2500,.22,3,'ring'],[.72,.18,3300,.24,1,'ring'],
+      [.12,.46,4550,.25,2,'willow'],[.88,.43,5100,.26,0,'willow'],
+      [.22,.30,6500,.29,1,'peony'],[.78,.32,7100,.29,0,'peony'],
+      [.13,.17,8400,.21,3,'ring'],[.86,.18,9100,.23,1,'ring'],
+      [.31,.27,10100,.26,2,'willow'],[.69,.26,11000,.27,1,'willow'],
+      [.10,.50,12000,.28,1,'peony'],[.90,.50,12550,.27,0,'peony'],
+      [.24,.18,13700,.26,3,'ring'],[.76,.18,14400,.27,0,'ring'],
+      [.18,.35,15500,.31,2,'willow'],[.82,.36,16100,.31,1,'willow'],
+      [.08,.20,17400,.22,0,'peony'],[.92,.20,17750,.24,3,'ring'],
+      [.30,.14,18400,.27,1,'peony'],[.70,.14,18750,.27,0,'peony'],
+      [.14,.39,19300,.32,2,'willow'],[.86,.39,19650,.32,1,'willow'],
+      [.24,.23,20500,.32,0,'peony'],[.76,.23,20700,.32,1,'peony'],
+      [.50,.16,21300,.29,3,'ring'],[.10,.44,21500,.27,1,'willow'],[.90,.44,21600,.27,0,'willow']
+    ].map(function(v,i){
+      return {x:v[0]*w,y:v[1]*h,at:v[2],r:v[3],c:v[4],kind:v[5],index:i,particles:[]};
+    });
+    if(small){
+      bursts=bursts.filter(function(b){return b.index%3!==1 || b.at>=19300;});
+      bursts.forEach(function(b){b.x=Math.max(w*.18,Math.min(w*.82,b.x));b.r*=.86;});
+    }
     bursts.forEach(function(b,bi){
-      b.x*=w;b.y*=h;b.originX=b.x+(bi%2===0?-1:1)*scale*.065;b.originY=Math.min(h*.75,b.y+scale*.37);
-      b.launch=b.at-440;
-      var count=small?30:57;
+      b.originX=b.x+(bi%2===0?-1:1)*scale*.10;
+      b.originY=Math.min(h*.86,b.y+scale*.48);
+      b.launch=b.at-600;
+      var count=small?42:88;
+      if(b.kind==='willow')count=small?52:106;
+      var spin=Math.random()*Math.PI*2;
       for(var i=0;i<count;i++){
-        var a=(i/count)*Math.PI*2+(Math.random()-.5)*.11;
-        var speed=b.r*scale*(.72+Math.random()*.66);
-        if(i%5===0)speed*=.65;
-        particles.push({b:b,angle:a,speed:speed,life:1.55+Math.random()*.95,color:palette[(b.c+i%3)%palette.length],size:.65+Math.random()*.8,twinkle:Math.random()*6.28});
+        var a=spin+(i/count)*Math.PI*2+(Math.random()-.5)*(b.kind==='ring'?.035:.13);
+        var speed=b.r*scale*(b.kind==='ring'?.94+Math.random()*.12:.56+Math.random()*.60);
+        var inner=b.kind==='peony' && i%5===0;
+        if(inner)speed*=.54;
+        var color=palette[(b.c+(i%5===0?2:0))%palette.length];
+        b.particles.push({b:b,angle:a,speed:speed,life:b.kind==='willow'?2.65+Math.random()*.55:2.05+Math.random()*.8,color:color,size:.85+Math.random()*.9,twinkle:Math.random()*6.28});
       }
     });
     function point(p,t){
-      var distance=p.speed*(1-Math.exp(-1.45*Math.max(0,t)));
-      return [p.b.x+Math.cos(p.angle)*distance,p.b.y+Math.sin(p.angle)*distance+scale*.021*t*t];
+      var age=Math.max(0,t),willow=p.b.kind==='willow';
+      var distance=p.speed*(1-Math.exp(-(willow?1.05:1.65)*age));
+      return [p.b.x+Math.cos(p.angle)*distance,p.b.y+Math.sin(p.angle)*distance+scale*(willow?.035:.016)*age*age];
     }
     function draw(now){
       if(!running || doc.hidden || reduce.matches){canvas.hidden=true;frame=0;return;}
-      var elapsed=now-start;if(elapsed>6000){canvas.hidden=true;frame=0;return;}
+      var elapsed=now-start;if(elapsed>24500){canvas.hidden=true;frame=0;return;}
       ctx.clearRect(0,0,w,h);
       ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
       bursts.forEach(function(b){
@@ -79,20 +101,30 @@
         }
         var age=(elapsed-b.at)/1000;
         if(age>=0 && age<.5){
-          var radius=Math.max(1,scale*.045*(.55+age));
+          var radius=Math.max(1,scale*.075*(.55+age));
           var glow=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,radius);
           glow.addColorStop(0,'rgba(255,225,156,.8)');glow.addColorStop(.25,'rgba(237,168,75,.19)');glow.addColorStop(1,'rgba(237,168,75,0)');
-          ctx.globalAlpha=Math.pow(1-age/.5,2)*.7;ctx.fillStyle=glow;ctx.fillRect(b.x-radius,b.y-radius,radius*2,radius*2);
+          ctx.globalAlpha=Math.pow(1-age/.5,2)*.78;ctx.fillStyle=glow;ctx.fillRect(b.x-radius,b.y-radius,radius*2,radius*2);
         }
       });
-      particles.forEach(function(p){
-        var age=(elapsed-p.b.at)/1000;
-        if(age<0 || age>p.life)return;
-        var alpha=Math.pow(1-age/p.life,1.3)*(.76+.24*Math.sin(age*18+p.twinkle));
-        var end=point(p,age),tail=point(p,Math.max(0,age-.21)),mid=point(p,Math.max(0,age-.09));
-        ctx.globalAlpha=Math.max(0,alpha)*.55;ctx.strokeStyle=p.color;ctx.lineWidth=p.size*.85;ctx.beginPath();ctx.moveTo(tail[0],tail[1]);ctx.lineTo(mid[0],mid[1]);ctx.stroke();
-        ctx.globalAlpha=Math.max(0,alpha);ctx.lineWidth=p.size;ctx.beginPath();ctx.moveTo(mid[0],mid[1]);ctx.lineTo(end[0],end[1]);ctx.stroke();
-        ctx.fillStyle='#fff1cd';ctx.beginPath();ctx.arc(end[0],end[1],p.size*.66,0,Math.PI*2);ctx.fill();
+      bursts.forEach(function(b){
+        var age=(elapsed-b.at)/1000;
+        if(age<0 || age>3.25)return;
+        b.particles.forEach(function(p){
+          if(age>p.life)return;
+          var alpha=Math.pow(1-age/p.life,1.15)*(.78+.22*Math.sin(age*14+p.twinkle));
+          var tailTime=b.kind==='willow'?.55:.33;
+          var end=point(p,age),tail=point(p,age-tailTime),mid=point(p,age-tailTime*.38);
+          ctx.strokeStyle=p.color;ctx.lineWidth=p.size*.75;
+          ctx.globalAlpha=Math.max(0,alpha)*.27;ctx.beginPath();ctx.moveTo(tail[0],tail[1]);ctx.lineTo(mid[0],mid[1]);ctx.stroke();
+          ctx.globalAlpha=Math.max(0,alpha)*.82;ctx.lineWidth=p.size;ctx.beginPath();ctx.moveTo(mid[0],mid[1]);ctx.lineTo(end[0],end[1]);ctx.stroke();
+          ctx.globalAlpha=Math.max(0,alpha)*.8;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(end[0],end[1],p.size*.68,0,Math.PI*2);ctx.fill();
+          // Pequeñas brasas separadas, especialmente visibles en las cascadas.
+          if(b.kind==='willow' && age>.55 && Math.sin(age*24+p.twinkle)>.60){
+            var ember=point(p,age-.34);
+            ctx.globalAlpha=alpha*.40;ctx.fillStyle='#ffe2a2';ctx.fillRect(ember[0],ember[1]+2,1.3,1.3);
+          }
+        });
       });
       ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
       frame=requestAnimationFrame(draw);
@@ -101,6 +133,7 @@
     return true;
   }
   button.addEventListener('click',function(){play({title:'¡Feliz Año Nuevo, Perú!',subtitle:'Simulación de celebración internacional · 2027'});});
+  if(close)close.addEventListener('click',stop);
   doc.addEventListener('visibilitychange',function(){
     doc.documentElement.classList.toggle('ga-ny-paused',doc.hidden);
     if(doc.hidden)stop();
