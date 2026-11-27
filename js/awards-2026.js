@@ -1,0 +1,60 @@
+/* GEO ARMY Awards 2026. All official state comes from the isolated RPC. */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id), el=(tag,cls,txt)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x;};
+const sb=window.supabase&&window.supabase.createClient(window.GEOARMY_SUPABASE_URL,window.GEOARMY_SUPABASE_ANON_KEY);
+let state=null,epoch=0,busy=false,pending=null,previousPhase=null,previewChoices={},lastAuth=null;
+const dialog=$('confirmDialog');
+if(!sb){$('awardsMessage').textContent='No se pudo cargar la conexión. Actualiza la página.';return;}
+async function rpc(action,category=null,candidate=null,payload={}){const r=await sb.rpc('geo_awards_2026',{p_action:action,p_category:category,p_candidate:candidate,p_payload:payload});if(r.error)throw Error(r.error.message||'Error de conexión');return r.data;}
+function safeAvatar(person){const a=el('span','avatar',(person.name||person.login||'?').slice(0,2).toUpperCase());if(/^https:\/\/static-cdn\.jtvnw\.net\//.test(person.avatar||'')){const i=el('img');i.src=person.avatar;i.alt='';i.loading='lazy';i.referrerPolicy='no-referrer';i.onerror=()=>i.remove();a.append(i);}return a;}
+function errorText(e){const s=String(e&&e.message||'');const map={login_required:'Inicia sesión con Twitch.',awards_disabled:'Las votaciones oficiales aún no están activadas.',voting_closed:'La votación está cerrada.',nominations_closed:'La nominación ha cerrado.',voting_not_open:'Las votaciones finales aún no han abierto.',invalid_candidate:'Este candidato no está disponible o es tu propia cuenta.',jury_only:'Tu cuenta tiene acceso al voto del jurado.',jury_not_open:'Esta categoría no admite voto del jurado ahora.',invalid_evidence:'Revisa la fuente, el período y la fecha de captura.',invalid_metric:'Revisa los usuarios y valores numéricos.',not_allowed:'Esta operación no está disponible.',not_linkable:'No existe un premio pendiente de vincular.'};return Object.keys(map).find(k=>s.includes(k))?map[Object.keys(map).find(k=>s.includes(k))]:'No se pudo completar. Inténtalo nuevamente.';}
+function winnerBox(w,cat){const box=el('div','winner');box.append(safeAvatar(w),el('strong','',w.name||w.login));if(w.total!==null&&w.total!==undefined){box.append(el('p','',Number(w.total).toFixed(2)+' / 100 puntos · '+w.votes+' votos'));box.append(el('p','','Comunidad '+Number(w.community).toFixed(2)+' · Web '+Number(w.web).toFixed(2)+' · Geo '+Number(w.jury).toFixed(2)));}else if(w.metric!==null&&w.metric!==undefined){const unit={chat:'mensajes',watch:'minutos activos',gifts:'suscripciones regaladas',xp:'XP',streak:'días consecutivos',missions:'misiones'}[cat.code]||'';box.append(el('p','',Number(w.metric).toLocaleString('es-ES')+' '+unit));}box.append(el('p','',[w.source,w.coverage].filter(Boolean).join(' · ')));return box;}
+function card(cat){
+const section=el('section','award '+(cat.code==='current'?'current':''));section.id='award-'+cat.code;
+const head=el('div','section-head'),title=el('div','category-name'),ic=el('span','merit-icon',cat.icon),body=el('div');body.append(el('p','kicker',cat.kind==='fixed'?(cat.code==='current'?'EQUIPO VIGENTE':'LEGADO GEO ARMY'):cat.kind==='nominated'?'ELECCIÓN DE LA COMUNIDAD':'RECONOCIMIENTO ESTADÍSTICO'),el('h2','',cat.label),el('p','',cat.description));title.append(ic,body);head.append(title);section.append(head);
+const mixed=['fixed','nominated'].includes(cat.kind);
+if(state.phase==='gala'&&cat.settled){section.append(el('p','result-note',cat.settled==='Premiado'?(cat.winners.length>1?'Ganadores empatados':'Ganador oficial'):cat.settled));cat.winners.forEach(w=>section.append(winnerBox(w,cat)));return section;}
+if(!mixed){section.append(el('p','result-note',cat.kind==='web'?'Resultado reservado hasta la gala. Datos de GEO ARMY disponibles desde '+(cat.code==='streak'?'11 de octubre':'27 de agosto')+' de 2026.':'Resultado pendiente del ranking externo verificado al cierre.'));return section;}
+const preview=state.phase==='preview';let action=null,people=cat.candidates||[];
+if(preview){action=state.admin&&cat.kind==='fixed'?'jury':cat.kind==='fixed'?'vote':'nominate';if(cat.kind==='nominated')people=state.directory||[];}
+else if(state.admin&&['nominate','vote','closed','gala'].includes(state.phase)&&(cat.kind==='fixed'||state.phase!=='nominate')){action='jury';}
+else if(state.phase==='nominate'&&cat.kind==='nominated'){action='nominate';people=state.directory||[];}
+else if(state.phase==='vote'||(state.phase==='nominate'&&cat.kind==='fixed')){action='vote';}
+if(cat.kind==='nominated'&&state.phase==='upcoming'){section.append(el('p','result-note','Las nominaciones comienzan el 1 de diciembre.'));return section;}
+if(!action){section.append(el('p','result-note',state.phase==='gala'?'Resultado pendiente de completar el jurado.':'Resultados reservados hasta la gala.'));return section;}
+if(action==='jury')section.append(el('p','admin-choice','Voto independiente del jurado · '+state.weights.jury+' puntos. No cuenta como voto comunitario.'));
+const choiceKey=cat.code+':'+action;let selected=preview?previewChoices[choiceKey]||null:cat.choice||null;
+const count=el('span','count',people.length+' '+(action==='nominate'?'miembros':'nominados'));head.append(count);
+if(!state.authenticated&&!(preview&&cat.kind==='fixed')){section.append(el('p','result-note','Inicia sesión con Twitch para '+(action==='nominate'?'nominar':'votar')+'.'));return section;}
+let search=null;if(action==='nominate'){search=el('input','search');search.type='search';search.placeholder='Buscar miembro de GEO ARMY…';search.setAttribute('aria-label','Buscar candidato para '+cat.label);section.append(search);}
+const roster=el('div','roster');section.append(roster);
+const actions=el('div','actions'),status=el('p',''),confirm=el('button','confirm',preview?'Confirmar prueba':action==='nominate'?'Confirmar nominación':action==='jury'?'Confirmar voto de Geo':'Confirmar voto');confirm.type='button';const toast=el('p','toast');toast.setAttribute('role','status');actions.append(status,confirm);section.append(actions,toast);
+if(action==='jury'){const abstain=el('button','quiet','Abstenerme en esta categoría');abstain.type='button';abstain.onclick=()=>{selected='abstain';render();};section.append(abstain);}
+const selectedPerson=()=>people.find(p=>p.key===selected);
+function render(){roster.replaceChildren();const term=(search?search.value:'').trim().toLowerCase();const visible=people.filter(p=>!term||(p.name+' '+p.login).toLowerCase().includes(term));(search&&!term?visible.slice(0,12):visible).forEach(p=>{const b=el('button','nominee'+(p.self?' self':''));b.type='button';b.disabled=!!p.self;b.setAttribute('aria-pressed',String(selected===p.key));b.append(safeAvatar(p),el('span','who',p.name||p.login),el('span','mark'));b.onclick=()=>{selected=p.key;render();};roster.append(b);});
+const p=selectedPerson();status.textContent=selected==='abstain'?'Selección: abstención':p?'Selección: '+p.name:'Elige un candidato.';confirm.disabled=!selected||(!p&&selected!=='abstain');}
+if(search)search.oninput=render;render();
+if(!preview&&cat.choice)toast.textContent='Selección registrada. Puedes cambiarla mientras esté abierta.';
+confirm.onclick=()=>{if(!selected||busy||dialog.open)return;const chosen=selected,person=selectedPerson();pending={action,cat:cat.code,key:chosen,preview,choiceKey,toast,epoch};dialog.returnValue='';$('dialogTitle').textContent=preview?'Confirmar selección de prueba':'Confirmar '+(action==='nominate'?'nominación':'voto');$('dialogText').textContent=(chosen==='abstain'?'Has elegido abstenerte.':'Has elegido a '+(person?person.name:chosen)+'.')+(preview?' Esta prueba no guarda datos oficiales.':' Puedes modificar tu elección hasta que se cierre esta fase.');dialog.querySelector('button[value="ok"]').textContent=preview?'Confirmar prueba':'Confirmar';dialog.showModal();};
+return section;
+}
+function render(){
+if(!state)return;
+const phase=state.phase,labels={preview:'Modo de pruebas · votos desactivados',upcoming:'Próximamente · 1 de diciembre',nominate:'Nominaciones abiertas · moderadores en votación',vote:'Votaciones oficiales abiertas',closed:'Votaciones cerradas · preparando gala',gala:'Gala GEO ARMY Awards 2026'};
+$('awardsPhase').textContent=labels[phase]||phase;$('awardsMode').textContent=phase==='preview'?'Vista de pruebas':'Edición 2026';
+$('awardsMessage').textContent=phase==='preview'?'Las selecciones son simulaciones locales. No se almacena ningún voto oficial.':state.admin?'Cuenta de Geo · jurado independiente.':state.authenticated?'Sesión verificada de GEO ARMY.':'Entra con Twitch para participar.';
+$('awardsLogin').hidden=state.authenticated;$('awardsAdmin').hidden=!state.admin||!['closed','gala'].includes(phase);
+const w=state.weights;['Community','Web','Jury'].forEach((n,i)=>{const key=n.toLowerCase();$('weight'+n).textContent=w[key]+'%';document.querySelectorAll('.weightbar i')[i].style.width=w[key]+'%';});
+const mix=$('mixedAwards'),merit=$('meritAwards');mix.replaceChildren();merit.replaceChildren();state.categories.forEach(c=>(['fixed','nominated'].includes(c.kind)?mix:merit).append(card(c)));
+}
+async function load(silent=false){const gen=++epoch;try{const x=await rpc('status');if(gen!==epoch)return;state=x;previousPhase=x.phase;render();}catch(e){if(gen!==epoch)return;if(!silent||!state){$('awardsPhase').textContent='No se pudo conectar';$('awardsMessage').textContent=errorText(e);}}}
+dialog.addEventListener('close',async()=>{const p=pending;pending=null;if(dialog.returnValue!=='ok'||!p||p.epoch!==epoch)return;if(p.preview){previewChoices[p.choiceKey]=p.key;p.toast.textContent='Selección de prueba confirmada. No se guardó ningún voto.';return;}busy=true;try{await rpc(p.action,p.cat,p.key);await load();}catch(e){p.toast.textContent=errorText(e);}finally{busy=false;}});
+$('awardsLogin').onclick=async()=>{try{sessionStorage.setItem('geoarmy_return_to_v1',location.pathname+location.hash);const r=await sb.auth.signInWithOAuth({provider:'twitch',options:{redirectTo:location.origin+window.GEOARMY_SITE_BASE+'auth/callback/',scopes:'user:read:email'}});if(r.error)throw r.error;}catch(e){$('awardsMessage').textContent='No se pudo iniciar sesión con Twitch.';}};
+$('awardsRefresh').onclick=()=>load();
+$('externalForm').onsubmit=async e=>{e.preventDefault();if(!state||!state.admin||busy)return;const status=$('externalStatus');try{const rows=$('externalRows').value.trim().split(/\r?\n/).filter(Boolean).map(l=>{const [login,value,twitchId,...rest]=l.split(',').map(x=>x.trim());if(rest.length||!login||!/^\d+$/.test(value||''))throw Error('invalid_metric');return{login,value:Number(value),twitchId:twitchId||null};});busy=true;await rpc('external',$('externalCategory').value,null,{source:$('externalSource').value,coverage:$('externalCoverage').value,capturedAt:$('externalCapture').value,rows});status.textContent='Ranking guardado. Se publicará a partir de la gala.';await load();}catch(e){status.textContent=errorText(e);}finally{busy=false;}};
+$('linkForm').onsubmit=async e=>{e.preventDefault();if(!state||!state.admin||busy)return;busy=true;try{await rpc('link',$('linkCategory').value,$('linkLogin').value,{twitchId:$('linkTwitchId').value});$('linkStatus').textContent='Identidad vinculada. La insignia aparecerá al iniciar sesión.';await load();}catch(e){$('linkStatus').textContent=errorText(e);}finally{busy=false;}};
+sb.auth.onAuthStateChange((event,session)=>{const id=session&&session.user?session.user.id:null;if(id!==lastAuth||event==='INITIAL_SESSION'){lastAuth=id;previewChoices={};setTimeout(()=>load(),0);}});
+load();setInterval(()=>{if(document.hidden||busy||dialog.open||!state||state.phase==='preview')return;const now=Date.now(),times=[state.opensAt,state.nomsEnd,state.closesAt,state.galaAt].map(Date.parse);const expected=now<times[0]?'upcoming':now<times[1]?'nominate':now<times[2]?'vote':now<times[3]?'closed':'gala';if(expected!==previousPhase)load(true);},15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy&&!dialog.open&&state&&state.phase!=='preview')load(true);});
+})();
