@@ -9,7 +9,7 @@
   var banner=doc.getElementById('gaNyCelebration'), title=doc.getElementById('gaNyCelebrationTitle'), subtitle=doc.getElementById('gaNyCelebrationSubtitle');
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)');
   var frame=0, timer=0, running=false, DURATION=25000;
-  var close=doc.getElementById('gaNyCelebrationClose');
+  var close=doc.getElementById('gaNyCelebrationClose'), flags=doc.getElementById('gaNyCelebrationFlags');
   // Sacar el canvas de los ancestros con aislamiento, recorte o transform.
   doc.body.appendChild(canvas);
   function stop(){
@@ -26,6 +26,14 @@
     if(banner && title && subtitle){
       title.textContent=options.title||'¡Bienvenido a 2027!';
       subtitle.textContent=options.subtitle||'GEO ARMY · Una nueva era';
+      if(flags){
+        flags.replaceChildren();
+        (Array.isArray(options.countries)?options.countries:[]).filter(function(c){return /^[A-Z]{2}$/.test(c);}).forEach(function(c){
+          var im=doc.createElement('img');im.src='https://flagcdn.com/48x36/'+c.toLowerCase()+'.png';im.alt=c;im.width=32;im.height=24;
+          im.addEventListener('error',function(){im.remove();});flags.appendChild(im);
+        });
+        flags.hidden=!flags.children.length;
+      }
       banner.hidden=false;
       banner.classList.add('ga-ny-celebration-on');
     }
@@ -132,7 +140,7 @@
     frame=requestAnimationFrame(draw);
     return true;
   }
-  button.addEventListener('click',function(){play({title:'¡Feliz Año Nuevo, Perú!',subtitle:'Simulación de celebración internacional · 2027'});});
+  button.addEventListener('click',function(){if(window.GeoArmyNewYearWorld)window.GeoArmyNewYearWorld.preview();else play({title:'¡Bienvenido a 2027!',subtitle:'Simulación visual · Sin conexión oficial'});});
   if(close)close.addEventListener('click',stop);
   doc.addEventListener('visibilitychange',function(){
     doc.documentElement.classList.toggle('ga-ny-paused',doc.hidden);
