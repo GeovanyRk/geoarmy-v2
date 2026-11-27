@@ -311,7 +311,7 @@
   betterstack('init', { environment: 'production' });
 </script>
   <link rel="stylesheet" href="css/plus-pin.css"/>
-  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=5"/>
+  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=6"/>
 </head>
 <body>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
@@ -560,7 +560,7 @@
               <span><b data-ny-unit="m">--</b><small>MIN</small></span>
               <span><b data-ny-unit="s">--</b><small>SEG</small></span>
             </div>
-            <button type="button" class="ga-ny-demo" id="gaNyDemo">Probar fuegos artificiales</button>
+            <button type="button" class="ga-ny-demo" id="gaNyDemo">Probar celebración de Año Nuevo</button>
             <p class="ga-ny-note">Vista de pruebas · Las actividades todavía no están activas.</p>
             <dialog id="gaNyDetails" aria-labelledby="gaNyDetailsTitle">
               <h2 id="gaNyDetailsTitle"></h2><p id="gaNyDetailsText"></p>
@@ -925,6 +925,11 @@
     })();
   </script>
 
+  <aside id="gaNyCelebration" role="status" aria-live="polite" hidden>
+    <strong id="gaNyCelebrationTitle"></strong>
+    <small id="gaNyCelebrationSubtitle"></small>
+  </aside>
+  <script src="js/ano-nuevo-2027-fx.js?v=1"></script>
   <script>
   (function(){
     'use strict';
@@ -958,50 +963,12 @@
         if(!dialog.open)dialog.showModal();
       });
     });
-    var canvas=document.getElementById('gaNyFireworks'), demo=document.getElementById('gaNyDemo');
-    var reduce=window.matchMedia('(prefers-reduced-motion: reduce)'), frame=0;
-    function stopFireworks(){
-      if(frame)cancelAnimationFrame(frame);
-      frame=0;if(canvas)canvas.hidden=true;if(demo)demo.disabled=false;
-    }
     function fireworks(){
-      if(!canvas || !demo || reduce.matches || document.hidden || frame)return;
-      var ctx=canvas.getContext('2d');if(!ctx)return;
-      var w=window.innerWidth,h=window.innerHeight,dpr=Math.min(window.devicePixelRatio||1,1.5);
-      canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-      canvas.hidden=false;demo.disabled=true;
-      var count=w<600?24:40, sparks=[],start=performance.now();
-      var colors=['#e9bc6f','#f7e1ac','#fff1d0','#c8a66c'];
-      [[.18,.25,0],[.82,.30,340],[.52,.13,690]].forEach(function(b,bi){
-        for(var i=0;i<count;i++){
-          var angle=i/count*Math.PI*2+Math.random()*.12, speed=(25+Math.random()*85)*(w<600?.65:1);
-          sparks.push({x:w*b[0],y:h*b[1],vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,delay:b[2],color:colors[(i+bi)%colors.length],size:1+Math.random()*1.3});
-        }
-      });
-      function draw(now){
-        var elapsed=now-start;if(elapsed>2600 || document.hidden || reduce.matches){stopFireworks();return;}
-        ctx.clearRect(0,0,w,h);
-        sparks.forEach(function(p){
-          var t=(elapsed-p.delay)/1000;if(t<0 || t>1.8)return;
-          var decay=Math.max(0,1-t/1.8),x=p.x+p.vx*t,y=p.y+p.vy*t+24*t*t;
-          ctx.globalAlpha=decay*.85;ctx.strokeStyle=p.color;ctx.lineWidth=p.size;
-          ctx.beginPath();ctx.moveTo(x-p.vx*.08,y-(p.vy+48*t)*.08);ctx.lineTo(x,y);ctx.stroke();
-        });
-        ctx.globalAlpha=1;frame=requestAnimationFrame(draw);
+      if(window.GeoArmyNewYearFX){
+        window.GeoArmyNewYearFX.stop();
+        window.GeoArmyNewYearFX.play({title:'¡Bienvenido a 2027!',subtitle:'GEO ARMY · Medianoche de Nueva York'});
       }
-      frame=requestAnimationFrame(draw);
     }
-    if(demo){
-      demo.addEventListener('click',fireworks);
-      function syncMotion(){demo.disabled=reduce.matches || !!frame;if(reduce.matches){stopFireworks();demo.disabled=true;}}
-      if(reduce.addEventListener)reduce.addEventListener('change',syncMotion);syncMotion();
-    }
-    document.addEventListener('visibilitychange',function(){
-      document.documentElement.classList.toggle('ga-ny-paused',document.hidden);
-      if(document.hidden)stopFireworks();
-      if(demo && reduce.matches)demo.disabled=true;
-    });
     var header=document.querySelector('.v3-world-header');
     if(header){
       Array.prototype.forEach.call(header.childNodes,function(node){
