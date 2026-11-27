@@ -7,7 +7,7 @@
   <meta name="description" content="Cuartel general de la comunidad GeoArmy. Streams de Fortnite y Overwatch con Geovannyrk en Twitch."/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <!-- Temporadas: tema estacional central (ver js/geoarmy-season.js) -->
-<script src="js/geoarmy-season.js?v=3"></script>
+<script src="js/geoarmy-season.js?v=4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css"/>
   <!-- Google Analytics -->
@@ -127,11 +127,11 @@
     #gaSeasonLab[hidden],#gaNewYearLab[hidden],#gaNewYearServices[hidden],#gaNyPlusLink[hidden]{display:none!important;}
     /* Vista central del 31 de diciembre: laboratorio sin fecha; no copiar esta
        activación a producción. Conserva DOM, rutas y funcionalidades originales. */
-    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow > .v3-world-slide-main,
-    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow > .v3-world-slide-03,
-    html[data-ga-season="ano-nuevo-2027"] .v3-world-hint{display:none!important;}
-    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow{justify-content:center;gap:0;overflow:visible;scroll-snap-type:none;}
-    html[data-ga-season="ano-nuevo-2027"] #v3WorldRow > .v3-world-slide-02{width:100%;min-width:0;max-width:760px;align-items:center;scroll-snap-align:none;}
+    html[data-ga-ny-exclusive="1"] #v3WorldRow > .v3-world-slide-main,
+    html[data-ga-ny-exclusive="1"] #v3WorldRow > .v3-world-slide-03,
+    html[data-ga-ny-exclusive="1"] .v3-world-hint{display:none!important;}
+    html[data-ga-ny-exclusive="1"] #v3WorldRow{justify-content:center;gap:0;overflow:visible;scroll-snap-type:none;}
+    html[data-ga-ny-exclusive="1"] #v3WorldRow > .v3-world-slide-02{width:100%;min-width:0;max-width:760px;align-items:center;scroll-snap-align:none;}
     #gaNewYearServices{box-sizing:border-box;max-width:600px;margin:14px auto 0;text-align:center;font-size:13px;color:#d4d7dd;}
     #gaNewYearServices summary{cursor:pointer;display:list-item;width:fit-content;margin:auto;padding:8px 14px;border:1px solid #ae925b66;border-radius:9px;color:#f4e0ad;background:#101929;}
     #gaNewYearServices nav{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:12px 0 0;}
@@ -311,7 +311,7 @@
   betterstack('init', { environment: 'production' });
 </script>
   <link rel="stylesheet" href="css/plus-pin.css"/>
-  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=8"/>
+  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=9"/>
 </head>
 <body>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
@@ -568,7 +568,7 @@
               <details><summary>Ver países de la comunidad</summary><ul id="gaNyWorldList"></ul></details>
               <p id="gaNyWorldNote">Consultando la hora oficial.</p>
             </section>
-            <aside id="gaNyPersonal" hidden><p id="gaNyPersonalText"></p></aside>
+            
             <p class="ga-ny-note">Vista de pruebas · Las votaciones y metas todavía no están activas.</p>
             <dialog id="gaNyDetails" aria-labelledby="gaNyDetailsTitle">
               <h2 id="gaNyDetailsTitle"></h2><p id="gaNyDetailsText"></p>
@@ -602,8 +602,9 @@
           <button type="button" id="gaNyPlusLink" hidden>Geo Army Plus</button>
         </nav>
       </details>
+      <aside id="gaNyPersonal" role="status" hidden><p id="gaNyPersonalText"></p></aside>
       <div id="gaSeasonLab" hidden><label for="gaSeasonSelect">Temporada de pruebas</label>
-        <select id="gaSeasonSelect"><option value="original">Original</option><option value="navidad-2026">Navidad 2026</option><option value="ano-nuevo-2027">Año Nuevo 2027</option></select>
+        <select id="gaSeasonSelect"><option value="reset">Laboratorio (predeterminado)</option><option value="auto">Calendario oficial</option><option value="original">Original</option><option value="navidad-2026">Navidad 2026</option><option value="ano-nuevo-2027">Año Nuevo 2027 (vista previa)</option></select>
       </div>
     </section>
 
@@ -948,7 +949,7 @@
     var control = document.getElementById('gaSeasonLab');
     var select = document.getElementById('gaSeasonSelect');
     if(control && select){
-      select.value=season; control.hidden=false;
+      select.value=window.GeoArmySeason.selection || season; control.hidden=false;
       select.addEventListener('change',function(){
         var url=new URL(location.href);url.searchParams.set('season',select.value);location.assign(url.href);
       });
@@ -976,11 +977,11 @@
     var header=document.querySelector('.v3-world-header');
     if(header){
       Array.prototype.forEach.call(header.childNodes,function(node){
-        if(node.nodeType===3 && node.nodeValue.indexOf('Elige tu mundo')!==-1)node.nodeValue=' Año Nuevo 2027 ';
+        if(node.nodeType===3 && node.nodeValue.indexOf('Elige tu mundo')!==-1)node.nodeValue=window.GeoArmySeason.exclusive?' Año Nuevo 2027 ':' Elige tu mundo ';
       });
     }
     var services=document.getElementById('gaNewYearServices');
-    if(services)services.hidden=false;
+    if(services)services.hidden=!window.GeoArmySeason.exclusive;
     // Plus conserva el interruptor y el flujo de acceso de su pin real.
     var plusPin=document.getElementById('gaPlusPin'), plusLink=document.getElementById('gaNyPlusLink');
     if(plusPin && plusLink){
@@ -1008,7 +1009,7 @@
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
-  <script src="js/ano-nuevo-2027-world.js?v=1"></script>
+  <script src="js/ano-nuevo-2027-world.js?v=2"></script>
   <script src="js/index-racha.js?v=1"></script>
   <script src="js/geoarmy-plus-pin.js"></script>
 <script>
