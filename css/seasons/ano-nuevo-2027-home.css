@@ -131,3 +131,11 @@ html.ga-ny-paused #gaNewYearLab .ga-ny-pin:before{animation-play-state:paused}
 #gaNyCelebrationFlags img{border-radius:3px;object-fit:cover;box-shadow:0 1px 9px #0008}
 #gaNyCelebration strong{overflow-wrap:anywhere}
 @media(max-width:480px){#gaNyWorldList{grid-template-columns:1fr}}
+
+/* Calendario oficial: tres mundos hasta el día 31, sin alterar la vista exclusiva aprobada. */
+@media(min-width:1301px){
+ html[data-ga-season="ano-nuevo-2027"]:not([data-ga-ny-exclusive]) #v3WorldRow > .v3-world-slide-02{width:min(29vw,460px);min-width:0}
+ html[data-ga-season="ano-nuevo-2027"]:not([data-ga-ny-exclusive]) #gaNewYearLab .ga-ny-art{width:100%}
+ html[data-ga-season="ano-nuevo-2027"]:not([data-ga-ny-exclusive]) #gaNewYearLab .ga-ny-title{font-size:clamp(19px,1.7vw,30px)}
+}
+#gaNyPersonal{text-align:center}
