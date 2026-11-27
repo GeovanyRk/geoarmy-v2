@@ -311,7 +311,7 @@
   betterstack('init', { environment: 'production' });
 </script>
   <link rel="stylesheet" href="css/plus-pin.css"/>
-  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=7"/>
+  <link rel="stylesheet" href="css/seasons/ano-nuevo-2027-home.css?v=8"/>
 </head>
 <body>
 <div class="scroll-progress" aria-hidden="true"><span data-scroll-progress></span></div>
@@ -561,7 +561,15 @@
               <span><b data-ny-unit="s">--</b><small>SEG</small></span>
             </div>
             <button type="button" class="ga-ny-demo" id="gaNyDemo">Probar celebración de Año Nuevo</button>
-            <p class="ga-ny-note">Vista de pruebas · Las actividades todavía no están activas.</p>
+            <section id="gaNyWorld" aria-label="Año Nuevo alrededor del mundo" hidden>
+              <h3>GEO ARMY ALREDEDOR DEL MUNDO</h3>
+              <strong id="gaNyWorldCount">—</strong>
+              <p id="gaNyWorldNext">Sincronizando las celebraciones internacionales…</p>
+              <details><summary>Ver países de la comunidad</summary><ul id="gaNyWorldList"></ul></details>
+              <p id="gaNyWorldNote">Consultando la hora oficial.</p>
+            </section>
+            <aside id="gaNyPersonal" hidden><p id="gaNyPersonalText"></p></aside>
+            <p class="ga-ny-note">Vista de pruebas · Las votaciones y metas todavía no están activas.</p>
             <dialog id="gaNyDetails" aria-labelledby="gaNyDetailsTitle">
               <h2 id="gaNyDetailsTitle"></h2><p id="gaNyDetailsText"></p>
               <form method="dialog"><button>Cerrar</button></form>
@@ -926,11 +934,12 @@
   </script>
 
   <aside id="gaNyCelebration" role="status" aria-live="polite" hidden>
+    <div id="gaNyCelebrationFlags" hidden></div>
     <strong id="gaNyCelebrationTitle"></strong>
     <small id="gaNyCelebrationSubtitle"></small>
     <button type="button" id="gaNyCelebrationClose" aria-label="Cerrar celebración">×</button>
   </aside>
-  <script src="js/ano-nuevo-2027-fx.js?v=2"></script>
+  <script src="js/ano-nuevo-2027-fx.js?v=3"></script>
   <script>
   (function(){
     'use strict';
@@ -964,12 +973,6 @@
         if(!dialog.open)dialog.showModal();
       });
     });
-    function fireworks(){
-      if(window.GeoArmyNewYearFX){
-        window.GeoArmyNewYearFX.stop();
-        window.GeoArmyNewYearFX.play({title:'¡Bienvenido a 2027!',subtitle:'GEO ARMY · Medianoche de Nueva York'});
-      }
-    }
     var header=document.querySelector('.v3-world-header');
     if(header){
       Array.prototype.forEach.call(header.childNodes,function(node){
@@ -988,15 +991,16 @@
     }
     var target=Date.parse('2027-01-01T00:00:00-05:00');
     var fields=['d','h','m','s'].map(function(k){return lab.querySelector('[data-ny-unit="'+k+'"]');});
-    var timer=null,previousSeconds=null;
+    var timer=null;
     function update(){
-      var seconds=Math.max(0,Math.ceil((target-Date.now())/1000));
+      var synced=window.GeoArmyNewYearWorld&&window.GeoArmyNewYearWorld.now();
+      var clock=typeof synced==='number'&&Number.isFinite(synced)?synced:Date.now();
+      var seconds=Math.max(0,Math.ceil((target-clock)/1000));
       var values=[Math.floor(seconds/86400),Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60];
       fields.forEach(function(el,i){if(el)el.textContent=String(values[i]).padStart(2,'0');});
-      if(seconds===0){document.getElementById('gaNyClockLabel').textContent='¡Bienvenido a 2027!';if(previousSeconds!==null && previousSeconds>0 && Date.now()-target<10000)fireworks();if(timer!==null){clearInterval(timer);timer=null;}}
-      previousSeconds=seconds;
+      document.getElementById('gaNyClockLabel').textContent=seconds===0?'¡Bienvenido a 2027!':'Cuenta regresiva · medianoche de Nueva York';
     }
-    update();if(Date.now()<target)timer=setInterval(update,1000);
+    update();timer=setInterval(update,1000);
     document.addEventListener('visibilitychange',function(){if(!document.hidden)update();});
   })();
   </script>
@@ -1004,6 +1008,7 @@
   <script src="js/geoarmy-config.js"></script>
   <script src="js/geoarmy-ranks.js"></script>
   <script src="js/geoarmy-account.js"></script>
+  <script src="js/ano-nuevo-2027-world.js?v=1"></script>
   <script src="js/index-racha.js?v=1"></script>
   <script src="js/geoarmy-plus-pin.js"></script>
 <script>
