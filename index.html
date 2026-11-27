@@ -124,7 +124,7 @@
     /* Año Nuevo: soporte de laboratorio, no arte final. */
     html:not([data-ga-season="navidad-2026"]) .ga-xmas-fx,
     html:not([data-ga-season="navidad-2026"]) .ga-xmas-glow{display:none!important;}
-    #gaSeasonLab[hidden],#gaNewYearLab[hidden],#gaNewYearServices[hidden],#gaNyPlusLink[hidden]{display:none!important;}
+    #gaSeasonLab[hidden],#gaNewYearLab[hidden],#gaNewYearServices[hidden],#gaNyPlusLink[hidden],#gaAwardsPin[hidden]{display:none!important;}
     /* Vista central del 31 de diciembre: laboratorio sin fecha; no copiar esta
        activación a producción. Conserva DOM, rutas y funcionalidades originales. */
     html[data-ga-ny-exclusive="1"] #v3WorldRow > .v3-world-slide-main,
@@ -418,6 +418,11 @@
              para caer sobre zonas oscuras del planeta, con buen espacio
              entre pins y respecto al logo. Ya no son un octágono perfecto. -->
         <div class="v3-planet-nav" id="v3PlanetNav">
+          <a href="awards-2026.html" id="gaAwardsPin" style="--mx:52%; --my:17.5%;" hidden aria-label="GEO ARMY Awards 2026">
+            <span class="v3-marker-label">Awards 2026</span>
+            <span class="v3-marker-icon" style="color:#f4d38b">🏆</span>
+            <span class="v3-marker-stem"></span><span class="v3-marker-ring"></span>
+          </a>
           <a href="ganadores.html" style="--mx:33.9%; --my:26.7%;">
             <span class="v3-marker-label">Ganadores</span>
             <span class="v3-marker-icon">👑</span>
@@ -591,6 +596,7 @@
       <details id="gaNewYearServices" hidden>
         <summary>Servicios de GEO ARMY</summary>
         <nav aria-label="Servicios durante Año Nuevo">
+          <a href="awards-2026.html">Awards 2026</a>
           <a href="ganadores.html">Ganadores</a>
           <a href="ranking.html">Ranking</a>
           <a href="puntos.html">Ruleta de Subs</a>
@@ -954,6 +960,11 @@
         var url=new URL(location.href);url.searchParams.set('season',select.value);location.assign(url.href);
       });
     }
+    var awardsPin=document.getElementById('gaAwardsPin');
+    if(awardsPin){
+      // Solo laboratorio: el modo calendario respeta el 1 de diciembre.
+      awardsPin.hidden=window.GeoArmySeason.selection==='auto' && Date.now()<Date.parse('2026-12-01T00:00:00-05:00');
+    }
     if(season!=='ano-nuevo-2027') return;
     var lab=document.getElementById('gaNewYearLab');
     if(!lab)return;
@@ -969,6 +980,7 @@
       pin.addEventListener('click',function(){
         if(!dialog || typeof dialog.showModal!=='function')return;
         var awards=pin.getAttribute('data-ny-pin')==='awards';
+        if(awards){location.assign('awards-2026.html');return;}
         document.getElementById('gaNyDetailsTitle').textContent=awards?'GEO ARMY Awards 2026':'Cápsula 2027';
         document.getElementById('gaNyDetailsText').textContent=awards?'El reconocimiento anual a nuestra comunidad. Votaciones y ceremonia en desarrollo.':'Tu espacio para registrar metas y seguir tu progreso durante todo 2027. En desarrollo; todavía no guarda datos.';
         if(!dialog.open)dialog.showModal();
