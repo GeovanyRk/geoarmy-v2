@@ -109,3 +109,25 @@ html.ga-ny-paused #gaNewYearLab .ga-ny-pin:before{animation-play-state:paused}
 #gaNyCelebration strong{font-size:clamp(20px,4.6vw,36px)}
 #gaNyCelebrationClose{position:absolute;right:9px;top:9px;width:28px;height:28px;border:1px solid #c5a26b55;border-radius:50%;background:#131b29;color:#f7e0b0;font:400 20px/1 Inter,sans-serif;cursor:pointer;pointer-events:auto}
 #gaNyCelebrationClose:focus-visible{outline:2px solid #f7e0b0;outline-offset:3px}
+
+/* Celebraciones internacionales: resumen discreto bajo el contador. */
+#gaNyWorld[hidden],#gaNyPersonal[hidden],#gaNyCelebrationFlags[hidden]{display:none!important}
+#gaNyWorld{box-sizing:border-box;width:min(100%,540px);margin:14px auto 0;padding:12px 14px;border:1px solid #b79a6250;border-radius:10px;background:#0b1321c9;text-align:center}
+#gaNyWorld h3{font:600 13px/1.4 Inter,sans-serif;letter-spacing:.1em;color:#f0d6a0;margin:0 0 6px}
+#gaNyWorldCount{display:block;font:700 22px/1.4 'Space Grotesk',sans-serif;color:#f2d9a2}
+#gaNyWorld #gaNyWorldNext{font-size:12px;color:#d9c6a3;margin:5px 0;overflow-wrap:anywhere}
+#gaNyWorld #gaNyWorldNote{font-size:10px;color:#a9b1bd;margin:5px 0}
+#gaNyWorld details{margin-top:8px;font-size:12px}
+#gaNyWorld summary{cursor:pointer;color:#e8c98c}
+#gaNyWorldList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;list-style:none;padding:8px 0 0;margin:0;text-align:left}
+#gaNyWorldList li{display:flex;align-items:center;gap:7px;min-width:0;padding:6px 8px;border-radius:6px;background:#17202d;font-size:11px;color:#cbd0d8}
+#gaNyWorldList li img{object-fit:cover;border-radius:2px;flex-shrink:0}
+#gaNyWorldList li span{flex:1;overflow-wrap:anywhere}
+#gaNyWorldList li small{color:#a9aeb8;white-space:nowrap;font-size:9px}
+#gaNyWorldList li.is-done small{color:#92d9b0}
+#gaNyPersonal{width:min(100%,540px);box-sizing:border-box;margin:10px auto 0;border:1px solid #d5ad6666;border-radius:10px;background:#151c28;padding:10px 14px;color:#f2d9a2}
+#gaNyPersonal #gaNyPersonalText{font-size:13px;color:#f2d9a2;margin:0}
+#gaNyCelebrationFlags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 8px}
+#gaNyCelebrationFlags img{border-radius:3px;object-fit:cover;box-shadow:0 1px 9px #0008}
+#gaNyCelebration strong{overflow-wrap:anywhere}
+@media(max-width:480px){#gaNyWorldList{grid-template-columns:1fr}}
