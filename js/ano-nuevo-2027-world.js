@@ -3,16 +3,20 @@
    llegada de Santa NO se usan en este evento. */
 (function(){
   'use strict';
-  if(!window.GeoArmySeason || window.GeoArmySeason.id!=='ano-nuevo-2027')return;
+  if(!window.GeoArmySeason || !/^\/geoarmy-v2(?:\/|$)/i.test(location.pathname))return;
+  var season=window.GeoArmySeason, showWorld=season.id==='ano-nuevo-2027';
+  var cutoff=Date.parse('2027-01-01T02:00:00-05:00'), greetingEnd=Date.parse('2027-01-08T00:00:00-05:00');
+  var postEvent=season.id==='original' && Date.now()>=cutoff && Date.now()<greetingEnd;
+  if(!showWorld&&!postEvent)return;
   var doc=document, account=window.GeoArmyAccount, fx=window.GeoArmyNewYearFX;
   var panel=doc.getElementById('gaNyWorld'), count=doc.getElementById('gaNyWorldCount'),
       next=doc.getElementById('gaNyWorldNext'), note=doc.getElementById('gaNyWorldNote'),
       list=doc.getElementById('gaNyWorldList'), personal=doc.getElementById('gaNyPersonal'),
       personalText=doc.getElementById('gaNyPersonalText'), demo=doc.getElementById('gaNyDemo');
-  if(!panel || !account || !account.client || !fx)return;
+  if(!panel || !account || !account.client || (showWorld&&!fx))return;
   var sb=account.client, anchor=null, anchorAt=0, groups=[], countries=[], unknown=[],
       me=null, syncing=false, generation=0, lastSignature='', handled=new Set(), greeted=new Set();
-  var NY=Date.parse('2027-01-01T00:00:00-05:00'), END=Date.parse('2027-01-02T12:00:00Z');
+  var NY=Date.parse('2027-01-01T00:00:00-05:00'), END=cutoff;
   var zones={
     AR:'America/Argentina/Buenos_Aires',CO:'America/Bogota',CR:'America/Costa_Rica',
     DO:'America/Santo_Domingo',EC:'America/Guayaquil',ES:'Europe/Madrid',
@@ -73,6 +77,7 @@
     return NY;
   }
   function render(t){
+    if(showWorld){
     var done=countries.filter(function(c){return c.at<=t;}).length;
     var group=groups.find(function(g){return g.at>t;});
     count.textContent=done+' de '+countries.length+' países';
@@ -84,13 +89,14 @@
       countries.forEach(function(c){var item=doc.createElement('li');item.appendChild(flag(c.code));var label=doc.createElement('span');label.textContent=name(c.code);item.appendChild(label);
         var status=doc.createElement('small');status.textContent=c.at<=t?'2027':'Pendiente';if(c.at<=t)item.classList.add('is-done');item.appendChild(status);list.appendChild(item);});
     }
-    var mt=myTime();personal.hidden=!(me && mt!==null && t>=mt && t<END);
+    }
+    var mt=myTime();personal.hidden=!(me && mt!==null && t>=mt && t<greetingEnd && (showWorld || t>=cutoff));
     if(!personal.hidden)personalText.textContent='¡Feliz Año Nuevo, '+me.name+'! Gracias por ser parte de GEO ARMY. Que 2027 esté lleno de nuevas metas y victorias.';
   }
   function tick(){
     var t=now();if(t===null)return;
     render(t);
-    if(doc.hidden || t>=END)return;
+    if(!showWorld || !fx || doc.hidden || t>=END)return;
     // Si varios países tienen la misma medianoche se celebra una sola vez.
     // Ventana de recuperación de 2 minutos para quien abre la página tarde.
     var g=groups.find(function(x){return x.at<=t && t-x.at<120000 && !seen('group:'+x.at,handled);});
@@ -130,13 +136,14 @@
   }
   // La demostración usa países reales pero nunca cambia reloj, estados ni marcas de celebración.
   function preview(){
+    if(!showWorld||!fx)return;
     var t=now();var g=groups.find(function(x){return t===null||x.at>t;})||groups[0];
     if(!g){fx.play({title:'¡Bienvenido a 2027!',subtitle:'Demostración visual · Sin datos oficiales'});return;}
     fx.play({title:'¡Feliz Año Nuevo, '+join(g.codes)+'!',subtitle:'SIMULACIÓN · Países registrados en GEO ARMY',countries:g.codes});
   }
   window.GeoArmyNewYearWorld={now:now,preview:preview};
-  panel.hidden=false;
+  panel.hidden=!showWorld;
   sb.auth.onAuthStateChange(function(ev){if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'||ev==='INITIAL_SESSION'){generation++;me=null;personal.hidden=true;setTimeout(sync,0);}});
   doc.addEventListener('visibilitychange',function(){if(!doc.hidden){tick();sync();}});
-  sync();setInterval(tick,1000);setInterval(sync,60000);
+  sync();setInterval(tick,1000);setInterval(function(){if(!postEvent||Date.now()<greetingEnd)sync();},60000);
 })();
